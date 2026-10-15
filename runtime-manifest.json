@@ -8501,10 +8501,10 @@
     },
     {
       "file": "platform.js",
-      "bytes": 3502,
-      "sha256": "09aac753d5663c44c1ec6cc17fb8612835afbd18b0402b0fc5875c594355a700",
-      "gzip": 1682,
-      "brotli": 1544
+      "bytes": 3862,
+      "sha256": "b1f5374d5a8977f1020fe6351ad81d46eae29e0a936ddb27476414e615247c08",
+      "gzip": 1805,
+      "brotli": 1648
     },
     {
       "file": "preferences.js",

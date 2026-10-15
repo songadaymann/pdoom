@@ -27,6 +27,10 @@ export async function connectPlatform(level,{block}){
         // Layout bridge only; the shared component owns its controls and panels.
         styles.textContent=`.home{width:44px;min-height:44px;padding:0;justify-content:center}.home span{display:none}.home b{font-size:18px}.action{width:54px;min-height:44px}.panel{border-radius:0!important}h2{font-size:27px;line-height:1.4;letter-spacing:0}.leaderboard-tabs button{font-size:11px;line-height:1.5}.scores{font-size:13px}.score{gap:8px;padding:10px}.backdrop{backdrop-filter:none}.panel .status{font-size:13px}@media(pointer:coarse){.home,.actions{top:146px}.menu{top:52px;right:0}.panel{padding:22px 14px}h2{font-size:23px}.scores{font-size:11px}.score{grid-template-columns:22px minmax(0,1fr) auto;padding:9px 5px}}@media(pointer:coarse) and (orientation:portrait){:host([data-hal-question]) .home,:host([data-hal-question]) .actions{top:max(12px,env(safe-area-inset-top))}}`;
         shell.shadowRoot.append(styles);
+        // The current shared shell links scores; the catalog owns its guestbook.
+        const guestbook=document.createElement('a');guestbook.href='https://mann.cool/?guestbook=1';
+        guestbook.textContent='Guestbook ↗';guestbook.target='_blank';guestbook.rel='noopener noreferrer';
+        shell.shadowRoot.querySelector('.menu')?.append(guestbook);
         // Menu/modals do not publish pause events in v1. Observe their visibility.
         const refresh=()=>block('shell',!!shell.shadowRoot.querySelector('.menu:not([hidden]),.backdrop:not([hidden])'));
         new MutationObserver(refresh).observe(shell.shadowRoot,{subtree:true,attributes:true,attributeFilter:['hidden']});refresh();resolve(shell);
