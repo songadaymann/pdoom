@@ -1,15 +1,16 @@
 import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import {createHash} from 'node:crypto';
 import {nativeQA} from './native-qa-helpers.mjs';
 const base=process.env.DOOM_URL||'http://127.0.0.1:5198/',out=process.env.DOOM_OUT||'output/opening-autosave';
 await fs.mkdir(out,{recursive:true});
-const browser=await chromium.launch({channel:'chrome',args:['--mute-audio']}),report={url:base,cases:[],errors:[]};
+const browser=await chromium.launch({channel:'chrome',args:['--mute-audio']}),report={url:base,cases:[],errors:[],resources:[]};
 const contexts=[];let current;
 async function open(query='',save,viewport){
  const context=await browser.newContext({viewport:viewport||{width:1280,height:800}});contexts.push(context);
  if(save)await context.addInitScript(save=>{if(!sessionStorage.getItem('opening-qa-seeded')){localStorage.setItem('pdoom.campaign.v1',JSON.stringify(save));sessionStorage.setItem('opening-qa-seeded','1');}},save);
- const p=await context.newPage();current=p;p.on('pageerror',e=>report.errors.push(String(e)));await p.goto(new URL(query,base).href);await p.waitForFunction(()=>window.render_game_to_text);return {p,q:nativeQA(p),context};
+ const p=await context.newPage();current=p;const pageIndex=contexts.length;let navigation=0;p.on('framenavigated',f=>{if(f===p.mainFrame())navigation++;});p.on('response',r=>{if(/\/(main|campaign|onboarding)\.js$/.test(r.url())){const nav=navigation;r.body().then(bytes=>report.resources.push({page:pageIndex,navigation:nav,url:r.url(),sha256:createHash('sha256').update(bytes).digest('hex')})).catch(()=>{});}});p.on('pageerror',e=>report.errors.push(String(e)));await p.goto(new URL(query,base).href);await p.waitForFunction(()=>window.render_game_to_text);return {p,q:nativeQA(p),context};
 }
 async function main(p){await p.click('#title-enter');}
 async function load(p,q){await main(p);assert.equal(await p.locator('#menu-load').isEnabled(),true);await p.click('#menu-load');await q.wait(s=>s.menu.page==='closed'&&!s.uiBlocked,'Load completes',90000);}
