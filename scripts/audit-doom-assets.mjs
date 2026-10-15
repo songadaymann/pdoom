@@ -8,7 +8,7 @@ const root='doom-web',out='output/onboarding/assets';await fs.mkdir(out,{recursi
 const files=new Set();
 async function add(name){await fs.stat(path.join(root,name));files.add(name);}
 async function directory(name,filter=()=>true){for(const e of await fs.readdir(path.join(root,name),{withFileTypes:true})){const n=path.posix.join(name,e.name);if(e.isDirectory())await directory(n,filter);else if(filter(n))await add(n);}}
-for(const e of await fs.readdir(root,{withFileTypes:true}))if(e.isFile()&&/\.(js|css|html|cfg|json|png|pk3)$/.test(e.name))await add(e.name);
+for(const e of await fs.readdir(root,{withFileTypes:true}))if(e.isFile()&&/\.(js|css|html|cfg|json|png|svg|pk3)$/.test(e.name))await add(e.name);
 for(const n of ['engine/engine.worker.js','engine/gzdoom.js','engine/gzdoom.wasm','engine/gzdoom.pk3','engine/game_support.pk3','engine/game_widescreen_gfx.pk3','engine/brightmaps.pk3','engine/lights.pk3','engine/LICENSE','engine/provenance.json','local/DOOM.WAD','local/rescue-music.ogg','local/ui/doom-small.ttf','local/ui/doom-numbers.ttf','local/ui/pdoom-logo.png','local/ui/title-heroes.webp','local/ui/interpic.png','local/ui/menu-skull.png','local/ui/shotgun.png','local/ui/doom-success.wav','local/outside/doom-wall.png','outside/outside.js','music/bliss.mp3'])await add(n);
 await directory('local/ui/stbar',n=>/\.(png|json)$/.test(n));
 // SAFE MODE hub exteriors from the local IWAD (scripts/build-hub-assets.py): HAL's station walls,

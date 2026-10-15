@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {createLocalLeaderboards} from './local-leaderboards.mjs';
 
 const root=fileURLToPath(new URL('../doom-web/',import.meta.url));
-const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.wasm':'application/wasm','.mp4':'video/mp4','.webm':'video/webm','.mp3':'audio/mpeg','.wav':'audio/wav'};
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.json':'application/json','.wasm':'application/wasm','.mp4':'video/mp4','.webm':'video/webm','.mp3':'audio/mpeg','.wav':'audio/wav'};
 const localBoards=createLocalLeaderboards();
 http.createServer(async(req,res)=>{
   try{

@@ -12,6 +12,10 @@ created for this project on 2026-10-14 and 2026-10-15. The media is CC BY 4.0,
 attributed to Jonathan Mann. The artwork is drawn in code; no operating-system icon
 bitmaps or product artwork were imported for these toys. Product names label the toys.
 
+The favicon in `doom-web/favicon.svg` is original vector artwork created for this project
+on 2026-10-15: a cream italic p and red parentheses on black. It uses paths rather than
+a font or third-party image and is CC BY 4.0, attributed to Jonathan Mann.
+
 ## 2. Third-party software
 
 Rapier 3D is Apache-2.0: https://github.com/dimforge/rapier
