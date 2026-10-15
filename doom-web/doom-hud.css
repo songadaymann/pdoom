@@ -1,0 +1,80 @@
+/* Five Prisons draws the original Doom status bar from the local WAD into
+   canvas.statusbar (doom-statusbar.js). Intake keeps its text overlay. */
+.hud-label,.hud-face,.hud-survival,#rescue-slots,.doom-statusbar>canvas{display:none}
+#hud-note{font-size:11px;color:#b9b69c;max-width:500px;line-height:1.4}
+
+/* Geometry of the engine view (#canvas is min(100vw,160dvh) wide, 8:5, centred).
+   Like the original, the bar is 32/200 of the view and spans its full width. */
+.checkpoint{--gw:min(100vw,160dvh);--gh:calc(var(--gw) * 5 / 8);--bar-h:calc(var(--gw) / 10);--view-bottom:calc(50% - var(--gh) / 2);--bar-top:calc(var(--view-bottom) + var(--bar-h))}
+#stage.checkpoint:not(.outside) #hud{inset:auto auto var(--view-bottom) calc(50% - var(--gw) / 2);width:var(--gw);max-width:none;margin:0;color:#d1c9af;text-shadow:2px 2px #1b1715}
+#stage.checkpoint:not(.outside) #people{position:absolute;bottom:100%;left:0;padding:5px 10px;background:#171714d9;font-size:var(--doom-small);line-height:calc(var(--px-s) * 14)}
+#stage.checkpoint:not(.outside) .doom-statusbar{position:relative;width:100%;height:var(--bar-h);pointer-events:none}
+#stage.checkpoint:not(.outside) .doom-statusbar>canvas{display:block;position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+
+/* The text HUD stays in the DOM, transparent, over the panel that shows it:
+   screen readers and tests read it; the canvas is what players see. */
+#stage.checkpoint:not(.outside) .doom-statusbar>div{display:block;position:static}
+#stage.checkpoint:not(.outside) .doom-statusbar :is(#health,#hud-face,#survival,#doom-chance,#rescue-slots,#group,#equipment,#camera-tally){position:absolute;display:block;margin:0;padding:0;overflow:hidden;opacity:0;font-size:6px;line-height:1;white-space:nowrap;letter-spacing:0;text-shadow:none;border:0;background:none}
+#stage.checkpoint:not(.outside) .doom-statusbar :is(.hud-label,.survival-track){display:none}
+#stage.checkpoint:not(.outside) .doom-statusbar .rescue-slot{display:inline-block;font-size:6px}
+#stage.checkpoint:not(.outside) #hud-portrait{display:block;width:100%;height:100%;object-fit:cover}
+/* Panels in bar pixels (x/320, y/32): health 49-103, freed 104-143, face 143-177,
+   p(DOOM) 178-235, items 236-249, tallies 250-319 (CAMS row 5-10, the rest 11-29). */
+#stage.checkpoint:not(.outside) #health{left:15.3125%;width:17.1875%;top:0;height:100%}
+#stage.checkpoint:not(.outside) #rescue-slots{left:32.5%;width:12.5%;top:0;height:100%}
+#stage.checkpoint:not(.outside) #hud-face{left:44.6875%;width:10.9375%;top:0;height:100%}
+#stage.checkpoint:not(.outside) #survival{left:55.625%;width:17.8125%;top:0;height:50%}
+#stage.checkpoint:not(.outside) #doom-chance{left:55.625%;width:17.8125%;top:50%;height:50%}
+#stage.checkpoint:not(.outside) #equipment{left:73.75%;width:4.375%;top:0;height:100%}
+#stage.checkpoint:not(.outside) #camera-tally{left:78.125%;width:21.875%;top:15.625%;height:18.75%}
+#stage.checkpoint:not(.outside) #group{left:78.125%;width:21.875%;top:34.375%;height:56.25%}
+/* If the WAD-derived patches are missing, show the same text plainly instead. */
+#stage.checkpoint:not(.outside) .doom-statusbar.statusbar-unavailable{display:flex;align-items:center;justify-content:space-around;background:#24201b}
+#stage.checkpoint:not(.outside) .doom-statusbar.statusbar-unavailable>canvas{display:none}
+#stage.checkpoint:not(.outside) .doom-statusbar.statusbar-unavailable :is(#health,#survival,#doom-chance,#group,#equipment,#camera-tally){position:static;opacity:1;width:auto;height:auto;overflow:visible;font-size:12px;line-height:1.4;text-shadow:2px 2px #1b1715}
+#stage.checkpoint:not(.outside) .doom-statusbar.statusbar-unavailable .hud-label{display:block;font-size:10px;line-height:1.4;color:#ddd4b4}
+#stage.checkpoint:not(.outside) .doom-statusbar.statusbar-unavailable #hud-face{display:none}
+
+/* Weapon sprites stand on the bar; prompts and dialogue sit above it. */
+#stage.checkpoint:not(.outside) #held-wrench,#stage.checkpoint:not(.outside) #held-gun{bottom:var(--bar-top)}
+#stage.checkpoint:not(.outside) #message{bottom:calc(var(--bar-top) + 34px)}
+.checkpoint #dev-badge{top:16px;bottom:auto}
+@media not (pointer:coarse){#stage.has-game-shell.checkpoint:not(.outside) #dev-badge{left:72px}}/* clear of the shell's back button */
+
+/* The relief of the meadow includes dropping the heavy facility interface. */
+.checkpoint.outside #hud{inset:16px auto auto 16px;width:auto;background:#171714b0;padding:4px 8px;color:#d1c9af;text-shadow:2px 2px #1b1715}
+.checkpoint.outside #people{position:static;background:none;padding:0;font-size:16px}
+.checkpoint.outside .doom-statusbar,.checkpoint.outside .doom-statusbar>.hud-rescues{display:block;height:auto;border:0;box-shadow:none;padding:0;background:none}
+.checkpoint.outside .hud-label,.checkpoint.outside #rescue-slots,.checkpoint.outside .doom-statusbar>div:not(.hud-rescues){display:none}
+.checkpoint.outside .doom-statusbar>div.hud-gear{display:block;position:static;max-width:none;padding:0;border:0;box-shadow:none;background:none}
+.checkpoint.outside #equipment{display:none}
+.checkpoint.outside #camera-tally{text-align:left;font-size:11px;line-height:1.4;margin-top:4px;color:#ddd4b4;font-variant-numeric:tabular-nums}
+.checkpoint.outside #camera-tally.all-destroyed{color:#cee6a6}
+.checkpoint.outside #group{text-align:left;font-size:13px;line-height:1.3}
+.checkpoint.outside #message{bottom:24px}
+.checkpoint.outside #dev-badge{top:auto;bottom:16px}
+
+@media(pointer:coarse){
+ #stage.checkpoint:not(.outside) #people{top:100%;bottom:auto;max-width:calc(100vw - 90px)}
+ .checkpoint #message{top:134px;bottom:auto}
+ .checkpoint #restart{top:82px;right:8px;padding:5px 8px;font-size:11px}
+ .checkpoint #dev-badge{top:176px;bottom:auto;left:8px;font-size:10px}
+ #stage.checkpoint:not(.outside) #message{bottom:auto}
+ #stage.checkpoint:not(.outside) #held-wrench{bottom:16%;height:clamp(70px,20vh,130px)}
+ #stage.checkpoint:not(.outside) #held-gun{bottom:16%}
+ .checkpoint.outside #hud{inset:16px auto auto 16px;max-width:calc(100vw - 100px)}
+ .checkpoint.outside #restart{top:16px}.checkpoint.outside #dev-badge{top:76px;bottom:auto;max-width:calc(100vw - 16px)}
+ .checkpoint.outside #message{top:112px}
+}
+/* Touch, landscape: the view fills the height and the pads flank its bottom
+   corners, so the bar moves to the top edge of the view. */
+@media(pointer:coarse) and (orientation:landscape){
+ #stage.checkpoint:not(.outside) #hud{inset:calc(50% - var(--gh) / 2) auto auto calc(50% - var(--gw) / 2)}
+}
+/* Touch, portrait: there is room under the view, so the bar sits directly
+   beneath it (as in Doom) and above the pads; very short screens let it rise
+   over the bottom of the view instead of reaching the pads. */
+@media(pointer:coarse) and (orientation:portrait){
+ #stage.checkpoint:not(.outside) #hud{inset:min(calc(50% + var(--gh) / 2),calc(100% - 176px - var(--bar-h))) auto auto calc(50% - var(--gw) / 2)}
+ #stage.checkpoint:not(.outside) #held-wrench,#stage.checkpoint:not(.outside) #held-gun{bottom:max(var(--view-bottom),calc(176px + var(--bar-h)))}
+}

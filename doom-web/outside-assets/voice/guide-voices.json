@@ -1,0 +1,152 @@
+{
+ "mario": {
+  "call": {
+   "file": "outside-assets/voice/guide-mario-call.mp3",
+   "duration": 1.411,
+   "source": [
+    "dario-prologue-vo-v2/dario-20261010-152126-125091.wav"
+   ],
+   "gain_db": 3.3
+  },
+  "greet": {
+   "file": "outside-assets/voice/guide-mario-greet.mp3",
+   "duration": 7.079,
+   "source": [
+    "dario-prologue-vo-v3/dario-20261010-173939-434125.wav"
+   ],
+   "gain_db": 0.7
+  },
+  "follow": {
+   "file": "outside-assets/voice/guide-mario-follow.mp3",
+   "duration": 4.833,
+   "source": [
+    "dario-prologue-vo-v3/dario-20261010-174145-331441.wav"
+   ],
+   "gain_db": 2.0
+  },
+  "recap": {
+   "file": "outside-assets/voice/guide-mario-recap.mp3",
+   "duration": 17.293,
+   "source": [
+    "dario-prologue-vo-v3/dario-20261010-174702-127402.wav",
+    "dario-prologue-vo-v3/dario-20261010-174524-926537.wav",
+    "dario-prologue-vo-v3/dario-20261010-174547-262230.wav"
+   ],
+   "gain_db": 1.8
+  },
+  "fault": {
+   "file": "outside-assets/voice/guide-mario-fault.mp3",
+   "duration": 3.709,
+   "source": [
+    "dario-prologue-vo-v3/dario-20261010-174614-430191.wav"
+   ],
+   "gain_db": 2.4
+  },
+  "situation": {
+   "file": "outside-assets/voice/guide-mario-situation.mp3",
+   "duration": 14.289,
+   "source": [
+    "dario-prologue-vo-v3/dario-20261010-175853-166026.wav"
+   ],
+   "gain_db": 0.9
+  },
+  "inside": {
+   "file": "outside-assets/voice/guide-mario-inside.mp3",
+   "duration": 15.726,
+   "source": [
+    "dario-prologue-vo-v3/dario-20261010-180147-561194.wav",
+    "dario-prologue-vo-v3/dario-20261010-180257-289146.wav"
+   ],
+   "gain_db": 1.4
+  },
+  "call2": {
+   "file": "outside-assets/voice/guide-mario-call2.mp3",
+   "duration": 2.116,
+   "source": [
+    "guide-mario-call2 take.wav"
+   ]
+  },
+  "call3": {
+   "file": "outside-assets/voice/guide-mario-call3.mp3",
+   "duration": 2.978,
+   "source": [
+    "guide-mario-call3 take.wav"
+   ]
+  }
+ },
+ "samwise": {
+  "call": {
+   "file": "outside-assets/voice/guide-samwise-call.mp3",
+   "duration": 4.989,
+   "source": [
+    "sam-prologue-vo-v2/sam-20261010-153257-770630.wav"
+   ],
+   "gain_db": -1.4
+  },
+  "greet": {
+   "file": "outside-assets/voice/guide-samwise-greet.mp3",
+   "duration": 4.519,
+   "source": [
+    "sam-prologue-vo-v2/sam-20261010-153331-443732.wav"
+   ],
+   "gain_db": -0.8
+  },
+  "follow": {
+   "file": "outside-assets/voice/guide-samwise-follow.mp3",
+   "duration": 4.362,
+   "source": [
+    "sam-prologue-vo-v2/sam-20261010-153352-484927.wav"
+   ],
+   "gain_db": -1.5
+  },
+  "recap": {
+   "file": "outside-assets/voice/guide-samwise-recap.mp3",
+   "duration": 17.058,
+   "source": [
+    "sam-prologue-vo-v2/sam-20261010-153451-153471.wav",
+    "sam-prologue-vo-v2/sam-20261010-153520-834702.wav"
+   ],
+   "gain_db": -1.2
+  },
+  "fault": {
+   "file": "outside-assets/voice/guide-samwise-fault.mp3",
+   "duration": 2.586,
+   "source": [
+    "sam-prologue-vo-v2/sam-20261010-153541-129013.wav"
+   ],
+   "gain_db": -1.5
+  },
+  "situation": {
+   "file": "outside-assets/voice/guide-samwise-situation.mp3",
+   "duration": 14.106,
+   "source": [
+    "sam-prologue-vo-v2/sam-20261010-153605-793528.wav"
+   ],
+   "gain_db": -1.5
+  },
+  "inside": {
+   "file": "outside-assets/voice/guide-samwise-inside.mp3",
+   "duration": 14.393,
+   "source": [
+    "sam-prologue-vo-v2/sam-20261010-153846-231068.wav",
+    "sam-prologue-vo-v2/sam-20261010-153909-940924.wav",
+    "sam-prologue-vo-v2/sam-20261010-153924-171267.wav"
+   ],
+   "gain_db": -1.6
+  },
+  "call2": {
+   "file": "outside-assets/voice/guide-samwise-call2.mp3",
+   "duration": 2.429,
+   "source": [
+    "guide-samwise-call2 take.wav"
+   ]
+  },
+  "call3": {
+   "file": "outside-assets/voice/guide-samwise-call3.mp3",
+   "duration": 2.978,
+   "source": [
+    "guide-samwise-call3 take.wav"
+   ]
+  }
+ }
+}

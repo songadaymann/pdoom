@@ -1,0 +1,298 @@
+{
+  "name": "Intake",
+  "cell_size": 128,
+  "rows_north_to_south": [
+    "##########################",
+    "#PPPPPPPPPPPPPPPPPPPPPPPP#",
+    "#PPPPPPPPPPPPPPPPPPPPPPPP#",
+    "#.............CC.........#",
+    "#......CC................#",
+    "#.................C......#",
+    "#.................C......#",
+    "#.........CCC............#",
+    "#........................#",
+    "#........................#",
+    "#.......########RRR#######",
+    "#.....C.########RRR#######",
+    "#.....C.########RRR#######",
+    "#.......##MMMMMMMMMM######",
+    "#.CC....#SSSS#MMMMMM######",
+    "#.......#SSSS#MMMMcM######",
+    "#....rr.#DDDD#McMMMM######",
+    "#....rr.#SSSSWMMMMMM######",
+    "####WGGW#SScSBMMMMMM######",
+    "###HHHHH#cSSS#W##MMM######",
+    "###HHHHH#SSSSAAA#MMM######",
+    "###HHHHHSSSSSAAA#MMM######",
+    "###HHHHH#########MMM######",
+    "#######HKMMMMMMMMMM#######",
+    "########A#################",
+    "##########################"
+  ],
+  "legend": {
+    "#": "solid architectural wall",
+    "H": "holding room",
+    "S": "red surveillance hall",
+    "M": "maintenance bay",
+    "A": "armory or storage alcove",
+    "D": "ordinary door, tag 10",
+    "B": "cracked partition, tag 20",
+    "G": "rescue gate, tag 30",
+    "K": "cart-blocked service passage, tag 40",
+    "W": "barred viewing window; never navigable",
+    "R": "broad sloping main ramp",
+    "r": "rescue courtyard ramp",
+    ".": "open field",
+    "P": "permanent safety",
+    "c": "interior machine cover",
+    "C": "outdoor stone cover"
+  },
+  "tags": {
+    "door": 10,
+    "breach": 20,
+    "rescue": 30,
+    "cart": 40
+  },
+  "player": {
+    "x": 704,
+    "y": 416,
+    "angle": 90
+  },
+  "companions": [
+    [
+      536,
+      556
+    ],
+    [
+      624,
+      592
+    ],
+    [
+      712,
+      552
+    ],
+    [
+      800,
+      608
+    ],
+    [
+      848,
+      548
+    ]
+  ],
+  "hunter": {
+    "x": 1472,
+    "y": 1472,
+    "angle": 270
+  },
+  "cart_parking": {
+    "x": 1168,
+    "y": 292
+  },
+  "objects": [
+    {
+      "name": "Holding surveillance camera",
+      "type": 15002,
+      "id": 301,
+      "x": 1440,
+      "y": 608,
+      "angle": 180
+    },
+    {
+      "name": "Maintenance surveillance camera",
+      "type": 15002,
+      "id": 302,
+      "x": 2432,
+      "y": 1376,
+      "angle": 225
+    },
+    {
+      "name": "Service cart",
+      "type": 15003,
+      "id": 303,
+      "x": 1010,
+      "y": 320,
+      "angle": 0
+    },
+    {
+      "name": "Demolition charge",
+      "type": 15004,
+      "id": 304,
+      "x": 1872,
+      "y": 976,
+      "angle": 90
+    },
+    {
+      "name": "Cracked partition",
+      "type": 15005,
+      "id": 305,
+      "x": 1808,
+      "y": 960,
+      "angle": 180
+    },
+    {
+      "name": "Six-shot gun",
+      "type": 15006,
+      "id": 306,
+      "x": 1872,
+      "y": 720,
+      "angle": 90
+    },
+    {
+      "name": "Outside rescue relay",
+      "type": 15007,
+      "id": 307,
+      "x": 848,
+      "y": 1328,
+      "angle": 270
+    },
+    {
+      "name": "Cart secret ammunition",
+      "type": 15008,
+      "id": 308,
+      "x": 1088,
+      "y": 192,
+      "angle": 90
+    },
+    {
+      "name": "Surveillance door south control",
+      "type": 15009,
+      "id": 309,
+      "x": 1376,
+      "y": 1104,
+      "angle": 90
+    },
+    {
+      "name": "Surveillance door north control",
+      "type": 15009,
+      "id": 310,
+      "x": 1376,
+      "y": 1312,
+      "angle": 270
+    }
+  ],
+  "wall_signs": [
+    {
+      "cell": [
+        3,
+        6
+      ],
+      "edge": "north",
+      "texture": "PDGATE"
+    },
+    {
+      "cell": [
+        6,
+        3
+      ],
+      "edge": "south",
+      "texture": "PDMAINT"
+    },
+    {
+      "cell": [
+        9,
+        5
+      ],
+      "edge": "west",
+      "texture": "PDWATCH"
+    },
+    {
+      "cell": [
+        15,
+        5
+      ],
+      "edge": "east",
+      "texture": "PDARMORY"
+    },
+    {
+      "cell": [
+        19,
+        8
+      ],
+      "edge": "east",
+      "texture": "PDMAINT"
+    },
+    {
+      "cell": [
+        19,
+        12
+      ],
+      "edge": "north",
+      "texture": "PDEXIT"
+    },
+    {
+      "cell": [
+        7,
+        10
+      ],
+      "edge": "east",
+      "texture": "PDRELAY"
+    }
+  ],
+  "debug_landmarks": {
+    "holding": [
+      704,
+      416
+    ],
+    "cart_use": [
+      936,
+      320
+    ],
+    "after_cart": [
+      1216,
+      320
+    ],
+    "hall_entry": [
+      1184,
+      576
+    ],
+    "door_use": [
+      1376,
+      1072
+    ],
+    "armory": [
+      1856,
+      720
+    ],
+    "charge": [
+      1872,
+      976
+    ],
+    "breach_use": [
+      1848,
+      960
+    ],
+    "maintenance": [
+      2240,
+      1088
+    ],
+    "ramp_base": [
+      2240,
+      1632
+    ],
+    "field_reveal": [
+      2240,
+      2136
+    ],
+    "relay_use": [
+      832,
+      1408
+    ],
+    "rescue_gate_inside": [
+      704,
+      832
+    ],
+    "rescue_gate_outside": [
+      704,
+      1064
+    ],
+    "final_cover": [
+      1728,
+      2848
+    ],
+    "permanent_safety": [
+      1728,
+      3040
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+pdoom/wrench-pickup PDPICKUP
+pdoom/camera-break PDCAMBRK
+pdoom/release PDREL
+pdoom/contact PDCONT
+pdoom/seen PDSEEN
+pdoom/charge PDCHRG
+pdoom/loss PDLOSS
+pdoom/discovery PDDISC
+
+pdoom/gathered PDGATH
+
+pdoom/tea-clink PDTEAC
+
+pdoom/valve-turn PDVALVE
+
+pdoom/chess-piece PDCHESS
+
+pdoom/sling-fire PDSLING
+pdoom/sling-hit PDSLHIT
+
+// HAL's BREAK GLASS case on the main breaker.
+pdoom/glass-crack PDGLCRK
+pdoom/glass-break PDGLBRK
+
+// The Last Stand marines: Doom's own player sounds.
+pdoom/marine-pain DSPLPAIN
+pdoom/marine-death DSPLDETH

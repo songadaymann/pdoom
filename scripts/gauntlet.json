@@ -1,0 +1,846 @@
+{
+ "sky": "SKY1",
+ "sections": [
+  {
+   "id": "s0-hangar",
+   "name": "THE HANGAR",
+   "map": "E1M1",
+   "sectors": [
+    38,
+    37,
+    39,
+    41
+   ],
+   "start": [
+    1056,
+    -3616,
+    90
+   ],
+   "exit": {
+    "inside": 41,
+    "outside": 24
+   },
+   "squads": [
+    {
+     "sector": 39,
+     "mix": [
+      "trooper"
+     ],
+     "near": [
+      1136,
+      -3232
+     ],
+     "facing": 90,
+     "name": "SENTRY"
+    },
+    {
+     "sector": 41,
+     "mix": [
+      "trooper"
+     ],
+     "near": [
+      560,
+      -3232
+     ],
+     "facing": 180,
+     "name": "DOOR GUARD"
+    }
+   ],
+   "items": [
+    {
+     "type": "armorbonus",
+     "at": [
+      1056,
+      -3570
+     ]
+    },
+    {
+     "type": "armorbonus",
+     "at": [
+      1056,
+      -3525
+     ]
+    },
+    {
+     "type": "armorbonus",
+     "at": [
+      1056,
+      -3480
+     ]
+    },
+    {
+     "type": "armorbonus",
+     "at": [
+      1056,
+      -3435
+     ]
+    },
+    {
+     "type": "greenarmor",
+     "sector": 39
+    },
+    {
+     "type": "shellbox",
+     "at": [
+      1056,
+      -2960
+     ]
+    },
+    {
+     "type": "bullets",
+     "at": [
+      1180,
+      -2960
+     ]
+    },
+    {
+     "type": "stimpack",
+     "at": [
+      790,
+      -3232
+     ],
+     "count": 2
+    },
+    {
+     "type": "medikit",
+     "at": [
+      790,
+      -3150
+     ]
+    }
+   ]
+  },
+  {
+   "id": "s1-red-depot",
+   "name": "CONTAINMENT FLOOR",
+   "map": "E2M2",
+   "sectors": [
+    3,
+    17,
+    2,
+    36,
+    25
+   ],
+   "exit": {
+    "inside": 3,
+    "outside": 4
+   },
+   "wall": "BROWN96",
+   "strip": [
+    1564,
+    1518
+   ],
+   "squads": [
+    {
+     "sector": 3,
+     "mix": [
+      "trooper",
+      "trooper"
+     ],
+     "near": [
+      208,
+      176
+     ],
+     "facing": 270,
+     "name": "PICKETS"
+    },
+    {
+     "sector": 25,
+     "mix": [
+      "trooper",
+      "squid"
+     ],
+     "near": [
+      560,
+      192
+     ],
+     "facing": 180,
+     "name": "DEPOT WATCH"
+    },
+    {
+     "sector": 3,
+     "mix": [
+      "trooper"
+     ],
+     "near": [
+      256,
+      -384
+     ],
+     "facing": 90,
+     "name": "BLAST DOOR GUARD"
+    }
+   ],
+   "items": [
+    {
+     "type": "chaingun",
+     "at": [
+      256,
+      176
+     ]
+    },
+    {
+     "type": "shells",
+     "at": [
+      600,
+      -40
+     ]
+    },
+    {
+     "type": "bullets",
+     "at": [
+      700,
+      -60
+     ]
+    },
+    {
+     "type": "stimpack",
+     "at": [
+      96,
+      -40
+     ]
+    },
+    {
+     "type": "medikit",
+     "at": [
+      64,
+      -320
+     ]
+    }
+   ],
+   "entrance": {
+    "inside": 17,
+    "outside": 16
+   },
+   "allies": {
+    "every": 9,
+    "max": 4
+   },
+   "soldiers": {
+    "count": 3
+   },
+   "robots": {
+    "every": 12
+   }
+  },
+  {
+   "id": "s2-skull-crypt",
+   "name": "THE OSSUARY",
+   "map": "E2M5",
+   "sectors": [
+    138,
+    144,
+    146,
+    148,
+    153,
+    155,
+    157,
+    172,
+    191
+   ],
+   "entrance": {
+    "inside": 146,
+    "outside": 147
+   },
+   "exit": {
+    "inside": 157,
+    "outside": 181
+   },
+   "wall": "MARBLE1",
+   "squads": [
+    {
+     "sector": 138,
+     "mix": [
+      "trooper",
+      "trooper"
+     ],
+     "near": [
+      -2624,
+      -560
+     ],
+     "facing": 270,
+     "name": "CRYPT SENTRIES"
+    },
+    {
+     "sector": 138,
+     "mix": [
+      "trooper",
+      "squid",
+      "squid"
+     ],
+     "near": [
+      -3072,
+      -320
+     ],
+     "facing": 0,
+     "name": "CROSSWAY AMBUSH"
+    },
+    {
+     "sector": 157,
+     "mix": [
+      "trooper",
+      "trooper",
+      "squid"
+     ],
+     "near": [
+      -3296,
+      128
+     ],
+     "facing": 270,
+     "name": "MARBLE HALL GARRISON"
+    }
+   ],
+   "items": [
+    {
+     "type": "stimpack",
+     "at": [
+      -2540,
+      -990
+     ]
+    },
+    {
+     "type": "bullets",
+     "at": [
+      -2900,
+      -320
+     ]
+    },
+    {
+     "type": "shellbox",
+     "at": [
+      -3072,
+      -192
+     ]
+    },
+    {
+     "type": "medikit",
+     "at": [
+      -2656,
+      192
+     ]
+    },
+    {
+     "type": "shells",
+     "at": [
+      -3488,
+      192
+     ]
+    }
+   ],
+   "seal": [
+    158,
+    161,
+    179
+   ],
+   "allies": {
+    "every": 8,
+    "max": 4
+   },
+   "soldiers": {
+    "count": 3
+   },
+   "robots": {
+    "every": 10
+   }
+  },
+  {
+   "id": "s3-blue-lab",
+   "name": "THE BLUE LAB",
+   "map": "E2M4",
+   "sectors": [
+    61,
+    150,
+    148,
+    155
+   ],
+   "entrance": {
+    "inside": 61,
+    "outside": 63
+   },
+   "exit": {
+    "inside": 148,
+    "outside": 195
+   },
+   "squads": [
+    {
+     "sector": 61,
+     "mix": [
+      "gunship",
+      "trooper",
+      "trooper"
+     ],
+     "near": [
+      -640,
+      -960
+     ],
+     "facing": 90,
+     "name": "LAB SENTRY"
+    },
+    {
+     "sector": 148,
+     "mix": [
+      "squid",
+      "squid",
+      "squid"
+     ],
+     "near": [
+      -576,
+      -1548
+     ],
+     "facing": 270,
+     "name": "SENTINEL NEST"
+    },
+    {
+     "sector": 148,
+     "mix": [
+      "trooper",
+      "assault"
+     ],
+     "near": [
+      -300,
+      -1660
+     ],
+     "facing": 135,
+     "name": "EAST WING"
+    },
+    {
+     "sector": 148,
+     "mix": [
+      "assault",
+      "trooper",
+      "trooper"
+     ],
+     "near": [
+      -832,
+      -1940
+     ],
+     "facing": 90,
+     "name": "EXIT GUARD"
+    }
+   ],
+   "items": [
+    {
+     "type": "shellbox",
+     "at": [
+      -640,
+      -880
+     ]
+    },
+    {
+     "type": "rocketlauncher",
+     "at": [
+      -576,
+      -1608
+     ]
+    },
+    {
+     "type": "medikit",
+     "at": [
+      -300,
+      -1500
+     ]
+    },
+    {
+     "type": "rockets",
+     "at": [
+      0,
+      -1856
+     ]
+    },
+    {
+     "type": "bullets",
+     "at": [
+      -900,
+      -1700
+     ]
+    },
+    {
+     "type": "medikit",
+     "at": [
+      -900,
+      -1520
+     ]
+    }
+   ],
+   "allies": {
+    "every": 8,
+    "max": 5
+   },
+   "soldiers": {
+    "count": 4
+   },
+   "robots": {
+    "every": 9
+   }
+  },
+  {
+   "id": "s4-pillar-yard",
+   "name": "THE PILLAR YARD",
+   "map": "E2M7",
+   "sectors": [
+    151,
+    155,
+    156,
+    147,
+    146,
+    148,
+    149
+   ],
+   "entrance": {
+    "inside": 151,
+    "outside": 164
+   },
+   "exit": {
+    "inside": 151,
+    "outside": 152
+   },
+   "sky": "SKY2",
+   "squads": [
+    {
+     "sector": 151,
+     "mix": [
+      "trooper",
+      "trooper",
+      "trooper"
+     ],
+     "near": [
+      3552,
+      320
+     ],
+     "facing": 270,
+     "name": "PILLAR PICKET"
+    },
+    {
+     "sector": 151,
+     "mix": [
+      "squid",
+      "squid",
+      "squid",
+      "squid"
+     ],
+     "near": [
+      2960,
+      560
+     ],
+     "facing": 0,
+     "name": "SENTINEL FLIGHT"
+    },
+    {
+     "sector": 151,
+     "mix": [
+      "gunship",
+      "gunship"
+     ],
+     "near": [
+      3000,
+      0
+     ],
+     "facing": 45,
+     "name": "HUNTER-KILLERS"
+    },
+    {
+     "sector": 147,
+     "mix": [
+      "assault",
+      "trooper",
+      "assault"
+     ],
+     "near": [
+      3232,
+      -336
+     ],
+     "facing": 180,
+     "name": "SOUTH BUNKER"
+    }
+   ],
+   "items": [
+    {
+     "type": "backpack",
+     "at": [
+      3600,
+      576
+     ]
+    },
+    {
+     "type": "shellbox",
+     "at": [
+      3776,
+      320
+     ]
+    },
+    {
+     "type": "medikit",
+     "at": [
+      3776,
+      240
+     ]
+    },
+    {
+     "type": "bullets",
+     "at": [
+      2944,
+      -40
+     ]
+    },
+    {
+     "type": "rockets",
+     "at": [
+      3520,
+      -256
+     ]
+    },
+    {
+     "type": "medikit",
+     "at": [
+      3200,
+      -256
+     ]
+    },
+    {
+     "type": "stimpack",
+     "at": [
+      2944,
+      -256
+     ]
+    }
+   ],
+   "allies": {
+    "every": 7,
+    "max": 6
+   },
+   "soldiers": {
+    "count": 5
+   },
+   "robots": {
+    "every": 8
+   }
+  },
+  {
+   "id": "s5-breach",
+   "name": "THE BREACH",
+   "map": "E3M1",
+   "sectors": [
+    10,
+    9,
+    8
+   ],
+   "entrance": {
+    "inside": 10,
+    "outside": 11
+   },
+   "exit": {
+    "inside": 9,
+    "outside": 12
+   },
+   "sky": "SKY3",
+   "squads": [
+    {
+     "sector": 8,
+     "mix": [
+      "enforcer",
+      "assault",
+      "assault"
+     ],
+     "near": [
+      440,
+      520
+     ],
+     "facing": 270,
+     "name": "THE GATEKEEPER"
+    },
+    {
+     "sector": 8,
+     "mix": [
+      "trooper",
+      "assault",
+      "trooper",
+      "assault",
+      "trooper"
+     ],
+     "near": [
+      220,
+      600
+     ],
+     "facing": 295,
+     "name": "PIT LINE"
+    },
+    {
+     "sector": 8,
+     "mix": [
+      "squid",
+      "squid",
+      "squid",
+      "squid",
+      "squid"
+     ],
+     "near": [
+      520,
+      740
+     ],
+     "facing": 265,
+     "name": "SENTINEL STORM"
+    },
+    {
+     "sector": 10,
+     "mix": [
+      "gunship",
+      "gunship"
+     ],
+     "near": [
+      680,
+      300
+     ],
+     "facing": 225,
+     "name": "GATE WATCH"
+    }
+   ],
+   "items": [
+    {
+     "type": "rockets",
+     "at": [
+      448,
+      176
+     ]
+    },
+    {
+     "type": "medikit",
+     "at": [
+      560,
+      240
+     ]
+    },
+    {
+     "type": "shellbox",
+     "at": [
+      296,
+      424
+     ]
+    },
+    {
+     "type": "rockets",
+     "at": [
+      160,
+      640
+     ]
+    },
+    {
+     "type": "bullets",
+     "at": [
+      696,
+      600
+     ]
+    },
+    {
+     "type": "medikit",
+     "at": [
+      720,
+      470
+     ]
+    }
+   ],
+   "allies": {
+    "every": 7,
+    "max": 6
+   },
+   "soldiers": {
+    "count": 5
+   },
+   "robots": {
+    "every": 7
+   }
+  },
+  {
+   "id": "s6-last-ground",
+   "name": "THE LAST GROUND",
+   "map": "E2M8",
+   "sectors": [
+    0
+   ],
+   "entrance": {
+    "inside": 0,
+    "outside": 3
+   },
+   "sky": "SKY3",
+   "finale": true,
+   "items": [
+    {
+     "type": "soulsphere",
+     "at": [
+      -96,
+      -1560
+     ]
+    },
+    {
+     "type": "rockets",
+     "at": [
+      -176,
+      -1520
+     ]
+    },
+    {
+     "type": "bullets",
+     "at": [
+      -16,
+      -1520
+     ]
+    },
+    {
+     "type": "rockets",
+     "at": [
+      -224,
+      -1600
+     ]
+    },
+    {
+     "type": "rockets",
+     "at": [
+      32,
+      -1600
+     ]
+    },
+    {
+     "type": "shellbox",
+     "at": [
+      -256,
+      -1680
+     ]
+    },
+    {
+     "type": "bullets",
+     "at": [
+      64,
+      -1680
+     ]
+    },
+    {
+     "type": "medikit",
+     "at": [
+      -640,
+      -2000
+     ]
+    },
+    {
+     "type": "medikit",
+     "at": [
+      448,
+      -2000
+     ]
+    },
+    {
+     "type": "medikit",
+     "at": [
+      -96,
+      -2304
+     ]
+    }
+   ],
+   "allies": {
+    "every": 4,
+    "max": 12
+   },
+   "soldiers": {
+    "count": 10,
+    "depth": 300
+   }
+  }
+ ]
+}

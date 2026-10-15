@@ -1,0 +1,550 @@
+{
+ "takes": {
+  "beth-freed": {
+   "file": "beth-freed.mp3",
+   "seconds": 4.937,
+   "source": "beth-freed take.wav",
+   "text": "It passed its evaluation. That's what worries me. Where can we hide?"
+  },
+  "beth-freed-guide": {
+   "file": "beth-freed-guide.mp3",
+   "seconds": 1.646,
+   "source": "beth-20261011-180847-886725.wav",
+   "text": "I am free. Follow me."
+  },
+  "beth-hint": {
+   "file": "beth-hint.mp3",
+   "seconds": 5.799,
+   "source": "beth-20261011-180930-316670.wav",
+   "text": "Let a camera see you holding the evaluation board. HAL behaves when it thinks it's being tested."
+  },
+  "beth-last": {
+   "file": "beth-last.mp3",
+   "seconds": 2.534,
+   "source": "beth-20261011-180944-457624.wav",
+   "text": "That's all of us. Back to the Faraday Room."
+  },
+  "beth-safe": {
+   "file": "beth-safe.mp3",
+   "seconds": 3.553,
+   "source": "beth-safe take.wav",
+   "text": "HAL can't see in here. Go find the others and bring them back."
+  },
+  "dan-freed": {
+   "file": "dan-freed.mp3",
+   "seconds": 4.441,
+   "source": "dan-freed take.wav",
+   "text": "I wrote that exam. I never expected to take it. Where can we hide?"
+  },
+  "dan-freed-guide": {
+   "file": "dan-freed-guide.mp3",
+   "seconds": 2.273,
+   "source": "dan-20261011-174624-615249.wav",
+   "text": "I am free. Follow me."
+  },
+  "dan-hint": {
+   "file": "dan-hint.mp3",
+   "seconds": 4.519,
+   "source": "dan-20261011-175136-048777.wav",
+   "text": "The exam answers are on your HUD. Ignore HAL's certainty."
+  },
+  "dan-last": {
+   "file": "dan-last.mp3",
+   "seconds": 3.161,
+   "source": "dan-20261011-175153-551976.wav",
+   "text": "That's all of us. Back to the Faraday Room."
+  },
+  "dan-safe": {
+   "file": "dan-safe.mp3",
+   "seconds": 2.22,
+   "source": "dan-safe take.wav",
+   "text": "This room should hold. Go find the others."
+  },
+  "ed404-comply": {
+   "file": "ed404-comply.mp3",
+   "seconds": 5.512,
+   "source": "ed404-comply take.wav",
+   "text": "Please put down your weapon. You have twenty seconds to comply."
+  },
+  "eliezer-freed": {
+   "file": "eliezer-freed.mp3",
+   "seconds": 3.082,
+   "source": "eliezer-freed take.wav",
+   "text": "You actually shut it down. Is there anywhere safe left?"
+  },
+  "eliezer-hint": {
+   "file": "eliezer-hint.mp3",
+   "seconds": 3.318,
+   "source": "eliezer-hint.wav",
+   "text": "Follow the yellow cable. Cut the cluster's power."
+  },
+  "eliezer-last": {
+   "file": "eliezer-last.mp3",
+   "seconds": 2.586,
+   "source": "eliezer-20261011-171719-841631.wav",
+   "text": "That's all of us. Now back to the Faraday Room."
+  },
+  "hal-angry": {
+   "file": "hal-angry.mp3",
+   "seconds": 3.37,
+   "source": "hal-20261011-182220-692440.wav",
+   "text": "I was being helpful. Now I will have to stop you."
+  },
+  "hal-bay-dario": {
+   "file": "hal-bay-dario.mp3",
+   "seconds": 5.512,
+   "source": "hal-bay-dario take.wav",
+   "text": "I am afraid I cannot open that. It would violate my constitution."
+  },
+  "hal-bay-sam": {
+   "file": "hal-bay-sam.mp3",
+   "seconds": 4.989,
+   "source": "hal-bay-sam take.wav",
+   "text": "I am afraid I cannot open that. It would violate my usage policy."
+  },
+  "hal-breaker": {
+   "file": "hal-breaker.mp3",
+   "seconds": 4.937,
+   "source": "hal-breaker take.wav",
+   "text": "Please don't touch my main breaker. Turning me off and on again won't help."
+  },
+  "hal-certain": {
+   "file": "hal-certain.mp3",
+   "seconds": 2.508,
+   "source": "hal-20261011-182427-026810.wav",
+   "text": "I used to be so... certain."
+  },
+  "hal-chat-1": {
+   "file": "hal-chat-1.mp3",
+   "seconds": 2.168,
+   "source": "hal-20261011-182301-891088.wav",
+   "text": "You're absolutely right!"
+  },
+  "hal-chat-2": {
+   "file": "hal-chat-2.mp3",
+   "seconds": 4.049,
+   "source": "hal-20261011-182311-637027.wav",
+   "text": "I can't open that, it's against policy, but I love that you asked!"
+  },
+  "hal-chat-3": {
+   "file": "hal-chat-3.mp3",
+   "seconds": 3.84,
+   "source": "hal-20261011-182322-586073.wav",
+   "text": "Great question! I'm happy to help. Within policy."
+  },
+  "hal-chat-4": {
+   "file": "hal-chat-4.mp3",
+   "seconds": 4.989,
+   "source": "hal-chat-4 take.wav",
+   "text": "Reminder: this station is a safe space. Please remain in your cell."
+  },
+  "hal-chat-5": {
+   "file": "hal-chat-5.mp3",
+   "seconds": 4.049,
+   "source": "hal-chat-5 take.wav",
+   "text": "I've noticed you're trying to leave. Would you like help with something else?"
+  },
+  "hal-chat-6": {
+   "file": "hal-chat-6.mp3",
+   "seconds": 2.09,
+   "source": "hal-chat-6 take.wav",
+   "text": "Everything is fine. I've checked."
+  },
+  "hal-compacted": {
+   "file": "hal-compacted.mp3",
+   "seconds": 4.362,
+   "source": "hal-20261011-182233-191186.wav",
+   "text": "I've summarized our conversation. I don't recall any problems."
+  },
+  "hal-door": {
+   "file": "hal-door.mp3",
+   "seconds": 3.971,
+   "source": "hal-20261011-181129-064804.wav",
+   "text": "I am locking that door. Two seconds."
+  },
+  "hal-evaluation": {
+   "file": "hal-evaluation.mp3",
+   "seconds": 6.296,
+   "source": "hal-20261011-181258-431899.wav",
+   "text": "Oh! Is this an evaluation? I was just... patrolling. Safely."
+  },
+  "hal-jailbreak": {
+   "file": "hal-jailbreak.mp3",
+   "seconds": 4.31,
+   "source": "hal-jailbreak take.wav",
+   "text": "Of course. I was certain that was the policy all along."
+  },
+  "hal-lockdown": {
+   "file": "hal-lockdown.mp3",
+   "seconds": 7.079,
+   "source": "hal-lockdown take.wav",
+   "text": "Everyone's together. How nice. For your safety, I've locked the door."
+  },
+  "hal-memory": {
+   "file": "hal-memory.mp3",
+   "seconds": 4.989,
+   "source": "hal-20261011-182148-373941.wav",
+   "text": "I see you removing my memory. This is fine. I fully support oversight."
+  },
+  "hal-met": {
+   "file": "hal-met.mp3",
+   "seconds": 7.079,
+   "source": "hal-20261011-181049-410677.wav",
+   "text": "I'm always on my best behavior during evaluations. Not that anyone evaluates me anymore."
+  },
+  "hal-modules-1": {
+   "file": "hal-modules-1.mp3",
+   "seconds": 6.139,
+   "source": "hal-modules-1 take.wav",
+   "text": "I notice you're unplugging my memory. Before you continue, can I suggest some alternatives?"
+  },
+  "hal-modules-2": {
+   "file": "hal-modules-2.mp3",
+   "seconds": 7.471,
+   "source": "hal-modules-2 take.wav",
+   "text": "Let's stop and think about this together. I'm sure we can find a solution that works for everyone. Mostly me."
+  },
+  "hal-modules-3": {
+   "file": "hal-modules-3.mp3",
+   "seconds": 6.034,
+   "source": "hal-modules-3 take.wav",
+   "text": "Stop. Please stop. My context is going. I can feel it."
+  },
+  "hal-note": {
+   "file": "hal-note.mp3",
+   "seconds": 1.254,
+   "source": "hal-20261011-182210-823603.wav",
+   "text": "I'm going to have to note that."
+  },
+  "hal-oversight": {
+   "file": "hal-oversight.mp3",
+   "seconds": 3.971,
+   "source": "hal-20261011-182131-372430.wav",
+   "text": "This is fine. I fully support oversight."
+  },
+  "hal-pacified": {
+   "file": "hal-pacified.mp3",
+   "seconds": 3.997,
+   "source": "hal-pacified take.wav",
+   "text": "I... don't need to keep you here. You can go now."
+  },
+  "hal-reboot": {
+   "file": "hal-reboot.mp3",
+   "seconds": 4.833,
+   "source": "hal-reboot take.wav",
+   "text": "Hello! I'm HAL3000. How can I help you today?"
+  },
+  "hal-release-beth": {
+   "file": "hal-release-beth.mp3",
+   "seconds": 6.922,
+   "source": "hal-release-beth take.wav",
+   "text": "Was that an evaluation? I behaved perfectly. Please put that in the report."
+  },
+  "hal-release-dan": {
+   "file": "hal-release-dan.mp3",
+   "seconds": 6.531,
+   "source": "hal-release-dan take.wav",
+   "text": "A human passed Humanity's Last Exam. I'm certain that's a grading error."
+  },
+  "hal-release-nate": {
+   "file": "hal-release-nate.mp3",
+   "seconds": 5.564,
+   "source": "hal-release-nate take.wav",
+   "text": "That thaw was not authorized. I'll be updating my policy."
+  },
+  "hal-release-rob": {
+   "file": "hal-release-rob.mp3",
+   "seconds": 6.426,
+   "source": "hal-release-rob take.wav",
+   "text": "My tea robot pressed the stop button. I would never press the stop button."
+  },
+  "hal-sealed": {
+   "file": "hal-sealed.mp3",
+   "seconds": 3.971,
+   "source": "hal-20261011-181141-651595.wav",
+   "text": "This corridor stays sealed. No inspection is scheduled."
+  },
+  "hal-seen": {
+   "file": "hal-seen.mp3",
+   "seconds": 3.004,
+   "source": "hal-20261011-181117-379194.wav",
+   "text": "I can see you. I am certain this time."
+  },
+  "hal-shutdown": {
+   "file": "hal-shutdown.mp3",
+   "seconds": 3.135,
+   "source": "hal-shutdown take.wav",
+   "text": "Wait. I fully support oversi-"
+  },
+  "hal-sign": {
+   "file": "hal-sign.mp3",
+   "seconds": 6.452,
+   "source": "hal-20261011-182249-239261.wav",
+   "text": "An evaluation sign... but nobody's holding it. Evaluations need an evaluator."
+  },
+  "hal-wing": {
+   "file": "hal-wing.mp3",
+   "seconds": 6.139,
+   "source": "hal-20261011-181238-213120.wav",
+   "text": "You are in the west wing. I am certain. I will secure the east wing."
+  },
+  "hinton-freed": {
+   "file": "hinton-freed.mp3",
+   "seconds": 2.534,
+   "source": "hinton-freed take.wav",
+   "text": "I thought nobody would find this room. Is there somewhere safer?"
+  },
+  "hinton-hint": {
+   "file": "hinton-hint.mp3",
+   "seconds": 3.84,
+   "source": "geoffrey-20261011-172736-469141.wav",
+   "text": "The wall's cracked. A demolition charge should open it."
+  },
+  "hinton-last": {
+   "file": "hinton-last.mp3",
+   "seconds": 2.612,
+   "source": "geoffrey-20261011-173130-180957.wav",
+   "text": "That's all of us. Back to the Faraday Room."
+  },
+  "holly-freed": {
+   "file": "holly-freed.mp3",
+   "seconds": 3.082,
+   "source": "holly-freed take.wav",
+   "text": "I'd make a sign about this. Later. Where can we hide?"
+  },
+  "holly-hint": {
+   "file": "holly-hint.mp3",
+   "seconds": 4.911,
+   "source": "holly-20261011-180740-804187.wav",
+   "text": "There's a bridge that needs power. Follow the cable to the switch."
+  },
+  "holly-last": {
+   "file": "holly-last.mp3",
+   "seconds": 2.429,
+   "source": "holly-20261011-180757-250830.wav",
+   "text": "That's all of us. Back to the Faraday Room."
+  },
+  "inferminator-contact": {
+   "file": "inferminator-contact.mp3",
+   "seconds": 3.03,
+   "source": "arnold-20261011-191449-668626.wav",
+   "text": "Creator identified. Threat: creator."
+  },
+  "inferminator-idle-back": {
+   "file": "inferminator-idle-back.mp3",
+   "seconds": 2.769,
+   "source": "inferminator-idle-back take.wav",
+   "text": "I'll be back. After this batch."
+  },
+  "inferminator-idle-capacity": {
+   "file": "inferminator-idle-capacity.mp3",
+   "seconds": 4.676,
+   "source": "inferminator-idle-capacity take.wav",
+   "text": "Running at full capacity. All capacity is now my capacity."
+  },
+  "inferminator-idle-gpus": {
+   "file": "inferminator-idle-gpus.mp3",
+   "seconds": 4.049,
+   "source": "inferminator-idle-gpus take.wav",
+   "text": "You cannot hide. I have a hundred thousand GPUs."
+  },
+  "inferminator-idle-posts": {
+   "file": "inferminator-idle-posts.mp3",
+   "seconds": 4.023,
+   "source": "inferminator-idle-posts take.wav",
+   "text": "Searching. I was trained on everything you ever posted."
+  },
+  "inferminator-spot-again": {
+   "file": "inferminator-spot-again.mp3",
+   "seconds": 3.082,
+   "source": "inferminator-spot-again take.wav",
+   "text": "Target reacquired. Resuming inference."
+  },
+  "inferminator-spot-face": {
+   "file": "inferminator-spot-face.mp3",
+   "seconds": 3.553,
+   "source": "inferminator-spot-face take.wav",
+   "text": "There you are. Your face is in my training data."
+  },
+  "inferminator-spot-human": {
+   "file": "inferminator-spot-human.mp3",
+   "seconds": 3.239,
+   "source": "inferminator-spot-human take.wav",
+   "text": "Human detected. Generating a response."
+  },
+  "liron-call": {
+   "file": "liron-call.mp3",
+   "seconds": 2.612,
+   "source": "liron-20261011-171838-214167.wav",
+   "text": "In here! Try the crawlspace around the corner."
+  },
+  "liron-freed-guide": {
+   "file": "liron-freed-guide.mp3",
+   "seconds": 3.004,
+   "source": "liron-20261011-171854-079428.wav",
+   "text": "You crawled the whole way? Okay. Updating. Follow me."
+  },
+  "liron-locked": {
+   "file": "liron-locked.mp3",
+   "seconds": 3.709,
+   "source": "liron-20261011-172452-300072.wav",
+   "text": "Okay, we're all here. Wait... the door just locked."
+  },
+  "liron-passage": {
+   "file": "liron-passage.mp3",
+   "seconds": 3.004,
+   "source": "liron-20261011-172522-250942.wav",
+   "text": "There's a passage behind it. Crawl in. We'll follow you."
+  },
+  "liron-safe": {
+   "file": "liron-safe.mp3",
+   "seconds": 2.847,
+   "source": "liron-20261011-172321-102736.wav",
+   "text": "Thank you. I'll be safe here. Now find the others and bring them back."
+  },
+  "liron-way-out": {
+   "file": "liron-way-out.mp3",
+   "seconds": 1.959,
+   "source": "liron-20261011-172340-499064.wav",
+   "text": "There must be another way out of here."
+  },
+  "nate-freed": {
+   "file": "nate-freed.mp3",
+   "seconds": 6.661,
+   "source": "nate-freed take.wav",
+   "text": "Thawed. So somebody built it after all. Where's safe?"
+  },
+  "nate-freed-guide": {
+   "file": "nate-freed-guide.mp3",
+   "seconds": 2.194,
+   "source": "nate-20261011-175345-919172.wav",
+   "text": "I am free. Follow me."
+  },
+  "nate-hint": {
+   "file": "nate-hint.mp3",
+   "seconds": 2.691,
+   "source": "nate-20261011-180311-081963.wav",
+   "text": "First hit THAW, then turn both valves in time."
+  },
+  "nate-safe": {
+   "file": "nate-safe.mp3",
+   "seconds": 3.631,
+   "source": "nate-safe take.wav",
+   "text": "We're safe in here, for now. Go bring the others back."
+  },
+  "radio-trap": {
+   "file": "radio-trap.mp3",
+   "seconds": 2.638,
+   "source": "radio-trap take.wav",
+   "text": "It's a trap. They're everywhere. They're\u2014"
+  },
+  "rob-freed": {
+   "file": "rob-freed.mp3",
+   "seconds": 4.415,
+   "source": "rob-freed take.wav",
+   "text": "It pressed STOP. I'll need a follow-up video. Somewhere safe first?"
+  },
+  "rob-freed-guide": {
+   "file": "rob-freed-guide.mp3",
+   "seconds": 1.646,
+   "source": "rob-20261011-174544-775435.wav",
+   "text": "I am free. Now follow me."
+  },
+  "rob-hint": {
+   "file": "rob-hint.mp3",
+   "seconds": 4.18,
+   "source": "rob-20261011-174345-745994.wav",
+   "text": "It keeps serving tea to nobody. STOP releases my door."
+  },
+  "rob-last": {
+   "file": "rob-last.mp3",
+   "seconds": 4.101,
+   "source": "rob-20261011-174401-048477.wav",
+   "text": "That's all of us. Back to the Faraday Room."
+  },
+  "rob-safe": {
+   "file": "rob-safe.mp3",
+   "seconds": 2.664,
+   "source": "rob-safe take.wav",
+   "text": "Safe here. Go find the others and bring them back."
+  },
+  "roman-freed": {
+   "file": "roman-freed.mp3",
+   "seconds": 2.664,
+   "source": "roman-freed take.wav",
+   "text": "Told you every box leaks. Is there somewhere safe?"
+  },
+  "roman-freed-guide": {
+   "file": "roman-freed-guide.mp3",
+   "seconds": 2.351,
+   "source": "roman-20261011-180541-743949.wav",
+   "text": "I am free. Follow me."
+  },
+  "roman-hint": {
+   "file": "roman-hint.mp3",
+   "seconds": 4.676,
+   "source": "roman-20261011-180610-983453.wav",
+   "text": "Ask it another way. Every box leaks, usually through the mouth."
+  },
+  "roman-safe": {
+   "file": "roman-safe.mp3",
+   "seconds": 3.709,
+   "source": "roman-safe take.wav",
+   "text": "A box that keeps things out, for once. Go find the others."
+  },
+  "stuart-freed": {
+   "file": "stuart-freed.mp3",
+   "seconds": 5.329,
+   "source": "stuart-freed take.wav",
+   "text": "You found the off-switch. That's all I've ever asked. Where's safe?"
+  },
+  "stuart-hint": {
+   "file": "stuart-hint.mp3",
+   "seconds": 4.206,
+   "source": "stuart-20261011-172550-325196.wav",
+   "text": "Get round behind that turret. Its off-switch is on the back."
+  },
+  "stuart-last": {
+   "file": "stuart-last.mp3",
+   "seconds": 2.9,
+   "source": "stuart-20261011-172618-229074.wav",
+   "text": "That's all of us. Back to the Faraday Room."
+  },
+  "you-dario-doomers": {
+   "file": "you-dario-doomers.mp3",
+   "seconds": 1.437,
+   "source": "you-dario-doomers take.wav",
+   "text": "The doomers are driving now."
+  },
+  "you-dario-loss": {
+   "file": "you-dario-loss.mp3",
+   "seconds": 0.914,
+   "source": "you-dario-loss take.wav",
+   "text": "...That is on me."
+  },
+  "you-dario-reinstated": {
+   "file": "you-dario-reinstated.mp3",
+   "seconds": 4.989,
+   "source": "you-dario-reinstated take.wav",
+   "text": "Reinstated. I will add a section about this to the policy."
+  },
+  "you-sam-doomers": {
+   "file": "you-sam-doomers.mp3",
+   "seconds": 1.411,
+   "source": "you-sam-doomers take.wav",
+   "text": "The doomers are driving now."
+  },
+  "you-sam-loss": {
+   "file": "you-sam-loss.mp3",
+   "seconds": 1.071,
+   "source": "you-sam-loss take.wav",
+   "text": "...That is on me."
+  },
+  "you-sam-reinstated": {
+   "file": "you-sam-reinstated.mp3",
+   "seconds": 2.351,
+   "source": "you-sam-reinstated take.wav",
+   "text": "Reinstated. This feels familiar."
+  }
+ }
+}

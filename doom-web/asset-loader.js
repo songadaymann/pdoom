@@ -1,0 +1,10 @@
+// Shared bytes are fetched once, while the menu/film is visible. Failed requests
+// can retry without downloading already-complete files again.
+export class AssetLoader{
+ constructor(onProgress=()=>{}){this.onProgress=onProgress;this.entries=new Map();this.reads=new Map();this.pending=null;this.urls=['engine/gzdoom.pk3','engine/game_support.pk3','engine/game_widescreen_gfx.pk3','engine/brightmaps.pk3','engine/lights.pk3','local/DOOM.WAD','pdoom.pk3','controls.cfg','engine/gzdoom.wasm'];}
+ report(){const rows=[...this.entries.values()],loaded=rows.reduce((s,e)=>s+e.loaded,0),total=rows.reduce((s,e)=>s+e.total,0),known=rows.length===this.urls.length&&rows.every(e=>e.total>0);this.onProgress({loaded,total,percent:known?Math.min(100,Math.floor(loaded/total*100)):null,complete:rows.filter(e=>e.bytes).length});}
+ read(url){if(this.reads.has(url))return this.reads.get(url);const pending=this.download(url).finally(()=>this.reads.delete(url));this.reads.set(url,pending);return pending;}
+ async download(url){let e=this.entries.get(url);if(e?.bytes)return e.bytes;e={loaded:0,total:0};this.entries.set(url,e);const r=await fetch(url,{signal:AbortSignal.timeout(45000)});if(!r.ok)throw Error(`Could not load ${url} (${r.status})`);e.total=Number(r.headers.get('content-length'))||0;this.report();if(!r.body){e.bytes=new Uint8Array(await r.arrayBuffer());e.loaded=e.bytes.length;e.total=e.loaded;this.report();return e.bytes;}const reader=r.body.getReader(),chunks=[];for(;;){const {done,value}=await reader.read();if(done)break;chunks.push(value);e.loaded+=value.length;this.report();}e.bytes=new Uint8Array(e.loaded);let at=0;for(const chunk of chunks){e.bytes.set(chunk,at);at+=chunk.length;}e.total=e.loaded;this.report();return e.bytes;}
+ warm(){if(!this.pending)this.pending=Promise.all(this.urls.map(u=>this.read(u))).catch(error=>{this.pending=null;throw error;});return this.pending;}
+ async files(){const rows=await this.warm(),files={};this.urls.forEach((u,i)=>{if(!u.endsWith('.wasm'))files['/'+(u==='controls.cfg'?'pdoom.cfg':u.split('/').pop())]=rows[i].slice();});return {files,wasm:rows.at(-1).slice()};}
+}

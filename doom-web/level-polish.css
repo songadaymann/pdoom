@@ -1,0 +1,67 @@
+/* Doom's message font (STCFN, from the WAD) is a 7-8 pixel bitmap at 10px of
+   font-size per glyph pixel. --px, one glyph pixel snapped to device pixels, is
+   set from the game view by level-polish.js; fractional sizes smear it. */
+#stage{--px:2px;--px-s:1.5px;--doom-text:calc(var(--px) * 10);--doom-lead:calc(var(--px) * 14);--doom-small:calc(var(--px-s) * 10)}
+#stage :is(#game-text,#threat-warning,#discovery-card,#bliss-guide,#people){-webkit-font-smoothing:none;font-smooth:never}
+#status-line{position:absolute;bottom:calc(var(--hud-height,100px) + 96px);left:50%;transform:translateX(-50%);color:#e9d4a1;font:var(--doom-text)/var(--doom-lead) 'DoomSmall',monospace;text-align:center;max-width:85%;text-shadow:var(--px) var(--px) #000;pointer-events:none}
+/* Shared flow gives status, interaction and queued dialogue separate space.
+   Their height can grow with wrapped text without colliding with one another.
+   It starts above the objective line (#people) that sits on the status bar (2026-10-13). */
+#game-text{display:contents}
+#stage.checkpoint:not(.outside) #game-text{position:absolute;z-index:7;display:flex;flex-direction:column;align-items:center;gap:8px;left:0;right:0;margin:0 auto;bottom:calc(var(--bar-top) + var(--px-s) * 14 + 24px);width:min(calc(var(--px) * 400),calc(var(--gw) - 32px));pointer-events:none}
+#stage.checkpoint:not(.outside) #game-text :is(#prompt,#message,#status-line,#hal-thaw){position:static;inset:auto;transform:none;box-sizing:border-box;margin:0;max-width:100%;width:fit-content;overflow-wrap:anywhere}
+#stage.checkpoint:not(.outside) #status-line{background:#160c09e8;padding:6px 12px;line-height:var(--doom-lead);font-size:var(--doom-text)}
+#stage.discovery-active :is(#game-text,#threat-warning){visibility:hidden}
+@media(pointer:coarse) and (orientation:portrait){#stage.checkpoint:not(.outside) #game-text{bottom:calc(max(var(--view-bottom),176px + var(--bar-h)) + 14px);width:calc(100% - 24px)}}
+@media(pointer:coarse) and (orientation:landscape){#stage.checkpoint:not(.outside) #game-text{bottom:12px;width:calc(100% - 228px)}#stage.checkpoint:not(.outside) #game-text :is(#prompt,#message,#status-line,#hal-thaw){padding:4px 8px}}
+#threat-warning{position:absolute;inset:0;pointer-events:none;color:#ff6052;text-align:center;padding-top:13vh;font:var(--doom-text) 'DoomSmall',monospace;text-shadow:var(--px) var(--px) #000}
+#threat-warning.locked{box-shadow:inset 0 0 calc(25px + var(--charge)*100px) rgba(180,0,0,.36)}
+
+#hub-ui{position:absolute;top:22px;left:50%;transform:translateX(-50%);text-align:center;color:#fffbe3;font:16px DoomSmall,monospace;text-shadow:2px 2px #000;z-index:5}#hub-ui button{font:16px DoomSmall,monospace;border:2px solid #eeeece;border-right-color:#55564c;border-bottom-color:#55564c;background:#c0c0aa;color:#182733;padding:12px;margin:4px;min-height:44px}#hub-ui p{margin:6px}#hub-ui .hub-heading{letter-spacing:3px}#hub-ui[hidden]{display:none}
+
+#discovery-card {position:absolute;z-index:12;inset:30% 8% auto;padding:24px;background:#160d07eb;border-top:4px solid #9b3928;border-bottom:4px solid #9b3928;color:#f0cd99;text-align:center;font-family:DoomSmall,monospace;text-shadow:var(--px) var(--px) #000;pointer-events:none;}
+#discovery-card strong {font-size:calc(var(--px) * 20);line-height:calc(var(--px) * 24);color:#e35939;}#discovery-card p {margin:20px 0 0;font-size:var(--doom-text);line-height:var(--doom-lead);}
+.level-links {font-size:12px;} #new-campaign {font-size:12px;padding:8px;margin:8px;}
+
+/* One question owns this area; dialogue and status cannot run underneath it. */
+#stage.hal-question-active :is(#message,#status-line,#prompt,#hal-thaw){display:none!important}
+#stage.hal-question-active .action-pad{visibility:hidden}
+#stage.hal-question-active #restart{visibility:hidden}
+#hal-question{position:absolute;z-index:9;left:50%;top:12%;transform:translateX(-50%);width:min(720px,calc(100% - 32px));max-height:calc(100% - var(--bar-h,100px) - 32px);overflow:auto;box-sizing:border-box;background:#17120ef5;border:3px solid #7c6045;border-top-color:#b39264;padding:16px 20px;color:#edca93;font:clamp(12px,1.2vw,16px) DoomSmall,monospace;line-height:1.55;text-shadow:2px 2px #000}
+#hal-question h2{margin:0 0 10px;color:#e45d3d;font:inherit;font-size:1.05em}
+#hal-question .hal-question-text{margin:0 0 14px}
+.hal-choices{display:grid;gap:8px}
+.hal-choices button{display:flex;align-items:center;gap:14px;min-height:48px;padding:10px 12px;border:2px solid #766449;background:#30291f;color:#f1d4a5;font:inherit;text-shadow:inherit;text-align:left;cursor:pointer}
+.hal-choices button:hover,.hal-choices button:focus-visible{background:#51412c;border-color:#dfbe7b;outline:2px solid #dfbe7b;outline-offset:1px}
+.hal-choice-number{flex:0 0 18px;color:#f07046}
+#hal-question .hal-comment{margin:14px 0 0;padding-top:10px;border-top:1px solid #766449;color:#c8b08d;font-size:.9em}
+#hal-question .hal-question-help{margin:12px 0 0;color:#a8977b;font-size:.75em}
+@media(pointer:coarse) and (orientation:portrait){#hal-question{top:80px;max-height:min(calc(100% - 280px),calc(50% + var(--gh) / 2 - 96px));font-size:12px;padding:12px}.hal-choices button{gap:8px;padding:9px;line-height:1.5}}
+@media(pointer:coarse) and (orientation:landscape){#hal-question{top:72px;max-height:calc(100% - 80px);width:min(520px,calc(100% - 360px));font-size:11px;padding:10px 14px}#hal-question h2,#hal-question .hal-question-text{margin-bottom:6px}.hal-choices{gap:4px}.hal-choices button{padding:7px 9px;min-height:44px;line-height:1.4}#hal-question .hal-comment{margin-top:7px;padding-top:7px}#hal-question .hal-question-help{margin-top:7px}}
+
+#hal-thaw{color:#dfdf98;background:#160c09e8;padding:6px 12px;font:var(--doom-text)/var(--doom-lead) DoomSmall,monospace;text-align:center;text-shadow:var(--px) var(--px) #000}
+
+#person-label{position:absolute;z-index:8;transform:translate(-50%,-100%);padding:3px 7px;max-width:90vw;pointer-events:none;background:#160c09d9;color:#edca93;font:clamp(12px,1.4vw,17px) DoomSmall,monospace;line-height:1.4;text-shadow:2px 2px #000}
+#stage:is(.discovery-active,.hal-question-active,.game-paused) #person-label{display:none}
+#game-pause{position:absolute;inset:0;z-index:15;background:#090604c9;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px}
+#game-pause h2{font:32px DoomSmall,monospace;color:#e35939;text-shadow:2px 2px #000;margin:0 0 12px}
+#game-pause button{min-width:220px;min-height:48px}
+/* Leaving a level: the last Doom frame melts away into Bliss (screen-melt.js), above the
+   meadow, scorecard and discovery cards, under the pause menu. */
+#screen-melt{position:fixed;inset:0;width:100vw;height:100vh;z-index:14;pointer-events:none;image-rendering:pixelated}
+#screen-melt[hidden]{display:none}
+/* SAFE MODE's install dialogs and the final door's Display Properties (doom-outside.ts):
+   a Win95 window drawn in CSS, under the scorecard and the pause menu. */
+#hub-dialog{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9;width:min(480px,calc(100vw - 32px));box-sizing:border-box;background:#c0c0c0;color:#000;border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:1px 1px 0 #000;font:16px DoomSmall,monospace}
+#hub-dialog[hidden]{display:none}
+#hub-dialog .win95-title{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#000080;color:#fff;padding:4px 4px 4px 10px;letter-spacing:1px}
+#hub-dialog .win95-close{min-width:30px;min-height:26px;padding:0;font:bold 16px sans-serif;background:#c0c0c0;color:#000;border:2px solid;border-color:#fff #404040 #404040 #fff;cursor:pointer}
+#hub-dialog .win95-body{padding:14px 16px 4px}
+#hub-dialog p{margin:0 0 12px;line-height:1.5}
+#hub-dialog .win95-progress{height:24px;box-sizing:border-box;border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;padding:2px;margin:0 0 12px}
+#hub-dialog .win95-progress span{display:block;height:100%;width:0;background:repeating-linear-gradient(90deg,#000080 0 10px,transparent 10px 13px);transition:width .4s steps(4)}
+#hub-dialog .win95-status{min-height:3em}
+#hub-dialog .win95-buttons{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;padding:0 16px 14px}
+#hub-dialog .win95-buttons button{min-width:120px;min-height:44px;font:16px DoomSmall,monospace;background:#c0c0c0;color:#000;border:2px solid;border-color:#fff #404040 #404040 #fff;cursor:pointer}
+#hub-dialog .win95-b{outline:1px dotted #000;outline-offset:-7px}
+#hub-dialog button:active{border-color:#404040 #fff #fff #404040}

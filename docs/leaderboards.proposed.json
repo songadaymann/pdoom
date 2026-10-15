@@ -1,0 +1,31 @@
+{
+  "boards": [
+    {
+      "variant": "rescue-v1",
+      "label": "Rescue score",
+      "metric": "rescueScoreV1",
+      "metricLabel": "People saved + cameras + speed + survival outlook",
+      "direction": "desc",
+      "display": "integer",
+      "aggregation": "best"
+    },
+    {
+      "variant": "perfect-v1",
+      "label": "Perfect rescue",
+      "metric": "perfectRescueActiveMs",
+      "metricLabel": "Fastest escape with all six people saved",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    },
+    {
+      "variant": "clean-sweep-v1",
+      "label": "Clean sweep",
+      "metric": "cleanSweepActiveMs",
+      "metricLabel": "All six saved and all nine cameras destroyed",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    }
+  ]
+}

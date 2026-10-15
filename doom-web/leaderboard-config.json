@@ -1,0 +1,6 @@
+{
+  "mode": "public",
+  "enabled": true,
+  "endpoint": "https://mann.cool/api/v1/leaderboard",
+  "shellSrc": "https://mann.cool/platform/v1/game-shell.js?v=20260809-tip-attribution1"
+}

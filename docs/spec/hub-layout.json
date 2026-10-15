@@ -1,0 +1,667 @@
+{
+ "units": "metres; x east, z south (north = -z), y up; facing = degrees clockwise from north",
+ "playArea": {
+  "x": [
+   -240,
+   230
+  ],
+  "z": [
+   -262,
+   200
+  ],
+  "current": {
+   "x": [
+    -180,
+    200
+   ],
+   "z": [
+    -220,
+    180
+   ]
+  }
+ },
+ "newHills": [
+  [
+   -75,
+   105,
+   7,
+   2600,
+   2000
+  ],
+  [
+   85,
+   150,
+   6,
+   3200,
+   2400
+  ],
+  [
+   -205,
+   25,
+   10,
+   2000,
+   2500
+  ]
+ ],
+ "terrainFade": "continuous: h*smooth(0,14,distToApronRect(x,z)), apron x -4..38, z 0..34 (replaces the z<0 / z>=0 split in bliss.ts groundY; mirror in GROUND_GLSL). Required before adding newHills.",
+ "pads": {
+  "hal": {
+   "cx": 8,
+   "cz": -206,
+   "r": 28,
+   "blend": 24,
+   "y": 3.82
+  },
+  "toy": {
+   "cx": -160,
+   "cz": 6,
+   "r": 30,
+   "blend": 14,
+   "y": 3.27
+  },
+  "matrix": {
+   "cx": 148,
+   "cz": 95,
+   "r": 24,
+   "blend": 12,
+   "y": 0.49
+  },
+  "camp": {
+   "cx": -14,
+   "cz": -20,
+   "r": 16,
+   "blend": 10,
+   "y": 4.12
+  },
+  "crest": {
+   "cx": -45,
+   "cz": -94,
+   "r": 12,
+   "blend": 8,
+   "y": 29.96
+  }
+ },
+ "structures": {
+  "L1": {
+   "file": "CONTROL.EXE",
+   "episode": "KNEE-DEEP IN THE DATA",
+   "guardian": "THE INFERMINATOR",
+   "map": "E1M4",
+   "centre": [
+    17,
+    8
+   ],
+   "width": 18,
+   "depth": 16,
+   "facing": 0,
+   "door": [
+    17,
+    0
+   ],
+   "spawn": [
+    17,
+    -3
+   ],
+   "groundY": 0.0
+  },
+  "L2": {
+   "file": "HAL3000.SYS",
+   "episode": "THE SHORES OF HAL",
+   "guardian": "HAL3000",
+   "map": "E1M7 Computer Station",
+   "centre": [
+    10,
+    -208
+   ],
+   "width": 36,
+   "depth": 22,
+   "facing": 223,
+   "door": [
+    2.5,
+    -200.0
+   ],
+   "spawn": [
+    0.5,
+    -197.8
+   ],
+   "groundY": 3.82
+  },
+  "L3": {
+   "file": "MEG3N.AVI",
+   "episode": "INFERENCE",
+   "guardian": "MEG3N",
+   "map": "E2M7 Spawning Vats",
+   "centre": [
+    -162,
+    8
+   ],
+   "width": 40,
+   "depth": 26,
+   "facing": 65,
+   "door": [
+    -150.2,
+    2.5
+   ],
+   "spawn": [
+    -147.5,
+    1.2
+   ],
+   "groundY": 3.27
+  },
+  "L4": {
+   "file": "AGENTIC.BAT",
+   "episode": "THY FLESH COMPUTED",
+   "guardian": "AGENTIC SMITH",
+   "map": "E2M2 Containment Area (south half)",
+   "centre": [
+    150,
+    98
+   ],
+   "width": 26,
+   "depth": 26,
+   "facing": 330,
+   "door": [
+    143.5,
+    86.7
+   ],
+   "spawn": [
+    142.0,
+    84.1
+   ],
+   "groundY": 0.49
+  }
+ },
+ "camp": {
+  "centre": [
+   -14,
+   -20
+  ],
+  "radius": 16,
+  "slotsRadius": 11,
+  "slots": 20
+ },
+ "finalDoor": {
+  "kind": "SSMAZE.SCR: giant Display Properties dialog (Wait: n survivors) beside a flush hatch; a 16 m CRT rises from the hatch at 20/20 (docs/GAME-SPEC.md section 8.1)",
+  "centre": [
+   -45,
+   -92
+  ],
+  "size": [
+   14,
+   10
+  ],
+  "facing": "south-east, toward bunker door (05)",
+  "plateauClearRadius": 25,
+  "summitJunction": [
+   -5,
+   -95
+  ],
+  "processionSpur": [
+   [
+    -5,
+    -95
+   ],
+   [
+    -25,
+    -94
+   ],
+   [
+    -45,
+    -92
+   ]
+  ]
+ },
+ "skiRun": {
+  "north": [
+   [
+    -12,
+    -101
+   ],
+   [
+    -22,
+    -115
+   ],
+   [
+    -14,
+    -130
+   ],
+   [
+    -32,
+    -144
+   ],
+   [
+    -24,
+    -158
+   ],
+   [
+    -42,
+    -170
+   ],
+   [
+    -38,
+    -184
+   ]
+  ],
+  "southSchuss": [
+   [
+    -5,
+    -95
+   ],
+   [
+    -8,
+    -60
+   ],
+   [
+    -14,
+    -20
+   ]
+  ]
+ },
+ "landmarks": {
+  "hal3000Eye": {
+   "anchor": [
+    10,
+    -208
+   ],
+   "altitude": 70,
+   "diameter": 12,
+   "orbitRadius": 15,
+   "orbitPeriodS": 90
+  },
+  "meg3nTower": {
+   "at": [
+    -178,
+    22
+   ],
+   "height": 35
+  },
+  "agenticTower": {
+   "height": 60,
+   "spinner": 10,
+   "phoneBooth": [
+    137,
+    79
+   ]
+  },
+  "controlMast": {
+   "at": [
+    23,
+    3
+   ],
+   "height": 9
+  },
+  "dataCentre": {
+   "at": [
+    -40,
+    -470
+   ],
+   "size": [
+    220,
+    60
+   ],
+   "height": 25,
+   "coolingTowers": 45,
+   "note": "your lab: the one that wakes"
+  },
+  "otherLabDataCentre": {
+   "at": [
+    190,
+    -480
+   ],
+   "size": [
+    160,
+    50
+   ],
+   "height": 22,
+   "note": "the other CEO's lab: stays dark"
+  },
+  "mcpColumn": {
+   "at": [
+    60,
+    900
+   ],
+   "height": 260,
+   "diameter": 50
+  },
+  "giantCursor": {
+   "home": "25 m above the final door (hourglass while locked)",
+   "awayAltitude": 45,
+   "height": 9,
+   "speed": 6,
+   "returnWithinM": 60,
+   "returnAfterS": 45
+  }
+ },
+ "routes": {
+  "R1 Taskbar Road (west)": {
+   "points": [
+    [
+     -150.2,
+     2.5
+    ],
+    [
+     -128,
+     -2
+    ],
+    [
+     -90,
+     -6
+    ],
+    [
+     -50,
+     -12
+    ],
+    [
+     -14,
+     -20
+    ]
+   ],
+   "lengthM": 139,
+   "climbM": 3
+  },
+  "R2 Camp to bunker": {
+   "points": [
+    [
+     -14,
+     -20
+    ],
+    [
+     0,
+     -12
+    ],
+    [
+     17,
+     -3
+    ]
+   ],
+   "lengthM": 36,
+   "climbM": 0
+  },
+  "R3 Taskbar Road (east)": {
+   "points": [
+    [
+     17,
+     -3
+    ],
+    [
+     45,
+     -6
+    ],
+    [
+     75,
+     8
+    ],
+    [
+     105,
+     35
+    ],
+    [
+     128,
+     62
+    ],
+    [
+     143.5,
+     86.7
+    ]
+   ],
+   "lengthM": 166,
+   "climbM": 2
+  },
+  "R4 Crest Trail": {
+   "points": [
+    [
+     -14,
+     -20
+    ],
+    [
+     8,
+     -30
+    ],
+    [
+     38,
+     -48
+    ],
+    [
+     52,
+     -72
+    ],
+    [
+     30,
+     -90
+    ],
+    [
+     -5,
+     -95
+    ],
+    [
+     5,
+     -112
+    ],
+    [
+     25,
+     -128
+    ],
+    [
+     28,
+     -155
+    ],
+    [
+     15,
+     -180
+    ],
+    [
+     2.5,
+     -200.0
+    ]
+   ],
+   "lengthM": 280,
+   "climbM": 23
+  },
+  "R5 Shoulder Pass": {
+   "points": [
+    [
+     17,
+     -3
+    ],
+    [
+     40,
+     -30
+    ],
+    [
+     52,
+     -72
+    ],
+    [
+     68,
+     -100
+    ],
+    [
+     58,
+     -135
+    ],
+    [
+     35,
+     -170
+    ],
+    [
+     2.5,
+     -200.0
+    ]
+   ],
+   "lengthM": 236,
+   "climbM": 14
+  },
+  "R6 West Back Road": {
+   "points": [
+    [
+     -150.2,
+     2.5
+    ],
+    [
+     -170,
+     -40
+    ],
+    [
+     -178,
+     -90
+    ],
+    [
+     -160,
+     -140
+    ],
+    [
+     -115,
+     -175
+    ],
+    [
+     -60,
+     -195
+    ],
+    [
+     2.5,
+     -200.0
+    ]
+   ],
+   "lengthM": 330,
+   "climbM": 9
+  },
+  "R7 Server Trail": {
+   "points": [
+    [
+     143.5,
+     86.7
+    ],
+    [
+     172,
+     50
+    ],
+    [
+     186,
+     -20
+    ],
+    [
+     172,
+     -95
+    ],
+    [
+     128,
+     -150
+    ],
+    [
+     70,
+     -182
+    ],
+    [
+     2.5,
+     -200.0
+    ]
+   ],
+   "lengthM": 402,
+   "climbM": 12
+  }
+ },
+ "minigameSites": {
+  "M1 Minesweeper Meadow": {
+   "rect": [
+    70,
+    97,
+    38,
+    65
+   ]
+  },
+  "M2 Doom Debates (radio show; camp stage after Liron is freed)": {
+   "at": [
+    -44,
+    -10
+   ]
+  },
+  "M4 SkiFree north run": {
+   "pathRef": "skiRun.north"
+  },
+  "M9 3D Pipes": {
+   "at": [
+    -95,
+    45
+   ]
+  },
+  "M10 Paint wall": {
+   "at": [
+    -42,
+    -36
+   ]
+  },
+  "M11 phone booth": {
+   "at": [
+    137,
+    79
+   ]
+  },
+  "M12 Start monolith": {
+   "at": [
+    -14,
+    -44
+   ]
+  },
+  "M13 Recycle Bin": {
+   "at": [
+    -14,
+    -20
+   ]
+  },
+  "M15 Hover arena": {
+   "rect": [
+    -15,
+    75,
+    100,
+    160
+   ]
+  },
+  "M16 Pinball knoll": {
+   "at": [
+    -75,
+    105
+   ]
+  },
+  "M17 Defrag yard": {
+   "at": [
+    50,
+    -186
+   ],
+   "pad": [
+    50,
+    -186,
+    9,
+    6,
+    8.89
+   ]
+  },
+  "M22 My Briefcase": {
+   "at": [
+    16,
+    -44
+   ]
+  }
+ },
+ "vistas": {
+  "V1 crest": [
+   -45,
+   -92
+  ],
+  "V2 Shoulder Pass": [
+   66,
+   -96
+  ],
+  "V3 AGENTIC roof": [
+   150,
+   98
+  ],
+  "V4 MEG3N tower catwalk": [
+   -178,
+   22
+  ],
+  "V5 bunker door": [
+   17,
+   -3
+  ]
+ }
+}

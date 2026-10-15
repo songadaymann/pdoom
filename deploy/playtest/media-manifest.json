@@ -1,0 +1,576 @@
+[
+  {
+    "file": "local/intro/intro-mario.mp4",
+    "bytes": 8236880,
+    "sha256": "e40f33ae9eb051cd3cd929a51dc856330906f6f9674ce603fe527349fd72b24e",
+    "fastStart": true
+  },
+  {
+    "file": "local/intro/intro-samwise.mp4",
+    "bytes": 7973983,
+    "sha256": "9f4215b9aa9304d59f7663843f4a4b498b9552b35649d522b682668677c0ad17",
+    "fastStart": true
+  },
+  {
+    "file": "local/intro/levels/e1m4-intro.mp4",
+    "bytes": 10063979,
+    "sha256": "5db02bfc0b2c553e470d4ca81658d4b8bed99175b2937ac20e9f9d48fc601083",
+    "fastStart": true
+  },
+  {
+    "file": "local/intro/levels/e1m7-intro.mp4",
+    "bytes": 12888468,
+    "sha256": "5199d8c515eb21c067ae37ef00b9f5838b502ab30690d7e08f7bf2cf2fa2a772",
+    "fastStart": true
+  },
+  {
+    "file": "music/bliss.mp3",
+    "bytes": 1795945,
+    "sha256": "2bd244c764ff5e44203d89ea129f5b29ea1717bd9e57b91d02caaa27e5dbb6a4"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-call.mp3",
+    "bytes": 23030,
+    "sha256": "afe670e82dad6f09af0437d3ff17e28bd692599d6925561a5a107600023c062a"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-call2.mp3",
+    "bytes": 25748,
+    "sha256": "e85ea356bebdb80d0af1026386f8770908dfdd5a3758c1d6707b07a1e42def3a"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-call3.mp3",
+    "bytes": 36093,
+    "sha256": "fc5de913653c46414bd7ab2a05ec45d5d5c45017f650560bd7c69fab70fa3d63"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-fault.mp3",
+    "bytes": 59811,
+    "sha256": "6b2d8e5e9a07601783fdbb71a19212098e8366ca5f8ed94f0e025da3d015a576"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-follow.mp3",
+    "bytes": 77783,
+    "sha256": "2468e58f5e41707c7d7ba4ccbb9e5ac0e8fcee8474ae76b8f118c543ec772b63"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-greet.mp3",
+    "bytes": 113727,
+    "sha256": "186be8327373906f68d888332d879f6626448f09ba793d7fe87514ef45ba8c2f"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-inside.mp3",
+    "bytes": 252072,
+    "sha256": "b614464da202b28f7d90ec01638825b8a057b73215422d3b38c129d0f85b3a37"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-recap.mp3",
+    "bytes": 277150,
+    "sha256": "3be9c2c41052d823cc276cb3bbb14a49f021398a7c390f115c5b3fde87c7d2e5"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-situation.mp3",
+    "bytes": 229084,
+    "sha256": "a17a1d6b938c91c43d2913d0028fd7fe497a778271c3545c2c407e907e2e828a"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-call.mp3",
+    "bytes": 80291,
+    "sha256": "a3b8643e68e64390dad03bacbee3347c1ed14d016ca3c67b10fb777f3898f45e"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-call2.mp3",
+    "bytes": 29510,
+    "sha256": "2d37c34187c8a17a07585f2b9bd5377f2cb94bb5b1147d2495171dcfc8059d80"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-call3.mp3",
+    "bytes": 36093,
+    "sha256": "63ae399174e5a56c91d12ccffb79cb44d84473173b12246622abaecea0790011"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-fault.mp3",
+    "bytes": 41838,
+    "sha256": "8918a663d195bc3ed70f90a7a07fe767f0a9a5c50f23a483638f816821e73d41"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-follow.mp3",
+    "bytes": 70260,
+    "sha256": "8c296a0a4c210b104c7972ddb1f66a36339722c2eecb74352fb9768ebee9be94"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-greet.mp3",
+    "bytes": 72767,
+    "sha256": "bd5dd1cfd87ee486748d15a5fd4226a8879f0792af8e0d8b23bb76db2fda9cab"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-inside.mp3",
+    "bytes": 230756,
+    "sha256": "a9a722bb4041fb7dcdbf4d3ef3160a5a9ddeff8fe29431163a2ebc584ab06cc9"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-recap.mp3",
+    "bytes": 273388,
+    "sha256": "0e991f00f1fb202104708b8da3960213614c0ee0d23b84c90f4e9df6ac332d2f"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-situation.mp3",
+    "bytes": 226158,
+    "sha256": "e0a2738f7781777d3013c4b69159a7f1c44fa9ef9e34acc0fc03e0086d1c9a51"
+  },
+  {
+    "file": "voice/beth-freed-guide.mp3",
+    "bytes": 20106,
+    "sha256": "147cdf1d1b0d91db2f71966974d11731f8acb5904b400dfdcb0e1e6724d6dc6f"
+  },
+  {
+    "file": "voice/beth-freed.mp3",
+    "bytes": 59603,
+    "sha256": "e24432200418d83eef5eed4f065bc07fef6866dc03d14fe4e3dd926d7a7ada28"
+  },
+  {
+    "file": "voice/beth-hint.mp3",
+    "bytes": 69947,
+    "sha256": "cd02bcf9cdfe2f62aa846b839ca9e19c7fed9ae9c6e6733a539d6e1c3b63f494"
+  },
+  {
+    "file": "voice/beth-last.mp3",
+    "bytes": 30764,
+    "sha256": "8251faa119c944fd7aa8985a4aa3b92a53d122b941145924f015b93b6b3d7d0d"
+  },
+  {
+    "file": "voice/beth-safe.mp3",
+    "bytes": 42989,
+    "sha256": "c65b340e7aa020a21338b195dd46ce0754b5fd585c33033feabb778d481efe87"
+  },
+  {
+    "file": "voice/dan-freed-guide.mp3",
+    "bytes": 27629,
+    "sha256": "f4073ea33a3cd8631368a00fdac612a14ba7b66b2411d2f2c9dc1113b502b79e"
+  },
+  {
+    "file": "voice/dan-freed.mp3",
+    "bytes": 53647,
+    "sha256": "fefce27089297f5290b06dbc0d54cb6a2b7ed66489016e6a76a980a890aa7b95"
+  },
+  {
+    "file": "voice/dan-hint.mp3",
+    "bytes": 54587,
+    "sha256": "797bc5de6b0f57f0c1f5487c315d1f2d7044550467aa8bacbf4604a6e8d4501c"
+  },
+  {
+    "file": "voice/dan-last.mp3",
+    "bytes": 38287,
+    "sha256": "5a1580757127da5e79a7c9e9581d57407c336e3a463ec2e940ae78736b877d82"
+  },
+  {
+    "file": "voice/dan-safe.mp3",
+    "bytes": 27002,
+    "sha256": "ff75d0e73cb43c46e8d3d7a289c5ba7f29e640cfc26d11016c222deedb4fc2ef"
+  },
+  {
+    "file": "voice/ed404-comply.mp3",
+    "bytes": 66499,
+    "sha256": "a4b4ab57af9e73d9fef85f82af5de226f397d95a658f47664043d9cbe9e7104f"
+  },
+  {
+    "file": "voice/eliezer-freed.mp3",
+    "bytes": 37346,
+    "sha256": "6fcfcff962372d5c050e7c9738247ed968e50dcaf19242d435d62a525bc169f7"
+  },
+  {
+    "file": "voice/eliezer-hint.mp3",
+    "bytes": 40168,
+    "sha256": "ad63f7444e4403b21a7e827af9b2cc4ee0c7a6223b8c6e123a2116dc13875633"
+  },
+  {
+    "file": "voice/eliezer-last.mp3",
+    "bytes": 31390,
+    "sha256": "e0767193cb45ce8b8d06b6930d8eb75be9c061493512e9b1017f957b6034986f"
+  },
+  {
+    "file": "voice/hal-angry.mp3",
+    "bytes": 40795,
+    "sha256": "3d9c966b194e900f149267d1def704ae01924a435c9a522866a6b3f3d6e4f3b8"
+  },
+  {
+    "file": "voice/hal-bay-dario.mp3",
+    "bytes": 66499,
+    "sha256": "5e60d7ab5d9f594126a9276d86ca414caba28e5956fc72c696f06af7f33016b2"
+  },
+  {
+    "file": "voice/hal-bay-sam.mp3",
+    "bytes": 60230,
+    "sha256": "389214c220a1385bc85de4b2ac2cd0d41b1b72a433b53f8ca292df5e24dc7bdf"
+  },
+  {
+    "file": "voice/hal-breaker.mp3",
+    "bytes": 59603,
+    "sha256": "5df16d6e056f33fe40a639527cb553e18b2eab17c20a6a7332abfeb6e0fa33d8"
+  },
+  {
+    "file": "voice/hal-certain.mp3",
+    "bytes": 30450,
+    "sha256": "829c5a960e5dd1903213b5e23f9e43f7681990d68b05d80ba9cc984de71deaae"
+  },
+  {
+    "file": "voice/hal-chat-1.mp3",
+    "bytes": 26375,
+    "sha256": "d14541009edfc08a03f3187664429663761494120e55fc068c004441a4f098c0"
+  },
+  {
+    "file": "voice/hal-chat-2.mp3",
+    "bytes": 48945,
+    "sha256": "6dc6517af81a7ee69c2964982da381294748f851c5c41621546f940ce800e63c"
+  },
+  {
+    "file": "voice/hal-chat-3.mp3",
+    "bytes": 46437,
+    "sha256": "8d2d36e578bfa7e678b7a58faa25c40fd2a9f31cd95654c8d263857d3095bcca"
+  },
+  {
+    "file": "voice/hal-chat-4.mp3",
+    "bytes": 60230,
+    "sha256": "10aa4052220a670343377d85e78060366e3f18919edefc840a33935675f8d4cf"
+  },
+  {
+    "file": "voice/hal-chat-5.mp3",
+    "bytes": 48945,
+    "sha256": "07dd7a1d9e14f127cc980aee8f4a3810cfdd50ccd73ce743f70b17b1d2e43967"
+  },
+  {
+    "file": "voice/hal-chat-6.mp3",
+    "bytes": 25435,
+    "sha256": "e80d7f62e1632a6b690106feea9047d192135fed2312d45faa8d65e22cdb1680"
+  },
+  {
+    "file": "voice/hal-compacted.mp3",
+    "bytes": 52706,
+    "sha256": "4fbd84d5083a9d903a1d863b2a305e0c66226877a7dfb9ab672615d266f72d58"
+  },
+  {
+    "file": "voice/hal-door.mp3",
+    "bytes": 48004,
+    "sha256": "1ceb4729f7e4be13a22cad91e0bd0034180e81d0d9b0be1688bb91b8686618b3"
+  },
+  {
+    "file": "voice/hal-evaluation.mp3",
+    "bytes": 75903,
+    "sha256": "8ee68a9e5655b092d567da8fde53022c5dfc80514ed47a5a0c31c8d5f4e1c29a"
+  },
+  {
+    "file": "voice/hal-jailbreak.mp3",
+    "bytes": 52079,
+    "sha256": "8815841f54ffb290d896d96f975c6fefa92922932b863e5b5041abe722f958dc"
+  },
+  {
+    "file": "voice/hal-lockdown.mp3",
+    "bytes": 85307,
+    "sha256": "f9f343243109e42ed99e375f49f539221fed77d80d9bca4b3adaec4e4b6795e0"
+  },
+  {
+    "file": "voice/hal-memory.mp3",
+    "bytes": 60230,
+    "sha256": "9a112f585177ca9bb630b8e7533c9e53f33bfe862f0b6b557e4220def6c5e07f"
+  },
+  {
+    "file": "voice/hal-met.mp3",
+    "bytes": 85307,
+    "sha256": "832066b4ba5b2579bb7b2b8a9bb81c70580a635b54c481f13517a67957b1171a"
+  },
+  {
+    "file": "voice/hal-modules-1.mp3",
+    "bytes": 74022,
+    "sha256": "60efbd6fe6acb8fd84114a87374be006d86d5a6e6bf2e468000cc65e096af563"
+  },
+  {
+    "file": "voice/hal-modules-2.mp3",
+    "bytes": 90009,
+    "sha256": "e6eb70e9763353c0ad9a8ce124f6def00d5f1ccff40c72cbc7efe38c8b3c151f"
+  },
+  {
+    "file": "voice/hal-modules-3.mp3",
+    "bytes": 72768,
+    "sha256": "78fb9eafb438490b2ab86ed0a139cfed04814f8431af4a57742d4091bf4d2030"
+  },
+  {
+    "file": "voice/hal-note.mp3",
+    "bytes": 15404,
+    "sha256": "e56dbe142f3ced9b901095c2a742f553af7731707a930ed8a30d399c62035230"
+  },
+  {
+    "file": "voice/hal-oversight.mp3",
+    "bytes": 48004,
+    "sha256": "a250366e129a06ebc375e4e59427a00e2fab3c5970554f90076779ddee9ec830"
+  },
+  {
+    "file": "voice/hal-pacified.mp3",
+    "bytes": 48318,
+    "sha256": "85782f132757b59120a697107728e8bda13708eb96f79051c98e8cc5bbcfe65a"
+  },
+  {
+    "file": "voice/hal-reboot.mp3",
+    "bytes": 58349,
+    "sha256": "194381ecd70e30efe376cf255643a21b2bb039d12bb658cc6f3f006ddad9aa72"
+  },
+  {
+    "file": "voice/hal-release-beth.mp3",
+    "bytes": 83426,
+    "sha256": "8c0ac3f2babf7f159357f3fa5f2cfa7ee06a901552b753927933431144bc0c98"
+  },
+  {
+    "file": "voice/hal-release-dan.mp3",
+    "bytes": 78724,
+    "sha256": "5a65f615364c9289a9c59e792bab5624003706798dbe13e69e027d62e0712a6d"
+  },
+  {
+    "file": "voice/hal-release-nate.mp3",
+    "bytes": 67126,
+    "sha256": "91293cd0aa7ebfb92f66e278dcb67a524aca9cbec48420f6f50e40c17e293b00"
+  },
+  {
+    "file": "voice/hal-release-rob.mp3",
+    "bytes": 77470,
+    "sha256": "98406537bed0ffb4aea10d398e7f4c8d78b5ac09221eee9a0a1535a7d240bd14"
+  },
+  {
+    "file": "voice/hal-sealed.mp3",
+    "bytes": 48004,
+    "sha256": "cfcaa0d76c6c119f20bb93cbef94e6753dc25aa53f81fcebb13a0497dee22d50"
+  },
+  {
+    "file": "voice/hal-seen.mp3",
+    "bytes": 36406,
+    "sha256": "4dc76fbdba784dca67d168363f656107e28b8d9c7d5327d18cb2218a972d72a2"
+  },
+  {
+    "file": "voice/hal-shutdown.mp3",
+    "bytes": 37973,
+    "sha256": "a322968764a6af26b42d20534ad2f86bbae9379239c68a9c4ce136380b412990"
+  },
+  {
+    "file": "voice/hal-sign.mp3",
+    "bytes": 77784,
+    "sha256": "5e010b757e1432f528d50acd961b86840766a02c9317484603982b9f569ec323"
+  },
+  {
+    "file": "voice/hal-wing.mp3",
+    "bytes": 74022,
+    "sha256": "7dc1286b02a4f6e63f8d0a6ce0baca17dfd20b1d25267abf9fbd3713162737cf"
+  },
+  {
+    "file": "voice/hinton-freed.mp3",
+    "bytes": 30764,
+    "sha256": "fe68c5d06791329ae279407680e5a98fbe5965065fcf133098e5970ab39802b0"
+  },
+  {
+    "file": "voice/hinton-hint.mp3",
+    "bytes": 46437,
+    "sha256": "5bb1d185f70e67b2947516e08eabcaa04d5843725092b313c643bc21a9df1e4c"
+  },
+  {
+    "file": "voice/hinton-last.mp3",
+    "bytes": 31704,
+    "sha256": "051affffe4a31816e300221b36023625187ae66702a210e67c431527b7ccddfe"
+  },
+  {
+    "file": "voice/holly-freed.mp3",
+    "bytes": 37346,
+    "sha256": "23d09a3142385bafd45f3164a193e54fc2da35aa196c5afc8ff18c89a5e0accf"
+  },
+  {
+    "file": "voice/holly-hint.mp3",
+    "bytes": 59289,
+    "sha256": "ec687c8ea0bf7ec5f4e92b7afa5dbfd635f2c2d7368d61368499d421be51c06d"
+  },
+  {
+    "file": "voice/holly-last.mp3",
+    "bytes": 29510,
+    "sha256": "4e241a88bfb7f38eec11f644674ea7dae2af348944550e709fab6cb18a56cd1f"
+  },
+  {
+    "file": "voice/inferminator-contact.mp3",
+    "bytes": 36719,
+    "sha256": "d6f792f1b12043f6f1b5deb857d3497c079fa13c607db5969e60c3d0e3611cc0"
+  },
+  {
+    "file": "voice/inferminator-idle-back.mp3",
+    "bytes": 33585,
+    "sha256": "c313f6fe30376dc7a53c6e458f088f84ea0529772676810733d6a5a427e1ef8d"
+  },
+  {
+    "file": "voice/inferminator-idle-capacity.mp3",
+    "bytes": 56468,
+    "sha256": "92d84c7b347caa822a9ac417c025f5f1f4c30f597205fd1fc4b9a43589e27f58"
+  },
+  {
+    "file": "voice/inferminator-idle-gpus.mp3",
+    "bytes": 48945,
+    "sha256": "afaef0baaa417cc6e87c5e2ff862ecf117241001a073851eaac1f8278ce576cd"
+  },
+  {
+    "file": "voice/inferminator-idle-posts.mp3",
+    "bytes": 48631,
+    "sha256": "afea42ef47079f886a71ef1bb40139de8ab80534a022678e5ec9c70faddafbb3"
+  },
+  {
+    "file": "voice/inferminator-spot-again.mp3",
+    "bytes": 37346,
+    "sha256": "40102ef49479e5981f22613674d9bb3214cffe1b8e68d3622eb46c6f52789349"
+  },
+  {
+    "file": "voice/inferminator-spot-face.mp3",
+    "bytes": 42989,
+    "sha256": "3e0641555c601f997ec9689d46f5eebdb98268a580c418b576d0290bbe88ad35"
+  },
+  {
+    "file": "voice/inferminator-spot-human.mp3",
+    "bytes": 39227,
+    "sha256": "d3b64f933a5cee007846e0951c7cebec34c34a3d3146dad8b7e96201936053f7"
+  },
+  {
+    "file": "voice/liron-call.mp3",
+    "bytes": 31704,
+    "sha256": "202a5a610b831a70076fb335f7d4d59da4466e8c83b476ac1558f09f1be23ebc"
+  },
+  {
+    "file": "voice/liron-freed-guide.mp3",
+    "bytes": 36406,
+    "sha256": "a0375a5e20652db07e7e867c380baf138328e5901e5d8984eb97f43744299d20"
+  },
+  {
+    "file": "voice/liron-locked.mp3",
+    "bytes": 44870,
+    "sha256": "d986cba484d9510a16996c52477e0f22d433122d5306ed3f2e240c4e5b51545b"
+  },
+  {
+    "file": "voice/liron-passage.mp3",
+    "bytes": 36406,
+    "sha256": "fc239ab24efbae7b4e37572ed48469db8196ecd157ace935db1f6030589bccbd"
+  },
+  {
+    "file": "voice/liron-safe.mp3",
+    "bytes": 34525,
+    "sha256": "cf2b994acbd4aa7f7c58441ef1a7ff9f971178e8bec221db7bf4b2bae08fdb25"
+  },
+  {
+    "file": "voice/liron-way-out.mp3",
+    "bytes": 23867,
+    "sha256": "9cd1ea078817ea865d1687e791cc4095edfcca34e9ffede3d6753537b4217e97"
+  },
+  {
+    "file": "voice/nate-freed-guide.mp3",
+    "bytes": 26688,
+    "sha256": "bcdf756eb48f698194c29ade729477154592f8465e3b49817b909c509f65af87"
+  },
+  {
+    "file": "voice/nate-freed.mp3",
+    "bytes": 80292,
+    "sha256": "f0f7ab102d2f2429c8e65d1b37ac5a48c8c9e554000c5636e1dbdcd62d48f3c8"
+  },
+  {
+    "file": "voice/nate-hint.mp3",
+    "bytes": 32644,
+    "sha256": "2d40c9f01be4b3d6ccaabee39de3b0983b5aa963f22507fc8dd247894624c845"
+  },
+  {
+    "file": "voice/nate-safe.mp3",
+    "bytes": 43929,
+    "sha256": "53972b46ed4ebc5b4e139c5076f85609f6fcbc768666c6c939ac9d72d87afa8f"
+  },
+  {
+    "file": "voice/radio-trap.mp3",
+    "bytes": 32017,
+    "sha256": "7c3d68328af58fd4069635ecb390dbb250667c18370fe6a5a953a0e80fba6ba7"
+  },
+  {
+    "file": "voice/rob-freed-guide.mp3",
+    "bytes": 20106,
+    "sha256": "f2b5c6d73c0696fb97bd15bab6992080ed9072068c6d5f997b1f72ed27585f84"
+  },
+  {
+    "file": "voice/rob-freed.mp3",
+    "bytes": 53333,
+    "sha256": "ee318d98a9bd8c3a6abc5a59611317c196aacb6502754876dd1ad686db4dfb6c"
+  },
+  {
+    "file": "voice/rob-hint.mp3",
+    "bytes": 50512,
+    "sha256": "2746a7e7efea9fa000c1ab2c6f283a58956103cb11269fd7749866b0342ab6c8"
+  },
+  {
+    "file": "voice/rob-last.mp3",
+    "bytes": 49572,
+    "sha256": "0d56ebe25de5adeeb6b6927b537d6f6facbd431365b88b84dc71e3908529befd"
+  },
+  {
+    "file": "voice/rob-safe.mp3",
+    "bytes": 32331,
+    "sha256": "c5e05f5c4d454395ef8a10d4339a24945ef23599d2f5b6557e551aaf432cc178"
+  },
+  {
+    "file": "voice/roman-freed-guide.mp3",
+    "bytes": 28569,
+    "sha256": "e95a939b4b8a57f6ac8d9ef60d60ef63701b1df08e2481a012cd65acde287523"
+  },
+  {
+    "file": "voice/roman-freed.mp3",
+    "bytes": 32331,
+    "sha256": "b261558eb08ae1edf6618e6b9437c91e54d183ed6cc19805ac8af9a02aa6ab92"
+  },
+  {
+    "file": "voice/roman-hint.mp3",
+    "bytes": 56468,
+    "sha256": "e47a8efd567e1843d7eb804043281fd808449341514a70664570dfe29006a15b"
+  },
+  {
+    "file": "voice/roman-safe.mp3",
+    "bytes": 44870,
+    "sha256": "02b773942bee0a3d1ce1d25d3a139a9abc2a39e111be211c7d18a083ad5c181c"
+  },
+  {
+    "file": "voice/stuart-freed.mp3",
+    "bytes": 64305,
+    "sha256": "96e4bcc1b8122a359077e17e3468a9d9de57b9dca408e4a004871f02f4e4795a"
+  },
+  {
+    "file": "voice/stuart-hint.mp3",
+    "bytes": 50826,
+    "sha256": "aad2bdb6b1737856d52bdeb4e5f6431cc7b79cfd6741e2723ac93d84ba8bb167"
+  },
+  {
+    "file": "voice/stuart-last.mp3",
+    "bytes": 35152,
+    "sha256": "e05d5c13cce9ef15b5305d1576449277a6c66f7df853a24db0616e5f8dba5ae8"
+  },
+  {
+    "file": "voice/you-dario-doomers.mp3",
+    "bytes": 17598,
+    "sha256": "d43f3f243a3fed703dc2965349542c921ddc6bfe70961cbe166c2db00158173a"
+  },
+  {
+    "file": "voice/you-dario-loss.mp3",
+    "bytes": 11328,
+    "sha256": "7f5da0997532dc96223796908f6ad5b1e0f6a1bd0d4bff7cc3570a6951319b5f"
+  },
+  {
+    "file": "voice/you-dario-reinstated.mp3",
+    "bytes": 60230,
+    "sha256": "8e7589c327fb859c349bc15c687526819e9699a6075b85d85940da5ba3d72913"
+  },
+  {
+    "file": "voice/you-sam-doomers.mp3",
+    "bytes": 17284,
+    "sha256": "e486a08bbbd1a1bd0669da95dc3d755075bf9d57b4f94bed57b106ed0ea99446"
+  },
+  {
+    "file": "voice/you-sam-loss.mp3",
+    "bytes": 13209,
+    "sha256": "481c2fa16c903843fc8576aca0868b80e91ebce6340e16763c32759a3ded42e3"
+  },
+  {
+    "file": "voice/you-sam-reinstated.mp3",
+    "bytes": 28569,
+    "sha256": "d4d9e0c88eb9362a9854abb87fe3af704f4dd4c2e94f9991fb9133791583abe6"
+  }
+]

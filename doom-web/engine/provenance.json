@@ -1,0 +1,56 @@
+{
+  "repository": "https://github.com/mungus43/tomb-engine",
+  "commit": "6c735315b8ac1b1dd6646ac78c46bbbdbb775a5c",
+  "localPatches": [
+    {
+      "file": "engine.worker.js",
+      "description": "Include worker audio time and an absolute send timestamp in play and stop messages, allowing the page to preserve audio scheduling across different clock origins and message transit. Asset checksums below describe the unmodified upstream files."
+    },
+    {
+      "file": "engine.worker.js",
+      "description": "Accept the menu loader preloaded wasmBinary so measured WASM download is transferred once rather than fetched again by the engine."
+    }
+  ],
+  "assets": [
+    {
+      "file": "engine.worker.js",
+      "bytes": 38866,
+      "sha256": "2cbbddf39a4600deb707119d5aedc43610a22a0ccf89cc53d5e4c84e3b64a9a8"
+    },
+    {
+      "file": "gzdoom.js",
+      "bytes": 1735730,
+      "sha256": "d131a89e1482e26d7a89b990169883246f4759c23dc742777b43c94281de7402"
+    },
+    {
+      "file": "gzdoom.wasm",
+      "bytes": 8169518,
+      "sha256": "d46b5a348ca041090467aaa376c4e36a4228476c2a30e66ca564c1cf3516c477"
+    },
+    {
+      "file": "gzdoom.pk3",
+      "bytes": 2569170,
+      "sha256": "d242ae9470f1a6409f38c91fb8b600bfba3aa89cc92b682d844d5aba55d06272"
+    },
+    {
+      "file": "game_support.pk3",
+      "bytes": 2354603,
+      "sha256": "5f14ed8cabc76ec955517f3473bd7e8853bdf2c11f7407326e7cce84aa6c6154"
+    },
+    {
+      "file": "game_widescreen_gfx.pk3",
+      "bytes": 5565898,
+      "sha256": "133342060454e78c3a623e539cbeed128fc893daabe4bc66b03810aea560ac9c"
+    },
+    {
+      "file": "brightmaps.pk3",
+      "bytes": 246072,
+      "sha256": "7232197c7d1edae8baa73bf3a3856fafb2aaf0518e3dac75ab2fe54de3838ebb"
+    },
+    {
+      "file": "lights.pk3",
+      "bytes": 23677,
+      "sha256": "daf901148e0a4ef9692d1f14c1481dabe2be8cbf2489b895619cc0b03d3ae6bb"
+    }
+  ]
+}

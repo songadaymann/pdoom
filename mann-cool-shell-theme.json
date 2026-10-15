@@ -1,0 +1,16 @@
+{
+  "paper": "#241c17",
+  "ink": "#dcc18e",
+  "muted": "#bca67d",
+  "rule": "#736250",
+  "accent": "#ef573c",
+  "panel": "#241c17",
+  "panelInk": "#edca93",
+  "panelMuted": "#bca67d",
+  "field": "#100c09",
+  "focus": "#ffe3a3",
+  "font": "DoomSmall, monospace",
+  "headingFont": "DoomSmall, monospace",
+  "controlRadius": "0px",
+  "panelRadius": "0px"
+}

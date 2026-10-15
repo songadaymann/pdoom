@@ -1,0 +1,60 @@
+import {startGame} from './doom-qa-ui.mjs';
+import {chromium} from 'playwright';
+import fs from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+const url=process.env.DOOM_URL||'http://127.0.0.1:5198/?level=intake',out='output/doom-browser/intake-qa';
+const selected=process.env.DOOM_QA_CASES?.split(',');
+const reportPath=out+(selected?'/report-'+selected.join('-')+'.json':'/report.json');
+const map=JSON.parse(await fs.readFile('output/doom-browser/map-debug.json','utf8'));
+assert.equal(map.name,'Intake');await fs.mkdir(out,{recursive:true});
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--mute-audio']});
+const report={map:map.name,url,started:new Date().toISOString(),cases:[],methodology:{naturalRoute:'Keyboard movement and normal hunter. No console commands or state mutations.',fixtures:'Native Doom console warp positions the player. Interactions use real keyboard input; hunter stays active.',touch:'Chrome CDP touch emulation; portrait and landscape, not physical-device certification.'}};
+report.modSha256=createHash('sha256').update(await fs.readFile('doom-web/pdoom.pk3')).digest('hex');
+const errorPattern=/Unknown command|Script error|VM execution aborted|Execution could not continue|Unknown identifier/i;
+async function read(p){return JSON.parse(await p.evaluate(()=>window.render_game_to_text()));}
+async function world(p){return(await read(p)).world;}
+async function waitWorld(p,test,label,timeout=7000){const end=Date.now()+timeout;while(Date.now()<end){const s=await read(p);assert.notEqual(s.mode,'error',s.error||'Engine error');if(test(s.world,s))return s.world;await p.waitForTimeout(90);}throw Error(label+': '+JSON.stringify(await read(p)));}
+async function press(p,k){await p.keyboard.press(k,{delay:90});await p.waitForTimeout(220);}
+async function shot(p,name){await p.screenshot({path:`${out}/${name}.png`});}
+async function boot(c,d){const p=await c.newPage();d.errors=[];p.on('pageerror',e=>d.errors.push(String(e)));p.on('console',m=>{if(m.type()==='error')d.errors.push(m.text());});await p.addInitScript(()=>{const NativeWorker=window.Worker;window.Worker=class extends NativeWorker{constructor(...args){super(...args);window.__QA_WORKER__=this;}};});await p.goto(url);await startGame(p);await p.waitForFunction(()=>['playing','error'].includes(window.__DOOM_DEBUG__.state.mode),{},{timeout:55000});const s=await read(p);assert.equal(s.mode,'playing',JSON.stringify(s));assert.ok(await p.evaluate(()=>window.__DOOM_DEBUG__.logs.some(l=>l.includes('PDOOM_MOD_LOADED intake-v1'))),'Current Intake actor code required');assert.ok('cart'in s.world&&'relay'in s.world&&'angle'in s.world);assert.equal(s.world.alive,6);d.initial=s;return p;}
+async function face(p,angle){for(let i=0;i<16;i++){const w=await world(p),delta=((angle-w.angle+540)%360)-180;if(Math.abs(delta)<=7)return;const key=delta>0?'ArrowLeft':'ArrowRight';await p.keyboard.down(key);await p.waitForTimeout(Math.min(800,Math.max(90,Math.abs(delta)*10)));await p.keyboard.up(key);await p.waitForTimeout(220);}throw Error(`Cannot face ${angle}: ${JSON.stringify(await world(p))}`);}
+async function axis(p,dim,target){await face(p,90);for(let i=0;i<24;i++){const before=await world(p),delta=target-before[dim];if(Math.abs(delta)<27)return;const key=dim==='x'?(delta>0?'KeyD':'KeyA'):(delta>0?'KeyW':'KeyS');await p.keyboard.down(key);await p.waitForTimeout(Math.min(900,Math.max(80,(Math.abs(delta)-12)*5)));await p.keyboard.up(key);await p.waitForTimeout(230);const after=await world(p);if(after.controlled!==before.controlled)throw Error('Control changed while navigating: '+JSON.stringify(after));if(i>2&&Math.abs(after[dim]-before[dim])<1)throw Error(`Movement blocked at ${dim}=${target}: ${JSON.stringify(after)}`);}throw Error(`Could not reach ${dim}=${target}`);}
+function corners(route){return route.filter((p,i)=>i===0||i===route.length-1||(p[0]-route[i-1][0])*(route[i+1][1]-p[1])!==(p[1]-route[i-1][1])*(route[i+1][0]-p[0]));}
+async function route(p,points,d){for(const[x,y]of corners(points)){await axis(p,'x',x);await axis(p,'y',y);d.waypoints.push(await world(p));}}
+async function warp(p,x,y,d,angle=90){const cell=map.rows_north_to_south.at(-1-Math.floor(y/map.cell_size))?.[Math.floor(x/map.cell_size)];assert.ok(cell&&!'#WcC'.includes(cell),`Fixture ${x},${y} must be on a walkable cell, got ${cell}`);(d.fixtureWarps??=[]).push({x,y});await p.keyboard.press('Backquote');await p.waitForTimeout(200);await p.evaluate(command=>{for(const key of command){const charCode=key.charCodeAt(0);window.__QA_WORKER__.postMessage({type:'input',target:'window',evType:'keypress',init:{key,keyCode:charCode,which:charCode,charCode,bubbles:true,cancelable:true}});}},`warp ${x} ${y}`);await p.waitForTimeout(100);await p.keyboard.press('Enter');await p.keyboard.press('Backquote');await waitWorld(p,w=>Math.hypot(w.x-x,w.y-y)<45,`Warp ${x},${y}`);await face(p,angle);}
+async function use(p,test,label){await press(p,'KeyE');return waitWorld(p,test,label);}
+async function runCase(name,options,test){if(selected&&!selected.includes(name))return;const d={name,passed:false},c=await browser.newContext(options);let p;try{p=await boot(c,d);await test(p,d,c);d.final=await read(p);d.engineErrors=await p.evaluate(pattern=>window.__DOOM_DEBUG__.logs.filter(l=>new RegExp(pattern,'i').test(l)),errorPattern.source);assert.deepEqual(d.errors,[]);assert.deepEqual(d.engineErrors,[]);d.passed=true;}catch(e){d.failure=String(e);if(p){d.final=await read(p).catch(()=>null);d.logs=await p.evaluate(()=>window.__DOOM_DEBUG__?.logs).catch(()=>null);await shot(p,name+'-failure').catch(()=>{});}console.error(name+': '+e);}finally{report.cases.push(d);await fs.writeFile(reportPath,JSON.stringify(report,null,2)+'\n');await c.close();console.log(name+': '+(d.passed?'PASS':'FAIL'));}}
+try{
+await runCase('desktop-natural-route',{viewport:{width:1200,height:800}},async(p,d)=>{
+ d.waypoints=[];await shot(p,'holding-survivors');await press(p,'KeyQ');assert.equal((await world(p)).hold,1);await press(p,'KeyQ');assert.equal((await world(p)).hold,0);
+ const index=map.baseline_route.findIndex(([x,y])=>x===1600&&y===704);assert.ok(index>=0);
+ await route(p,[...map.baseline_route.slice(0,index+1),[1728,704],[1856,704]],d);d.armory=await use(p,w=>w.gun===1,'Collect armory gun');await shot(p,'armory-generated-survivors');
+ const before=await world(p);await press(p,'Space');assert.equal((await world(p)).ammo,before.ammo-1);
+ d.multiroomRoute='Holding room to surveillance hall to optional armory, all by keyboard with normal hunter.';assert.ok(d.armory.awake===1&&d.armory.alive===6);assert.equal(d.armory.saved,0);
+});
+await runCase('desktop-interaction-fixtures',{viewport:{width:1200,height:800}},async(p,d)=>{
+ await press(p,'KeyQ');await warp(p,936,320,d,0);d.cart=await use(p,w=>w.cart===1,'Push cart');
+ await warp(p,1060,192,d,0);d.secret=await use(p,w=>w.ammo===2,'Secret ammunition');
+ await warp(p,1840,672,d);d.gun=await use(p,w=>w.gun===1&&w.ammo===8,'Gun and spare ammunition');
+ await warp(p,704,416,d);await press(p,'KeyG');d.give=await waitWorld(p,w=>w.gun===0&&w.ammo===0&&/take the gun/.test(w.message),'Give gun');
+ await warp(p,1440,544,d);d.camera=await use(p,w=>w.cameras===1,'Smash camera');
+ await warp(p,1376,1040,d);d.doorOpen=await use(p,w=>w.door===1,'Open door');d.doorClose=await use(p,w=>w.door===0,'Close door');
+ await warp(p,1872,1024,d,270);d.charge=await use(p,w=>w.charge===1,'Collect charge');await warp(p,1872,960,d,180);d.fuse=await use(p,w=>w.fuse>0&&w.charge===0,'Plant charge');
+ assert.ok(d.fuse.fuse>90&&d.fuse.fuse<=140,'The charge has an observable four-second fuse.');await shot(p,'charge-fuse');await warp(p,2240,1216,d);d.breach=await waitWorld(p,w=>w.breach===1&&w.fuse===0,'Breach opens',8000);await warp(p,2020,960,d,180);await shot(p,'breach-open');
+ await warp(p,832,1408,d,270);d.relay=await use(p,w=>w.relay===1&&w.cameras===0,'Operate relay');await p.waitForTimeout(1400);await shot(p,'relay-rescue');
+ const controlled=(await world(p)).controlled;await warp(p,1728,2880,d);await axis(p,'y',3008).catch(async e=>{if((await world(p)).saved<1)throw e;});d.safety=await waitWorld(p,w=>w.saved>=1&&w.controlled!==controlled,'Safety transfers control');await press(p,'KeyR');await waitWorld(p,(w,s)=>s.mode==='escaped','Finish rescued run');await shot(p,'rescued-result');
+});
+await runCase('desktop-service-route',{viewport:{width:1200,height:800}},async(p,d)=>{
+ d.waypoints=[];await route(p,[[960,448],[960,320]],d);await face(p,0);d.cart=await use(p,w=>w.cart===1,'Open service route with the cart');await face(p,90);await p.keyboard.down('ShiftLeft');
+ try{await route(p,[[1216,320],[2240,320],[2240,1600],[2240,2220]],d);}finally{await p.keyboard.up('ShiftLeft');}
+ await p.waitForTimeout(650);d.field=await waitWorld(p,w=>w.outside===1&&w.y>2144,'Reach far enough into field for following bodies to cross');assert.equal(d.field.saved,0);await shot(p,'field-reveal');await axis(p,'x',2124);await p.waitForTimeout(650);d.westField=await world(p);d.cohort=await waitWorld(p,w=>w.outside_people===6&&w.alive===6,'All six people physically traverse service route and ramp, including west-side regroup',14000);await face(p,270);await shot(p,'six-survivors-outside');
+});
+await runCase('desktop-blast-transfer',{viewport:{width:1200,height:800}},async(p,d)=>{
+ await press(p,'KeyQ');await warp(p,936,320,d,0);await use(p,w=>w.cart===1,'Move cart for loose-ammunition test');await warp(p,1060,192,d,0);await use(p,w=>w.ammo===2,'Carry two loose rounds before dying');await warp(p,1872,1024,d,270);await use(p,w=>w.charge===1,'Collect charge for blast consequence');await warp(p,1872,960,d,180);const controlled=(await world(p)).controlled;await use(p,w=>w.fuse>0,'Plant charge and deliberately remain in blast radius');d.transfer=await waitWorld(p,w=>w.breach===1&&w.controlled!==controlled&&w.alive===5,'Lethal blast transfers control and preserves five living people',8000);assert.equal(d.transfer.saved,0);assert.equal(d.transfer.ended,0);assert.equal(d.transfer.ammo,0);await shot(p,'blast-control-transfer');await warp(p,1808,960,d,0);d.recoveredAmmo=await use(p,w=>w.ammo===2,'Recover loose ammunition dropped by the dead survivor');
+});
+for(const[name,viewport]of[['touch-landscape',{width:844,height:390}],['touch-portrait',{width:390,height:844}]])await runCase(name,{viewport,isMobile:true,hasTouch:true,deviceScaleFactor:1},async(p,d,c)=>{
+ const cdp=await c.newCDPSession(p);async function touch(code,ms=100){const box=await p.locator(`[data-code="${code}"]`).boundingBox();assert.ok(box&&box.width>0&&box.height>0,code+' visible');assert.ok(box.x>=0&&box.y>=0&&box.x+box.width<=viewport.width+1&&box.y+box.height<=viewport.height+1,code+' fits viewport');await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2}]});await p.waitForTimeout(ms);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await p.waitForTimeout(250);}
+ const before=await world(p);await touch('KeyW',650);d.movement=await world(p);assert.ok(d.movement.y>before.y+30,'Touch movement');await touch('KeyQ');assert.equal((await world(p)).hold,1);await touch('KeyQ');assert.equal((await world(p)).hold,0);await warp(p,936,320,d,0);await touch('KeyE');d.use=await waitWorld(p,w=>w.cart===1,'Touch use cart');await shot(p,name);const audio=await read(p);assert.equal(audio.audioState,'running','Touch unlocks browser audio');assert.ok(audio.musicPlaying||audio.audioBuffers>0,'Music or sound effects are playing');
+});
+}finally{report.finished=new Date().toISOString();report.passed=report.cases.length===(selected?.length??6)&&report.cases.every(c=>c.passed);await fs.writeFile(reportPath,JSON.stringify(report,null,2)+'\n');await browser.close();console.log(JSON.stringify({passed:report.passed,cases:report.cases.map(({name,passed,failure})=>({name,passed,failure})),report:reportPath},null,2));if(!report.passed)process.exitCode=1;}

@@ -1,0 +1,13 @@
+export const SETTINGS_KEY='pdoom.options.v1';
+// Keys are the codes the engine binds (controls.cfg); E is an unlisted alias for USE.
+export const ACTIONS=Object.freeze({KeyW:'FORWARD',KeyS:'BACK',KeyA:'STRAFE LEFT',KeyD:'STRAFE RIGHT',Space:'USE',ControlLeft:'ATTACK',ShiftLeft:'RUN',KeyT:'CHANGE TOOL',KeyG:'GIVE WEAPON'});
+// keysVersion 2: Space became USE and Ctrl ATTACK, so older saved layouts are not reinterpreted.
+const defaults=()=>({music:.7,sfx:.8,filmSound:true,sensitivity:1,reducedMotion:false,keysVersion:2,keys:Object.fromEntries(Object.keys(ACTIONS).map(k=>[k,k]))});
+const reserved=new Set(['Escape','Tab','Enter','Digit1','Digit2','Digit3','KeyF','KeyR','KeyQ',...Array.from({length:12},(_,i)=>`F${i+1}`)]);
+export function keyName(code){return code==='Space'?'SPACE':/^Control/.test(code)?'CTRL':/^Shift/.test(code)?'SHIFT':code.replace(/^Key/,'').replace(/^Digit/,'').replace(/^Arrow/,'');}
+export function createPreferences(storage){
+ let data=defaults();const listeners=new Set();
+ try{const d=JSON.parse(storage?.getItem(SETTINGS_KEY)||'null');if(d){for(const k of ['music','sfx','sensitivity'])if(Number.isFinite(d[k]))data[k]=Math.max(k==='sensitivity'?.2:0,Math.min(k==='sensitivity'?3:1,d[k]));for(const k of ['filmSound','reducedMotion'])if(typeof d[k]==='boolean')data[k]=d[k];const used=new Set();if(d.keysVersion===2)for(const k of Object.keys(ACTIONS)){const v=d.keys?.[k]||k;if(!/^(Key[A-Z]|Space|ShiftLeft|ControlLeft|Arrow(Up|Down|Left|Right))$/.test(v)||reserved.has(v)||used.has(v)){data.keys=defaults().keys;break;}data.keys[k]=v;used.add(v);}}}catch{}
+ function publish(){try{storage?.setItem(SETTINGS_KEY,JSON.stringify(data));}catch{}listeners.forEach(f=>f(data));}
+ return {get data(){return data;},subscribe(f){listeners.add(f);f(data);return ()=>listeners.delete(f);},set(k,v){if(['music','sfx','sensitivity'].includes(k))data[k]=Math.max(k==='sensitivity'?.2:0,Math.min(k==='sensitivity'?3:1,Number(v)));else if(['filmSound','reducedMotion'].includes(k))data[k]=!!v;publish();},bind(action,code){if(!ACTIONS[action]||reserved.has(code)||!/^(Key[A-Z]|Space|ShiftLeft|ControlLeft|Arrow(Up|Down|Left|Right))$/.test(code))return 'THAT KEY IS RESERVED';const other=Object.keys(data.keys).find(k=>k!==action&&data.keys[k]===code);if(other)return `ALREADY USED FOR ${ACTIONS[other]}`;data.keys[action]=code;publish();return null;},reset(){data=defaults();publish();},map(code){const bound=Object.keys(data.keys).find(k=>data.keys[k]===code);if(bound)return bound;if(ACTIONS[code]&&data.keys[code]!==code)return null;return code;},prompt(text){return text.replace(/\b(T|G|W|A|S|D|SPACE)\b/g,(s)=>keyName(data.keys[s==='SPACE'?'Space':'Key'+s]||(s==='SPACE'?'Space':'Key'+s)));}};
+}

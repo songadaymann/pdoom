@@ -1,0 +1,4 @@
+WallTexture PDGLASS, 144, 60
+{
+    Patch "patches/environment/PDGLASS.png", 0, 0
+}

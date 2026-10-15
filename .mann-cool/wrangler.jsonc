@@ -1,0 +1,52 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "mann-cool-pdoom",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-08",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": true,
+  "preview_urls": false,
+  "routes": [
+    {
+      "pattern": "mann.cool/pdoom",
+      "zone_name": "mann.cool"
+    },
+    {
+      "pattern": "mann.cool/pdoom/*",
+      "zone_name": "mann.cool"
+    },
+    {
+      "pattern": "www.mann.cool/pdoom",
+      "zone_name": "mann.cool"
+    },
+    {
+      "pattern": "www.mann.cool/pdoom/*",
+      "zone_name": "mann.cool"
+    }
+  ],
+  "assets": {
+    "directory": "../.mann-cool-assets",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "not_found_handling": "none"
+  },
+  "r2_buckets": [
+    {
+      "binding": "GAME_ASSETS",
+      "bucket_name": "mann-cool-game-assets"
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.05
+    }
+  },
+  "account_id": "a79a1faef6e8f94566f3320429d54006"
+}

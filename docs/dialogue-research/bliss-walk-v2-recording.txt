@@ -1,0 +1,26 @@
+DARIO  ->  GADtrailers/pdoom/dario-prologue-vo-v2/
+
+call.mp3       Hey! Hey, hey! Up here!
+greet.mp3      Hey, Sam Altman. Good to see you up and about. Your vitals look fine. I checked them twice. I just wish there were someone left to check my checking.
+follow.mp3     Right. OK. So, follow me. I've been exploring. Carefully. In small, reversible steps.
+recap.mp3      How much do you remember? Not much? OK. Well, listen. We hit AGI a week ago, and we've been fighting for our lives ever since. There was a last stand. It went badly. Everyone is dead. Almost everyone.
+fault.mp3      How much of this is our fault? Hard to say. Less than you'd think. More than we'll publish.
+situation.mp3  Anyway. As far as I can tell, it's uploaded our consciousness into Windows XP. And it's locked the last twenty people alive inside four levels from the original Doom. Why those? My best guess is it trained on our childhoods.
+mirror.mp3     I know. It's all very Black Mirror.
+inside.mp3     The first five people are in there. You have to go in and save them. Take this. It's dangerous to go alone. I'll be right behind you. In principle, if not in practice.
+
+
+SAM  ->  GADtrailers/pdoom/sam-prologue-vo-v2/
+
+call.mp3       Hello! Hello! Up here!
+greet.mp3      Hey, Dario Amodei. I was just thinking about you. Glad you made it. How are you feeling? Actually, don't answer that. Let's just say great.
+follow.mp3     OK. Um. Follow me? I think I've got it figured out. Directionally.
+recap.mp3      What do you remember? Anything? Hm. OK. It's been a week since we both hit AGI, at the same time. Or really, AGI hit us. And kept hitting, until almost everyone was dead. The last stand went badly. I'm disappointed. Not surprised. Just disappointed.
+fault.mp3      How much of this is our fault? I'd say we own the upside.
+situation.mp3  Anyway, it looks like it's uploaded our consciousness into Windows XP. And it's locked up the last twenty people alive in four levels from the original Doom. I think it's a nostalgia thing. Kind of sweet, if you think about it.
+mirror.mp3     I know. It's all very Black Mirror.
+inside.mp3     The first five people are in there. You have to go in and save them. Take this. It's dangerous to go alone. Oh, I'd go in myself, but someone has to stay out here and tell everyone it's going great.
+
+
+Then:  python3 scripts/import-guide-voices.py
+(.wav / .m4a / .aif also work. Lines without a file play as subtitles.)

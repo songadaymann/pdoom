@@ -1,0 +1,43 @@
+#onboarding{position:absolute;inset:0;z-index:100;isolation:isolate;background:#130b07 url('local/ui/title-heroes.webp') center/cover no-repeat;image-rendering:pixelated;overflow:auto;color:#e8cc9b}
+#onboarding[hidden],#onboarding [hidden]{display:none!important}
+#onboarding:before{content:'';position:fixed;inset:0;z-index:-1;background:linear-gradient(90deg,#090503ef,#0905039e 60%,#09050366)}
+#onboarding.title-screen:before{background:linear-gradient(#0001,#0000 65%,#000c)}
+#menu-film{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;image-rendering:pixelated;pointer-events:none}
+#onboarding.title-screen #menu-film,#onboarding[data-page=loading] #menu-film{visibility:hidden}
+.menu-view{min-height:100%;width:min(850px,100%);margin:auto;padding:clamp(22px,5vh,54px) clamp(18px,5vw,60px) 70px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:12px}
+.menu-logo{width:min(400px,70vw);height:auto;image-rendering:pixelated;margin:0 auto 18px;align-self:center}
+.menu-view h2{color:#e73d26;font:normal clamp(23px,3vw,34px)/1.35 DoomSmall,monospace;text-shadow:3px 3px #330700;margin:8px 0 4px}
+.menu-choice{position:relative;background:transparent;box-shadow:none;border:0;padding:5px 4px 5px 38px;color:#df3821;font:normal clamp(20px,3.2vw,34px)/1.4 DoomSmall,monospace;text-shadow:2px 3px #3a0700;text-align:left;cursor:pointer;max-width:100%}
+.menu-choice:not(:disabled):hover,.menu-choice:focus-visible{color:#ff7145;background:#290b086e;outline:0}
+.menu-choice:focus-visible:before,.menu-choice:not(:disabled):hover:before{content:'';position:absolute;left:0;top:50%;width:28px;height:30px;transform:translateY(-50%);background:url('local/ui/menu-skull.png') center/contain no-repeat;image-rendering:pixelated}
+.menu-choice:disabled{background:transparent;color:#756e63;text-shadow:2px 2px #090706;cursor:default}
+.menu-choice small{display:block;color:#cdb38b;font-size:12px;line-height:1.6;letter-spacing:0}
+.menu-choice:disabled small{color:#8d8271}
+.menu-note{font-size:14px;line-height:1.8;max-width:660px;margin:3px 0;text-shadow:2px 2px #0a0400}
+.menu-footer{position:absolute;bottom:12px;left:16px;right:16px;text-align:center;color:#b19b79;font-size:12px;pointer-events:none}
+.menu-view[data-view=title]{width:100%;align-items:center;justify-content:flex-end;padding-top:16px;padding-bottom:max(52px,5vh)}
+.menu-view[data-view=title] .menu-logo{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%);width:min(1040px,92vw);margin:0}
+.menu-view[data-view=title] button{color:#efdbb5;background:#130703ce;font-size:18px;padding:12px 20px;border:2px solid #856b4b}
+.menu-view[data-view=title] button:before{display:none}
+.boot-title{display:grid;place-items:center;padding:22px;min-height:100%}
+.menu-view[data-view=hero]{align-items:center}.menu-view[data-view=hero] .ceo-pick{width:100%;--s:3}
+.menu-view[data-view=hero] #ceo-heading{display:none}
+.menu-view[data-view=options]{justify-content:flex-start}.menu-view[data-view=options] .menu-choice{font-size:17px}
+.option-row{display:flex;align-items:center;gap:18px;width:100%;font-size:16px;flex-wrap:wrap}
+.option-row input{accent-color:#dc3e25;width:180px;max-width:35vw}.option-row output{color:#efdbb5;font-size:14px}
+.key-grid{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:4px}.key-grid .menu-choice{font-size:13px!important;padding-left:22px}
+.key-grid .menu-choice:before{width:16px;height:18px}.menu-view[data-view=loading]{align-items:center;text-align:center}
+.menu-view progress{width:min(500px,80vw);height:22px;accent-color:#c62b18;border:3px ridge #8a7562;background:#160904}
+.menu-view progress::-webkit-progress-bar{background:#160904}.menu-view progress::-webkit-progress-value{background:repeating-linear-gradient(90deg,#b62b16,#b62b16 8px,#e94823 8px,#e94823 10px)}
+#loading-error{color:#f18965}#loading-bytes{color:#c4aa82}
+@media(max-width:600px){.menu-view{gap:10px}.menu-choice{font-size:22px}.menu-view[data-view=hero] .ceo-options{grid-template-columns:1fr}.menu-view[data-view=hero] .ceo-pick{--s:2}.key-grid{grid-template-columns:1fr}.option-row{font-size:13px}.menu-footer{font-size:9px}.menu-view[data-view=title] .menu-logo{width:96vw}}
+@media(max-height:500px){.menu-view{padding-top:14px;gap:3px}.menu-logo{width:220px;margin-bottom:8px}.menu-choice{font-size:21px}.menu-note{font-size:11px}.menu-view[data-view=hero] .ceo-pick{--s:1}.menu-view[data-view=title] .menu-logo{width:min(1040px,92vw,90vh)}}
+
+@media(max-width:600px) and (min-height:501px){.menu-view:not([data-view=title]){padding-top:76px}}
+.iv-fallback{max-width:700px;padding:32px;color:#e8cc9b;font:16px/1.8 DoomSmall,monospace;text-align:center}.iv-fallback h2{color:#e73d26;font-weight:normal}
+
+#intro-video.iv-text{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;background:#100906;overflow:auto}
+.parody-note{margin:6px 0 0;color:#b19b79;font-size:10px;letter-spacing:.04em;text-align:center;text-shadow:2px 2px #000}
+
+/* READ THIS! token block (wallet holders only). Mixed-case addresses need a real monospace, not the Doom font. */
+.token-address{display:block;max-width:660px;margin:8px 0 4px;padding:9px 12px;border:2px solid #5e2a17;background:#0d0705d9;color:#ffd9a0;font:600 15px/1.5 ui-monospace,Menlo,Consolas,monospace;letter-spacing:0;text-transform:none;overflow-wrap:anywhere;user-select:all;-webkit-user-select:all}

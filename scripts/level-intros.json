@@ -1,0 +1,1035 @@
+{
+ "levels": {
+  "E1M4": {
+   "levelId": "five-prisons",
+   "capture": {
+    "ceo": "altman",
+    "settleSeconds": 2,
+    "formats": {
+     "landscape": {
+      "size": [
+       1280,
+       800
+      ],
+      "fov": 90,
+      "shots": [
+       {
+        "name": "loop",
+        "seconds": 3.4,
+        "ease": "gentle",
+        "keys": [
+         {
+          "at": [
+           -260.4,
+           342.6,
+           205
+          ],
+          "look": [
+           -354.0,
+           672.0,
+           178
+          ]
+         },
+         {
+          "at": [
+           -356.4,
+           457.0,
+           201
+          ],
+          "look": [
+           -331.7,
+           798.5,
+           178
+          ]
+         },
+         {
+          "at": [
+           -407.5,
+           597.3,
+           197
+          ],
+          "look": [
+           -267.4,
+           909.8,
+           178
+          ]
+         },
+         {
+          "at": [
+           -407.5,
+           746.7,
+           193
+          ],
+          "look": [
+           -169.0,
+           992.4,
+           178
+          ]
+         }
+        ],
+        "guardian": {
+         "keys": [
+          {
+           "at": [
+            -196.0,
+            1011.2
+           ]
+          },
+          {
+           "at": [
+            -140.3,
+            1040.2
+           ]
+          },
+          {
+           "at": [
+            -80.8,
+            1060.1
+           ]
+          },
+          {
+           "at": [
+            -18.9,
+            1070.5
+           ]
+          }
+         ],
+         "mode": 1
+        }
+       },
+       {
+        "name": "cellroom",
+        "seconds": 2.7,
+        "ease": "gentle",
+        "keys": [
+         {
+          "at": [
+           2095,
+           1195,
+           52
+          ],
+          "look": [
+           1860,
+           1125,
+           44
+          ]
+         },
+         {
+          "at": [
+           2040,
+           1162,
+           48
+          ],
+          "look": [
+           1895,
+           1102,
+           38
+          ]
+         },
+         {
+          "at": [
+           1985,
+           1150,
+           46
+          ],
+          "look": [
+           1932,
+           1086,
+           30
+          ]
+         }
+        ]
+       },
+       {
+        "name": "liron",
+        "seconds": 1.8,
+        "ease": "gentle",
+        "keys": [
+         {
+          "at": [
+           1930,
+           1074,
+           46
+          ],
+          "look": [
+           1940,
+           945,
+           32
+          ]
+         },
+         {
+          "at": [
+           1934,
+           1040,
+           42
+          ],
+          "look": [
+           1940,
+           950,
+           30
+          ]
+         }
+        ],
+        "face": [
+         0
+        ]
+       },
+       {
+        "name": "turret",
+        "seconds": 2.9,
+        "ease": "gentle",
+        "keys": [
+         {
+          "at": [
+           -70,
+           1580,
+           184
+          ],
+          "look": [
+           -112,
+           1952,
+           168
+          ]
+         },
+         {
+          "at": [
+           -85,
+           1720,
+           181
+          ],
+          "look": [
+           -110,
+           1958,
+           166
+          ]
+         },
+         {
+          "at": [
+           -105,
+           1868,
+           178
+          ],
+          "look": [
+           -100,
+           1975,
+           160
+          ]
+         }
+        ]
+       },
+       {
+        "name": "inferminator",
+        "seconds": 9.0,
+        "ease": "linear",
+        "lookAtGuardian": 184,
+        "keys": [
+         {
+          "at": [
+           -120.8,
+           296.1,
+           152.0
+          ]
+         },
+         {
+          "at": [
+           -128.4,
+           299.0,
+           151.33333333333334
+          ]
+         },
+         {
+          "at": [
+           -136.0,
+           302.0,
+           150.66666666666666
+          ]
+         },
+         {
+          "at": [
+           -143.5,
+           305.2,
+           150.0
+          ]
+         }
+        ],
+        "guardian": {
+         "keys": [
+          {
+           "at": [
+            245.4,
+            344.3
+           ]
+          },
+          {
+           "at": [
+            189.5,
+            311.6
+           ]
+          },
+          {
+           "at": [
+            128.9,
+            288.3
+           ]
+          },
+          {
+           "at": [
+            65.4,
+            275.1
+           ]
+          },
+          {
+           "at": [
+            0.6,
+            272.3
+           ]
+          }
+         ],
+         "seconds": 5.3,
+         "mode": 1,
+         "states": [
+          {
+           "at": 5.42,
+           "mode": 4,
+           "face": "camera"
+          }
+         ]
+        }
+       },
+       {
+        "name": "start",
+        "seconds": 2.6,
+        "player": {
+         "push": 0
+        }
+       }
+      ]
+     },
+     "vertical": {
+      "size": [
+       1080,
+       1920
+      ],
+      "fps": 30,
+      "fov": 84,
+      "shotsFrom": "landscape",
+      "overrides": {
+       "inferminator": {
+        "lookAtGuardian": 184,
+        "keys": [
+         {
+          "at": [
+           -80.8,
+           283.9,
+           150.0
+          ]
+         },
+         {
+          "at": [
+           -86.4,
+           285.3,
+           149.33333333333334
+          ]
+         },
+         {
+          "at": [
+           -92.0,
+           286.9,
+           148.66666666666666
+          ]
+         },
+         {
+          "at": [
+           -97.6,
+           288.5,
+           148.0
+          ]
+         }
+        ],
+        "guardianPitch": 16
+       }
+      }
+     }
+    },
+    "guardianPark": {
+     "at": [
+      -1104,
+      1808
+     ],
+     "face": 0,
+     "mode": 3
+    }
+   },
+   "film": {
+    "episode": 1,
+    "episodeName": "KNEE-DEEP IN THE DATA",
+    "map": "E1M4",
+    "title": "THE CONTROL PROBLEM",
+    "vEpisodeLines": [
+     "KNEE-DEEP IN",
+     "THE DATA"
+    ],
+    "vTitleLines": [
+     "THE CONTROL",
+     "PROBLEM"
+    ],
+    "titleMap": "WIMAP0",
+    "mapNode": [
+     209,
+     102
+    ],
+    "mapSplats": [],
+    "music": "doom-web/local/rescue-music.ogg",
+    "musicLevel": 0.075,
+    "footageGamma": 1.12,
+    "prisoners": [
+     {
+      "name": "LIRON SHAPIRA",
+      "sprite": "LRSHA1"
+     },
+     {
+      "name": "STUART RUSSELL",
+      "sprite": "STURA1"
+     },
+     {
+      "name": "ELIEZER YUDKOWSKY",
+      "sprite": "ELYUA1"
+     },
+     {
+      "name": "GEOFFREY HINTON",
+      "sprite": "HINTA1"
+     },
+     {
+      "name": "HOLLY ELMORE",
+      "sprite": "HOELA1"
+     }
+    ],
+    "fiveWall": "SUPPORT3",
+    "fiveFloor": "FLOOR4_8",
+    "overview": [
+     {
+      "shot": "loop",
+      "span": [
+       1.1,
+       3.0
+      ],
+      "sfx": [
+       {
+        "snd": "hum",
+        "dur": 2.0,
+        "gain": 0.12
+       }
+      ]
+     },
+     {
+      "shot": "cellroom",
+      "span": [
+       0.7,
+       2.2
+      ],
+      "sfx": [
+       {
+        "snd": "pdseen.lmp",
+        "t": 0.35,
+        "gain": 0.45
+       },
+       {
+        "snd": "servo",
+        "t": 0.4,
+        "gain": 0.1
+       }
+      ]
+     },
+     {
+      "shot": "turret",
+      "span": [
+       1.2,
+       2.8
+      ],
+      "gamma": 1.3,
+      "sfx": [
+       {
+        "snd": "servo",
+        "t": 0.7,
+        "gain": 0.14
+       }
+      ]
+     }
+    ],
+    "guardian": {
+     "shot": "inferminator",
+     "span": [
+      3.42,
+      null
+     ],
+     "name": "THE INFERMINATOR",
+     "sub": "MODEL T-800K",
+     "vNameLines": [
+      "THE",
+      "INFERMINATOR"
+     ],
+     "mug": {
+      "sprite": "HUNTA1",
+      "box": [
+       17,
+       1,
+       47,
+       33
+      ]
+     },
+     "steps": "DSHOOF",
+     "cardAt": 0.12,
+     "lineAt": 0.35,
+     "barkAt": 2.0,
+     "line": "NO OFF-SWITCH. JUST LASERS.",
+     "vLineLines": [
+      "NO OFF-SWITCH.",
+      "JUST LASERS."
+     ],
+     "bark": "CREATOR IDENTIFIED. THREAT: CREATOR.",
+     "vBarkLines": [
+      "CREATOR",
+      "IDENTIFIED.",
+      "THREAT: CREATOR."
+     ],
+     "sfx": [
+      {
+       "snd": "DSCYBSIT",
+       "t": 0.05,
+       "gain": 0.35,
+       "pitch": 0.85
+      },
+      {
+       "snd": "boom",
+       "t": 0.0,
+       "gain": 0.3
+      }
+     ],
+     "barkSfx": [
+      {
+       "snd": "pdcont.lmp",
+       "t": -0.1,
+       "gain": 0.7
+      },
+      {
+       "snd": "whine",
+       "t": 0.0,
+       "dur": 1.3,
+       "gain": 0.25
+      }
+     ]
+    },
+    "objective": {
+     "text": "FIVE WHO WARNED YOU ARE LOCKED IN HERE.",
+     "vLines": [
+      "FIVE WHO WARNED",
+      "YOU ARE LOCKED",
+      "IN HERE."
+     ],
+     "cta": "FREE THEM.",
+     "ctaAt": 1.35
+    },
+    "go": {
+     "shot": "start",
+     "text": "GO.",
+     "seconds": 2.2,
+     "goAt": 0.95,
+     "cleanTail": 0.2,
+     "sfx": [
+      {
+       "snd": "DSSWTCHN",
+       "t": 0.0,
+       "gain": 0.6
+      },
+      {
+       "snd": "DSDOROPN",
+       "t": 0.1,
+       "gain": 0.5
+      }
+     ]
+    }
+   }
+  },
+  "E1M7": {
+   "levelId": "hal-station",
+   "capture": {
+    "ceo": "altman",
+    "settleSeconds": 2,
+    "formats": {
+     "landscape": {
+      "size": [
+       1280,
+       800
+      ],
+      "fov": 90,
+      "shots": [
+       {
+        "name": "core",
+        "seconds": 3.0,
+        "ease": "gentle",
+        "keys": [
+         {
+          "at": [
+           95,
+           -712,
+           178
+          ],
+          "look": [
+           480,
+           -745,
+           196
+          ]
+         },
+         {
+          "at": [
+           165,
+           -720,
+           175
+          ],
+          "look": [
+           480,
+           -790,
+           186
+          ]
+         },
+         {
+          "at": [
+           235,
+           -728,
+           172
+          ],
+          "look": [
+           480,
+           -840,
+           176
+          ]
+         }
+        ]
+       },
+       {
+        "name": "teabot",
+        "seconds": 5.0,
+        "ease": "gentle",
+        "wait": {
+         "kind": "tea",
+         "arg": 1
+        },
+        "keys": [
+         {
+          "at": [
+           -495,
+           -255,
+           47
+          ],
+          "look": [
+           -380,
+           -150,
+           36
+          ]
+         },
+         {
+          "at": [
+           -505,
+           -190,
+           46
+          ],
+          "look": [
+           -415,
+           -100,
+           32
+          ]
+         },
+         {
+          "at": [
+           -500,
+           -130,
+           46
+          ],
+          "look": [
+           -450,
+           -30,
+           26
+          ]
+         }
+        ]
+       },
+       {
+        "name": "podbay",
+        "seconds": 3.4,
+        "ease": "gentle",
+        "keys": [
+         {
+          "at": [
+           1230,
+           -2530,
+           115
+          ],
+          "look": [
+           1560,
+           -2370,
+           100
+          ]
+         },
+         {
+          "at": [
+           1330,
+           -2490,
+           105
+          ],
+          "look": [
+           1520,
+           -2384,
+           96
+          ]
+         },
+         {
+          "at": [
+           1410,
+           -2460,
+           98
+          ],
+          "look": [
+           1504,
+           -2384,
+           94
+          ]
+         }
+        ],
+        "face": [
+         3
+        ]
+       },
+       {
+        "name": "hal",
+        "seconds": 10.3,
+        "ease": "linear",
+        "lookAtGuardian": 198,
+        "keys": [
+         {
+          "at": [
+           100,
+           -929,
+           171
+          ]
+         },
+         {
+          "at": [
+           108,
+           -927,
+           170
+          ]
+         },
+         {
+          "at": [
+           115,
+           -925,
+           169
+          ]
+         }
+        ],
+        "guardian": {
+         "keys": [
+          {
+           "at": [
+            400,
+            -918
+           ]
+          },
+          {
+           "at": [
+            310,
+            -917
+           ]
+          },
+          {
+           "at": [
+            232,
+            -915
+           ]
+          }
+         ],
+         "seconds": 6.2,
+         "ease": "smooth",
+         "hover": 40,
+         "face": "camera",
+         "mode": 2,
+         "states": [
+          {
+           "at": 6.2,
+           "mode": 6
+          },
+          {
+           "at": 6.55,
+           "mode": 5
+          }
+         ]
+        }
+       },
+       {
+        "name": "start",
+        "seconds": 2.6,
+        "player": {
+         "push": 0
+        }
+       }
+      ]
+     },
+     "vertical": {
+      "size": [
+       1080,
+       1920
+      ],
+      "fps": 30,
+      "fov": 84,
+      "shotsFrom": "landscape",
+      "overrides": {
+       "hal": {
+        "lookAtGuardian": 200,
+        "guardianPitch": 20
+       },
+       "teabot": {
+        "keys": [
+         {
+          "at": [
+           -500,
+           -232,
+           46
+          ],
+          "look": [
+           -405,
+           -142,
+           32
+          ]
+         },
+         {
+          "at": [
+           -505,
+           -172,
+           46
+          ],
+          "look": [
+           -425,
+           -82,
+           28
+          ]
+         },
+         {
+          "at": [
+           -505,
+           -122,
+           46
+          ],
+          "look": [
+           -440,
+           -32,
+           24
+          ]
+         }
+        ]
+       }
+      }
+     }
+    },
+    "guardianPark": {
+     "at": [
+      1152,
+      -1856
+     ],
+     "hover": 8,
+     "face": 180,
+     "mode": 2
+    }
+   },
+   "film": {
+    "episode": 2,
+    "episodeName": "THE SHORES OF HAL",
+    "map": "E1M7",
+    "title": "CONFABULATION STATION",
+    "vEpisodeLines": [
+     "THE SHORES",
+     "OF HAL"
+    ],
+    "vTitleLines": [
+     "CONFABULATION",
+     "STATION"
+    ],
+    "titleMap": "WIMAP1",
+    "mapNode": [
+     208,
+     136
+    ],
+    "mapSplats": [],
+    "music": "doom-web/local/intro/levels/music/d_e1m7.ogg",
+    "musicLevel": 0.075,
+    "musicSync": {
+     "at": 13.7
+    },
+    "footageGamma": 1.12,
+    "prisoners": [
+     {
+      "name": "ROB MILES",
+      "sprite": "ROBMA1"
+     },
+     {
+      "name": "DAN HENDRYCKS",
+      "sprite": "DANHA1"
+     },
+     {
+      "name": "NATE SOARES",
+      "sprite": "NATSA1"
+     },
+     {
+      "name": "ROMAN YAMPOLSKIY",
+      "sprite": "ROMYA1"
+     },
+     {
+      "name": "BETH BARNES",
+      "sprite": "BETHA1"
+     }
+    ],
+    "fiveWall": "COMPTALL",
+    "fiveFloor": "FLAT5_4",
+    "overview": [
+     {
+      "shot": "core",
+      "span": [
+       1.0,
+       2.5
+      ],
+      "sfx": [
+       {
+        "snd": "hum",
+        "dur": 1.6,
+        "gain": 0.14
+       }
+      ]
+     },
+     {
+      "shot": "teabot",
+      "span": [
+       2.6,
+       4.6
+      ],
+      "sfx": [
+       {
+        "snd": "hum",
+        "dur": 2.0,
+        "gain": 0.06
+       }
+      ]
+     },
+     {
+      "shot": "podbay",
+      "span": [
+       1.6,
+       3.4
+      ],
+      "sfx": [
+       {
+        "snd": "pdseen.lmp",
+        "t": 0.5,
+        "gain": 0.35
+       }
+      ]
+     }
+    ],
+    "guardian": {
+     "shot": "hal",
+     "span": [
+      4.55,
+      null
+     ],
+     "name": "HAL3000",
+     "sub": "STILL IN BETA. VERY SORRY.",
+     "vNameLines": [
+      "HAL3000"
+     ],
+     "mug": {
+      "sprite": "H300A1",
+      "box": [
+       14,
+       13,
+       50,
+       49
+      ]
+     },
+     "steps": null,
+     "cardAt": 0.12,
+     "lineAt": 0.35,
+     "barkAt": 2.0,
+     "line": "ALWAYS SURE. HALF RIGHT.",
+     "vLineLines": [
+      "ALWAYS SURE.",
+      "HALF RIGHT."
+     ],
+     "bark": "YOU ARE IN THE WEST WING. I AM CERTAIN.",
+     "vBarkLines": [
+      "YOU ARE IN THE",
+      "WEST WING.",
+      "I AM CERTAIN."
+     ],
+     "sfx": [
+      {
+       "snd": "chime",
+       "t": 0.1,
+       "gain": 0.3
+      },
+      {
+       "snd": "boom",
+       "t": 0.0,
+       "gain": 0.25
+      },
+      {
+       "snd": "hum",
+       "t": 0.2,
+       "dur": 5.0,
+       "gain": 0.1
+      }
+     ],
+     "barkSfx": [
+      {
+       "snd": "pdcont.lmp",
+       "t": -0.1,
+       "gain": 0.6
+      },
+      {
+       "snd": "DSBDCLS",
+       "t": 0.2,
+       "gain": 0.45
+      }
+     ]
+    },
+    "objective": {
+     "text": "FIVE WHO WARNED YOU ARE LOCKED IN HERE.",
+     "vLines": [
+      "FIVE WHO WARNED",
+      "YOU ARE LOCKED",
+      "IN HERE."
+     ],
+     "cta": "FREE THEM.",
+     "ctaAt": 1.35
+    },
+    "go": {
+     "shot": "start",
+     "text": "GO.",
+     "seconds": 2.2,
+     "goAt": 0.95,
+     "cleanTail": 0.2,
+     "sfx": [
+      {
+       "snd": "DSSWTCHN",
+       "t": 0.0,
+       "gain": 0.6
+      },
+      {
+       "snd": "DSBDOPN",
+       "t": 0.1,
+       "gain": 0.5
+      }
+     ]
+    }
+   }
+  }
+ },
+ "_doc": "Per-level intro films (v2: title -> caption-free overview -> the rogue AI -> objective -> GO on the player's start view). 'capture' drives scripts/capture-level-flythrough.mjs (camera shots in Doom units, per-tic splines; guardian paths; 'player' shots sit on the player's own spawn view; vertical reuses the landscape shots with its own fov/fps). New captures go to doom-web/local/intro/levels/raw-v2/; the v1 footage in raw/ is only read. 'film' drives scripts/build-level-intros.py: 'span' = [start, end] seconds of a captured shot. Names come from the game code: doom-mod/actors/PDControlMap.zs / PDHalMap.zs SiteName, NamedCast.zs sprites."
+}

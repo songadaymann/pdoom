@@ -1,0 +1,139 @@
+{
+  "boards": [
+    {
+      "variant": "five-prisons-rescue-v3",
+      "label": "Control · Rescue score",
+      "metric": "rescueScoreV2",
+      "metricLabel": "The Control Problem: saved + cameras + speed + outlook",
+      "direction": "desc",
+      "display": "integer",
+      "aggregation": "best"
+    },
+    {
+      "variant": "five-prisons-perfect-v3",
+      "label": "Control · Perfect rescue",
+      "metric": "perfectRescueActiveMs",
+      "metricLabel": "The Control Problem: all 6 saved",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    },
+    {
+      "variant": "five-prisons-clean-sweep-v3",
+      "label": "Control · Clean sweep",
+      "metric": "cleanSweepActiveMs",
+      "metricLabel": "The Control Problem: all 6 saved, all 9 cameras",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    },
+    {
+      "variant": "hal-station-rescue-v3",
+      "label": "HAL · Rescue score",
+      "metric": "rescueScoreV2",
+      "metricLabel": "Confabulation Station: saved + cameras + speed + outlook",
+      "direction": "desc",
+      "display": "integer",
+      "aggregation": "best"
+    },
+    {
+      "variant": "hal-station-perfect-v3",
+      "label": "HAL · Perfect rescue",
+      "metric": "perfectRescueActiveMs",
+      "metricLabel": "Confabulation Station: all 6 saved",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    },
+    {
+      "variant": "hal-station-clean-sweep-v3",
+      "label": "HAL · Clean sweep",
+      "metric": "cleanSweepActiveMs",
+      "metricLabel": "Confabulation Station: all 6 saved, all 9 cameras",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    },
+    {
+      "variant": "five-prisons-rescue-v1",
+      "label": "Control v1 · Rescue score",
+      "metric": "rescueScoreV1",
+      "metricLabel": "Five Prisons (legacy): saved + cameras + speed + outlook",
+      "direction": "desc",
+      "display": "integer",
+      "aggregation": "best"
+    },
+    {
+      "variant": "five-prisons-perfect-v1",
+      "label": "Control v1 · Perfect rescue",
+      "metric": "perfectRescueActiveMs",
+      "metricLabel": "Five Prisons (legacy): all 6 saved",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    },
+    {
+      "variant": "five-prisons-clean-sweep-v1",
+      "label": "Control v1 · Clean sweep",
+      "metric": "cleanSweepActiveMs",
+      "metricLabel": "Five Prisons (legacy): all 6 saved, all 9 cameras",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    },
+    {
+      "variant": "five-prisons-rescue-v2",
+      "label": "Control v2 · Rescue score",
+      "metric": "rescueScoreV2",
+      "metricLabel": "Control v2: saved + cameras + speed + outlook",
+      "direction": "desc",
+      "display": "integer",
+      "aggregation": "best"
+    },
+    {
+      "variant": "five-prisons-perfect-v2",
+      "label": "Control v2 · Perfect rescue",
+      "metric": "perfectRescueActiveMs",
+      "metricLabel": "Control v2: all 6 saved",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    },
+    {
+      "variant": "five-prisons-clean-sweep-v2",
+      "label": "Control v2 · Clean sweep",
+      "metric": "cleanSweepActiveMs",
+      "metricLabel": "Control v2: all 6 saved, all 9 cameras",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    },
+    {
+      "variant": "hal-station-rescue-v2",
+      "label": "HAL v2 · Rescue score",
+      "metric": "rescueScoreV2",
+      "metricLabel": "HAL v2: saved + cameras + speed + outlook",
+      "direction": "desc",
+      "display": "integer",
+      "aggregation": "best"
+    },
+    {
+      "variant": "hal-station-perfect-v2",
+      "label": "HAL v2 · Perfect rescue",
+      "metric": "perfectRescueActiveMs",
+      "metricLabel": "HAL v2: all 6 saved",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    },
+    {
+      "variant": "hal-station-clean-sweep-v2",
+      "label": "HAL v2 · Clean sweep",
+      "metric": "cleanSweepActiveMs",
+      "metricLabel": "HAL v2: all 6 saved, all 9 cameras",
+      "direction": "asc",
+      "display": "time-ms",
+      "aggregation": "best"
+    }
+  ]
+}

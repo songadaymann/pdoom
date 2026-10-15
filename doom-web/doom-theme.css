@@ -1,0 +1,114 @@
+@font-face{font-family:DoomSmall;src:url('local/ui/doom-small.ttf') format('truetype');font-display:swap}
+@font-face{font-family:DoomNumbers;src:url('local/ui/doom-numbers.ttf') format('truetype');font-display:swap}
+:root{font-family:DoomSmall,monospace;font-synthesis:none;color:#d6b988}
+button,a{font-family:inherit;text-shadow:1px 2px #210600}
+button{color:#e3442d;background:#241c17;border:2px solid;border-color:#736250 #120e0b #100c09 #736250;box-shadow:inset 0 0 0 1px #3c3025;font-size:19px}
+button:hover{color:#ff7c51;background:#30221a}
+button:disabled{color:#a5957b;background:#241c17}
+a{color:#be714b}
+#launcher,#story{background:linear-gradient(#000a,#000b),url('local/ui/interpic.png');background-size:auto,640px 400px;image-rendering:pixelated}
+#launcher{gap:10px}#title{line-height:0;margin:0 0 4px;letter-spacing:0}
+#title img,.story-logo{width:368px;max-width:65vw;image-rendering:pixelated}
+#scenario{color:#e74730;font-size:21px;text-shadow:2px 2px #210800}
+.controls{color:#c3a67b;font-size:16px;line-height:1.5;margin:10px 0}
+#hud-note,#status{font-size:13px;color:#a89270;line-height:1.5}
+#hud-note{max-width:650px}
+#other-level{font-size:13px}
+#story{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px;text-align:center}
+.story-panel{max-width:680px;min-height:170px}
+#story-count{color:#8d7557;font-size:15px}
+#story-heading{color:#e4432a;font-size:28px;line-height:1.5;margin:14px 0 18px;text-shadow:2px 3px #2b0800}
+#story-text{color:#d7b98b;font-size:22px;line-height:1.8;text-shadow:2px 2px #140a04}
+.story-actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+#story-skip{font-size:14px;color:#a68a66}
+.story-keys{font-size:12px;color:#8d7557}
+.checkpoint .hud-label{font-size:13px;font-weight:400;letter-spacing:0;color:#cab181}
+.checkpoint #health,.checkpoint #survival{font-family:DoomNumbers,monospace;font-weight:400;letter-spacing:0;font-size:34px}
+.checkpoint #survival{font-size:30px}
+.checkpoint #people,.checkpoint #group,.checkpoint #equipment,.checkpoint #doom-chance{font-size:var(--doom-small);line-height:calc(var(--px-s) * 14)}
+.checkpoint #group{font-size:11px}
+.checkpoint #rescue-slots{margin:3px 0}
+.checkpoint .rescue-slot{font-size:18px}
+.checkpoint #prompt{font-size:var(--doom-text);color:#dfbc83;border-bottom:2px solid #77553c;background:#1a100ce8;line-height:var(--doom-lead);text-shadow:var(--px) var(--px) #100400}
+.checkpoint #message{font-size:var(--doom-text);color:#c7ae84;line-height:var(--doom-lead);background:#160c09e8;padding:8px 14px;max-width:min(760px,90vw);text-shadow:var(--px) var(--px) #180300}
+.checkpoint #message.spoken{border-left:4px solid #a92d1c;text-align:left}
+.dialogue-speaker{display:block;color:#ee5336;font-size:var(--doom-text);line-height:var(--doom-lead)}
+.dialogue-line{display:block;color:#edca93;font-size:var(--doom-text);line-height:var(--doom-lead)}
+.checkpoint #held-wrench.swinging{animation:wrench-swing .44s linear}
+@keyframes wrench-swing{0%{transform:rotate(-18deg)}25%{transform:translate(30px,15px) rotate(24deg)}50%{transform:translate(-90px,-20px) rotate(-75deg)}100%{transform:rotate(-18deg)}}
+#held-gun{position:absolute;left:50%;bottom:100px;width:210px;image-rendering:pixelated;pointer-events:none;transform:translateX(-50%)}
+#held-gun.firing{transform:translate(-50%,14px)}
+@media(pointer:coarse){
+ #launcher{padding:14px;gap:7px}.controls{font-size:13px;margin:6px 0}#scenario{font-size:16px}#hud-note,#status,#other-level{font-size:11px}
+ #title img,.story-logo{max-width:55vw;width:276px}
+ .checkpoint .hud-label{font-size:10px}.checkpoint #health{font-size:25px}.checkpoint #survival{font-size:24px}
+ .checkpoint #people,.checkpoint #equipment,.checkpoint #doom-chance{font-size:var(--doom-small)}.checkpoint #group{font-size:9px}
+ .checkpoint #message{padding:7px 10px}
+ #touch button{font-family:DoomSmall,monospace;font-size:16px;color:#cfb084;background:#251b13}
+ #held-gun{bottom:16%;width:150px}
+ #story{gap:12px;padding:16px}#story-heading{font-size:22px;margin:10px 0}#story-text{font-size:18px;line-height:1.6}.story-panel{min-height:160px}
+}
+@media(pointer:coarse) and (max-height:500px){
+ #launcher{gap:3px}#title img{width:200px}#scenario{font-size:14px}.controls{font-size:11px;margin:3px 0}#hud-note{font-size:9px}#status{margin:0;min-height:12px}#start{padding:9px 16px}
+ #story{gap:8px;padding:14px}.story-logo{width:150px}.story-panel{min-height:120px;max-width:660px}#story-heading{font-size:18px;margin:4px 0}#story-text{font-size:16px;line-height:1.5}#story-count{font-size:11px}.story-keys{display:none}.story-actions button{padding:8px 14px;font-size:14px}
+}
+/* CHOOSE YOUR CEO: Doom's menu voice. Each face stands in the status bar's own face
+   well (PDBAR x 142-178), at an integer scale --s; both entries get identical treatment. */
+#launcher{justify-content:safe center;overflow-y:auto}
+.ceo-pick{--s:3;display:flex;flex-direction:column;align-items:center;gap:4px;margin:2px 0 6px;max-width:100%}
+#ceo-heading{margin:0;color:#e4432a;font-size:26px;font-weight:400;line-height:1.3;letter-spacing:0;text-shadow:2px 3px #2b0800}
+#ceo-subtitle,#ceo-footer{color:#a89270;font-size:13px;line-height:1.5}
+#ceo-footer{color:#8d7557}
+.ceo-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;width:min(720px,100%);margin:6px 0 4px}
+.ceo-option{position:relative;display:flex;align-items:center;gap:14px;padding:8px 12px 8px 8px;text-align:left;cursor:pointer;
+  background:#1a1410e0;border:2px solid;border-color:#4d4033 #0d0a08 #0d0a08 #4d4033;box-shadow:inset 0 0 0 1px #2a2119;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+/* The radio covers its whole entry (invisible), so touch screen readers find it anywhere on the card. */
+.ceo-option input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;pointer-events:none}
+.ceo-face{flex:none;position:relative;width:calc(37px*var(--s));height:calc(32px*var(--s));image-rendering:pixelated;
+  background:#1b1b1b url('local/ui/stbar/PDBAR.png') calc(-142px*var(--s)) 0/calc(320px*var(--s)) calc(32px*var(--s)) no-repeat}
+/* height:auto keeps each lump's own height: STFEVL0 (the grin) is 24x30, STFST01 24x29. */
+.ceo-face img{position:absolute;left:calc(6px*var(--s));top:calc(2px*var(--s));width:calc(24px*var(--s));height:auto;image-rendering:pixelated;pointer-events:none}
+.ceo-face img[src*="/samwise/"],.ceo-face img[src*="/mario/"]{left:calc(2px*var(--s));width:calc(33px*var(--s))}
+#replay-intro{font-size:13px;padding:7px 12px;color:#c9b894}
+.ceo-text{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ceo-name{color:#bca67d;font-size:21px;line-height:1.3;text-shadow:2px 2px #210600}
+.ceo-line{color:#9c8767;font-size:13px;line-height:1.6;text-shadow:1px 2px #140a04}
+.ceo-line span{display:block}
+.ceo-option:not(.selected) .ceo-face img{filter:grayscale(.8) brightness(.55)}
+.ceo-option:hover{background:#2a1e17e6}
+.ceo-option.selected{background:#3b1a10eb;border-color:#ff7c51 #5e1005 #5e1005 #ff7c51;box-shadow:inset 0 0 0 1px #a92d1c}
+.ceo-option.selected .ceo-name{color:#ff5a3c;text-shadow:2px 2px #2b0800}
+.ceo-option.selected .ceo-line{color:#edca93}
+.ceo-option:has(input:focus-visible){outline:2px solid #ffe3a3;outline-offset:4px}
+.ceo-pick.locked .ceo-option{cursor:default}
+.ceo-pick.locked .ceo-option:not(.selected):hover{background:#1a1410e0}
+/* Shorter desktop windows tighten the launcher in steps so Start stays on screen. */
+@media(pointer:fine) and (max-height:850px){#launcher{gap:6px;padding:16px 24px}#title img{width:300px}.controls{margin:4px 0}.ceo-pick{--s:2}}
+@media(pointer:fine) and (max-height:760px){.controls{line-height:1.4}.ceo-pick{--s:2}.ceo-options{margin:4px 0 2px}}
+@media(pointer:fine) and (max-height:660px){
+ #title img{width:220px}#scenario{font-size:17px}.controls{font-size:13px}#hud-note{font-size:11px}
+ #ceo-heading{font-size:20px}#ceo-subtitle,#ceo-footer{font-size:11px}.ceo-name{font-size:16px}.ceo-line{font-size:11px;line-height:1.5}
+}
+@media(max-width:560px){#launcher{gap:6px;padding:16px}.controls{font-size:13px;margin:6px 0}}
+@media(pointer:coarse){
+ /* Touch: the keyboard help gives way to the picker (the touch pads replace it in play). */
+ .controls{display:none}
+}
+@media(pointer:coarse),(max-width:560px){
+ .ceo-pick{--s:2;gap:3px;margin:2px 0 4px}
+ #ceo-heading{font-size:20px}#ceo-subtitle,#ceo-footer{font-size:11px}
+ .ceo-options{gap:10px;margin:4px 0 2px}.ceo-name{font-size:16px}.ceo-line{font-size:11px;line-height:1.5}
+}
+@media(max-width:560px){
+ #scenario{max-width:calc(100vw - 140px)}
+ .ceo-option{flex-direction:column;justify-content:flex-start;gap:6px;padding:8px 4px 10px;text-align:center}
+ .ceo-text{align-items:center;gap:4px}.ceo-name{font-size:14px}.ceo-line{font-size:10px}
+}
+@media(pointer:coarse) and (max-height:500px){
+ #title img{width:150px}#launcher{padding:8px 14px}
+ #ceo-heading{font-size:15px;line-height:1.3}#ceo-subtitle,#ceo-footer{font-size:9px;line-height:1.4}
+ .ceo-options{width:min(600px,100%);margin:3px 0 1px}.ceo-option{padding:3px 10px 3px 3px;gap:10px}
+ .ceo-name{font-size:14px}.ceo-line{font-size:10px;line-height:1.4}.ceo-text{gap:3px}
+}
+@media(pointer:coarse) and (max-width:560px) and (min-height:700px){.ceo-pick{--s:3}}

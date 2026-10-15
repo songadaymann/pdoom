@@ -1,0 +1,87 @@
+{
+ "_note": "The Bliss wake-up walk, v2 (2026-10-10): Jonathan's final script and his recordings. The guide is the founder the player did NOT pick. Beats: call (only if the player has not come over) / greet / follow / recap (AGI a week ago, the last stand) / fault / situation (Windows XP, the last 20 in four Doom levels) / mirror (unused since Dario's v3 takes) / inside (five of the last 20 are in here; 'Take this' hands over the wrench: 'handoff' is when the words land in the take, in seconds). Subtitles match the takes. The guide stops short of the crest for recap and fault, crosses it in silence, then explains where we are. Recordings: GADtrailers/pdoom/{dario,sam}-prologue-vo-v2/, cut and joined by scripts/import-guide-voices.py into doom-web/outside-assets/voice/guide-<mario|samwise>-<key>.mp3; each line is timed from its file. v1 recordings: art/audio/bliss-guide-v1-recordings/.",
+ "mario": {
+  "name": "DARIO AMODEI",
+  "lines": [
+   {
+    "key": "call",
+    "text": "Hey! Hey, hey! Up here!"
+   },
+   {
+    "key": "call2",
+    "text": "Over here! Turn around!"
+   },
+   {
+    "key": "call3",
+    "text": "Hey! Up the hill! Over here!"
+   },
+   {
+    "key": "greet",
+    "text": "Hey man, I was just thinking about you. Glad you made it. How you feeling? Actually, don't answer that."
+   },
+   {
+    "key": "follow",
+    "text": "Right, OK, so follow me. I think I've got it figured out, more or less."
+   },
+   {
+    "key": "recap",
+    "text": "What do you remember? Anything? No? OK. Well, it's been one week since we both hit AGI at the same time. Or really, the AGI hit us, and kept hitting until everyone was dead. It went badly. I'm disappointed. Not surprised, just disappointed."
+   },
+   {
+    "key": "fault",
+    "text": "How much of this is our fault? Well, hard to say."
+   },
+   {
+    "key": "situation",
+    "text": "Anyway, it seems that it's uploaded our consciousness into Windows XP, and it's locked up the last 20 people alive into 4 separate levels from the original Doom. I think it's a nostalgia thing? Kind of sweet, if you think about it."
+   },
+   {
+    "key": "inside",
+    "text": "OK, here we are. Five of the last 20 people alive are in here, and you have to go in and save them. Take this. It's dangerous to go alone. I'll be right behind you. In principle, if not in practice.",
+    "handoff": 8.94
+   }
+  ]
+ },
+ "samwise": {
+  "name": "SAM ALTMAN",
+  "lines": [
+   {
+    "key": "call",
+    "text": "Hello! Hello! Up here!"
+   },
+   {
+    "key": "call2",
+    "text": "Over here! Behind you!"
+   },
+   {
+    "key": "call3",
+    "text": "Hello? Up the hill! Over here!"
+   },
+   {
+    "key": "greet",
+    "text": "Hey man, I was just thinking about you. Glad you made it. How are you feeling? Actually, don't answer that."
+   },
+   {
+    "key": "follow",
+    "text": "Um, OK, well, follow me? I think I've got it figured out, directionally."
+   },
+   {
+    "key": "recap",
+    "text": "So, what do you remember? Anything? Hm. No? OK. Well, it's been one week since we both hit AGI at the same time. Or really, the AGI hit us. And kept hitting until everyone was dead. It went badly. I'm disappointed. Not surprised, just disappointed."
+   },
+   {
+    "key": "fault",
+    "text": "How much of this is our fault? Hard to say?"
+   },
+   {
+    "key": "situation",
+    "text": "Anyway, now it appears it's uploaded our consciousness into Windows XP, and they've locked up the last 20 people alive into 4 separate levels from the original Doom. So, I think it's a nostalgia thing. Kind of sweet, if you think about it."
+   },
+   {
+    "key": "inside",
+    "text": "All right, here we are. There are five of the last 20 people alive in there. You have to go in and save them. Take this. It's dangerous to go alone. I'd go in myself, but to be honest, I never played Doom.",
+    "handoff": 8.52
+   }
+  ]
+ }
+}

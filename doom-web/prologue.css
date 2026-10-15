@@ -1,0 +1,25 @@
+#prologue-hud{position:absolute;inset:0;pointer-events:none;text-shadow:2px 2px #180600;color:#e4c59a;font-family:DoomSmall,monospace}
+#prologue-hud .war-title{position:absolute;left:50%;top:22%;transform:translateX(-50%);font-size:clamp(18px,3vw,40px);white-space:nowrap;color:#df3526;transition:opacity 1.2s linear}
+#prologue-hud .war-objective{position:absolute;left:calc(50% - var(--gw,100vw) / 2 + 12px);top:calc(50% - var(--gh,62vw) / 2 + 10px);max-width:70%;margin:0;color:#e8e2c8;text-shadow:2px 2px #000;font-size:clamp(10px,1.1vw,16px)}
+#prologue-hud .war-skip{position:absolute;right:76px;top:20px;pointer-events:auto;font-size:11px;color:#b7a184}
+/* Capture: exactly over the engine view (#canvas: min(100vw,160dvh) wide, 8:5, centred). */
+#prologue-transition{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(100vw,160dvh);aspect-ratio:8/5;z-index:18;pointer-events:none;image-rendering:pixelated;background:transparent}
+#prologue-transition[hidden]{display:none}
+#prologue-whiteout{position:absolute;z-index:19;background:#fff;pointer-events:none}
+#prologue-whiteout[hidden]{display:none}
+/* The upload readout: Doom lettering on whole pixels (--px), green over the code, dark on the white. */
+#prologue-upload-label{position:absolute;z-index:20;left:0;right:0;top:calc(50% - var(--px) * 24);margin:0;display:flex;flex-direction:column;align-items:center;gap:calc(var(--px) * 5);font:var(--doom-text)/var(--doom-lead) DoomSmall,monospace;color:#7dff8a;text-shadow:var(--px) var(--px) #031a06;-webkit-font-smoothing:none;pointer-events:none}
+#prologue-upload-label[hidden]{display:none}
+#prologue-upload-label .upload-bar{display:block;width:calc(var(--px) * 160);height:calc(var(--px) * 7);border:var(--px) solid currentColor;padding:var(--px);box-sizing:content-box}
+#prologue-upload-label .upload-bar span{display:block;height:100%;width:0;background:currentColor}
+#prologue-upload-label.on-white{color:#1d2a20;text-shadow:none}
+.prologue #people,.prologue #held-wrench,.prologue #held-gun,.prologue #message,.prologue #prompt{display:none!important}
+.prologue #restart{display:none!important}
+
+.bliss-intro #hud,.bliss-intro #hub-count,.bliss-intro .hub-heading,.bliss-intro #restart,.bliss-intro #doom-dialogue,.bliss-intro #message{display:none!important}
+#bliss-guide{position:absolute;z-index:7;left:0;right:0;margin:0 auto;bottom:5%;width:min(calc(var(--px) * 380),86vw);box-sizing:border-box;padding:14px 20px;background:#140f0bd9;border-left:3px solid #ccad79;color:#ead9b6;font-family:DoomSmall,monospace;text-shadow:var(--px) var(--px) #000;pointer-events:none}
+#bliss-guide[hidden]{display:none}
+#bliss-guide p{margin:0;line-height:var(--doom-lead);overflow-wrap:anywhere}
+#bliss-guide .guide-speaker{color:#e4b97b;font-size:var(--doom-small);margin-bottom:8px}
+#bliss-guide .guide-line{font-size:var(--doom-text)}
+#bliss-guide .guide-skip{position:fixed;right:0;bottom:calc(100% + 12px);font:10px DoomSmall,monospace;color:#c7b78e;pointer-events:auto}

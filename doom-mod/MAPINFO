@@ -1,0 +1,105 @@
+clearepisodes
+episode E1M4 { name = "The Control Problem" key = "c" }
+episode E1M7 { name = "Confabulation Station" key = "h" }
+
+gameinfo
+{
+    PlayerClasses = "PDSurvivorPlayer"
+    AddEventHandlers = "PDCampaignSession", "PDGame", "PDCheckpoint", "PDPlatformPanel", "PDEnvironmentReport", "PDLastStand", "PDAutoDoors"
+}
+
+DoomEdNums
+{
+    15000 = PDCompanion
+    15001 = PDHunter
+    15002 = PDCamera
+    15003 = PDCart
+    15004 = PDCharge
+    15005 = PDCrackedWall
+    15006 = PDGun
+    15007 = PDRelay
+    15008 = PDAmmo
+    15009 = PDDoor
+    15100 = PDCheckpointPrisoner
+    15101 = PDCheckpointCamera
+    15102 = PDCheckpointWrench
+    15103 = PDCheckpointGun
+    15104 = PDCheckpointLock
+    15105 = PDCheckpointRelease
+    15107 = PDCheckpointTurret
+    15108 = PDCheckpointBreaker
+    15109 = PDCheckpointKey
+    15110 = PDCheckpointCharge
+    15111 = PDCheckpointBreach
+    15112 = PDCheckpointPad
+    15113 = PDCheckpointEmergency
+    15114 = PDCheckpointRounds
+    15116 = PDRefugeOverride
+    15117 = PDRefugeCover
+    15118 = PDSamJunction
+    15119 = PDSamShutterMarker
+    15120 = PDSamInsideLatch
+    15121 = PDSamCable
+    15122 = PDHalTerminal
+    15123 = PDHalPod
+    15124 = PDTeaBot
+    15127 = PDTeaPanel
+    15128 = PDTeaCupPile
+    15129 = PDHalDoorPanel
+    15130 = PDEvaluationSign
+    15131 = PDHubCrank
+    15140 = PDLabPoster
+    15141 = PDQuietTerminal
+    15142 = PDSteamEmitter
+    15143 = PDSteamVent
+    15144 = PDBrokenLight
+    15145 = PDCivilianChess
+    15150 = PDHollyPower
+    15151 = PDHollyControl
+    15152 = PDHollyGate
+    15153 = PDHollyBridge
+    15154 = PDHollyCable
+    15156 = PDEvaluationNotice
+    15106 = PDCheckpointHunter
+    15200 = PDWarTrooper
+    15201 = PDWarSquid
+    15202 = PDWarSpawn
+    15203 = PDWarEnforcer
+    15204 = PDWarGunship
+    15206 = PDWarAssault
+    15207 = PDWarSectionMark
+    15208 = PDWarAirlock
+    15209 = PDWarAlly
+    15210 = PDWarAllyGrey
+    15211 = PDWarAllyBrown
+    15212 = PDWarAllyRed
+}
+
+map E1M2 "p(DOOM): The Last Stand"
+{ next="E1M4" secretnext="E1M4" levelnum=2 sky1="SKY1",0 music="D_E1M2" nointermission nojump allowcrouch }
+
+map E1M1 "p(DOOM): Intake"
+{
+    levelnum = 1
+    next = "EndGame1"
+    sky1 = "PDINTSKY", 0
+    music = "D_E1M1"
+    nointermission
+    nojump
+    nocrouch
+}
+
+map E1M4 "p(DOOM): Five Prisons"
+{
+    next = "EndGame1"
+    secretnext = "EndGame1"
+    levelnum = 4
+    sky1 = "SKY1", 0
+    music = "D_E1M4"
+    nointermission
+    nojump
+    allowcrouch
+}
+
+map E1M7 "p(DOOM): Computer Station"
+{next="EndGame1" secretnext="EndGame1" levelnum=7 sky1="SKY1",0 music="D_E1M7" nointermission nojump allowcrouch}

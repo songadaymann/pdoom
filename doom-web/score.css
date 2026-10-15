@@ -1,0 +1,18 @@
+#score-dialog{width:min(540px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:0;overflow:auto;border:3px solid #736250;color:#dcc18e;background:#241c17;font-family:DoomSmall,monospace;box-shadow:8px 8px #100c09;z-index:10}
+#score-dialog::backdrop{background:#100c0980}
+.score-card{padding:24px}.score-kicker{font-size:11px;color:#a89572;margin-right:36px}.score-close{position:absolute;top:8px;right:8px;padding:3px 9px;font:24px monospace;color:#dcc18e}
+#score-title{margin:12px 32px 4px 0;font-size:27px;color:#ef573c;line-height:1.3}#score-level{color:#b69b73;font-size:13px}
+.score-stats,.score-points{display:grid;grid-template-columns:1fr auto;gap:9px 16px;margin:20px 0;font-size:14px;line-height:1.5}.score-stats dd,.score-points dd{margin:0;text-align:right;color:#f0d4a1}.score-points{border-top:2px solid #736250;padding-top:16px;color:#bca67d;font-size:12px}
+.score-total{font-family:DoomNumbers,monospace;color:#ef573c;font-size:36px;text-align:right;margin:12px 0 22px}
+#score-submit label{display:block;font-size:13px;margin-bottom:8px}.score-name-row{display:flex;gap:8px}#score-name{min-width:0;flex:1;width:100%;padding:10px;border:2px solid #736250;background:#100c09;color:#edca93;font:16px DoomSmall,monospace}
+#score-name:focus-visible{outline:3px solid #ffe3a3;outline-offset:2px}#score-status{font-size:12px;color:#bca67d;line-height:1.7;margin:14px 0;min-height:20px}.score-actions{display:flex;flex-wrap:wrap;gap:8px}.score-actions button,#submit-score{padding:10px;font-size:13px}
+#show-score{position:absolute;top:74px;right:16px;padding:8px;font-size:12px;background:#241c17;color:#dcc18e}#stage.has-game-shell #restart{top:16px;right:156px}
+#show-score.score-unread{color:#ffe1c2;border-color:#c84b3b;background:#651b16;animation:results-pulse 3s ease-in-out infinite}
+@keyframes results-pulse{50%{background:#983326;box-shadow:0 0 12px #da382c55}}
+@media(prefers-reduced-motion:reduce){#show-score.score-unread{animation:none}}
+#stage.reduced-motion #show-score.score-unread{animation:none}
+#stage.has-game-shell.outside #hud{left:72px;right:170px;max-width:600px;width:auto}
+@media(pointer:coarse){#stage.has-game-shell #restart{top:82px;right:8px}#stage.has-game-shell #show-score{top:116px;right:8px}#stage.has-game-shell.outside #restart{top:68px}#stage.has-game-shell.outside #show-score{top:106px}.score-card{padding:18px}.score-stats,.score-points{font-size:12px;gap:7px 10px}.score-total{font-size:31px}#score-title{font-size:22px}#stage.has-game-shell.outside #hud{left:68px;right:76px;max-width:none}#stage.has-game-shell.checkpoint #message{max-width:calc(100vw - 144px)}#stage.has-game-shell.checkpoint #dev-badge{top:212px}#stage.has-game-shell.checkpoint.outside #dev-badge{top:auto;bottom:128px}}
+@media(max-height:500px){.score-card{padding:14px 18px}.score-stats,.score-points{margin:12px 0;gap:4px 10px}.score-points{padding-top:10px}.score-total{font-size:28px;margin:8px 0}.score-kicker{font-size:10px}#score-title{font-size:20px;margin-top:8px}#score-status{margin:8px 0}}
+
+@media(pointer:fine){#stage.has-game-shell .war-skip{right:156px}}

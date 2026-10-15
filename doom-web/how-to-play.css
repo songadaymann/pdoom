@@ -1,0 +1,32 @@
+/* Readable controls. Body text is a plain sans-serif at a real size; only the
+   heading keeps the Doom bitmap lettering. */
+.how-to-play{--ink:#f1e6cc;--dim:#c9b894;
+  width:min(620px,100%);margin:4px auto;padding:6px 14px;background:#1b140fe6;
+  border:2px solid;border-color:#8d775c #2a1f17 #2a1f17 #8d775c;box-shadow:4px 4px #0a0705;
+  font:500 15px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink);text-shadow:none;text-align:left;letter-spacing:0}
+.how-to-play .htp-heading{display:block;cursor:pointer;list-style:none;padding:2px 0;font-family:DoomSmall,monospace;font-size:20px;letter-spacing:1px;color:#ef573c;text-align:center;text-shadow:2px 2px #210600}
+.how-to-play .htp-heading::-webkit-details-marker{display:none}
+.how-to-play .htp-heading::after{content:' ▸';font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;color:#e7b45a}
+.how-to-play[open] .htp-heading::after{content:' ▾'}
+.how-to-play .htp-heading:focus-visible{outline:2px solid #e7b45a;outline-offset:2px}
+.how-to-play .htp-list{display:grid;grid-template-columns:max-content 1fr max-content 1fr;align-items:center;gap:4px 10px;margin:2px 0 0}
+.how-to-play .htp-row{display:contents}
+.how-to-play .htp-row:nth-child(even) .htp-keys{margin-left:18px}
+.how-to-play .htp-keys{margin:0;white-space:nowrap;display:flex;gap:3px}
+.how-to-play .htp-action{margin:0}
+.how-to-play .htp-key{display:inline-block;min-width:1.5em;padding:0 6px;font:700 13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#fff3d6;text-align:center;
+  background:#2d221a;border:1px solid;border-color:#9b8466 #1a120c #1a120c #9b8466;border-radius:3px;box-shadow:0 2px #0d0906}
+.how-to-play .htp-meter{margin:6px 0 0;padding-top:5px;border-top:1px solid #4a3a2b;font-size:13px;color:var(--dim);text-align:center}
+@media (max-width:600px){
+  .how-to-play{padding:4px 10px;font-size:14px}
+  .how-to-play .htp-list{grid-template-columns:max-content 1fr;gap:3px 10px}
+  .how-to-play .htp-row:nth-child(even) .htp-keys{margin-left:0}
+  .how-to-play .htp-row:nth-child(odd)>*{order:1}
+  .how-to-play .htp-row:nth-child(even)>*{order:2}
+  .how-to-play .htp-heading{font-size:17px}
+}
+@media (max-height:520px){
+  .how-to-play{margin:2px auto;padding:0 10px}
+  .how-to-play .htp-heading{font-size:15px;padding:1px 0}
+}

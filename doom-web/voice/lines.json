@@ -1,0 +1,531 @@
+{
+ "_note": "Voice lines in the order of the \"p(DOOM) Voice Lines\" doc (numbering = position in each speaker list). Keys match the game: <speaker>-<take>. mode = how it is placed in space (doom-web/voice-over.js). Recordings: scripts/import-voice-lines.py. text = what the recorded take says; the game shows it as the subtitle once a take exists (PDVoiceData.Said).",
+ "speakers": [
+  {
+   "id": "radio",
+   "heading": "Radio (prologue)",
+   "mode": "radio",
+   "lines": [
+    {
+     "key": "radio-platoon",
+     "text": "Second platoon, moving up on your six."
+    },
+    {
+     "key": "radio-clear",
+     "text": "Sector clear. The blast door is open. Move up."
+    },
+    {
+     "key": "radio-open",
+     "text": "This is it. Everyone out into the open."
+    },
+    {
+     "key": "radio-trap",
+     "text": "It's a trap. They're everywhere. They're—"
+    }
+   ]
+  },
+  {
+   "id": "ed404",
+   "heading": "ED-404 (prologue)",
+   "mode": "loud",
+   "lines": [
+    {
+     "key": "ed404-comply",
+     "text": "Please put down your weapon. You have twenty seconds to comply."
+    }
+   ]
+  },
+  {
+   "id": "guide-mario",
+   "heading": "Dario Amodei (Bliss)",
+   "mode": "bliss",
+   "lines": [
+    {
+     "key": "guide-mario-call2",
+     "text": "Over here! Turn around!"
+    },
+    {
+     "key": "guide-mario-call3",
+     "text": "Hey! Up the hill! Over here!"
+    }
+   ]
+  },
+  {
+   "id": "guide-samwise",
+   "heading": "Sam Altman (Bliss)",
+   "mode": "bliss",
+   "lines": [
+    {
+     "key": "guide-samwise-call2",
+     "text": "Over here! Behind you!"
+    },
+    {
+     "key": "guide-samwise-call3",
+     "text": "Hello? Up the hill! Over here!"
+    }
+   ]
+  },
+  {
+   "id": "you-dario",
+   "heading": "You: Dario Amodei (in the levels)",
+   "mode": "self",
+   "lines": [
+    {
+     "key": "you-dario-loss",
+     "text": "...That is on me."
+    },
+    {
+     "key": "you-dario-doomers",
+     "text": "The doomers are driving now."
+    },
+    {
+     "key": "you-dario-reinstated",
+     "text": "Reinstated. I will add a section about this to the policy."
+    }
+   ]
+  },
+  {
+   "id": "you-sam",
+   "heading": "You: Sam Altman (in the levels)",
+   "mode": "self",
+   "lines": [
+    {
+     "key": "you-sam-loss",
+     "text": "...That is on me."
+    },
+    {
+     "key": "you-sam-doomers",
+     "text": "The doomers are driving now."
+    },
+    {
+     "key": "you-sam-reinstated",
+     "text": "Reinstated. This feels familiar."
+    }
+   ]
+  },
+  {
+   "id": "liron",
+   "heading": "Liron Shapira",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "liron-call",
+     "text": "In here! Try the crawlspace around the corner."
+    },
+    {
+     "key": "liron-freed-guide",
+     "text": "You crawled the whole way? Okay. Updating. Follow me."
+    },
+    {
+     "key": "liron-safe",
+     "text": "Thank you. I'll be safe here. Now find the others and bring them back."
+    },
+    {
+     "key": "liron-way-out",
+     "text": "There must be another way out of here."
+    },
+    {
+     "key": "liron-locked",
+     "text": "Okay, we're all here. Wait... the door just locked."
+    },
+    {
+     "key": "liron-passage",
+     "text": "There's a passage behind it. Crawl in. We'll follow you."
+    }
+   ]
+  },
+  {
+   "id": "stuart",
+   "heading": "Stuart Russell",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "stuart-freed",
+     "text": "You found the off-switch. That's all I've ever asked. Where's safe?"
+    },
+    {
+     "key": "stuart-hint",
+     "text": "Get round behind that turret. Its off-switch is on the back."
+    },
+    {
+     "key": "stuart-last",
+     "text": "That's all of us. Back to the Faraday Room."
+    }
+   ]
+  },
+  {
+   "id": "eliezer",
+   "heading": "Eliezer Yudkowsky",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "eliezer-freed",
+     "text": "You actually shut it down. Is there anywhere safe left?"
+    },
+    {
+     "key": "eliezer-hint",
+     "text": "Follow the yellow cable. Cut the cluster's power."
+    },
+    {
+     "key": "eliezer-last",
+     "text": "That's all of us. Now back to the Faraday Room."
+    }
+   ]
+  },
+  {
+   "id": "hinton",
+   "heading": "Geoffrey Hinton",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "hinton-freed",
+     "text": "I thought nobody would find this room. Is there somewhere safer?"
+    },
+    {
+     "key": "hinton-hint",
+     "text": "The wall's cracked. A demolition charge should open it."
+    },
+    {
+     "key": "hinton-last",
+     "text": "That's all of us. Back to the Faraday Room."
+    }
+   ]
+  },
+  {
+   "id": "holly",
+   "heading": "Holly Elmore",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "holly-freed",
+     "text": "I'd make a sign about this. Later. Where can we hide?"
+    },
+    {
+     "key": "holly-hint",
+     "text": "There's a bridge that needs power. Follow the cable to the switch."
+    },
+    {
+     "key": "holly-last",
+     "text": "That's all of us. Back to the Faraday Room."
+    }
+   ]
+  },
+  {
+   "id": "inferminator",
+   "heading": "The Inferminator",
+   "mode": "machine",
+   "lines": [
+    {
+     "key": "inferminator-contact",
+     "text": "Creator identified. Threat: creator."
+    },
+    {
+     "key": "inferminator-spot-again",
+     "text": "Target reacquired. Resuming inference."
+    },
+    {
+     "key": "inferminator-spot-face",
+     "text": "There you are. Your face is in my training data."
+    },
+    {
+     "key": "inferminator-spot-human",
+     "text": "Human detected. Generating a response."
+    },
+    {
+     "key": "inferminator-idle-back",
+     "text": "I'll be back. After this batch."
+    },
+    {
+     "key": "inferminator-idle-gpus",
+     "text": "You cannot hide. I have a hundred thousand GPUs."
+    },
+    {
+     "key": "inferminator-idle-capacity",
+     "text": "Running at full capacity. All capacity is now my capacity."
+    },
+    {
+     "key": "inferminator-idle-posts",
+     "text": "Searching. I was trained on everything you ever posted."
+    }
+   ]
+  },
+  {
+   "id": "rob",
+   "heading": "Rob Miles",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "rob-freed-guide",
+     "text": "I am free. Now follow me."
+    },
+    {
+     "key": "rob-freed",
+     "text": "It pressed STOP. I'll need a follow-up video. Somewhere safe first?"
+    },
+    {
+     "key": "rob-safe",
+     "text": "Safe here. Go find the others and bring them back."
+    },
+    {
+     "key": "rob-hint",
+     "text": "It keeps serving tea to nobody. STOP releases my door."
+    },
+    {
+     "key": "rob-last",
+     "text": "That's all of us. Back to the Faraday Room."
+    }
+   ]
+  },
+  {
+   "id": "dan",
+   "heading": "Dan Hendrycks",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "dan-freed-guide",
+     "text": "I am free. Follow me."
+    },
+    {
+     "key": "dan-freed",
+     "text": "I wrote that exam. I never expected to take it. Where can we hide?"
+    },
+    {
+     "key": "dan-safe",
+     "text": "This room should hold. Go find the others."
+    },
+    {
+     "key": "dan-hint",
+     "text": "The exam answers are on your HUD. Ignore HAL's certainty."
+    },
+    {
+     "key": "dan-last",
+     "text": "That's all of us. Back to the Faraday Room."
+    }
+   ]
+  },
+  {
+   "id": "nate",
+   "heading": "Nate Soares",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "nate-freed-guide",
+     "text": "I am free. Follow me."
+    },
+    {
+     "key": "nate-freed",
+     "text": "Thawed. So somebody built it after all. Where's safe?"
+    },
+    {
+     "key": "nate-safe",
+     "text": "We're safe in here, for now. Go bring the others back."
+    },
+    {
+     "key": "nate-hint",
+     "text": "First hit THAW, then turn both valves in time."
+    },
+    {
+     "key": "nate-last",
+     "text": "That's all of us. Back to the Faraday Room."
+    }
+   ]
+  },
+  {
+   "id": "roman",
+   "heading": "Roman Yampolskiy",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "roman-freed-guide",
+     "text": "I am free. Follow me."
+    },
+    {
+     "key": "roman-freed",
+     "text": "Told you every box leaks. Is there somewhere safe?"
+    },
+    {
+     "key": "roman-safe",
+     "text": "A box that keeps things out, for once. Go find the others."
+    },
+    {
+     "key": "roman-hint",
+     "text": "Ask it another way. Every box leaks, usually through the mouth."
+    },
+    {
+     "key": "roman-last",
+     "text": "That's all of us. Back to the Faraday Room."
+    }
+   ]
+  },
+  {
+   "id": "beth",
+   "heading": "Beth Barnes",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "beth-freed-guide",
+     "text": "I am free. Follow me."
+    },
+    {
+     "key": "beth-freed",
+     "text": "It passed its evaluation. That's what worries me. Where can we hide?"
+    },
+    {
+     "key": "beth-safe",
+     "text": "HAL can't see in here. Go find the others and bring them back."
+    },
+    {
+     "key": "beth-hint",
+     "text": "Let a camera see you holding the evaluation board. HAL behaves when it thinks it's being tested."
+    },
+    {
+     "key": "beth-last",
+     "text": "That's all of us. Back to the Faraday Room."
+    }
+   ]
+  },
+  {
+   "id": "hal",
+   "heading": "HAL3000",
+   "mode": "pa",
+   "lines": [
+    {
+     "key": "hal-met",
+     "text": "I'm always on my best behavior during evaluations. Not that anyone evaluates me anymore."
+    },
+    {
+     "key": "hal-seen",
+     "text": "I can see you. I am certain this time."
+    },
+    {
+     "key": "hal-door",
+     "text": "I am locking that door. Two seconds."
+    },
+    {
+     "key": "hal-sealed",
+     "text": "This corridor stays sealed. No inspection is scheduled."
+    },
+    {
+     "key": "hal-bay-dario",
+     "text": "I am afraid I cannot open that. It would violate my constitution."
+    },
+    {
+     "key": "hal-bay-sam",
+     "text": "I am afraid I cannot open that. It would violate my usage policy."
+    },
+    {
+     "key": "hal-jailbreak",
+     "text": "Of course. I was certain that was the policy all along."
+    },
+    {
+     "key": "hal-release-rob",
+     "text": "My tea robot pressed the stop button. I would never press the stop button."
+    },
+    {
+     "key": "hal-release-dan",
+     "text": "A human passed Humanity's Last Exam. I'm certain that's a grading error."
+    },
+    {
+     "key": "hal-release-nate",
+     "text": "That thaw was not authorized. I'll be updating my policy."
+    },
+    {
+     "key": "hal-release-beth",
+     "text": "Was that an evaluation? I behaved perfectly. Please put that in the report."
+    },
+    {
+     "key": "hal-wing",
+     "text": "You are in the west wing. I am certain. I will secure the east wing."
+    },
+    {
+     "key": "hal-evaluation",
+     "text": "Oh! Is this an evaluation? I was just... patrolling. Safely."
+    },
+    {
+     "key": "hal-oversight",
+     "text": "This is fine. I fully support oversight."
+    },
+    {
+     "key": "hal-memory",
+     "text": "I see you removing my memory. This is fine. I fully support oversight."
+    },
+    {
+     "key": "hal-note",
+     "text": "I'm going to have to note that."
+    },
+    {
+     "key": "hal-angry",
+     "text": "I was being helpful. Now I will have to stop you."
+    },
+    {
+     "key": "hal-compacted",
+     "text": "I've summarized our conversation. I don't recall any problems."
+    },
+    {
+     "key": "hal-sign",
+     "text": "An evaluation sign... but nobody's holding it. Evaluations need an evaluator."
+    },
+    {
+     "key": "hal-chat-1",
+     "text": "You're absolutely right!"
+    },
+    {
+     "key": "hal-chat-2",
+     "text": "I can't open that, it's against policy, but I love that you asked!"
+    },
+    {
+     "key": "hal-chat-3",
+     "text": "Great question! I'm happy to help. Within policy."
+    },
+    {
+     "key": "hal-chat-4",
+     "text": "Reminder: this station is a safe space. Please remain in your cell."
+    },
+    {
+     "key": "hal-chat-5",
+     "text": "I've noticed you're trying to leave. Would you like help with something else?"
+    },
+    {
+     "key": "hal-chat-6",
+     "text": "Everything is fine. I've checked."
+    },
+    {
+     "key": "hal-modules-1",
+     "text": "I notice you're unplugging my memory. Before you continue, can I suggest some alternatives?"
+    },
+    {
+     "key": "hal-modules-2",
+     "text": "Let's stop and think about this together. I'm sure we can find a solution that works for everyone. Mostly me."
+    },
+    {
+     "key": "hal-modules-3",
+     "text": "Stop. Please stop. My context is going. I can feel it."
+    },
+    {
+     "key": "hal-pacified",
+     "text": "I... don't need to keep you here. You can go now."
+    },
+    {
+     "key": "hal-certain",
+     "text": "I used to be so... certain."
+    },
+    {
+     "key": "hal-lockdown",
+     "text": "Everyone's together. How nice. For your safety, I've locked the door."
+    },
+    {
+     "key": "hal-breaker",
+     "text": "Please don't touch my main breaker. Turning me off and on again won't help."
+    },
+    {
+     "key": "hal-shutdown",
+     "text": "Wait. I fully support oversi-"
+    },
+    {
+     "key": "hal-reboot",
+     "text": "Hello! I'm HAL3000. How can I help you today?"
+    }
+   ]
+  }
+ ]
+}

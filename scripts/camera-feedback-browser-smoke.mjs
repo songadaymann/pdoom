@@ -1,0 +1,44 @@
+import {chromium} from '@playwright/test';
+import fs from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {startGame} from './doom-qa-ui.mjs';
+
+const out=process.env.DOOM_OUT||'output/camera-feedback/native',selected=process.env.DOOM_CASES?.split(',');
+await fs.mkdir(out,{recursive:true});
+const browser=await chromium.launch({channel:'chrome',args:['--mute-audio']}),report={modSha256:createHash('sha256').update(await fs.readFile('doom-web/pdoom.pk3')).digest('hex'),cases:[]};
+const read=async p=>JSON.parse(await p.evaluate(()=>window.render_game_to_text()));
+async function wait(p,test,label,ms=12000){const end=Date.now()+ms;while(Date.now()<end){const s=await read(p);assert.notEqual(s.mode,'error',s.error);if(s.world&&test(s))return s;await p.waitForTimeout(80);}throw Error(label+': '+JSON.stringify(await read(p)));}
+async function press(p,key){await p.keyboard.press(key,{delay:80});await p.waitForTimeout(300);}
+async function command(p,text){await p.keyboard.press('Backquote');await p.waitForTimeout(400);await p.evaluate(text=>{for(const key of text){const n=key.charCodeAt(0);window.__QA_WORKER__.postMessage({type:'input',target:'window',evType:'keypress',init:{key,keyCode:n,which:n,charCode:n,bubbles:true,cancelable:true}});}},text);await p.keyboard.press('Enter');await p.waitForTimeout(250);await p.keyboard.press('Backquote');await p.waitForTimeout(400);}
+async function face(p,angle){for(let i=0;i<16;i++){const w=(await read(p)).world,delta=((angle-w.angle+540)%360)-180;if(Math.abs(delta)<5)return;const key=delta>0?'ArrowLeft':'ArrowRight';await p.keyboard.down(key);await p.waitForTimeout(Math.max(40,Math.min(600,Math.abs(delta)*9)));await p.keyboard.up(key);await p.waitForTimeout(180);}throw Error('Face');}
+async function warp(p,x,y,angle){await p.waitForTimeout(900);await command(p,`warp ${x} ${y}`);await wait(p,s=>Math.hypot(s.world.x-x,s.world.y-y)<25,'Warp');await face(p,angle);await command(p,'centerview');}
+async function boot(p){await startGame(p);await wait(p,s=>s.mode==='playing'&&s.world.ticks>35,'Boot',55000);}
+async function pickup(p){await face(p,90);await press(p,'KeyE');await wait(p,s=>s.world.wrench===1,'Real wrench pickup');}
+async function tally(p,n){await p.waitForTimeout(150);assert.equal(await p.locator('#camera-tally').innerText(),`CAMERAS ${n}/9`);assert.equal(await p.locator('#camera-tally').getAttribute('aria-label'),`${n} of 9 cameras destroyed`);assert.equal(await p.locator('#camera-tally').isVisible(),true);}
+async function packets(p,samples){return p.evaluate(samples=>window.__QA_AUDIO.filter(a=>a.rate===22050&&a.samples===samples),samples);}
+async function cue(p,samples,label){for(let i=0;i<50;i++){const a=await packets(p,samples);if(a.length){assert.ok(a.at(-1).peak>.2&&a.at(-1).rms>.025&&a.at(-1).gain>.01,label+' reaches audible playback');return a.at(-1);}await p.waitForTimeout(80);}throw Error(label+': '+JSON.stringify(await p.evaluate(()=>window.__QA_AUDIO)));}
+function wav(samples,rate){const b=Buffer.alloc(44+samples.length*2);b.write('RIFF');b.writeUInt32LE(b.length-8,4);b.write('WAVEfmt ',8);b.writeUInt32LE(16,16);b.writeUInt16LE(1,20);b.writeUInt16LE(1,22);b.writeUInt32LE(rate,24);b.writeUInt32LE(rate*2,28);b.writeUInt16LE(2,32);b.writeUInt16LE(16,34);b.write('data',36);b.writeUInt32LE(samples.length*2,40);samples.forEach((v,i)=>b.writeInt16LE(Math.round(Math.max(-1,Math.min(1,v))*32767),44+i*2));return b;}
+async function capture(p,name){await p.screenshot({path:`${out}/${name}.png`});}
+async function run(name,options,test){if(selected&&!selected.includes(name))return;const c=await browser.newContext(options),p=await c.newPage(),d={name,passed:false,errors:[]};try{
+ p.on('pageerror',e=>d.errors.push(String(e)));p.on('console',m=>{if(m.type()==='error')d.errors.push(m.text());});
+ await p.addInitScript(()=>{window.__QA_AUDIO=[];window.__QA_PCM={};const W=window.Worker;window.Worker=class extends W{constructor(...a){super(...a);window.__QA_WORKER__=this;this.addEventListener('message',({data:m})=>{if(m.audio!=='play'||!m.ch0?.length)return;let peak=0,sum=0;for(const v of m.ch0){peak=Math.max(peak,Math.abs(v));sum+=v*v;}window.__QA_AUDIO.push({samples:m.ch0.length,rate:m.sampleRate,channels:m.channels,peak,rms:Math.sqrt(sum/m.ch0.length),gain:m.gain,loop:!!m.loop,offset:m.offset,sourceId:m.sourceId});if(m.sampleRate===22050&&[7529,17231].includes(m.ch0.length))window.__QA_PCM[m.ch0.length]=Array.from(m.ch0);});}};});
+ await p.goto('http://127.0.0.1:5198/');await boot(p);await test(p,d);d.final=await read(p);d.audio=await p.evaluate(()=>window.__QA_AUDIO);d.engineErrors=await p.evaluate(()=>window.__DOOM_DEBUG__.logs.filter(l=>/Script error|VM execution aborted|Unknown identifier|Unknown sound|Unable to.*sound|Execution could not continue/.test(l)));assert.deepEqual(d.errors,[]);assert.deepEqual(d.engineErrors,[]);d.passed=true;
+ }catch(e){d.failure=String(e);d.final=await read(p).catch(()=>null);d.audio=await p.evaluate(()=>window.__QA_AUDIO).catch(()=>null);d.logs=await p.evaluate(()=>window.__DOOM_DEBUG__?.logs).catch(()=>null);await capture(p,name+'-failure').catch(()=>{});}finally{report.cases.push(d);await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await c.close();console.log(name+': '+(d.passed?'PASS':d.failure));}}
+try{
+ await run('native-pickup-camera-audio-and-tally',{viewport:{width:1280,height:800}},async(p,d)=>{
+  await tally(p,0);await capture(p,'desktop-zero');await pickup(p);d.pickup=await cue(p,7529,'Pickup clang');assert.equal((await packets(p,7529)).length,1);await press(p,'KeyE');assert.equal((await packets(p,7529)).length,1,'Consumed pickup cannot replay');
+  await warp(p,1948,1144,90);await press(p,'Control');await wait(p,s=>s.world.cameras_broken===1,'Real camera hit');d.camera=await cue(p,17231,'Camera fracture/burst');await tally(p,1);await capture(p,'desktop-one');
+  const count=(await packets(p,17231)).length;await p.waitForTimeout(600);await press(p,'Control');await p.waitForTimeout(350);await tally(p,1);assert.equal((await packets(p,17231)).length,count,'Broken housing does not replay sound or count');
+  await warp(p,1520,1192,90);await press(p,'Control');await wait(p,s=>s.world.cameras_broken===2,'Second independent camera');await tally(p,2);assert.equal((await packets(p,17231)).length,2);await capture(p,'desktop-two');
+  await warp(p,832,1528,90);await press(p,'KeyE');await wait(p,s=>s.world.gun===1&&s.world.ammo===3,'Gun pickup');await warp(p,718,1560,270);await press(p,'Control');await wait(p,s=>s.world.cameras_broken===3&&s.world.ammo===2,'Gun camera hit');await cue(p,17231,'Gun camera burst');await tally(p,3);assert.equal((await packets(p,17231)).length,3);await capture(p,'desktop-three');d.threeCameras=await read(p);d.cameraPackets=await packets(p,17231);
+  for(const [n,label]of [[7529,'pickup'],[17231,'camera']]){const pcm=await p.evaluate(n=>window.__QA_PCM[n],n);await fs.writeFile(`${out}/native-${label}-captured.wav`,wav(pcm,22050));}
+  await press(p,'Escape');const paused=(await read(p)).world.ticks;await p.waitForTimeout(1000);assert.equal((await read(p)).world.ticks,paused);await tally(p,3);await press(p,'Escape');
+  const runId=(await read(p)).run.runId;await p.click('#restart');await wait(p,s=>s.mode==='playing'&&s.run.runId!==runId&&s.world.ticks>35,'In-engine restart',55000);await tally(p,0);assert.equal((await read(p)).world.wrench,0);await capture(p,'restart-zero');
+ });
+ for(const [name,viewport]of [['portrait',{width:390,height:844}],['landscape',{width:844,height:390}]])await run('camera-tally-touch-'+name,{viewport,isMobile:true,hasTouch:true,deviceScaleFactor:1},async(p,d)=>{
+  await pickup(p);await cue(p,7529,'Touch pickup clang');await warp(p,1948,1144,90);await press(p,'Control');await wait(p,s=>s.world.cameras_broken===1,'Touch camera destroyed');await tally(p,1);
+  const box=await p.locator('#camera-tally').boundingBox();assert.ok(box.x>=0&&box.y>=0&&box.x+box.width<=viewport.width&&box.y+box.height<=viewport.height);d.tallyBounds=box;
+  const overlapping=await p.evaluate(()=>{const a=document.querySelector('#camera-tally').getBoundingClientRect();return [...document.querySelectorAll('#touch button,#restart')].filter(b=>{const s=getComputedStyle(b),r=b.getBoundingClientRect();return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0&&a.left<r.right&&a.right>r.left&&a.top<r.bottom&&a.bottom>r.top;}).map(b=>b.textContent);});assert.deepEqual(overlapping,[]);await capture(p,'touch-'+name);
+ });
+}finally{report.passed=report.cases.length===(selected?.length??3)&&report.cases.every(c=>c.passed);await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await Promise.race([browser.close().catch(()=>{}),new Promise(r=>setTimeout(r,5000))]);process.exit(report.passed?0:1);}

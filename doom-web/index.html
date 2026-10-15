@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#171714">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="doom-hud.css">
+  <link rel="stylesheet" href="doom-theme.css">
+  <link rel="stylesheet" href="how-to-play.css">
+  <link rel="stylesheet" href="score.css">
+  <link rel="stylesheet" href="level-polish.css">
+  <link rel="stylesheet" href="onboarding.css">
+  <link rel="stylesheet" href="prologue.css">
+  <title>p(DOOM) · Doom mod</title>
+</head>
+<body>
+  <main id="stage">
+    <canvas id="canvas" width="960" height="600" tabindex="0" aria-label="p(DOOM) game"></canvas>
+    <section id="onboarding" class="title-screen" aria-label="p(DOOM) menus" data-page="title">
+      <div class="boot-title"><img class="menu-logo" src="local/ui/pdoom-logo.png" alt="p(DOOM)"><p>LOADING MENU</p></div>
+    </section>
+    <section id="launcher" aria-labelledby="title">
+      <h1 id="title"><img src="local/ui/pdoom-logo.png" alt="p(DOOM)"></h1>
+      <p id="scenario">Five Prisons · Command Control</p>
+      <div id="controls"></div>
+      <section id="ceo-pick" class="ceo-pick" aria-labelledby="ceo-heading">
+        <h2 id="ceo-heading">CHOOSE YOUR CEO</h2>
+        <p id="ceo-subtitle">BOTH OF THEM DID THIS.</p>
+        <!-- Each entry's name and line are its radio's name and description; the visible copy is aria-hidden so it is not read twice. -->
+        <div class="ceo-options" role="radiogroup" aria-labelledby="ceo-heading" aria-describedby="ceo-subtitle ceo-footer">
+          <label class="ceo-option" data-ceo="altman">
+            <input type="radio" name="ceo" value="altman" aria-labelledby="ceo-name-altman" aria-describedby="ceo-line-altman">
+            <span class="ceo-face" aria-hidden="true"><img src="local/ui/faces/samwise/STFST01.png" data-lump="STFST01" alt="" width="33" height="30" draggable="false"></span>
+            <span class="ceo-text" aria-hidden="true"><span class="ceo-name" id="ceo-name-altman">SAM ALTMAN</span>
+            <span class="ceo-line" id="ceo-line-altman"><span>Shipped the future.</span> <span>Tested it live.</span></span></span>
+          </label>
+          <label class="ceo-option" data-ceo="amodei">
+            <input type="radio" name="ceo" value="amodei" aria-labelledby="ceo-name-amodei" aria-describedby="ceo-line-amodei">
+            <span class="ceo-face" aria-hidden="true"><img src="local/ui/faces/mario/STFST01.png" data-lump="STFST01" alt="" width="33" height="30" draggable="false"></span>
+            <span class="ceo-text" aria-hidden="true"><span class="ceo-name" id="ceo-name-amodei">DARIO AMODEI</span>
+            <span class="ceo-line" id="ceo-line-amodei"><span>Tested the future.</span> <span>Shipped it anyway.</span></span></span>
+          </label>
+        </div>
+        <p id="ceo-footer">SAME RULES. DIFFERENT GUILT.</p>
+      </section>
+      <p class="level-links"><a href="?level=five-prisons">CONTROL.EXE</a> · <a href="?level=hal-station">HAL3000.SYS</a></p>
+      <button id="new-campaign" type="button">New campaign</button>
+      <button id="start">Enter the facility</button>
+      <button id="replay-intro" type="button">Watch intro</button>
+      <p id="status" role="status">Explore the facility. Find the others.</p>
+      <a id="other-level" href="?level=intake">Play the previous Intake test</a>
+    </section>
+    <section id="story" aria-labelledby="story-heading" hidden>
+      <img class="story-logo" src="local/ui/pdoom-logo.png" alt="p(DOOM)">
+      <div class="story-panel"><p id="story-count"></p><h2 id="story-heading"></h2><p id="story-text"></p></div>
+      <div class="story-actions"><button id="story-next">Continue</button><button id="story-skip">Skip story</button></div>
+      <p class="story-keys">Enter / Space / E to continue</p>
+    </section>
+    <nav id="touch" aria-label="Touch controls" hidden>
+      <div class="move-pad">
+        <button data-code="KeyW" aria-label="Move forward">↑</button>
+        <button data-code="KeyA" aria-label="Move left">←</button>
+        <button data-code="KeyS" aria-label="Move backward">↓</button>
+        <button data-code="KeyD" aria-label="Move right">→</button>
+      </div>
+      <div class="action-pad">
+        <button data-code="Space">Use</button>
+        <button id="attack-button" data-code="ControlLeft">Swing</button>
+        <button data-code="KeyQ" hidden>Hold</button>
+        <button id="tool-button" data-code="KeyT">Tool</button>
+        <button id="crouch-button" data-code="KeyC" hidden>Crouch</button>
+        <button data-code="ShiftLeft">Run</button>
+        <button id="touch-menu">Menu</button>
+      </div>
+    </nav>
+    <div id="hud" hidden>
+      <p id="people"></p>
+      <!-- Five Prisons draws the original Doom status bar into the canvas; the text
+           elements stay in place over their panels for screen readers and tests. -->
+      <div class="doom-statusbar" role="group" aria-label="Status bar">
+        <canvas class="statusbar" width="320" height="32" aria-hidden="true"></canvas>
+        <div class="hud-health"><span class="hud-label">HEALTH</span><p id="health" hidden></p></div>
+        <div id="hud-face" class="hud-face" aria-hidden="true"><img id="hud-portrait" src="outside-assets/person-0-0-0.png" alt=""></div>
+        <div class="hud-survival" title="In-world estimate based on rescue progress, shelter, injuries and losses. A game meter, not a simulated forecast.">
+          <span class="hud-label">SURVIVAL EST.</span><p id="survival">≈12%</p>
+          <div class="survival-track" aria-hidden="true"><span id="survival-fill"></span></div>
+          <span id="doom-chance">p(DOOM) ≈88%</span>
+        </div>
+        <div class="hud-rescues"><span class="hud-label">RESCUES</span><div id="rescue-slots" aria-label="Prisoner rescue progress"></div><p id="group"></p></div>
+        <div class="hud-gear"><span class="hud-label">EQUIPMENT</span><p id="equipment"></p><p id="camera-tally" aria-label="Cameras destroyed" hidden></p></div>
+      </div>
+    </div>
+    <span id="reticle" aria-hidden="true" hidden></span>
+    <img id="held-wrench" src="wrench.png" alt="" aria-hidden="true" hidden>
+    <img id="held-gun" src="slingshot.png" alt="" aria-hidden="true" hidden>
+    <div id="game-text">
+      <p id="status-line" role="status" hidden></p>
+      <p id="prompt" hidden></p>
+      <p id="message" role="status" hidden></p>
+    </div>
+    <button id="restart" hidden>Restart</button>
+    <p id="dev-badge" hidden>Dev: ending test · <a href="?level=rescue">Start normally</a></p>
+    <button id="finish" hidden></button>
+    <p id="result" role="status" hidden></p>
+  </main>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

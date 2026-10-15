@@ -1,0 +1,63 @@
+<div id="hal-thaw-map">
+  <h3>HAL station · Nate’s two rescue routes</h3>
+  <div class="viz-controls" aria-label="Map view">
+    <button type="button" class="btn" data-view="station" aria-pressed="true">Whole station</button>
+    <button type="button" class="btn" data-view="power" aria-pressed="false">Five power switches</button>
+    <button type="button" class="btn" data-view="thaw" aria-pressed="false">Nate’s thaw room</button>
+  </div>
+  <svg class="station-map" role="img" aria-label="Current HAL station floor plan, with the five power switches in the hallway approaching Nate’s room and Nate’s pod in the southwest"></svg>
+  <div class="text-small" aria-live="polite" data-detail>P = all five power switches · N = Nate · S = start · R = refuge</div>
+  <script type="application/json" data-map>__MAP_DATA__</script>
+</div>
+<style>
+#hal-thaw-map .station-map{display:block;width:100%;margin:8px 0;color:var(--foreground)}
+#hal-thaw-map .structure{fill:none;stroke:var(--border);stroke-width:1}
+#hal-thaw-map .wall{fill:none;stroke:var(--muted-foreground);stroke-width:1.4}
+#hal-thaw-map .highlight{fill:none;stroke:var(--blue);stroke-width:2}
+#hal-thaw-map .point{fill:var(--blue)}
+#hal-thaw-map .landmark{fill:var(--muted-foreground)}
+#hal-thaw-map text{fill:var(--foreground);font-family:inherit;font-size:var(--font-size-base);font-weight:400}
+#hal-thaw-map .marker-letter{fill:var(--background);font-weight:500;text-anchor:middle;dominant-baseline:central}
+#hal-thaw-map .lead{stroke:var(--muted-foreground);stroke-width:1;fill:none}
+</style>
+<script>
+(() => {
+ const root=document.getElementById('hal-thaw-map'),svg=root.querySelector('.station-map'),data=JSON.parse(root.querySelector('[data-map]').textContent),detail=root.querySelector('[data-detail]');
+ const saved=window.openai?.widgetState?.privateContent?.view;
+ let view=['station','power','thaw'].includes(saved)?saved:'station';
+ const NS='http://www.w3.org/2000/svg';
+ function el(tag,attrs,text){const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);if(text)n.textContent=text;svg.append(n);return n;}
+ function draw(){
+  const width=root.clientWidth,height=Math.min(580,Math.max(320,width*.84));svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.style.height=height+'px';svg.replaceChildren();
+  const bounds=view==='power'?data.powerBounds:view==='thaw'?[-1512,-2864,-848,-2192]:data.bounds;
+  const scale=Math.min((width-36)/(bounds[2]-bounds[0]),(height-36)/(bounds[3]-bounds[1]));
+  const ox=(width-(bounds[2]-bounds[0])*scale)/2,oy=(height-(bounds[3]-bounds[1])*scale)/2;
+  const x=v=>ox+(v-bounds[0])*scale,y=v=>oy+(bounds[3]-v)*scale;
+  const path=edges=>edges.map(e=>`M${x(e[0]).toFixed(1)},${y(e[1]).toFixed(1)}L${x(e[2]).toFixed(1)},${y(e[3]).toFixed(1)}`).join('');
+  const defs=el('defs',{}),clip=document.createElementNS(NS,'clipPath');clip.id='hal-thaw-clip';const rect=document.createElementNS(NS,'rect');rect.setAttribute('width',width);rect.setAttribute('height',height);clip.append(rect);defs.append(clip);
+  for(const [cls,edges] of [['structure',data.lines],['wall',data.walls],['highlight',view==='power'?data.powerEdges:view==='thaw'?data.thawEdges:[]]])el('path',{d:path(edges),class:cls,'clip-path':'url(#hal-thaw-clip)'});
+  function mark(px,py,letter,label,secondary=false){
+   const mx=x(px),my=y(py);el('circle',{cx:mx,cy:my,r:12,class:secondary?'landmark':'point'});el('text',{x:mx,y:my,class:'marker-letter'},letter);
+   const right=mx<width-125;el('text',{x:mx+(right?18:-18),y:my+5,'text-anchor':right?'start':'end'},label);
+  }
+  if(view==='station'){
+   mark(...data.spawn,'S','Start',true);mark(...data.refuge,'R','Refuge',true);mark(...data.power,'P','Power switches');mark(...data.nate,'N','Nate');
+   detail.textContent='P = all five power switches · N = Nate · S = start · R = refuge';
+  }else if(view==='power'){
+   const names=['LIGHTS','DOORS','ALARMS','LIFE SUPPORT','HAL'];
+   const labelX=Math.max(...data.switches.map(p=>x(p[0])))+20;
+   const gap=22,middle=y(data.switches[2][1]);
+   data.switches.forEach((p,i)=>{const px=x(p[0]),py=y(p[1]),ly=middle+(2-i)*gap;el('rect',{x:px-4,y:py-4,width:8,height:8,class:'point'});el('path',{d:`M${px+7},${py}L${labelX-7},${ly}`,class:'lead'});el('text',{x:labelX,y:ly+5,'text-anchor':'start'},names[i]);});
+   detail.textContent='Keep LIFE SUPPORT + HAL + one of LIGHTS / DOORS / ALARMS on.';
+  }else{
+   mark(...data.nate,'N',width<400?'Nate':'Nate’s pod');mark(...data.override,'T','THAW override');
+   mark(...data.valves[0],'1','Valve 1');mark(...data.valves[1],'2','Valve 2');
+   detail.textContent='T = reusable 20-second override · 1 + 2 = both thaw valves';
+  }
+  for(const b of root.querySelectorAll('[data-view]'))b.setAttribute('aria-pressed',String(b.dataset.view===view));
+ }
+ root.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.view;draw();window.openai?.setWidgetState({modelContent:{mapView:view,level:'hal-station',prisoner:'Nate Soares'},privateContent:{view}})?.catch(()=>{});}));
+ window.addEventListener('openai:set_globals',e=>{const v=e.detail?.globals?.widgetState?.privateContent?.view;if(['station','power','thaw'].includes(v)){view=v;draw();}});
+ new ResizeObserver(draw).observe(root);draw();
+})();
+</script>

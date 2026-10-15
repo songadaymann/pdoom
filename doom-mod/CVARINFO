@@ -1,0 +1,11 @@
+server bool pdoom_development = false;
+server bool pdoom_dev_end = false;
+server bool pdoom_boot_hold = false;
+server int pdoom_ceo = 0;
+server int pdoom_saved0 = 0;
+server int pdoom_saved1 = 0;
+server int pdoom_lost0 = 0;
+server int pdoom_lost1 = 0;
+server int pdoom_follow0 = 0;
+server int pdoom_follow1 = 0;
+server int pdoom_hub_entry = 0;

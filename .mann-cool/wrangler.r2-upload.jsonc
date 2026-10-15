@@ -1,0 +1,13 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "mann-cool-pdoom-local-r2-uploader",
+  "main": "r2-multipart-worker.js",
+  "compatibility_date": "2026-10-15",
+  "r2_buckets": [
+    {
+      "binding": "GAME_ASSETS",
+      "bucket_name": "mann-cool-game-assets",
+      "remote": true
+    }
+  ]
+}
