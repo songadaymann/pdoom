@@ -9,3 +9,4 @@ server int pdoom_lost1 = 0;
 server int pdoom_follow0 = 0;
 server int pdoom_follow1 = 0;
 server int pdoom_hub_entry = 0;
+server int pdoom_opening_checkpoint = 0;

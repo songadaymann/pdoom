@@ -4,6 +4,7 @@ class PDCampaignSession : StaticEventHandler
     bool Loaded;
     bool HubEntry;
     bool GuideGift;   // entering the first facility from the Bliss walk: the guide handed us his wrench
+    bool OpeningEntry; // resumed first XP arrival, before the first facility
     bool Replay;
     int Saved0, Saved1, Lost0, Lost1, Following0, Following1;
     static PDCampaignSession Get(){return PDCampaignSession(StaticEventHandler.Find('PDCampaignSession'));}
@@ -18,6 +19,8 @@ class PDCampaignSession : StaticEventHandler
         Lost0=int(p.GetCVar("pdoom_lost0"));Lost1=int(p.GetCVar("pdoom_lost1"));
         Following0=int(p.GetCVar("pdoom_follow0"));Following1=int(p.GetCVar("pdoom_follow1"));
         HubEntry=p.GetCVar("pdoom_hub_entry")!=0;
+        OpeningEntry=!Hal()&&p.GetCVar("pdoom_opening_checkpoint")==1;
+        GuideGift=!Hal()&&p.GetCVar("pdoom_opening_checkpoint")==2;
     }
     int SavedMask(){return Hal()?Saved1:Saved0;}
     int LostMask(){return Hal()?Lost1:Lost0;}
@@ -70,9 +73,10 @@ class PDCampaignSession : StaticEventHandler
     void Enter(bool hal,bool asReplay=false)
     {
         let battle=PDLastStand.Get();
-        HubEntry=!(battle&&battle.Active&&battle.Bliss);Replay=asReplay;
+        bool fromOpening=!hal&&(OpeningEntry||battle&&battle.Active&&battle.Bliss);
+        HubEntry=!fromOpening;Replay=asReplay;OpeningEntry=false;
         // "Take this. It's dangerous to go alone." The guide's wrench comes with us.
-        GuideGift=!hal&&battle&&battle.Active&&battle.Bliss;
+        GuideGift=fromOpening;
         level.ChangeLevel(hal?"E1M7":"E1M4",0,CHANGELEVEL_NOINTERMISSION|CHANGELEVEL_RESETHEALTH|CHANGELEVEL_RESETINVENTORY);
     }
     void Restart(){level.ChangeLevel(level.MapName,0,CHANGELEVEL_NOINTERMISSION|CHANGELEVEL_RESETHEALTH|CHANGELEVEL_RESETINVENTORY);}

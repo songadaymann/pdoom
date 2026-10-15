@@ -292,4 +292,7 @@ are archived in `art/audio/bliss-guide-v1-recordings/`.
 
 This deliberately changes the original concealed-outside reveal: Bliss is
 introduced after the battle, so later escapes become reunions in the quiet
-meadow. Load Game remains the ordinary committed camp, without a guide replay.
+meadow. As of 2026-10-15, first XP arrival autosaves the start of this walk. Entering
+the first facility advances the checkpoint to Level 1's beginning and unlocks the
+optional Skip Opening choice on future New Games. Later committed camp saves still
+load the ordinary meadow without replaying the guide. See ONBOARDING's save contract.

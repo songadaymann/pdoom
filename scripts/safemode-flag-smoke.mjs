@@ -14,6 +14,7 @@ try{
   const s=JSON.parse(await page.evaluate(()=>window.render_game_to_text()));
   assert.equal(s.outside.currentLevel,door);assert.equal(s.campaign.saved,10);assert.equal(s.outside.future.wait,10);assert.equal(s.outside.future.mcp_blocks,8);
   assert.equal(await page.evaluate(()=>localStorage.getItem('pdoom.campaign.v1')),real,'The real save is untouched');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('pdoom.opening-complete.v1')),null,'The preview cannot unlock the real opening skip');
   report.cases.push(`${query}: SAFE MODE out of ${door}, ten saved, Wait 10, real save untouched`);
   await page.close();
  }

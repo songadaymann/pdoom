@@ -144,12 +144,24 @@ menus; reacquire it through the existing user-gesture path when resuming.
 
 ## Autosave and Load Game
 
-Current implementation: `campaign.js` writes `pdoom.campaign.v1` on committed
-level exits. It records rescued/lost/escort masks and hero, but not a mid-level
-position, puzzle state or last selected map. The current interface therefore
-cannot honestly promise to resume an interrupted rescue exactly as left.
+Current implementation (2026-10-15): `campaign.js` writes `pdoom.campaign.v1`
+at the first XP-world arrival after the prologue (`checkpoint: xp-intro`), then
+advances it after entering Level 1 (`checkpoint: level-one`). Load Game resumes
+the opening walk from its original wake-up position or starts Level 1 from its
+authored entrance, with the selected hero and the guide's wrench. Neither checkpoint
+counts as a hub return, rescue or elapsed rescue time. Reloading during Level 1
+starts that level again; arbitrary positions and puzzle progress are not saved.
 
-Proposed save contract for the new menu:
+Entering Level 1 also records `pdoom.opening-complete.v1`. Future New Games offer
+**SKIP OPENING — START LEVEL 1** beside Continue on the hero screen. Continue still
+plays the founder film, prologue and XP walk. The completed-opening marker survives
+starting another campaign. Legacy committed camp saves also qualify for skipping.
+
+Committed level exits replace an opening checkpoint with the existing saved/lost/
+escort masks and SAFE MODE resume behavior. An opening checkpoint can never downgrade
+that camp save. `scripts/opening-autosave-smoke.mjs` covers the transition/reload flow.
+
+Future refuge-checkpoint expansion:
 
 - Keep committed campaign data authoritative; preserve existing death, retreat
   and replay rules. A checkpoint does not count someone as evacuated to camp.
@@ -170,10 +182,8 @@ Proposed save contract for the new menu:
   a result or count videos and menus as play time. A checkpoint reload must be
   distinguishable from an uninterrupted run if the leaderboard requires it.
 
-For a smaller first implementation, Load Game can explicitly resume only the
-last committed SAFE MODE save; show **SAVED WHEN YOU LEAVE A FACILITY**. Expand
-to refuge checkpoints separately rather than presenting exit-only persistence
-as full mid-level autosaving.
+Refuge checkpoints remain a separate feature from the opening milestones and
+committed SAFE MODE saves described above.
 
 ## Read This! and Options
 

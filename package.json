@@ -41,6 +41,7 @@
     "test:doom:refuge-flow": "python3 scripts/build-refuge-flow-qa.py && node scripts/refuge-flow-smoke.mjs",
     "test:doom:rescue-redesign": "node scripts/rescue-redesign-smoke.mjs",
     "test:doom:onboarding": "node scripts/onboarding-smoke.mjs",
+    "test:doom:opening-save": "node --test tests/opening-checkpoints.test.mjs && node scripts/opening-autosave-smoke.mjs",
     "audit:doom:assets": "node scripts/audit-doom-assets.mjs",
     "prepare:playtest": "node scripts/prepare-playtest.mjs",
     "deploy:playtest": "npm run prepare:playtest && npx --yes wrangler@4.149.0 deploy --config deploy/playtest/wrangler.jsonc",

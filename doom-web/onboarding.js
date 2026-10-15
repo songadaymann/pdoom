@@ -2,12 +2,13 @@ import {ACTIONS,keyName} from './preferences.js';
 import {playIntroVideo} from './intro-video.js';
 import {detectWallet} from './wallet-detect.js';
 import {TOKEN} from './token-info.js';
+import {CAMPAIGN_KEY,OPENING_COMPLETE_KEY,readCampaign,campaignResumePoint,canSkipOpening} from './campaign.js';
 const MAPS=[['five-prisons','THE CONTROL PROBLEM','KNEE-DEEP IN THE DATA'],['hal-station','CONFABULATION STATION','THE SHORES OF HAL'],[null,'SPAWNING CHATS','COMING SOON'],[null,'HUMAN CONTAINMENT AREA','COMING SOON']];
 const seenKey='pdoom.level-intros.v1';
 export function createOnboarding({stage,storage,preferences,picker,block,warm,start,validate=()=>{},restart,active,activeHero,unlock,fullscreen}){
  const root=document.querySelector('#onboarding');let page='title',busy=false,capture=null,returnPage='main',selected=null,error=null,firstVisit=true;
  try{firstVisit=storage?.getItem('pdoom.opening-seen.v1')!=='1';}catch{}
- const saved=()=>{try{const d=JSON.parse(storage?.getItem('pdoom.campaign.v1')||'null');return d?.version===1&&d.hub&&['altman','amodei'].includes(d.ceo)?d:null;}catch{return null;}};
+ const saved=()=>readCampaign(storage);
  const views={};for(const id of ['title','main','hero','levels','read','options','confirm','loading']){const el=document.createElement('section');el.className='menu-view';el.dataset.view=id;el.hidden=true;root.append(el);views[id]=el;}
  const logo=()=>{const img=document.createElement('img');img.className='menu-logo';img.src='local/ui/pdoom-logo.png';img.alt='p(DOOM)';return img;};
  const heading=(el,text)=>{const h=document.createElement('h2');h.textContent=text;el.append(h);};
@@ -25,7 +26,9 @@ export function createOnboarding({stage,storage,preferences,picker,block,warm,st
  button(views.main,'READ THIS!',()=>show('read'),'menu-read');
  button(views.main,'OPTIONS',()=>{returnPage='main';show('options');},'menu-options');
  const retry=button(views.main,'RESTART LEVEL',()=>{selected={restart:true};show('confirm');},'menu-restart');
- heading(views.hero,'CHOOSE YOUR HERO');views.hero.append(document.querySelector('#ceo-pick'));button(views.hero,'CONTINUE',()=>levelSelect()?show('levels'):newCampaign(),'hero-next');button(views.hero,'BACK',()=>show('main'));
+ heading(views.hero,'CHOOSE YOUR HERO');views.hero.append(document.querySelector('#ceo-pick'));button(views.hero,'CONTINUE',()=>continueHero(),'hero-next');
+ const skipOpeningButton=button(views.hero,'SKIP OPENING — START LEVEL 1',()=>newCampaign(true),'hero-skip-opening');
+ button(views.hero,'BACK',()=>show('main'));
  heading(views.levels,'CHOOSE YOUR LEVEL');
  for(const [id,name,subtitle]of MAPS){const b=button(views.levels,name,()=>{selected={id};if(saved()||active()){show('confirm');}else launch(id,false);},id?'level-'+id:null);const small=document.createElement('small');small.textContent=subtitle;b.append(small);b.disabled=!id;}
  button(views.levels,'BACK',()=>show('hero'));
@@ -53,8 +56,8 @@ export function createOnboarding({stage,storage,preferences,picker,block,warm,st
  button(views.options,'FULLSCREEN',fullscreen);button(views.options,'WATCH STORY',()=>replayStory(),'menu-watch');
  for(const [id,name]of MAPS.filter(x=>x[0]))button(views.options,'WATCH '+name,()=>replayLevel(id));
  button(views.options,'RESET OPTIONS',()=>preferences.reset());button(views.options,'BACK',()=>show(returnPage));
- heading(views.confirm,'ARE YOU SURE?');const confirmNote=note(views.confirm,'');button(views.confirm,'YES',()=>{if(selected?.restart){restart();}else launch(selected.id,false,!!selected.prologue);},'menu-confirm');button(views.confirm,'NO',()=>show(selected?.restart?'main':selected?.prologue?'hero':'levels'),'menu-cancel');
- views.loading.append(logo());heading(views.loading,'LOADING');const loadingNote=note(views.loading,'PREPARING THE FACILITY','loading-stage');loadingNote.setAttribute('role','status');const progress=document.createElement('progress');progress.max=100;views.loading.append(progress);const bytesNote=note(views.loading,'','loading-bytes');const errorNote=note(views.loading,'','loading-error');const errorRetry=button(views.loading,'RETRY',()=>{if(error==='reload')location.reload();else launch(selected.id,selected.load,selected.prologue);},'loading-retry');errorRetry.hidden=true;
+ heading(views.confirm,'ARE YOU SURE?');const confirmNote=note(views.confirm,'');button(views.confirm,'YES',()=>{if(selected?.restart){restart();}else launch(selected.id,false,!!selected.prologue,!!selected.skipOpening);},'menu-confirm');button(views.confirm,'NO',()=>show(selected?.restart?'main':selected?.prologue||selected?.skipOpening?'hero':'levels'),'menu-cancel');
+ views.loading.append(logo());heading(views.loading,'LOADING');const loadingNote=note(views.loading,'PREPARING THE FACILITY','loading-stage');loadingNote.setAttribute('role','status');const progress=document.createElement('progress');progress.max=100;views.loading.append(progress);const bytesNote=note(views.loading,'','loading-bytes');const errorNote=note(views.loading,'','loading-error');const errorRetry=button(views.loading,'RETRY',()=>{if(error==='reload')location.reload();else launch(selected.id,selected.load,selected.prologue,selected.skipOpening);},'loading-retry');errorRetry.hidden=true;
  const footer=note(root,'ARROWS / ENTER TO CHOOSE · ESC TO GO BACK');footer.className='menu-footer';
  let bgId=null,bgMeta=null;fetch('local/intro/manifest.json',{signal:AbortSignal.timeout(5000)}).then(r=>r.ok?r.json():null).then(d=>{bgMeta=d;if(bgId)background();}).catch(()=>{});
  function quietRange(){const scene=bgMeta?.[bgId]?.scenes?.find(s=>s.name==='machines');return scene?[scene.t_ms/1000,scene.end_ms/1000]:null;}
@@ -62,7 +65,7 @@ export function createOnboarding({stage,storage,preferences,picker,block,warm,st
  video.addEventListener('loadedmetadata',excerpt);video.addEventListener('timeupdate',excerpt);
  function background(){const id=picker.id==='amodei'?'mario':'samwise';if(bgId!==id){bgId=id;video.src=`local/intro/intro-${id}.mp4`;video.poster=`local/intro/intro-${id}-poster.png`;video.load();}video.volume=preferences.data.music*.45;video.muted=!preferences.data.filmSound||!!active()||!firstVisit;excerpt();if(preferences.data.reducedMotion||page==='title'||page==='loading'){video.pause();return;}video.play().catch(()=>{});}
  function show(next){capture=null;page=next;root.hidden=false;root.dataset.page=page;for(const [id,v]of Object.entries(views))v.hidden=id!==page;
-  root.classList.toggle('title-screen',page==='title');resume.hidden=!active();retry.hidden=!active();load.disabled=!saved();const d=saved();saveNote.textContent=d?`${d.ceo==='amodei'?'DARIO':'SAM'} · ${count(d.saved0)+count(d.saved1)} SAVED · RESUME IN SAFE MODE`:'NO AUTOSAVE YET · PROGRESS SAVES WHEN YOU LEAVE A FACILITY';
+  root.classList.toggle('title-screen',page==='title');resume.hidden=!active();retry.hidden=!active();load.disabled=!saved();skipOpeningButton.hidden=levelSelect()||!canSkipOpening(storage);const d=saved(),point=campaignResumePoint(d);saveNote.textContent=d?`${d.ceo==='amodei'?'DARIO':'SAM'} · ${point==='xp-intro'?'XP WORLD · FIRST ARRIVAL':point==='level-one'?'LEVEL 1 · THE BEGINNING':`${count(d.saved0)+count(d.saved1)} SAVED · RESUME IN SAFE MODE`}`:'NO AUTOSAVE YET';
   confirmNote.textContent=selected?.restart?'RESTART THIS ATTEMPT? YOUR EVACUATED SURVIVORS STAY SAVED.':'START A NEW CAMPAIGN? THIS REPLACES THE PREVIOUS AUTOSAVE.';
   footer.hidden=page==='loading';background();setTimeout(()=>views[page]?.querySelector('button:not([disabled]),input')?.focus(),0);
  }
@@ -78,16 +81,17 @@ export function createOnboarding({stage,storage,preferences,picker,block,warm,st
  // New Game opens with the Last Stand prologue, which ends in Bliss beside the first
  // facility door. Level select stays for development: ?levels=1 or the QA storage flag.
  function levelSelect(){if(new URL(location.href).searchParams.get('levels')==='1')return true;try{return storage?.getItem('pdoom.level-select')==='1';}catch{return false;}}
- function newCampaign(){selected={id:'five-prisons',prologue:true};if(saved()||active())show('confirm');else launch('five-prisons',false,true);}
- async function launch(id,loadSave,withPrologue=false){if(busy)return;busy=true;selected={id,load:loadSave,prologue:withPrologue};error=null;errorNote.textContent='';errorRetry.hidden=true;block('onboarding',true);
+ function continueHero(){return levelSelect()?show('levels'):newCampaign();}
+ function newCampaign(skipOpening=false){if(skipOpening&&!canSkipOpening(storage))return;selected={id:'five-prisons',prologue:!skipOpening,skipOpening};if(saved()||active())show('confirm');else launch('five-prisons',false,!skipOpening,skipOpening);}
+ async function launch(id,loadSave,withPrologue=false,skipOpening=false){if(busy)return;skipOpening=skipOpening&&!loadSave&&canSkipOpening(storage);busy=true;selected={id,load:loadSave,prologue:withPrologue,skipOpening};error=null;errorNote.textContent='';errorRetry.hidden=true;block('onboarding',true);
   try{validate(id);await unlock();
    // Starting a new campaign from an existing worker needs a fresh canvas and
    // native session. Reload only after explicit confirmation, carrying choices.
-   const prologue=!loadSave&&id==='five-prisons'&&(withPrologue||new URL(location.href).searchParams.get('prologue')==='1');
-   if(active()){const u=new URL(location.href);u.searchParams.set('level',id);u.searchParams.set('ceo',picker.id);u.searchParams.set('play','1');if(loadSave)u.searchParams.set('load','1');else u.searchParams.delete('load');if(prologue)u.searchParams.set('prologue','1');location.assign(u);return;}
+   const prologue=!loadSave&&!skipOpening&&id==='five-prisons'&&(withPrologue||new URL(location.href).searchParams.get('prologue')==='1');
+   if(active()){const u=new URL(location.href);u.searchParams.set('level',id);u.searchParams.set('ceo',picker.id);u.searchParams.set('play','1');if(loadSave)u.searchParams.set('load','1');else u.searchParams.delete('load');if(prologue)u.searchParams.set('prologue','1');else u.searchParams.delete('prologue');if(skipOpening)u.searchParams.set('skipopening','1');else u.searchParams.delete('skipopening');location.assign(u);return;}
    // New Game (2026-10-12): the chosen founder's intro film, full-screen, then the prologue.
    // The engine keeps downloading behind it; any key or Skip ends it.
-   const preload=warm();preload.catch(()=>{});if(prologue)await founderFilm();else if(!loadSave)await levelFilm(id);show('loading');await preload;if(!loadSave){try{storage?.removeItem('pdoom.campaign.v1');}catch{}}loadingNote.textContent='STARTING ENGINE';await start(id,{load:loadSave,prologue});if(loadSave)loadingNote.textContent='ENTERING SAFE MODE';firstVisit=false;close();
+   const preload=warm();preload.catch(()=>{});if(prologue)await founderFilm();else if(!loadSave&&!skipOpening)await levelFilm(id);show('loading');await preload;if(!loadSave){try{if(canSkipOpening(storage))storage?.setItem(OPENING_COMPLETE_KEY,'1');storage?.removeItem(CAMPAIGN_KEY);}catch{}}loadingNote.textContent='STARTING ENGINE';await start(id,{load:loadSave,prologue,skipOpening});firstVisit=false;close();
   }catch(e){show('loading');errorNote.textContent=String(e.message||e);error=e.reload?'reload':'retry';errorRetry.hidden=false;errorRetry.focus();}finally{busy=false;}
  }
  async function filmFallback(id){
@@ -107,7 +111,7 @@ export function createOnboarding({stage,storage,preferences,picker,block,warm,st
  },true);
  document.addEventListener('visibilitychange',()=>{if(document.hidden)video.pause();else if(!root.hidden)background();});
  root.querySelector('.boot-title')?.remove();show('title');
- const handoff=new URL(location.href);if(handoff.searchParams.get('play')==='1'){const id=handoff.searchParams.get('level')||'five-prisons',loadSave=handoff.searchParams.get('load')==='1';handoff.searchParams.delete('play');handoff.searchParams.delete('load');history.replaceState(null,'',handoff);setTimeout(()=>launch(id,loadSave),50);}
+ const handoff=new URL(location.href);if(handoff.searchParams.get('play')==='1'){const id=handoff.searchParams.get('level')||'five-prisons',loadSave=handoff.searchParams.get('load')==='1',skipOpening=handoff.searchParams.get('skipopening')==='1';handoff.searchParams.delete('play');handoff.searchParams.delete('load');handoff.searchParams.delete('skipopening');history.replaceState(null,'',handoff);setTimeout(()=>launch(id,loadSave,false,skipOpening),50);}
  // READ THIS! straight from the game (SAFE MODE's install dialogs, 2026-10-14); BACK leads to the menu.
- return {open:()=>openMain(),openRead(){openMain();show('read');},toggle(){if(busy||page==='loading')return;root.hidden?openMain():page==='main'?close():show('main');},close,levelFilm,isOpen:()=>!root.hidden&&!!active(),isVisible:()=>!root.hidden,getState:()=>({page,busy,selected,error,video:bgId,preferences:preferences.data}),progress(p){progress.value=p.percent??0;if(p.percent==null)progress.removeAttribute('value');bytesNote.textContent=`${(p.loaded/1048576).toFixed(1)} MB${p.total?' / '+(p.total/1048576).toFixed(1)+' MB':''}${p.percent!=null?' · '+p.percent+'%':''}`;},loading(label){show('loading');loadingNote.textContent=label;},failed(message){show('loading');error='reload';errorNote.textContent=message;errorRetry.hidden=false;errorRetry.focus();},heroNext:()=>show('levels')};
+ return {open:()=>openMain(),openRead(){openMain();show('read');},toggle(){if(busy||page==='loading')return;root.hidden?openMain():page==='main'?close():show('main');},close,levelFilm,isOpen:()=>!root.hidden&&!!active(),isVisible:()=>!root.hidden,getState:()=>({page,busy,selected,error,video:bgId,preferences:preferences.data}),progress(p){progress.value=p.percent??0;if(p.percent==null)progress.removeAttribute('value');bytesNote.textContent=`${(p.loaded/1048576).toFixed(1)} MB${p.total?' / '+(p.total/1048576).toFixed(1)+' MB':''}${p.percent!=null?' · '+p.percent+'%':''}`;},loading(label){show('loading');loadingNote.textContent=label;},failed(message){show('loading');error='reload';errorNote.textContent=message;errorRetry.hidden=false;errorRetry.focus();},heroNext:continueHero};
 }

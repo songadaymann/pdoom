@@ -1,0 +1,39 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {nativeQA} from './native-qa-helpers.mjs';
+const base=process.env.DOOM_URL||'http://127.0.0.1:5198/',out=process.env.DOOM_OUT||'output/opening-autosave';
+await fs.mkdir(out,{recursive:true});
+const browser=await chromium.launch({channel:'chrome',args:['--mute-audio']}),report={url:base,cases:[],errors:[]};
+const contexts=[];let current;
+async function open(query='',save,viewport){
+ const context=await browser.newContext({viewport:viewport||{width:1280,height:800}});contexts.push(context);
+ if(save)await context.addInitScript(save=>{if(!sessionStorage.getItem('opening-qa-seeded')){localStorage.setItem('pdoom.campaign.v1',JSON.stringify(save));sessionStorage.setItem('opening-qa-seeded','1');}},save);
+ const p=await context.newPage();current=p;p.on('pageerror',e=>report.errors.push(String(e)));await p.goto(new URL(query,base).href);await p.waitForFunction(()=>window.render_game_to_text);return {p,q:nativeQA(p),context};
+}
+async function main(p){await p.click('#title-enter');}
+async function load(p,q){await main(p);assert.equal(await p.locator('#menu-load').isEnabled(),true);await p.click('#menu-load');await q.wait(s=>s.menu.page==='closed'&&!s.uiBlocked,'Load completes',90000);}
+async function levelOne(q){const s=await q.wait(s=>s.mode==='playing'&&s.world?.map==='E1M4'&&s.world.ticks>35&&s.menu.page==='closed'&&!s.uiBlocked,'First facility starts',60000);assert.equal(s.world.entry_hub,0);assert.equal(s.world.health,100);assert.equal(s.world.wrench,1);assert.equal(s.world.gun,0);assert.equal(s.world.freed,0);assert.equal(s.campaign.saved,0);assert.equal(s.run.practiceReason,'');assert.equal(s.prologue,null);assert.equal(s.outside,null);return s;}
+try{
+ const a=await open('?ceo=amodei');await main(a.p);await a.p.click('#menu-new');assert.equal(await a.p.locator('#hero-skip-opening').isVisible(),false);await a.p.click('#hero-next');await a.p.waitForSelector('#intro-video .iv-skip');await a.p.click('#intro-video .iv-skip');await a.q.wait(s=>s.prologue?.phase==='battle'&&!s.uiBlocked,'Prologue starts',60000);await a.p.click('.war-skip');
+ await a.q.wait(s=>s.outside?.intro&&s.outside.guide&&s.campaign.checkpoint==='xp-intro','First XP arrival autosaves',60000);
+ let save=await a.p.evaluate(()=>JSON.parse(localStorage.getItem('pdoom.campaign.v1')));assert.equal(save.checkpoint,'xp-intro');assert.equal(save.ceo,'amodei');assert.equal(save.hub,false);assert.equal(save.saved0,0);assert.equal(await a.p.evaluate(()=>localStorage.getItem('pdoom.opening-complete.v1')),null);await a.p.screenshot({path:out+'/first-xp-arrival.png'});
+ report.cases.push('New player has no skip; prologue -> first XP arrival saves the selected hero without marking the walk completed');
+ await a.p.reload();await a.p.waitForFunction(()=>window.render_game_to_text);await main(a.p);assert.match(await a.p.locator('#menu-save-note').innerText(),/XP WORLD/);await a.p.click('#menu-load');await a.q.wait(s=>s.outside?.intro&&s.outside.guide?.phase==='waiting'&&!s.uiBlocked&&s.menu.page==='closed','XP checkpoint resumes',60000);let s=await a.q.read();assert.equal(s.ceo,'amodei');assert.equal(s.outside.guide.character,'samwise');assert.ok(Math.abs(s.outside.x+45)<.2&&Math.abs(s.outside.z+150)<.2);assert.equal(s.prologue,null);assert.equal(await a.p.locator('#intro-video').count(),0);
+ report.cases.push('Reload + Load Game resumes the first XP arrival and guide, preserving Dario and bypassing the prologue/film');
+ await a.q.press('Space');await a.q.wait(s=>s.outside.guide.ready,'Skip Walk finishes exposition');assert.equal(await a.p.evaluate(()=>localStorage.getItem('pdoom.opening-complete.v1')),null);
+ await a.p.evaluate(()=>window.__DOOM_DEBUG__.outside.debug.setView(17,-3,Math.PI,0));await a.q.wait(s=>s.outside.nearestDoor==='five-prisons','First entrance becomes usable');await a.q.press('e');await levelOne(a.q);await a.q.wait(s=>s.campaign.checkpoint==='level-one','First-level checkpoint saved');save=await a.p.evaluate(()=>JSON.parse(localStorage.getItem('pdoom.campaign.v1')));assert.equal(save.checkpoint,'level-one');assert.equal(await a.p.evaluate(()=>localStorage.getItem('pdoom.opening-complete.v1')),'1');await a.p.screenshot({path:out+'/first-level-entry.png'});
+ report.cases.push('Entering the first facility advances the save, unlocks future skips, grants the guide wrench and starts a fresh eligible rescue');
+ await a.p.reload();await a.p.waitForFunction(()=>window.render_game_to_text);await main(a.p);assert.match(await a.p.locator('#menu-save-note').innerText(),/LEVEL 1/);await a.p.click('#menu-load');s=await levelOne(a.q);assert.equal(s.ceo,'amodei');assert.equal(await a.p.locator('#intro-video').count(),0);assert.ok(Math.abs(s.world.x-2032)<1);await a.p.screenshot({path:out+'/level-one-loaded.png'});
+ report.cases.push('Reload + Load Game starts Level 1 with original hero, full health, wrench, intact puzzles and no intro or meadow');
+ // New Game from an active native worker takes the real reload handoff and may select the other hero.
+ await a.p.keyboard.press('Escape');await a.p.click('#menu-new');assert.equal(await a.p.locator('#hero-skip-opening').isVisible(),true);await a.p.click('input[value="altman"]',{force:true});await a.p.click('#hero-skip-opening');await a.p.click('#menu-cancel');assert.equal(await a.p.locator('#hero-skip-opening').isVisible(),true);await a.p.click('#hero-skip-opening');await Promise.all([a.p.waitForNavigation({waitUntil:'domcontentloaded'}),a.p.click('#menu-confirm')]);await a.p.waitForFunction(()=>window.render_game_to_text);s=await levelOne(a.q);assert.equal(s.ceo,'altman');assert.equal(s.campaign.checkpoint,'level-one');assert.equal(await a.p.locator('#intro-video').count(),0);await a.p.screenshot({path:out+'/skip-opening-sam.png'});
+ report.cases.push('Future New Game offers skip; cancel preserves save; confirmed skip survives active-worker reload and starts Sam directly in fresh Level 1');
+ await a.context.close();
+ const camp={version:1,ceo:'amodei',hub:true,saved0:3,saved1:1,lost0:4,lost1:0,following0:0,following1:0};const b=await open('',camp);await load(b.p,b.q);s=await b.q.wait(s=>s.outside?.active&&!s.outside.intro,'Legacy camp restores',60000);assert.equal(s.campaign.saved,3);assert.equal(s.campaign.lost,1);assert.equal(s.ceo,'amodei');assert.equal(s.outside.guide,null);assert.deepEqual(await b.p.evaluate(()=>JSON.parse(localStorage.getItem('pdoom.campaign.v1'))),camp);await b.context.close();
+ report.cases.push('Existing committed camp save still resumes SAFE MODE with rescued/lost survivors and no introductory walk');
+ const phone=await open('',{...save,ceo:'altman'},{width:390,height:844});await main(phone.p);await phone.p.click('#menu-new');const button=phone.p.locator('#hero-skip-opening');await button.scrollIntoViewIfNeeded();assert.equal(await button.isVisible(),true);const box=await button.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=390);assert.equal(await phone.p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await phone.p.screenshot({path:out+'/phone-skip-option.png'});await phone.context.close();
+ report.cases.push('Unlocked skip option fits a phone-sized hero menu');assert.deepEqual(report.errors,[]);report.passed=true;
+}catch(error){report.failure=String(error);report.final=await current?.evaluate(()=>JSON.parse(window.render_game_to_text())).catch(()=>null);await current?.screenshot({path:out+'/failure.png'}).catch(()=>{});}
+finally{await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));for(const c of contexts)await c.close().catch(()=>{});await browser.close();}
+console.log(JSON.stringify({passed:report.passed,cases:report.cases,failure:report.failure,errors:report.errors},null,2));if(!report.passed)process.exitCode=1;

@@ -7,7 +7,7 @@ import {isGameControl} from './game-controls.js';
 import {nativePersonRects,createPersonLabel} from './person-label.js';
 import {createStoryBeats} from './story-beats.js';
 import {configureHalAnswers,updateHalHud} from './hal-hud.js';
-import {Campaign,CAMPAIGN_KEY} from './campaign.js';
+import {Campaign,CAMPAIGN_KEY,OPENING_COMPLETE_KEY,campaignResumePoint} from './campaign.js';
 import {updateLevelPolish} from './level-polish.js';
 import {DoomAudio} from './audio.js';
 import {createVoiceOver} from './voice-over.js';
@@ -33,8 +33,8 @@ const realStorage=browserStorage(),CEO_CHOICE=resolveCeo({search:location.search
 // in-memory save, so a real save in this browser is left alone; the menu's own Load Game hand-off launches it.
 const SAFE_MODE=CHECKPOINT&&new URLSearchParams(location.search).get('safemode')==='1';
 function campaignSandbox(storage,ceo){
- let save=JSON.stringify({version:1,ceo:['altman','amodei'].includes(ceo)?ceo:'altman',hub:true,saved0:31,saved1:31,lost0:0,lost1:0,following0:0,following1:0});
- return {getItem:k=>k===CAMPAIGN_KEY?save:storage?.getItem(k)??null,setItem:(k,v)=>{if(k===CAMPAIGN_KEY)save=String(v);else storage?.setItem(k,v);},removeItem:k=>{if(k===CAMPAIGN_KEY)save=null;else storage?.removeItem(k);}};
+ let save=JSON.stringify({version:1,ceo:['altman','amodei'].includes(ceo)?ceo:'altman',hub:true,saved0:31,saved1:31,lost0:0,lost1:0,following0:0,following1:0}),openingComplete='1';
+ return {getItem:k=>k===CAMPAIGN_KEY?save:k===OPENING_COMPLETE_KEY?openingComplete:storage?.getItem(k)??null,setItem:(k,v)=>{if(k===CAMPAIGN_KEY)save=String(v);else if(k===OPENING_COMPLETE_KEY)openingComplete=String(v);else storage?.setItem(k,v);},removeItem:k=>{if(k===CAMPAIGN_KEY)save=null;else if(k===OPENING_COMPLETE_KEY)openingComplete=null;else storage?.removeItem(k);}};
 }
 const ceoStorage=SAFE_MODE?campaignSandbox(realStorage,CEO_CHOICE.id):realStorage;
 if(SAFE_MODE){
@@ -53,7 +53,7 @@ preferences.subscribe(d=>{audio.setVolumes(d);document.querySelector('#stage').c
 const personLabel=createPersonLabel(document.querySelector('#stage'));
 const state={mode:'ready',engine:'GZDoom WebAssembly',mod:`p(DOOM): ${LEVEL?.title||'Unavailable'}`,clock:'real-time Doom ticks',frames:0,fps:0,world:null,events:[],error:null};
 let yardMusic=false;const logs=[];let worker=null,timeout=null,outside=null,hub=null,outsideLoading=false,pendingWin=0;
-let campaign=new Campaign(ceoStorage,CEO_CHOICE.id),runningCeo=null,bootResolve=null,bootReject=null,resumeHub=false,awaitingRun=false,nativeResume=null;
+let campaign=new Campaign(ceoStorage,CEO_CHOICE.id),runningCeo=null,bootResolve=null,bootReject=null,resumeHub=false,awaitingRun=false,nativeResume=null,openingCheckpointPending=false;
 launcher.hidden=CHECKPOINT;
 if(!CHECKPOINT)document.querySelector('#onboarding').hidden=true;
 const run=new RunTracker(LEVEL),panels=new Set();let uiBlocked=false,meadowPanelPaused=false;
@@ -202,6 +202,7 @@ function onMessage(m){
     if(state.mode==='loading'){
       prologue.reset();
       state.mode='playing';clearTimeout(timeout);launcher.hidden=true;
+      if(openingCheckpointPending&&LEVEL.id==='five-prisons'){campaign.saveOpening('level-one');openingCheckpointPending=false;}
       document.querySelector('#restart').hidden=false;
       document.querySelector('#touch').hidden=!matchMedia('(pointer:coarse)').matches;
       canvas.focus();
@@ -229,7 +230,7 @@ async function enterOutside({intro=false,melt=false}={}){
     else{const {createOutside}=await import('./outside/outside.js');
       outside=hub=await createOutside({source:canvas,stage:document.querySelector('#stage'),audio:audio.context,read:()=>state,campaign:()=>campaign.getState(),enter:enterLevel,prompt:text=>preferences.prompt(text),readThis:()=>gamePause?.openRead?.(),labels:(rects,surface,active)=>personLabel.update(rects,surface,active&&!uiBlocked)});}
     outside.setActive(true,LEVEL.id);
-    if(intro){await outside.startIntro(runningCeo);prologue.reset();document.querySelector('#reticle').hidden=true;}
+    if(intro){await outside.startIntro(runningCeo);campaign.saveOpening('xp-intro');prologue.reset();document.querySelector('#reticle').hidden=true;}
     window.__DOOM_DEBUG__.outside=outside;document.querySelector('#hal-thaw').hidden=true;
     outsideLoading=false;document.querySelector('#threat-warning').hidden=true;document.querySelector('#status-line')?.setAttribute('hidden','');
     canvas.hidden=true;document.querySelector('#stage').classList.add('outside');checkpointStatusBar()?.setPaused(true);
@@ -243,12 +244,13 @@ function validateEngine(id){
  if(!window.Worker||!canvas.transferControlToOffscreen||!WebAssembly.Suspending)throw Error('PLAY IN CURRENT CHROME OR EDGE — THIS ENGINE NEEDS WEBASSEMBLY JSPI.');
  if(!getLevel(id))throw Error('THIS LEVEL IS NOT AVAILABLE.');
 }
-async function startEngine(id,{load=false,prologue:playPrologue=false}={}){
+async function startEngine(id,{load=false,prologue:playPrologue=false,skipOpening=false}={}){
   yardMusic=false;
  if(worker)throw Error('The engine is already running.');
  validateEngine(id);
  LEVEL=getLevel(id);if(!LEVEL||CHECKPOINT&&!LEVEL.scored)throw Error('THIS LEVEL IS NOT AVAILABLE.');
- runningCeo=ceoPick?.id||CEO_CHOICE.id;campaign=new Campaign(ceoStorage,runningCeo);run.level=LEVEL;scoreView?.setLevel(LEVEL);ceoPick?.lock();checkpointStatusBar()?.setCeo(runningCeo);resumeHub=load;
+ runningCeo=ceoPick?.id||CEO_CHOICE.id;campaign=new Campaign(ceoStorage,runningCeo);run.level=LEVEL;scoreView?.setLevel(LEVEL);ceoPick?.lock();checkpointStatusBar()?.setCeo(runningCeo);
+ const resume=load?campaignResumePoint(campaign.data):null;resumeHub=resume==='hub'||resume==='xp-intro';openingCheckpointPending=skipOpening;
  const ready=new Promise((resolve,reject)=>{bootResolve=resolve;bootReject=reject;});
  try{
     state.mode='loading';start.disabled=true;status.textContent='Loading Doom…';await audio.unlock();
@@ -268,7 +270,7 @@ async function startEngine(id,{load=false,prologue:playPrologue=false}={}){
     timeout=setTimeout(()=>{fail('Doom did not finish starting. Reload to try again.');worker?.terminate();},45000);
     worker.postMessage({type:'boot',wasmBinary:wasm,canvas:offscreen,pinW:width,pinH:height,files,args:[
       '-iwad','DOOM.WAD','-file','pdoom.pk3','-exec','pdoom.cfg','-warp',String(LEVEL.episode),String(playPrologue?2:LEVEL.map),'-skill','3','-nomusic',
-      ...campaign.bootArgs(),'+set','pdoom_boot_hold','1','+set','pdoom_ceo',ceoPick?.id==='amodei'?'1':'0','+set','pdoom_development',development?'1':'0','+set','pdoom_dev_end',development?'1':'0',
+      ...campaign.bootArgs(skipOpening?{opening:'level-one'}:{}),'+set','pdoom_boot_hold','1','+set','pdoom_ceo',ceoPick?.id==='amodei'?'1':'0','+set','pdoom_development',development?'1':'0','+set','pdoom_dev_end',development?'1':'0',
       '+vid_rendermode','4','+vid_preferbackend','1','+vid_fullscreen','0',
       '+vid_defwidth',String(width),'+vid_defheight',String(height),'+win_w',String(width),'+win_h',String(height),
       '+vid_maxfps','120','+vid_vsync','0','+cl_capfps','0','+gl_texture_filter','0',
@@ -277,7 +279,7 @@ async function startEngine(id,{load=false,prologue:playPrologue=false}={}){
       '+fov','90','+set','freelook','1','+set','mouse_sensitivity','1.0'
     ]},[offscreen,wasm.buffer,...Object.values(files).map(b=>b.buffer)]);
   await ready;
-  if(load)await enterOutside();
+  if(resume==='hub'||resume==='xp-intro')await enterOutside({intro:resume==='xp-intro'});
  }catch(error){bootResolve=null;bootReject=null;if(worker)error.reload=true;throw error;}
 }
 start.addEventListener('click',()=>{if(CHECKPOINT)gamePause.heroNext();else startEngine(LEVEL.id).catch(e=>fail(e.message));});
@@ -356,6 +358,7 @@ function playLevelMusic(){
 async function enterLevel(id,replay=false,restart=false){
  if(!CHECKPOINT){location.reload();return;}
  if(!worker||(!restart&&!getLevel(id)))return;
+ openingCheckpointPending=!restart&&id==='five-prisons'&&outside?.getState().intro===true;
  if(!restart&&!outside?.getState().intro){blockPanel('level-transition',true);try{await gamePause.levelFilm(id);}finally{blockPanel('level-transition',false);}}
  const pausedTic=nativePanelPaused?state.world?.ticks:null;
  resumeHub=false;gamePause.close();if(nativePanelPaused){nativePanelKey(false);nativePanelPaused=false;}personLabel.hide();storyBeats.reset();scoreView.reset();releaseKeys();if(document.pointerLockElement)document.exitPointerLock();
