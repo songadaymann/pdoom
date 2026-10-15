@@ -52,7 +52,10 @@
     "test:doom:travel": "node scripts/build-doom-outside.mjs && node scripts/meadow-travel-smoke.mjs",
     "setup:runtime": "node scripts/setup-runtime.mjs",
     "prepare:mann-cool": "node scripts/prepare-mann-cool.mjs",
-    "deploy:mann-cool": "npm run prepare:mann-cool && npx --yes wrangler@4.149.0 deploy --config .mann-cool/wrangler.jsonc"
+    "deploy:mann-cool": "npm run prepare:mann-cool && npx --yes wrangler@4.149.0 deploy --config .mann-cool/wrangler.jsonc",
+    "test:doom:ranked": "node --test tests/ranked-runs.test.mjs tests/run-score.test.mjs",
+    "test:doom:replay": "node scripts/replay-feasibility-smoke.mjs",
+    "test:doom:ranked-browser": "node scripts/ranked-score-browser-smoke.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.21.0",

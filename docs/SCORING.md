@@ -60,9 +60,39 @@ milliseconds. The shell preserves any already-open native pause/menu state.
 
 The loopback server labels its boards **Local leaderboard** and stores them in
 `output/local-leaderboards/scores.json`. Browser QA uses an isolated fixture store;
-no tests submit public scores. Public catalog registration and deployment remain
-a separate release. The generic API trusts client scores; this is a casual board,
-not a claim of tamper-proof verified play. Its normal ordering is score then
+no tests submit public scores. The public p(DOOM) API now validates the rules and
+recalculates scores as described below. This remains a casual board without proof
+of gameplay. Its normal ordering is score then
 creation time, and it lists best runs rather than guaranteeing one row per person.
+
+## Server rules validation (option 1)
+
+The mann.cool Worker issues a ticket through `POST /api/v1/pdoom/runs` for each
+current map/version and client run UUID. A private, random browser nonce makes
+ticket acquisition retryable after an uncertain response; only its hash is stored
+on the server. Score submissions carry `{runTicket: {id, token}}` separately from
+public metadata. Both `/api/v1/leaderboard` and the legacy `/api/leaderboard` enforce
+the same p(DOOM) checks. Other games keep their existing contracts.
+
+The server requires an escaped, fresh, non-practice skill-3 result; validates
+survivor/CEO/camera counts, map and rules versions, outlook and the 35-tic clock;
+and enforces each board's qualification. It calculates the score and breakdown
+itself. One atomic completion fingerprint binds a ticket to the same result,
+player and name across all qualifying boards. Repeating a submission ID cannot
+create another row or change its stored score.
+
+Tickets last 90 days while unused; completed-ticket retries remain valid. There
+are no heartbeat deadlines, guessed minimum completion times, or wall-clock
+comparisons that penalize pausing, tab suspension or a lost connection. Ticket
+requests start with the native run and retry on submission if the service was
+unavailable. Acquisition failures never prevent playing. Completed eligible
+results and partial-submission progress are retained in browser storage; **Saved
+Results** in the main menu restores them after a refresh. Blocked/full browser
+storage still permits current-tab retries.
+
+`validation: server-rules-v1` means the rules and calculation were checked. It
+does not prove the browser's reported events happened. A fabricated but internally
+consistent run can still pass option 1. Replay verification (option 2) must reproduce
+the official simulation before any stronger claim is made.
 
 See [LEVELS.md](LEVELS.md) for adding further maps and campaign transitions.

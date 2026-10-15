@@ -26,6 +26,8 @@ The existing friends playtest stays available for rollback. The game remains fre
 - Requires current desktop Chrome/Edge with WebAssembly JSPI. Phone/tablet checks are emulated UI checks; physical mobile native-engine compatibility is not claimed in the catalog.
 - The previous friends preview remains available for rollback.
 
-Direct late-game visit: https://mann.cool/pdoom/?safemode=1 (in-memory test state).
+The public `?safemode=1` shortcut is retired. SAFE MODE remains accessible through
+normal progression and Load Game. The fixture is available only on loopback with
+`dev-config.enabled: true`.
 
 Local verification reports are ignored under `output/playtest/canonical/` and `output/playtest/canonical-shell/`.

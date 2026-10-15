@@ -12,7 +12,7 @@ export function submissionBodies(result,name,playerId,{ceo}={}){
   if(!result.eligible)throw Error(result.practiceReason||'Only completed escapes can be submitted.');
   const metadata={levelId:result.levelId,levelVersion:result.levelVersion,scoreVersion:result.scoreVersion,boardVersion:result.boardVersion,
     savedFigures:result.savedFigures,ceoState:result.ceoState,skill:result.skill,entry:result.entry,retreat:result.retreat,
-    saved:result.saved,camerasDestroyed:result.camerasDestroyed,camerasTotal:result.camerasTotal,
+    outcome:result.outcome,practice:!result.eligible,saved:result.saved,total:result.total,camerasDestroyed:result.camerasDestroyed,camerasTotal:result.camerasTotal,
     activeMs:result.activeMs,activeTics:result.activeTics,pDoomAtCoverOpen:result.pDoomAtCoverOpen,
     pDoomFinal:result.pDoomFinal,breakdown:result.breakdown,routes:result.routes};
   if(/^(altman|amodei|doomguy)$/.test(ceo||''))metadata.ceo=ceo;
@@ -22,22 +22,25 @@ export function submissionBodies(result,name,playerId,{ceo}={}){
 
 // Retain the identical name and IDs after a partial success or uncertain response.
 export class LeaderboardSubmission{
-  constructor(result,{endpoint='/api/v1/leaderboard',fetcher=(...args)=>fetch(...args),playerId,ceo}={}){
+  constructor(result,{endpoint='/api/v1/leaderboard',fetcher=(...args)=>fetch(...args),playerId,ceo,ticket=async()=>null,state,onProgress=()=>{}}={}){
     this.result=result;this.endpoint=endpoint;this.fetcher=fetcher;this.playerId=playerId;this.ceo=ceo;
-    this.bodies=null;this.accepted=new Set();this.inflight=null;
+    this.bodies=state?.bodies||null;this.accepted=new Set(state?.accepted||[]);this.inflight=null;this.ticket=ticket;this.onProgress=onProgress;
   }
   submit(name){
     if(this.inflight)return this.inflight;
     this.bodies??=submissionBodies(this.result,name,this.playerId,{ceo:this.ceo});
+    this.onProgress({bodies:this.bodies,accepted:[...this.accepted]});
     this.inflight=this.send().finally(()=>{this.inflight=null;});return this.inflight;
   }
   async send(){
+    const runTicket=await this.ticket();
     for(const body of this.bodies){
       if(this.accepted.has(body.variant))continue;
-      const response=await this.fetcher(this.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const response=await this.fetcher(this.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,...(runTicket?{runTicket}:{})})});
       let data;try{data=await response.json();}catch{throw Error('No confirmation received. Retry to check this same score.');}
       if(!response.ok||data.success!==true)throw Error(data.error||'Leaderboard unavailable. Retry this score.');
       this.accepted.add(body.variant);
+      this.onProgress({bodies:this.bodies,accepted:[...this.accepted]});
     }
     return {accepted:[...this.accepted],complete:this.accepted.size===this.bodies.length};
   }

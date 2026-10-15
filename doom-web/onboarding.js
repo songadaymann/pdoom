@@ -5,7 +5,7 @@ import {TOKEN} from './token-info.js';
 import {CAMPAIGN_KEY,OPENING_COMPLETE_KEY,readCampaign,campaignResumePoint,canSkipOpening} from './campaign.js';
 const MAPS=[['five-prisons','THE CONTROL PROBLEM','KNEE-DEEP IN THE DATA'],['hal-station','CONFABULATION STATION','THE SHORES OF HAL'],[null,'SPAWNING CHATS','COMING SOON'],[null,'HUMAN CONTAINMENT AREA','COMING SOON']];
 const seenKey='pdoom.level-intros.v1';
-export function createOnboarding({stage,storage,preferences,picker,block,warm,start,validate=()=>{},restart,active,activeHero,unlock,fullscreen}){
+export function createOnboarding({stage,storage,preferences,picker,block,warm,start,validate=()=>{},restart,active,activeHero,unlock,fullscreen,savedResults=()=>0,openSavedResults=()=>{}}){
  const root=document.querySelector('#onboarding');let page='title',busy=false,capture=null,returnPage='main',selected=null,error=null,firstVisit=true;
  try{firstVisit=storage?.getItem('pdoom.opening-seen.v1')!=='1';}catch{}
  const saved=()=>readCampaign(storage);
@@ -23,6 +23,8 @@ export function createOnboarding({stage,storage,preferences,picker,block,warm,st
  button(views.main,'NEW GAME',()=>{picker.unlock();show('hero');},'menu-new');
  const load=button(views.main,'LOAD GAME',()=>{const d=saved();if(d){picker.unlock();picker.select(d.ceo);launch('five-prisons',true);}},'menu-load');
  const saveNote=note(views.main,'','menu-save-note');
+ const savedScores=button(views.main,'SAVED RESULTS',openSavedResults,'menu-saved-results');
+ const refreshSavedResults=()=>{savedScores.hidden=savedResults()===0;};
  button(views.main,'READ THIS!',()=>show('read'),'menu-read');
  button(views.main,'OPTIONS',()=>{returnPage='main';show('options');},'menu-options');
  const retry=button(views.main,'RESTART LEVEL',()=>{selected={restart:true};show('confirm');},'menu-restart');
@@ -66,6 +68,7 @@ export function createOnboarding({stage,storage,preferences,picker,block,warm,st
  function background(){const id=picker.id==='amodei'?'mario':'samwise';if(bgId!==id){bgId=id;video.src=`local/intro/intro-${id}.mp4`;video.poster=`local/intro/intro-${id}-poster.png`;video.load();}video.volume=preferences.data.music*.45;video.muted=!preferences.data.filmSound||!!active()||!firstVisit;excerpt();if(preferences.data.reducedMotion||page==='title'||page==='loading'){video.pause();return;}video.play().catch(()=>{});}
  function show(next){capture=null;page=next;root.hidden=false;root.dataset.page=page;for(const [id,v]of Object.entries(views))v.hidden=id!==page;
   root.classList.toggle('title-screen',page==='title');resume.hidden=!active();retry.hidden=!active();load.disabled=!saved();skipOpeningButton.hidden=levelSelect()||!canSkipOpening(storage);const d=saved(),point=campaignResumePoint(d);saveNote.textContent=d?`${d.ceo==='amodei'?'DARIO':'SAM'} · ${point==='xp-intro'?'XP WORLD · FIRST ARRIVAL':point==='level-one'?'LEVEL 1 · THE BEGINNING':`${count(d.saved0)+count(d.saved1)} SAVED · RESUME IN SAFE MODE`}`:'NO AUTOSAVE YET';
+  refreshSavedResults();
   confirmNote.textContent=selected?.restart?'RESTART THIS ATTEMPT? YOUR EVACUATED SURVIVORS STAY SAVED.':'START A NEW CAMPAIGN? THIS REPLACES THE PREVIOUS AUTOSAVE.';
   footer.hidden=page==='loading';background();setTimeout(()=>views[page]?.querySelector('button:not([disabled]),input')?.focus(),0);
  }
@@ -103,7 +106,7 @@ export function createOnboarding({stage,storage,preferences,picker,block,warm,st
  async function replayLevel(id){await levelFilm(id,{force:true});show('options');}
  preferences.subscribe(d=>{for(const [key,{input,value}]of Object.entries(sliders)){input.value=d[key];value.textContent=key==='sensitivity'?d[key].toFixed(1):Math.round(d[key]*100)+'%';}for(const key of ['filmSound','reducedMotion']){const b=root.querySelector('#option-'+key);b.textContent=b.dataset.label+': '+(d[key]?'ON':'OFF');}for(const [code,b]of Object.entries(binds))b.textContent=b.dataset.label+' — '+keyName(d.keys[code]);if(bgId)background();});
  root.addEventListener('change',e=>{if(e.target.name==='ceo')background();});
- window.addEventListener('keydown',e=>{if(root.hidden)return;if(e.ctrlKey||e.metaKey||e.altKey)return;
+ window.addEventListener('keydown',e=>{if(root.hidden||e.target.closest?.('dialog[open]'))return;if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(capture){e.preventDefault();e.stopImmediatePropagation();if(e.code==='Escape'){capture=null;preferences.set('sfx',preferences.data.sfx);return;}keysNote.textContent=preferences.bind(capture,e.code)||'KEY CHANGED';capture=null;return;}
   if(e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();if(busy||page==='loading')return;if(page==='main'&&active())close();else show(page==='levels'?'hero':page==='hero'?'main':page==='title'?'title':'main');return;}
   if(page==='title'&&['Enter','Space'].includes(e.code)){e.preventDefault();e.stopImmediatePropagation();openMain(true);return;}
@@ -113,5 +116,5 @@ export function createOnboarding({stage,storage,preferences,picker,block,warm,st
  root.querySelector('.boot-title')?.remove();show('title');
  const handoff=new URL(location.href);if(handoff.searchParams.get('play')==='1'){const id=handoff.searchParams.get('level')||'five-prisons',loadSave=handoff.searchParams.get('load')==='1',skipOpening=handoff.searchParams.get('skipopening')==='1';handoff.searchParams.delete('play');handoff.searchParams.delete('load');handoff.searchParams.delete('skipopening');history.replaceState(null,'',handoff);setTimeout(()=>launch(id,loadSave,false,skipOpening),50);}
  // READ THIS! straight from the game (SAFE MODE's install dialogs, 2026-10-14); BACK leads to the menu.
- return {open:()=>openMain(),openRead(){openMain();show('read');},toggle(){if(busy||page==='loading')return;root.hidden?openMain():page==='main'?close():show('main');},close,levelFilm,isOpen:()=>!root.hidden&&!!active(),isVisible:()=>!root.hidden,getState:()=>({page,busy,selected,error,video:bgId,preferences:preferences.data}),progress(p){progress.value=p.percent??0;if(p.percent==null)progress.removeAttribute('value');bytesNote.textContent=`${(p.loaded/1048576).toFixed(1)} MB${p.total?' / '+(p.total/1048576).toFixed(1)+' MB':''}${p.percent!=null?' · '+p.percent+'%':''}`;},loading(label){show('loading');loadingNote.textContent=label;},failed(message){show('loading');error='reload';errorNote.textContent=message;errorRetry.hidden=false;errorRetry.focus();},heroNext:continueHero};
+ return {refreshSavedResults,open:()=>openMain(),openRead(){openMain();show('read');},toggle(){if(busy||page==='loading')return;root.hidden?openMain():page==='main'?close():show('main');},close,levelFilm,isOpen:()=>!root.hidden&&!!active(),isVisible:()=>!root.hidden,getState:()=>({page,busy,selected,error,video:bgId,preferences:preferences.data}),progress(p){progress.value=p.percent??0;if(p.percent==null)progress.removeAttribute('value');bytesNote.textContent=`${(p.loaded/1048576).toFixed(1)} MB${p.total?' / '+(p.total/1048576).toFixed(1)+' MB':''}${p.percent!=null?' · '+p.percent+'%':''}`;},loading(label){show('loading');loadingNote.textContent=label;},failed(message){show('loading');error='reload';errorNote.textContent=message;errorRetry.hidden=false;errorRetry.focus();},heroNext:continueHero};
 }

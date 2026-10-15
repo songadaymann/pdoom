@@ -19,6 +19,7 @@ import {getLevel} from './levels.js';
 import {RunTracker} from './run-score.js';
 import {connectPlatform} from './platform.js';
 import {createScoreView} from './score-view.js';
+import {localDevelopmentEnabled} from './dev-capabilities.js';
 import {browserStorage,resolveCeo,mountCeoPicker} from './ceo-pick.js';
 
 const DEBUG_OPTIONS={logs:new URLSearchParams(location.search).has('debug')};
@@ -28,10 +29,10 @@ const CHECKPOINT=LEVEL?.scored===true;
 const DEV_END=CHECKPOINT&&new URLSearchParams(location.search).get('dev')==='end';
 // Keep links/saved hero selection; fresh onboarding starts with Samwise.
 const realStorage=browserStorage(),CEO_CHOICE=resolveCeo({search:location.search,storage:realStorage,random:()=>0});
-// ?safemode=1 (2026-10-14): straight into SAFE MODE as if levels 1 and 2 were just cleared (ten saved),
+// Loopback development fixture only: pretend levels 1 and 2 were cleared (ten saved),
 // out of HAL's door (add &level=five-prisons to come out of the bunker instead). It plays from an
 // in-memory save, so a real save in this browser is left alone; the menu's own Load Game hand-off launches it.
-const SAFE_MODE=CHECKPOINT&&new URLSearchParams(location.search).get('safemode')==='1';
+const SAFE_MODE=CHECKPOINT&&new URLSearchParams(location.search).get('safemode')==='1'&&await localDevelopmentEnabled();
 function campaignSandbox(storage,ceo){
  let save=JSON.stringify({version:1,ceo:['altman','amodei'].includes(ceo)?ceo:'altman',hub:true,saved0:31,saved1:31,lost0:0,lost1:0,following0:0,following1:0}),openingComplete='1';
  return {getItem:k=>k===CAMPAIGN_KEY?save:k===OPENING_COMPLETE_KEY?openingComplete:storage?.getItem(k)??null,setItem:(k,v)=>{if(k===CAMPAIGN_KEY)save=String(v);else if(k===OPENING_COMPLETE_KEY)openingComplete=String(v);else storage?.setItem(k,v);},removeItem:k=>{if(k===CAMPAIGN_KEY)save=null;else if(k===OPENING_COMPLETE_KEY)openingComplete=null;else storage?.removeItem(k);}};
@@ -78,7 +79,8 @@ function blockPanel(name,open){
   if(!blocked){if(state.mode==='playing')audio.startMusic();(outside?document.querySelector('#outside-canvas'):canvas)?.focus();}
 }
 const assets=new AssetLoader(p=>gamePause.progress(p));
-const gamePause=CHECKPOINT?createOnboarding({stage:document.querySelector('#stage'),storage:ceoStorage,preferences,picker:ceoPick,block:blockPanel,warm:()=>assets.warm(),start:startEngine,validate:validateEngine,restart:()=>enterLevel(LEVEL.id,false,true),active:()=>worker?(outside?'outside':'native'):null,activeHero:()=>runningCeo,unlock:()=>audio.unlock(),fullscreen}):{isOpen:()=>false,isVisible:()=>false,close(){},toggle(){},getState:()=>null,progress(){},loading(){}};
+let scoreView=null;
+const gamePause=CHECKPOINT?createOnboarding({stage:document.querySelector('#stage'),storage:ceoStorage,preferences,picker:ceoPick,block:blockPanel,warm:()=>assets.warm(),start:startEngine,validate:validateEngine,restart:()=>enterLevel(LEVEL.id,false,true),active:()=>worker?(outside?'outside':'native'):null,activeHero:()=>runningCeo,unlock:()=>audio.unlock(),fullscreen,savedResults:()=>scoreView?.savedCount()||0,openSavedResults:()=>scoreView?.openSaved()}):{isOpen:()=>false,isVisible:()=>false,close(){},toggle(){},getState:()=>null,progress(){},loading(){}};
 // Leaving a level melts the last Doom frame away into Bliss, as Doom does between screens.
 const screenMelt=createScreenMelt({stage:document.querySelector('#stage'),source:canvas,audio});
 const prologue=createPrologue({stage:document.querySelector('#stage'),source:canvas,audio,skip:()=>{
@@ -88,7 +90,8 @@ const prologue=createPrologue({stage:document.querySelector('#stage'),source:can
 
 const storyBeats=createStoryBeats(blockPanel,()=>audio.playCue());
 const platform=LEVEL?await connectPlatform(LEVEL,{block:blockPanel}):null;
-const scoreView=CHECKPOINT?createScoreView({level:LEVEL,config:platform.config,block:blockPanel,openBoards:platform.openBoards,ceo:()=>ceoPick?.id,retry:()=>enterLevel(LEVEL.id,false,true)}):null;
+scoreView=CHECKPOINT?createScoreView({level:LEVEL,config:platform.config,block:blockPanel,openBoards:platform.openBoards,ceo:()=>ceoPick?.id,retry:()=>enterLevel(LEVEL.id,false,true),onPendingChange:()=>gamePause.refreshSavedResults?.()}):null;
+gamePause.refreshSavedResults?.();
 window.render_game_to_text=()=>JSON.stringify({...state,voiceOver:voiceOver.getState(),melt:screenMelt.getState(),levelId:LEVEL?.id,ceo:ceoPick?.id??null,ceoPick:ceoPick?.getState()??null,campaign:campaign.getState(),run:CHECKPOINT?run.getState():null,scoreView:scoreView?.getState()||null,uiBlocked,personLabel:personLabel.getState(),gamePaused:gamePause.isOpen(),menu:gamePause.getState(),opening:openingState(),prologueUi:prologue.getState(),survivalEstimate:prologue.active?{doom:state.prologue?.pdoom,kind:'historical in-world estimate'}:CHECKPOINT?survivalEstimate(state.world,state.mode,state.escape):null,statusBar:CHECKPOINT&&!prologue.active?checkpointStatusBar()?.getState()??null:null,outside:outside?.getState()||null,audioBuffers:audio.played,sound:audio.getState(),audioState:audio.context?.state||'uninitialized',musicPlaying:!!audio.musicSource,coordinateSystem:'Native world: Doom units; x east, y north, z up. Outside: metres; x east, z south, y up.'});
 window.__DOOM_DEBUG__={state,logs};
 
@@ -145,6 +148,7 @@ function onMessage(m){
       if(method==='begin'){
         playLevelMusic();
         state.prologue=null;awaitingRun=false;storyBeats.reset();scoreView.reset();if(!outside){state.mode='loading';state.world=null;}
+        if(!run.practiceReason)scoreView.beginRun({runId:run.runId,levelId:LEVEL.id,levelVersion:LEVEL.version,scoreVersion:LEVEL.scoreVersion,boardVersion:LEVEL.boardVersion});
       }
       if(method==='begin'&&DEV_END)run.markPractice('Development ending selected.');
     }catch(error){console.error('Run tracking:',error);}}

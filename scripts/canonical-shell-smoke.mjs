@@ -6,7 +6,8 @@ try{
  for(const [name,width,height,touch] of [['desktop',1280,800,false],['phone',390,844,true],['tablet',820,1180,true]]){
  const ctx=await b.newContext({viewport:{width,height},isMobile:touch,hasTouch:touch}),p=await ctx.newPage();let plays=0;
  p.on('pageerror',e=>report.errors.push(String(e)));p.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/v1/plays'))plays++;});
- await p.goto('https://mann.cool/pdoom/?safemode=1');await p.waitForFunction(()=>JSON.parse(window.render_game_to_text?.()||'{}').outside?.saved_visual===10,{},{timeout:90000});
+ await ctx.addInitScript(()=>localStorage.setItem('pdoom.campaign.v1',JSON.stringify({version:1,ceo:'amodei',hub:true,saved0:31,saved1:31,lost0:0,lost1:0,following0:0,following1:0})));
+ await p.goto('https://mann.cool/pdoom/');await p.waitForFunction(()=>window.render_game_to_text);await p.click('#title-enter');await p.click('#menu-load');await p.waitForFunction(()=>JSON.parse(window.render_game_to_text()).outside?.saved_visual===10,{},{timeout:90000});
  await p.waitForFunction(()=>document.querySelector('#stage').classList.contains('has-game-shell'));
  const shell=p.locator('mann-cool-game-shell');assert.equal(await shell.count(),1);assert.equal(await shell.locator('.home').getAttribute('href'),'https://mann.cool/');
  await shell.locator('[data-tip]').waitFor({state:'visible'});assert.equal(await shell.locator('[data-tip]').getAttribute('href'),'https://mann.cool/tip?from=pdoom');
@@ -14,8 +15,8 @@ try{
  await p.screenshot({path:`${out}/${name}-meadow.png`});
  await shell.locator('.menu-button').click();assert.equal(await shell.locator('[data-patreon]').getAttribute('href'),'http://songaday.studio');
  assert.equal(await shell.getByText('Guestbook ↗',{exact:true}).getAttribute('href'),'https://mann.cool/?guestbook=1');
- await shell.locator('[data-open="leaderboard"]').click();const tabs=shell.locator('[data-leaderboard-board]');assert.equal(await tabs.count(),15);
- for(let i=0;i<15;i++){
+ await shell.locator('[data-open="leaderboard"]').click();const tabs=shell.locator('[data-leaderboard-board]');assert.equal(await tabs.count(),6);
+ for(let i=0;i<6;i++){
  const tab=tabs.nth(i),variant=await tab.getAttribute('data-leaderboard-board');
  if(i)await tab.click();await p.waitForFunction(()=>{const r=document.querySelector('mann-cool-game-shell').shadowRoot;return !r.querySelector('.scores').textContent.includes('Loading');});
  assert.equal(await tabs.nth(i).getAttribute('aria-selected'),'true');
@@ -27,7 +28,7 @@ try{
  await shell.locator('[data-modal="leaderboard"] .close').click();await shell.locator('.menu-button').click();await shell.locator('[data-open="player"]').click();await shell.locator('[data-player-step="email"] input').waitFor({state:'visible'});
  await shell.locator('[data-modal="player"] .close').click();
  if(!touch){await p.keyboard.press('f');await p.waitForFunction(()=>!!document.fullscreenElement);await p.keyboard.press('f');await p.waitForFunction(()=>!document.fullscreenElement);await p.keyboard.press('Tab');}
- assert.equal(plays,1,'one automatic play');report.cases.push(`${name}: themed shell, HUD clearance, Tip, Patreon, guestbook link, 15 scoreboards, player panel, single play`);await ctx.close();
+ assert.equal(plays,1,'one automatic play');report.cases.push(`${name}: themed shell, HUD clearance, Tip, Patreon, guestbook link, 6 current scoreboards, player panel, single play`);await ctx.close();
  }
  const ctx=await b.newContext({viewport:{width:1280,height:800}}),p=await ctx.newPage();
  await p.goto('https://mann.cool/?guestbook=1');await p.getByRole('dialog',{name:'Guestbook'}).waitFor();await p.waitForFunction(()=>!document.querySelector('.guestbook-entries')?.textContent.includes('Loading'));
