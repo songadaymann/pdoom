@@ -34,9 +34,9 @@ export function createScoreView({level,config,block,openBoards,ceo=()=>null,retr
     const current=submission,completed=result;
     try{
       const promise=current.submit(name.value);name.disabled=true;
-      const accepted=await promise;
+      await promise;
       ranked.complete(completed.runId);onPendingChange();if(submission!==current)return;
-      el('#score-status').textContent=`Saved to ${accepted.accepted.length} ${accepted.accepted.length===1?'board':'boards'}${config.mode==='local'?' on this computer':''}.`;
+      el('#score-status').textContent=`Saved to the leaderboard${config.mode==='local'?' on this computer':''}.`;
       button.textContent='Submitted';try{localStorage.setItem('pdoom-name-v1',name.value.trim());}catch{}
     }catch(error){if(submission!==current)return;el('#score-status').textContent=error.message;button.textContent='Retry submission';button.disabled=false;if(!current.bodies)name.disabled=false;}
   });
@@ -62,7 +62,7 @@ export function createScoreView({level,config,block,openBoards,ceo=()=>null,retr
       el('.score-total').textContent=`TOTAL ${result.totalScore.toLocaleString()}`;
       const enabled=result.eligible&&config.enabled;
       el('#score-submit').hidden=!enabled;el('#score-name').disabled=!!submission.bodies;if(submission.bodies)el('#score-name').value=submission.bodies[0].name;el('#submit-score').disabled=false;el('#submit-score').textContent='Submit score';
-      el('#score-status').textContent=result.practiceReason?`Practice run — ${result.practiceReason}`:result.outcome==='lost'?'Try again to save the survivors.':!config.enabled?'Leaderboards are not connected yet.':config.mode==='local'?'Scores here stay on this computer.':'Submit this run to the qualifying boards.';
+      el('#score-status').textContent=result.practiceReason?`Practice run — ${result.practiceReason}`:result.outcome==='lost'?'Try again to save the survivors.':!config.enabled?'Leaderboards are not connected yet.':config.mode==='local'?'Scores here stay on this computer.':'Submit your total score.';
       el('#next-level').hidden=true;el('#retry-run').hidden=result.outcome!=='lost';el('#back-meadow').textContent=result.outcome==='escaped'?'Look around':'Close';
       reopen.hidden=false;
       if(automatic)open();else reopen.classList.add('score-unread');

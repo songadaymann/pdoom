@@ -12,7 +12,7 @@ import path from 'node:path';
 const level=getLevel(),payload=(overrides={})=>({level_id:level.id,level_version:level.version,score_version:level.scoreVersion,outcome:'escaped',saved:6,total:6,active_tics:21000,p_doom_cover:5,cameras_broken:9,cameras_total:9,practice:0,routes:['vent','turret','key','breach','pad'],saved_figures:overrides.outcome==='lost'?0:Math.max(0,(overrides.saved??6)-1),ceo_state:overrides.outcome==='lost'?'downed':'conscious',skill:3,entry:'cold',retreat:0,...overrides});
 const result=(overrides={},options={})=>scoreRun(payload(overrides),level,{runId:'run-test',...options});
 test('approved formula, rescue dominance and gentle speed',()=>{
-  assert.equal(result().totalScore,55200);assert.equal(result().submissions.length,3);
+  assert.equal(result().totalScore,55200);assert.equal(result().submissions.length,1);
   assert.equal(result({saved:5}).submissions.length,1);
   assert.ok(result({saved:5,active_tics:1,p_doom_cover:1}).totalScore<result({cameras_broken:0,active_tics:210000000,p_doom_cover:99}).totalScore);
   assert.ok(result({active_tics:42000}).breakdown.speed>0);
@@ -37,12 +37,12 @@ test('exact map totals, IDs, version and complete cover snapshot required',()=>{
 });
 test('future levels have isolated board keys, configurable targets and no invented next level',()=>{
   const future={...level,id:'level-two',version:'level-two-v1',title:'Second Level',peopleTotal:4,camerasTotal:3};
-  assert.equal(new Set([...boardsForLevel(level),...boardsForLevel(future)].map(b=>b.variant)).size,6);
+  assert.equal(new Set([...boardsForLevel(level),...boardsForLevel(future)].map(b=>b.variant)).size,2);
   const second=scoreRun({...payload(),level_id:future.id,level_version:future.version,total:4,saved:4,saved_figures:3,cameras_total:3,cameras_broken:3},future,{runId:'second'});
-  assert.equal(second.submissions.length,3);assert.ok(second.submissions.every(b=>b.variant.startsWith('level-two-')));
+  assert.equal(second.submissions.length,1);assert.ok(second.submissions.every(b=>b.variant.startsWith('level-two-')));
   // The next board version after the current one (level 1 is already on v3).
   const next=`v${Number(level.boardVersion.slice(1))+1}`,revised={...level,version:`five-prisons-${next}`,boardVersion:next};
-  assert.equal(new Set([...boardsForLevel(level),...boardsForLevel(revised)].map(b=>b.variant)).size,6);
+  assert.equal(new Set([...boardsForLevel(level),...boardsForLevel(revised)].map(b=>b.variant)).size,2);
   assert.equal(nextLevel(level),null);assert.equal(getLevel('rescue'),level);assert.equal(getLevel('absent'),null);assert.equal(boardsForLevel(getLevel('intake')).length,0);
 });
 test('stable browser ID, small frozen metadata and same per-board IDs on retry',async()=>{
@@ -53,13 +53,13 @@ test('stable browser ID, small frozen metadata and same per-board IDs on retry',
   const sent=[];let fail=true;
   const service=new LeaderboardSubmission(result(),{playerId:'id-one',fetcher:async(_,request)=>{
     const body=JSON.parse(request.body);sent.push(body);
-    if(body.variant.includes('perfect')&&fail){fail=false;throw Error('Uncertain network response');}
+    if(fail){fail=false;throw Error('Uncertain network response');}
     return {ok:true,json:async()=>({success:true})};
   }});
   await assert.rejects(service.submit('Original'));const retried=await service.submit('Changed');assert.equal(retried.complete,true);
-  assert.equal(sent.filter(b=>b.variant===bodies[0].variant).length,1);
-  assert.equal(sent[1].submissionId,sent[2].submissionId);assert.ok(sent.every(b=>b.name==='Original'));
-  await service.submit('Original');assert.equal(sent.length,4);
+  assert.equal(sent.filter(b=>b.variant===bodies[0].variant).length,2);
+  assert.equal(sent[0].submissionId,sent[1].submissionId);assert.ok(sent.every(b=>b.name==='Original'));
+  await service.submit('Original');assert.equal(sent.length,2);
 });
 test('loopback API persists, sorts each board, rejects unknown levels and deduplicates retries',async()=>{
   const temp=await mkdtemp(path.join(os.tmpdir(),'pdoom-boards-')),store=path.join(temp,'scores.json');
@@ -73,7 +73,8 @@ test('loopback API persists, sorts each board, rejects unknown levels and dedupl
     assert.equal((await post({...bodies[0],variant:'other-level'})).status,400);
     const again=createLocalLeaderboards({store});assert.equal(typeof again,'function');
     const data=await(await fetch(origin+`/api/v1/leaderboard?slug=pdoom&variant=${bodies[0].variant}`)).json();assert.equal(data.entries.length,1);assert.equal(data.entries[0].score,55200);
-    await post({...bodies[1],submissionId:'faster',score:500000});
-    const times=await(await fetch(origin+`/api/v1/leaderboard?slug=pdoom&variant=${bodies[1].variant}`)).json();assert.equal(times.entries[0].score,500000);assert.equal(times.entries[1].score,600000);
+    await post({...bodies[0],submissionId:'higher',score:56000});
+    const scores=await(await fetch(origin+`/api/v1/leaderboard?slug=pdoom&variant=${bodies[0].variant}`)).json();assert.equal(scores.entries[0].score,56000);assert.equal(scores.entries[1].score,55200);
+    for(const category of ['perfect','clean-sweep'])assert.equal((await post({...bodies[0],variant:`five-prisons-${category}-v3`})).status,400);
   }finally{await new Promise(resolve=>server.close(resolve));await rm(temp,{recursive:true,force:true});}
 });

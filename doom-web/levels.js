@@ -18,11 +18,7 @@ export function getLevel(id='five-prisons'){
 export function boardsForLevel(level){
   if(!level?.scored)return [];
   const prefix=`${level.id}-rescue-${level.boardVersion}`;
-  return [
-    {variant:prefix,label:'Rescue score',metric:level.scoreVersion==='rescue-v2'?'rescueScoreV2':'rescueScoreV1',metricLabel:`${level.title}: saved + cameras + speed + outlook`,direction:'desc',display:'integer',aggregation:'best'},
-    {variant:`${level.id}-perfect-${level.boardVersion}`,label:'Perfect rescue',metric:'perfectRescueActiveMs',metricLabel:`${level.title}: all ${level.peopleTotal} saved`,direction:'asc',display:'time-ms',aggregation:'best'},
-    {variant:`${level.id}-clean-sweep-${level.boardVersion}`,label:'Clean sweep',metric:'cleanSweepActiveMs',metricLabel:`${level.title}: all ${level.peopleTotal} saved, all ${level.camerasTotal} cameras`,direction:'asc',display:'time-ms',aggregation:'best'}
-  ];
+  return [{variant:prefix,label:'Total score',metric:level.scoreVersion==='rescue-v2'?'rescueScoreV2':'rescueScoreV1',metricLabel:'Total score',direction:'desc',display:'integer',aggregation:'best'}];
 }
 export function nextLevel(level){return level?.nextLevelId?getLevel(level.nextLevelId):null;}
 

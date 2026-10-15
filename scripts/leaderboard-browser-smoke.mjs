@@ -60,7 +60,7 @@ try{
     const request=route.request();
     if(request.method()==='POST'){
      const body=request.postDataJSON();bodies.push(body);
-     if(fail&&body.variant.includes('perfect')){fail=false;await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Temporary outage. Retry this score.'})});return;}
+     if(fail&&body.variant.includes('rescue-v3')){fail=false;await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Temporary outage. Retry this score.'})});return;}
     }
     const upstream=await fetch(api+new URL(request.url()).pathname+new URL(request.url()).search,{method:request.method(),...(request.method()==='POST'?{body:request.postData()}: {})});
     await route.fulfill({status:upstream.status,contentType:'application/json',body:await upstream.text()});
@@ -81,13 +81,13 @@ try{
    }
    await p.waitForFunction(()=>document.querySelector('#submit-score').textContent==='Submitted');
    assert.equal(await p.locator('#submit-score').isDisabled(),true);d.bodies=bodies;
-   assert.equal(bodies.filter(b=>b.variant.includes('rescue-v3')).length,1);
-   if(label==='desktop')assert.equal(bodies[1].submissionId,bodies[2].submissionId);
+   assert.equal(bodies.filter(b=>b.variant.includes('rescue-v3')).length,label==='desktop'?2:1);
+   if(label==='desktop')assert.equal(bodies[0].submissionId,bodies[1].submissionId);
    assert.ok(bodies.every(b=>b.metadata.levelId==='five-prisons'&&b.metadata.levelVersion==='five-prisons-v3'&&b.metadata.boardVersion==='v3'&&/-v3$/.test(b.variant)));
    await p.screenshot({path:`${out}/score-${label}.png`});await p.locator('#view-boards').click();
    const shell=p.locator('mann-cool-game-shell');await shell.locator('.score').first().waitFor();
    d.boards=[];
-   for(const variant of ['five-prisons-rescue-v3','five-prisons-perfect-v3','five-prisons-clean-sweep-v3']){
+   for(const variant of ['five-prisons-rescue-v3']){
     await shell.locator(`[data-leaderboard-board="${variant}"]`).click();await p.waitForTimeout(200);await shell.locator('.score').first().waitFor();
     const text=await shell.locator('.scores').innerText();assert.match(text,/QA/);assert.match(text,variant.includes('rescue')?/55,200/:/10:00\.00/);d.boards.push({variant,text});
     await p.screenshot({path:`${out}/board-${label}-${variant}.png`});

@@ -1,7 +1,9 @@
 # Two-level rescue score and leaderboards
 
 The game publishes only the current boards for Level 1, The Control Problem
-(E1M4), and Level 2, Confabulation Station (E1M7). Each level has three categories.
+(E1M4), and Level 2, Confabulation Station (E1M7). Each level has one total-score
+board. The shared view has a Level 1 / Level 2 switch and displays only rank,
+name and score.
 Both use v3 board keys and the rescue-v2 scoring formula. Earlier board versions
 are retired from the menu and API registration; their stored records are retained
 without mixing them into the current boards.
@@ -22,14 +24,12 @@ at ten minutes with nine cameras and 5% cover-opening p(DOOM) scores **55,200**:
 it is not a calibrated forecast or a countdown. The pre-escape minimum is 1%,
 so the attainable outlook bonus is at most 990. Final p(DOOM) is also recorded.
 
-Each level has three boards:
+Each level ranks the highest v2 total from a completed eligible escape. Rescue,
+camera and timing details stay on the results card. The former Perfect rescue and
+Clean sweep time boards are retired from the menu, submissions and API; their
+stored records are retained. Existing total-score records keep their current keys.
 
-- **Rescue score:** highest v2 total from a completed eligible escape.
-- **Perfect rescue:** shortest time with all five figures and a conscious CEO.
-- **Clean sweep:** shortest time with all five figures, a conscious CEO, and all nine cameras destroyed.
-
-Board keys are `<level-id>-rescue-v3`, `<level-id>-perfect-v3`, and
-`<level-id>-clean-sweep-v3`, with level IDs `five-prisons` and `hal-station`.
+Board keys are `<level-id>-rescue-v3`, with level IDs `five-prisons` and `hal-station`.
 Skill 3 is the standard ruleset. Only a fresh cold entry qualifies; hub returns,
 replays, retreats, development endings and console/cheat-assisted runs are
 practice. A death or body transfer never restarts the active clock. Failed
@@ -51,12 +51,11 @@ descriptors. Never reuse an old board key when the map or scoring becomes incomp
 
 The shared mann.cool v1 shell owns board viewing, guestbook, support and play
 tracking. The game owns scoring, eligibility, name entry and retryable submission.
-A single completed attempt submits at most once per qualifying board via
+A single completed attempt submits once to its level's total-score board via
 `POST /api/v1/leaderboard`; retry uses the identical per-run/per-board submission
 ID and frozen metadata. Metadata includes CEO choice/state, skill, entry type,
 retreat, level/score versions, saved figures, camera totals, native active time,
-cover/final p(DOOM), routes and point breakdown. Time boards submit integer
-milliseconds. The shell preserves any already-open native pause/menu state.
+cover/final p(DOOM), routes and point breakdown. The total score is an integer. The shell preserves any already-open native pause/menu state.
 
 The loopback server labels its boards **Local leaderboard** and stores them in
 `output/local-leaderboards/scores.json`. Browser QA uses an isolated fixture store;
@@ -76,10 +75,13 @@ the same p(DOOM) checks. Other games keep their existing contracts.
 
 The server requires an escaped, fresh, non-practice skill-3 result; validates
 survivor/CEO/camera counts, map and rules versions, outlook and the 35-tic clock;
-and enforces each board's qualification. It calculates the score and breakdown
+and requires the level's current total-score board. It calculates the score and
+breakdown
 itself. One atomic completion fingerprint binds a ticket to the same result,
-player and name across all qualifying boards. Repeating a submission ID cannot
-create another row or change its stored score.
+player and name. Repeating a submission ID cannot
+create another row or change its stored score. Saved results from before the
+simplification retain their original total-score submission identity and name;
+retired categories are filtered from both pending and accepted lists.
 
 Tickets last 90 days while unused; completed-ticket retries remain valid. There
 are no heartbeat deadlines, guessed minimum completion times, or wall-clock

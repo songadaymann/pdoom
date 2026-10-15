@@ -1,4 +1,6 @@
-import {GAME_SLUG} from './levels.js';
+import {GAME_SLUG,getLevel,boardsForLevel} from './levels.js';
+
+const currentVariants=result=>new Set(boardsForLevel(getLevel(result.levelId)).map(board=>board.variant));
 
 export function stablePlayer(storage,uuid=()=>crypto.randomUUID()){
   try{let id=storage.getItem('pdoom-player-v1');if(!id){id=uuid();storage.setItem('pdoom-player-v1',id);}return id;}
@@ -16,7 +18,9 @@ export function submissionBodies(result,name,playerId,{ceo}={}){
     activeMs:result.activeMs,activeTics:result.activeTics,pDoomAtCoverOpen:result.pDoomAtCoverOpen,
     pDoomFinal:result.pDoomFinal,breakdown:result.breakdown,routes:result.routes};
   if(/^(altman|amodei|doomguy)$/.test(ceo||''))metadata.ceo=ceo;
-  return result.submissions.map(board=>({slug:GAME_SLUG,variant:board.variant,name:clean,playerId,
+  const variants=currentVariants(result),boards=result.submissions.filter(board=>variants.has(board.variant));
+  if(!boards.length)throw Error('This result does not have a current leaderboard.');
+  return boards.map(board=>({slug:GAME_SLUG,variant:board.variant,name:clean,playerId,
     submissionId:`${result.runId}:${board.variant}`,score:board.score,metadata}));
 }
 
@@ -24,7 +28,10 @@ export function submissionBodies(result,name,playerId,{ceo}={}){
 export class LeaderboardSubmission{
   constructor(result,{endpoint='/api/v1/leaderboard',fetcher=(...args)=>fetch(...args),playerId,ceo,ticket=async()=>null,state,onProgress=()=>{}}={}){
     this.result=result;this.endpoint=endpoint;this.fetcher=fetcher;this.playerId=playerId;this.ceo=ceo;
-    this.bodies=state?.bodies||null;this.accepted=new Set(state?.accepted||[]);this.inflight=null;this.ticket=ticket;this.onProgress=onProgress;
+    // Old saved results may still include retired time boards. Keep the frozen
+    // total-score body, name and receipt without retrying removed categories.
+    const variants=currentVariants(result),bodies=state?.bodies?.filter(body=>variants.has(body.variant));
+    this.bodies=bodies?.length?bodies:null;this.accepted=new Set((state?.accepted||[]).filter(variant=>variants.has(variant)));this.inflight=null;this.ticket=ticket;this.onProgress=onProgress;
   }
   submit(name){
     if(this.inflight)return this.inflight;
@@ -33,6 +40,7 @@ export class LeaderboardSubmission{
     this.inflight=this.send().finally(()=>{this.inflight=null;});return this.inflight;
   }
   async send(){
+    if(this.bodies.every(body=>this.accepted.has(body.variant)))return {accepted:[...this.accepted],complete:true};
     const runTicket=await this.ticket();
     for(const body of this.bodies){
       if(this.accepted.has(body.variant))continue;

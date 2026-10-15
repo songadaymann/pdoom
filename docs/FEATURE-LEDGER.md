@@ -2,6 +2,7 @@
 
 | Area | Status | Owner / evidence |
 | --- | --- | --- |
+| Total-score leaderboard | Live: one shared view, Level 1 / Level 2 switch, rank/name/score; total points descending; existing keys retained | Canonical `main`, https://mann.cool/pdoom/; `doom-web/levels.js`, `doom-web/platform.js`; local filled-row and live desktop/phone/tablet checks pass; `output/leaderboard-simple/` |
 | Combat prologue: The Last Stand | Opt-in local prototype; four pop-culture war machines (Centurion, Sentinel, ED-404, Hunter-Killer), quiet first minute then slower growing waves, real Doom status bar, plain fade on defeat → Bliss walk (wake behind the dome, founder in the distance, crest reveal, spatial voice slots) → clean first rescue; test:doom:prologue passed | `doom-mod/actors/LastStand.zs`, `src/doom-bliss-guide.ts`, `art/war-robots-v1/`, `docs/COMBAT-PROLOGUE.md`, `output/prologue/` |
 | First level: The Control Problem | Playable, local native checks passed; items (wrench, slingshot, key, charge, ball bearings, textbook) are Doom walk-over pickups, switches/doors stay on E; the rescue gun is now a slingshot (hold/release, quiet, lures the hunter to the impact) | `doom-mod/`, `progress.md` |
 | Starting-room / ordinary-door interaction hint | Doom-style contextual E prompt; local/live escape checked | `doom-mod/actors/Checkpoint.zs`, `output/door-prompt/` |

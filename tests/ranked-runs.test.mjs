@@ -30,19 +30,19 @@ test('an uncertain ticket response retries the same nonce after reloading',async
   await assert.rejects(ranked.ticket(result()),/kept here/);
   ranked=new RankedRuns({endpoint:'/runs',storage:saved,fetcher});assert.equal(ranked.pending().length,1);await ranked.ticket(result());assert.deepEqual(sent[0],sent[1]);
 });
-test('partial submission and refresh retain the original name, IDs, result and accepted boards',async()=>{
+test('failed submission and refresh retain the original name, IDs and result',async()=>{
   const saved=storage(),sent=[];let fail=true;
   const fetcher=async(_,request)=>{
     const body=JSON.parse(request.body);if(!body.variant)return receipt(body);
-    sent.push(body);if(body.variant.includes('perfect')&&fail){fail=false;return {ok:false,json:async()=>({error:'Temporary outage'})};}
+    sent.push(body);if(fail){fail=false;return {ok:false,json:async()=>({error:'Temporary outage'})};}
     return {ok:true,json:async()=>({success:true})};
   };
   let ranked=new RankedRuns({endpoint:'/runs',storage:saved,fetcher});const value=result();ranked.save(value,'amodei');
   const create=()=>new LeaderboardSubmission(value,{endpoint:'/boards',fetcher,playerId:'original-player',ceo:'amodei',ticket:()=>ranked.ticket(value),state:ranked.pending()[0],onProgress:state=>ranked.progress(value.runId,state)});
   let submission=create();await assert.rejects(submission.submit('Original'),/Temporary outage/);
   ranked=new RankedRuns({endpoint:'/runs',storage:saved,fetcher});submission=create();const accepted=await submission.submit('Changed after reload');
-  assert.equal(accepted.complete,true);assert.equal(sent.length,4);assert.ok(sent.every(body=>body.name==='Original'));assert.equal(sent[1].submissionId,sent[2].submissionId);
-  assert.equal(sent.filter(body=>body.variant.includes('rescue-v3')).length,1);assert.ok(sent.every(body=>body.runTicket.token===sent[0].runTicket.token));
+  assert.equal(accepted.complete,true);assert.equal(sent.length,2);assert.ok(sent.every(body=>body.name==='Original'));assert.equal(sent[0].submissionId,sent[1].submissionId);
+  assert.ok(sent.every(body=>body.variant==='five-prisons-rescue-v3'));assert.ok(sent.every(body=>body.runTicket.token===sent[0].runTicket.token));
   assert.ok(sent.every(body=>!JSON.stringify(body.metadata).includes(body.runTicket.token)));
   ranked.complete(value.runId);assert.equal(new RankedRuns({endpoint:'/runs',storage:saved,fetcher}).pending().length,0);
 });
@@ -66,4 +66,17 @@ test('independent game tabs retain each other\'s results and observe completed s
   const saved=storage(),a=new RankedRuns({endpoint:'/runs',storage:saved}),b=new RankedRuns({endpoint:'/runs',storage:saved});
   a.save(result('tab-one-run'),'altman');b.save(result('tab-two-run'),'amodei');assert.equal(a.pending().length,2);assert.equal(b.pending().length,2);
   a.complete('tab-one-run');assert.equal(b.pending().length,1);assert.equal(b.pending()[0].result.runId,'tab-two-run');
+});
+test('old three-category results submit only the original frozen total score',async()=>{
+  const value=result(),rescue='five-prisons-rescue-v3',perfect='five-prisons-perfect-v3',clean='five-prisons-clean-sweep-v3';
+  const original=new LeaderboardSubmission(value,{playerId:'original-player',fetcher:async()=>{throw Error('offline');}});
+  await assert.rejects(original.submit('Frozen name'));
+  const bodies=[original.bodies[0],...[[perfect,600000],[clean,600000]].map(([variant,score])=>({...original.bodies[0],variant,score,submissionId:`${value.runId}:${variant}`}))];
+  const oldResult={...value,submissions:bodies.map(({variant,score})=>({variant,score}))};
+  const sent=[];const restored=new LeaderboardSubmission(oldResult,{state:{bodies,accepted:[perfect]},fetcher:async(_,request)=>{sent.push(JSON.parse(request.body));return{ok:true,json:async()=>({success:true})};}});
+  assert.equal((await restored.submit('Changed name')).complete,true);assert.equal(sent.length,1);assert.deepEqual(sent[0],bodies[0]);assert.deepEqual([...restored.accepted],[rescue]);
+  let reads=0;const acknowledged=new LeaderboardSubmission(oldResult,{state:{bodies,accepted:[rescue,perfect,clean]},ticket:async()=>{reads++;throw Error('Should not need a new ticket');},fetcher:async()=>{reads++;throw Error('Should not post again');}});
+  assert.deepEqual(await acknowledged.submit('Another name'),{accepted:[rescue],complete:true});assert.equal(reads,0);
+  const fresh=new LeaderboardSubmission(oldResult,{playerId:'player',fetcher:async(_,request)=>{assert.equal(JSON.parse(request.body).variant,rescue);return{ok:true,json:async()=>({success:true})};}});
+  await fresh.submit('New name');assert.equal(fresh.bodies.length,1);
 });

@@ -8,61 +8,21 @@ const game = createStaticGameWorker({
   "leaderboardBoards": [
     {
       "variant": "five-prisons-rescue-v3",
-      "label": "Level 1 · Rescue score",
+      "label": "Level 1",
       "metric": "rescueScoreV2",
-      "metricLabel": "The Control Problem: saved + cameras + speed + outlook",
+      "metricLabel": "Total score",
       "direction": "desc",
       "display": "integer",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "five-prisons-perfect-v3",
-      "label": "Level 1 · Perfect rescue",
-      "metric": "perfectRescueActiveMs",
-      "metricLabel": "The Control Problem: all 6 saved",
-      "direction": "asc",
-      "display": "time-ms",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "five-prisons-clean-sweep-v3",
-      "label": "Level 1 · Clean sweep",
-      "metric": "cleanSweepActiveMs",
-      "metricLabel": "The Control Problem: all 6 saved, all 9 cameras",
-      "direction": "asc",
-      "display": "time-ms",
       "aggregation": "best",
       "minimumMatches": 1
     },
     {
       "variant": "hal-station-rescue-v3",
-      "label": "Level 2 · Rescue score",
+      "label": "Level 2",
       "metric": "rescueScoreV2",
-      "metricLabel": "Confabulation Station: saved + cameras + speed + outlook",
+      "metricLabel": "Total score",
       "direction": "desc",
       "display": "integer",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "hal-station-perfect-v3",
-      "label": "Level 2 · Perfect rescue",
-      "metric": "perfectRescueActiveMs",
-      "metricLabel": "Confabulation Station: all 6 saved",
-      "direction": "asc",
-      "display": "time-ms",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "hal-station-clean-sweep-v3",
-      "label": "Level 2 · Clean sweep",
-      "metric": "cleanSweepActiveMs",
-      "metricLabel": "Confabulation Station: all 6 saved, all 9 cameras",
-      "direction": "asc",
-      "display": "time-ms",
       "aggregation": "best",
       "minimumMatches": 1
     }

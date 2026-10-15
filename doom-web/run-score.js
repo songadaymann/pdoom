@@ -26,9 +26,7 @@ export function scoreRun(payload,level,{runId,practiceReason=''}){
   }:{rescue:0,cameras:0,speed:0,outlook:0};
   const reason=practiceReason||(v2&&(payload.entry!=='cold'||payload.retreat)?'Campaign return, replay or retreat.':payload.practice?'Development or cheat-assisted run.':'');
   const boards=boardsForLevel(level);
-  const submissions=escaped&&!reason?[{variant:boards[0].variant,score:Object.values(bonus).reduce((a,b)=>a+b,0)},
-    ...(figures===level.peopleTotal-1&&ceoConscious?[{variant:boards[1].variant,score:activeMs}]:[]),
-    ...(figures===level.peopleTotal-1&&ceoConscious&&payload.cameras_broken===level.camerasTotal?[{variant:boards[2].variant,score:activeMs}]:[])]:[];
+  const submissions=escaped&&!reason?[{variant:boards[0].variant,score:Object.values(bonus).reduce((a,b)=>a+b,0)}]:[];
   return frozen({runId,levelId:level.id,levelVersion:level.version,scoreVersion:level.scoreVersion,boardVersion:level.boardVersion,
     outcome:payload.outcome,saved:payload.saved,total:level.peopleTotal,lost:level.peopleTotal-payload.saved,
     savedFigures:figures,ceoState:v2?payload.ceo_state:'conscious',skill:v2?payload.skill:3,entry:v2?payload.entry:'cold',retreat:!!payload.retreat,
