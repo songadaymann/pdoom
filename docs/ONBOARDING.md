@@ -181,8 +181,8 @@ Read This! explains the premise and p(DOOM). The token (name, network and a
 copyable contract address, from `doom-web/token-info.js`) appears there only when
 the browser has a crypto wallet extension installed (`doom-web/wallet-detect.js`,
 listen-only: it never connects or reads an address). Without a wallet, nothing
-about the token appears anywhere (Jonathan, 2026-10-14). While the contract in
-token-info.js is empty, nothing shows for anyone; do not invent token details.
+about the token appears anywhere (Jonathan, 2026-10-14). Jonathan confirmed the
+PDOOM token on Solana on 2026-10-15; its address is configured in token-info.js.
 Playing never needs a wallet or token. `scripts/read-this-token-smoke.mjs` checks it. The older SYSTEM CARD! label is superseded
 by Jonathan's READ THIS! request here.
 
