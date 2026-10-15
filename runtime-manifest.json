@@ -1,98 +1,9 @@
 {
   "files": [
     {
-      "file": "asset-loader.js",
-      "bytes": 2127,
-      "sha256": "7768efde09dcf70372c02141d70b7f1017142764331873804f1d0d0d6c3a2d68",
-      "gzip": 1014,
-      "brotli": 941
-    },
-    {
-      "file": "audio.js",
-      "bytes": 5744,
-      "sha256": "bb2a7ad36df1c922d6ca519180e2f2ab1755651863f4b23390d2acf8469bc5c3",
-      "gzip": 2039,
-      "brotli": 1950
-    },
-    {
-      "file": "campaign.js",
-      "bytes": 2052,
-      "sha256": "d171efa5814136a451c20432fcd56958e81005369d9eeeb5a9e09c301b24e78e",
-      "gzip": 991,
-      "brotli": 939
-    },
-    {
-      "file": "cast-art.js",
-      "bytes": 425,
-      "sha256": "ecc6c19132e981b77f95e23c886541cf41ea59f9bf9053c44cc6a5b6739522ff",
-      "gzip": 244,
-      "brotli": 215
-    },
-    {
-      "file": "ceo-pick.js",
-      "bytes": 7072,
-      "sha256": "ab8ee0fead9bf185b27d7627b8e4cde01bcac3860055ac021ce98600dfec9db9",
-      "gzip": 2963,
-      "brotli": 2780
-    },
-    {
-      "file": "checkpoint-hud.js",
-      "bytes": 4931,
-      "sha256": "80089b15d018f1c0df734f9f398c05419449a040739414e129997fc5847b9535",
-      "gzip": 1991,
-      "brotli": 1881
-    },
-    {
-      "file": "controls.cfg",
-      "bytes": 1389,
-      "sha256": "6869abf493fa67c0d308d9eba77abaf66718dcd0dbbf62ccd1f67dc95c2eee8c",
-      "gzip": 608,
-      "brotli": 553
-    },
-    {
-      "file": "doom-dialogue.js",
-      "bytes": 832,
-      "sha256": "9ffa0055d25d72b2f42983cc4966db05f381110d81bafd80c7b2788e752177f6",
-      "gzip": 408,
-      "brotli": 339
-    },
-    {
-      "file": "doom-hud.css",
-      "bytes": 7081,
-      "sha256": "1d76c3c8293cc6e21191e9b6a859d05144777d574f3127b40193c0a7f059b60a",
-      "gzip": 2176,
-      "brotli": 2008
-    },
-    {
-      "file": "doom-statusbar.js",
-      "bytes": 20353,
-      "sha256": "293a749c89595be8031dd9ca30a0d1c6849a9518685f6660a612e4a8348788c1",
-      "gzip": 7953,
-      "brotli": 7692
-    },
-    {
-      "file": "doom-theme.css",
-      "bytes": 9346,
-      "sha256": "703a61114892d91cceaaebad2a5d2789772d9277d145f9638082a8d040c1652b",
-      "gzip": 2985,
-      "brotli": 2801
-    },
-    {
-      "file": "engine/LICENSE",
-      "bytes": 35147,
-      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
-    },
-    {
       "file": "engine/brightmaps.pk3",
       "bytes": 246072,
       "sha256": "7232197c7d1edae8baa73bf3a3856fafb2aaf0518e3dac75ab2fe54de3838ebb"
-    },
-    {
-      "file": "engine/engine.worker.js",
-      "bytes": 39817,
-      "sha256": "124794bcdce6601e02927f2bef8795c2af68ec016c76ac144e5261bb01db1d19",
-      "gzip": 13381,
-      "brotli": 12895
     },
     {
       "file": "engine/game_support.pk3",
@@ -127,97 +38,6 @@
       "file": "engine/lights.pk3",
       "bytes": 23677,
       "sha256": "daf901148e0a4ef9692d1f14c1481dabe2be8cbf2489b895619cc0b03d3ae6bb"
-    },
-    {
-      "file": "engine/provenance.json",
-      "bytes": 1884,
-      "sha256": "f43004d654df2f6f8715f3894449aead0bdfa0a98d5ba667f1c3f72a00631a45",
-      "gzip": 879,
-      "brotli": 813
-    },
-    {
-      "file": "game-controls.js",
-      "bytes": 1332,
-      "sha256": "7cb089c367077643f95e75f2deaf33afdc8869b7a2041b97e7d719b7992d1ff3",
-      "gzip": 628,
-      "brotli": 561
-    },
-    {
-      "file": "hal-hud.js",
-      "bytes": 2491,
-      "sha256": "75d3889e9296b8860ae9f106d495a3ebf48d3ca5187dc423f37a030d7d06b87a",
-      "gzip": 1015,
-      "brotli": 919
-    },
-    {
-      "file": "how-to-play.css",
-      "bytes": 2372,
-      "sha256": "2b92d483b75d26ae3122301e3f62b2b02d1c0f3a22478ea716af83ac6a16ab34",
-      "gzip": 960,
-      "brotli": 873
-    },
-    {
-      "file": "how-to-play.js",
-      "bytes": 1746,
-      "sha256": "f06f709c5dc7f35c6bef844394db5fef3e62fb48c11b2cead6cd62d00d807d80",
-      "gzip": 891,
-      "brotli": 831
-    },
-    {
-      "file": "index.html",
-      "bytes": 6876,
-      "sha256": "f5ea4112c6ee67c7fcd5fbaadfe4bac5142b56c75b512034c0cc820b2ed04f8c",
-      "gzip": 2207,
-      "brotli": 1991
-    },
-    {
-      "file": "intake-hud.js",
-      "bytes": 1531,
-      "sha256": "482619de3935ea25995d7a2e6b9a7f812a86fc574dce0b18c8b30d2ff2ec430f",
-      "gzip": 594,
-      "brotli": 524
-    },
-    {
-      "file": "intro-video.js",
-      "bytes": 5651,
-      "sha256": "9c97047f6eda89af6ed39f357ae93a43775cd1ea7328454698c8592f4b572850",
-      "gzip": 2394,
-      "brotli": 2186
-    },
-    {
-      "file": "leaderboard-client.js",
-      "bytes": 2731,
-      "sha256": "eb395dedaef41ae3efe7b56e8ac83ae157887884b721a97e3a0814e009c6e445",
-      "gzip": 1258,
-      "brotli": 1169
-    },
-    {
-      "file": "leaderboard-config.json",
-      "bytes": 185,
-      "sha256": "39b947535d57ec6c1aefc368b26f0f7f2d65fe7c9576e365de3ee25612d0e006",
-      "gzip": 153,
-      "brotli": 121
-    },
-    {
-      "file": "level-polish.css",
-      "bytes": 8544,
-      "sha256": "04ff4a52729f0ec0a17756ac05e54c35d7ff0f374c86479d68a69721a942af43",
-      "gzip": 2779,
-      "brotli": 2576
-    },
-    {
-      "file": "level-polish.js",
-      "bytes": 1348,
-      "sha256": "a2b73c237800483c354a83503aeffc7ceb61938b4e02388a611c69c57c53bbcb",
-      "gzip": 710,
-      "brotli": 662
-    },
-    {
-      "file": "levels.js",
-      "bytes": 2603,
-      "sha256": "70ebff4ff1d22d77cbc0d4d8e95b70f7020cdcb8ef79d4498970900f80531d5e",
-      "gzip": 973,
-      "brotli": 894
     },
     {
       "file": "local/DOOM.WAD",
@@ -5511,37 +5331,9 @@
       "sha256": "e2c15e8405976c1108c33b2dc4415761c77384c10558bb732397cb2fb503cbee"
     },
     {
-      "file": "main.js",
-      "bytes": 32557,
-      "sha256": "8f140e714198f7c3469ec034c876329acfe2c1336af3cd9d6f682bf9ef5feff8",
-      "gzip": 10320,
-      "brotli": 9967
-    },
-    {
       "file": "music/bliss.mp3",
       "bytes": 1795945,
       "sha256": "2bd244c764ff5e44203d89ea129f5b29ea1717bd9e57b91d02caaa27e5dbb6a4"
-    },
-    {
-      "file": "onboarding.css",
-      "bytes": 5412,
-      "sha256": "9a3bcd558c15f6e05f45baebf6ede82fbadf65167ff3d0bbef885acfbf9378ca",
-      "gzip": 1926,
-      "brotli": 1741
-    },
-    {
-      "file": "onboarding.js",
-      "bytes": 17400,
-      "sha256": "9b0cb51c6ff32ab80741adcf695345fb73d7650df46e5698e61e2d1d553103d5",
-      "gzip": 6476,
-      "brotli": 6169
-    },
-    {
-      "file": "opening.js",
-      "bytes": 3412,
-      "sha256": "050fe9f8e54a9a8907c30b471a7603e64fa378b7a0de3fb33b4d6ba2883c2d20",
-      "gzip": 1507,
-      "brotli": 1372
     },
     {
       "file": "outside-assets/figure-beth-0-0.png",
@@ -8474,13 +8266,6 @@
       "sha256": "e0a2738f7781777d3013c4b69159a7f1c44fa9ef9e34acc0fc03e0086d1c9a51"
     },
     {
-      "file": "outside-assets/voice/guide-voices.json",
-      "bytes": 3760,
-      "sha256": "a22650c12d6953b5943255080546217e1c0e67d9abfaf8dec38bf39f8c05a747",
-      "gzip": 640,
-      "brotli": 597
-    },
-    {
       "file": "outside/outside.js",
       "bytes": 5181507,
       "sha256": "dcee9b3da2a9c9f8e8fb22671a336827c7f4f08aca044cbd837d5b0d5a896699",
@@ -8493,69 +8278,6 @@
       "sha256": "786d12ded282363b0dcb177d529550ac72202dc3fcdcfbee8a92f36b0cbf48ce"
     },
     {
-      "file": "person-label.js",
-      "bytes": 2567,
-      "sha256": "6c3f0940f8c086672724043d9fff0b488908303a7247b9dd73582472c81a48e1",
-      "gzip": 1195,
-      "brotli": 1108
-    },
-    {
-      "file": "platform.js",
-      "bytes": 3862,
-      "sha256": "b1f5374d5a8977f1020fe6351ad81d46eae29e0a936ddb27476414e615247c08",
-      "gzip": 1805,
-      "brotli": 1648
-    },
-    {
-      "file": "preferences.js",
-      "bytes": 2721,
-      "sha256": "e097d9c171797eae29420c305a7be3fee957a771e3de0ffc9921ecf4aa236b85",
-      "gzip": 1315,
-      "brotli": 1234
-    },
-    {
-      "file": "prologue.css",
-      "bytes": 3007,
-      "sha256": "a0c10ea8314236d3848448ffcbaee113bf4267cf07f306b109bf109c74c96041",
-      "gzip": 1151,
-      "brotli": 1035
-    },
-    {
-      "file": "prologue.js",
-      "bytes": 12761,
-      "sha256": "de0bf55833a6a2349efc40524c21fa5418d8b598ef799ca144294a3450f31a3f",
-      "gzip": 4910,
-      "brotli": 4668
-    },
-    {
-      "file": "run-score.js",
-      "bytes": 4889,
-      "sha256": "98443cca91d11a2371f6dec68694f3071cef4dba29a4d0a6a96acff7b973c971",
-      "gzip": 1773,
-      "brotli": 1659
-    },
-    {
-      "file": "score-view.js",
-      "bytes": 6484,
-      "sha256": "e60f6876ca716e6a0ac4179eae79543fc4bb564fc512891e6b09e9a85b147f72",
-      "gzip": 2440,
-      "brotli": 2255
-    },
-    {
-      "file": "score.css",
-      "bytes": 3104,
-      "sha256": "306a34db2152f7011c15b4d7674f6fa2cdc225aec0b8c38f5a74f6b50e00475e",
-      "gzip": 1146,
-      "brotli": 1003
-    },
-    {
-      "file": "screen-melt.js",
-      "bytes": 4252,
-      "sha256": "3c905c1fc328d2a50806de6fcb3bc96b7336573a837a4482721aa9967b69e30d",
-      "gzip": 1969,
-      "brotli": 1867
-    },
-    {
       "file": "slingshot-drawn.png",
       "bytes": 4878,
       "sha256": "f0440b50759de2503444bdfc526882529cec627d4c833f02f4d235440ad70d8b"
@@ -8564,48 +8286,6 @@
       "file": "slingshot.png",
       "bytes": 5298,
       "sha256": "55eee3987c3ff0bd373a4b4467145de952e44c06c4bfe38d813d7651d1fbfa38"
-    },
-    {
-      "file": "spatial-audio.js",
-      "bytes": 1478,
-      "sha256": "6d214eb94b09ebe262ff7c3374316d7e1e8c5729e2ce8afb708cc573b764bce0",
-      "gzip": 653,
-      "brotli": 600
-    },
-    {
-      "file": "story-beats.js",
-      "bytes": 1519,
-      "sha256": "35c7fb76b219c5d6d4bc5f747f1d8680050d4cb819dfc4b2f6f73a1cc3364b12",
-      "gzip": 824,
-      "brotli": 765
-    },
-    {
-      "file": "style.css",
-      "bytes": 3793,
-      "sha256": "adf96eb349429127a96ea408188962ee32b1abad5e632e8248890570210ab394",
-      "gzip": 1438,
-      "brotli": 1298
-    },
-    {
-      "file": "survival-estimate.js",
-      "bytes": 2558,
-      "sha256": "df499e1588886a2c3c5cedbfe69fedf5c7de9a5e45a5fdac718910c9e7cb8764",
-      "gzip": 1159,
-      "brotli": 1054
-    },
-    {
-      "file": "token-info.js",
-      "bytes": 284,
-      "sha256": "5da4df17f1ca54328634943d84079dfe9881fd270bf11745e6930fe38985f53f",
-      "gzip": 237,
-      "brotli": 202
-    },
-    {
-      "file": "voice-over.js",
-      "bytes": 6764,
-      "sha256": "3d3685fecc3c6c2fe5059159ba5297d12fe93ff8ade546ac518d4385ffd80236",
-      "gzip": 3154,
-      "brotli": 3046
     },
     {
       "file": "voice/beth-freed-guide.mp3",
@@ -8918,13 +8598,6 @@
       "sha256": "d3b64f933a5cee007846e0951c7cebec34c34a3d3146dad8b7e96201936053f7"
     },
     {
-      "file": "voice/lines.json",
-      "bytes": 12983,
-      "sha256": "8ae5dc52842b47b071baafc3619b4754274d00ce9f7d6adcdb68fd1c1573943e",
-      "gzip": 3419,
-      "brotli": 3318
-    },
-    {
       "file": "voice/liron-call.mp3",
       "bytes": 31704,
       "sha256": "202a5a610b831a70076fb335f7d4d59da4466e8c83b476ac1558f09f1be23ebc"
@@ -8953,13 +8626,6 @@
       "file": "voice/liron-way-out.mp3",
       "bytes": 23867,
       "sha256": "9cd1ea078817ea865d1687e791cc4095edfcca34e9ffede3d6753537b4217e97"
-    },
-    {
-      "file": "voice/manifest.json",
-      "bytes": 17065,
-      "sha256": "aeadce8512dc590da015d3e9a2e7a1fad83c12cc740e8a4fedf37bd76c06a7d7",
-      "gzip": 4145,
-      "brotli": 4048
     },
     {
       "file": "voice/nate-freed-guide.mp3",
@@ -9075,20 +8741,6 @@
       "file": "voice/you-sam-reinstated.mp3",
       "bytes": 28569,
       "sha256": "d4d9e0c88eb9362a9854abb87fe3af704f4dd4c2e94f9991fb9133791583abe6"
-    },
-    {
-      "file": "wallet-detect.js",
-      "bytes": 1921,
-      "sha256": "5373c045147a2ea5ceca093539a9ad7baa7a3200e47065ff875d8eb73cef172d",
-      "gzip": 926,
-      "brotli": 846
-    },
-    {
-      "file": "worker-audio-spatial.js",
-      "bytes": 1658,
-      "sha256": "698d64f8ea883713cc17be4bf20ed5250e213cf6efffbe3969aa9421f5e26981",
-      "gzip": 843,
-      "brotli": 768
     },
     {
       "file": "wrench.png",

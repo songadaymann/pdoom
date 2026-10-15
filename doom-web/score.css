@@ -16,3 +16,9 @@
 @media(max-height:500px){.score-card{padding:14px 18px}.score-stats,.score-points{margin:12px 0;gap:4px 10px}.score-points{padding-top:10px}.score-total{font-size:28px;margin:8px 0}.score-kicker{font-size:10px}#score-title{font-size:20px;margin-top:8px}#score-status{margin:8px 0}}
 
 @media(pointer:fine){#stage.has-game-shell .war-skip{right:156px}}
+
+@media(pointer:coarse) and (orientation:portrait){
+ #stage.has-game-shell.outside #hud{left:16px;right:110px}
+ #stage.has-game-shell.outside #restart{top:16px}
+ #stage.has-game-shell.outside #hub-ui{top:100px;width:calc(100% - 24px);font-size:12px}
+}

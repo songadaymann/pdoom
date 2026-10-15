@@ -33,12 +33,12 @@ requires the source media described in ASSETS.md; it is not required to run the 
 A playable design prototype of reverse Doom: start alone, find imprisoned humans, improvise a rescue and keep people alive while an overwhelming hunter searches for you. The browser Doom mod is the current implementation direction. The earlier Three.js prototype remains available separately.
 
 Friends playtest: **https://pdoom-playtest.novox-robot.workers.dev/** — standalone
-Cloudflare preview with separate test scoreboards; not listed at mann.cool.
+Cloudflare preview with separate test scoreboards; the public game is now on mann.cool.
 See [playtest hosting](docs/PLAYTEST-HOSTING.md) for updates and verification.
 
 Local opening experiment: [The Last Stand](http://127.0.0.1:5198/?prologue=1)
 (New Game → The Control Problem). Robot-filled rooms and endless escalating reinforcements lead to a real combat defeat and quiet Bliss wake-up; the opposite founder guides you to the first prison. This
-opt-in prototype has not replaced the deployed opening; see
+sequence is the current public opening; see
 [the prologue design](docs/COMBAT-PROLOGUE.md).
 
 ## Actual Doom mod in the browser

@@ -15,4 +15,6 @@ console.log('Canonical p(DOOM) runtime staged. Public platform integration; deve
 await fs.rm('.mann-cool-assets',{recursive:true,force:true});
 await fs.cp(stage,'.mann-cool-assets',{recursive:true});
 const inventory=JSON.parse(await fs.readFile('output/playtest/package.json','utf8'));
-await fs.writeFile('runtime-manifest.json',JSON.stringify({files:inventory.files},null,2));
+// Source files come from Git, not from HTML responses with injected shell markup.
+const tracked=new Set(execFileSync('git',['ls-files'],{encoding:'utf8'}).trim().split('\n'));
+await fs.writeFile('runtime-manifest.json',JSON.stringify({files:inventory.files.filter(r=>!tracked.has('doom-web/'+r.file))},null,2));
