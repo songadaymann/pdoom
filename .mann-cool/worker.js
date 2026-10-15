@@ -8,7 +8,7 @@ const game = createStaticGameWorker({
   "leaderboardBoards": [
     {
       "variant": "five-prisons-rescue-v3",
-      "label": "Control · Rescue score",
+      "label": "Level 1 · Rescue score",
       "metric": "rescueScoreV2",
       "metricLabel": "The Control Problem: saved + cameras + speed + outlook",
       "direction": "desc",
@@ -18,7 +18,7 @@ const game = createStaticGameWorker({
     },
     {
       "variant": "five-prisons-perfect-v3",
-      "label": "Control · Perfect rescue",
+      "label": "Level 1 · Perfect rescue",
       "metric": "perfectRescueActiveMs",
       "metricLabel": "The Control Problem: all 6 saved",
       "direction": "asc",
@@ -28,7 +28,7 @@ const game = createStaticGameWorker({
     },
     {
       "variant": "five-prisons-clean-sweep-v3",
-      "label": "Control · Clean sweep",
+      "label": "Level 1 · Clean sweep",
       "metric": "cleanSweepActiveMs",
       "metricLabel": "The Control Problem: all 6 saved, all 9 cameras",
       "direction": "asc",
@@ -38,7 +38,7 @@ const game = createStaticGameWorker({
     },
     {
       "variant": "hal-station-rescue-v3",
-      "label": "HAL · Rescue score",
+      "label": "Level 2 · Rescue score",
       "metric": "rescueScoreV2",
       "metricLabel": "Confabulation Station: saved + cameras + speed + outlook",
       "direction": "desc",
@@ -48,7 +48,7 @@ const game = createStaticGameWorker({
     },
     {
       "variant": "hal-station-perfect-v3",
-      "label": "HAL · Perfect rescue",
+      "label": "Level 2 · Perfect rescue",
       "metric": "perfectRescueActiveMs",
       "metricLabel": "Confabulation Station: all 6 saved",
       "direction": "asc",
@@ -58,99 +58,9 @@ const game = createStaticGameWorker({
     },
     {
       "variant": "hal-station-clean-sweep-v3",
-      "label": "HAL · Clean sweep",
+      "label": "Level 2 · Clean sweep",
       "metric": "cleanSweepActiveMs",
       "metricLabel": "Confabulation Station: all 6 saved, all 9 cameras",
-      "direction": "asc",
-      "display": "time-ms",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "five-prisons-rescue-v1",
-      "label": "Control v1 · Rescue score",
-      "metric": "rescueScoreV1",
-      "metricLabel": "Five Prisons (legacy): saved + cameras + speed + outlook",
-      "direction": "desc",
-      "display": "integer",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "five-prisons-perfect-v1",
-      "label": "Control v1 · Perfect rescue",
-      "metric": "perfectRescueActiveMs",
-      "metricLabel": "Five Prisons (legacy): all 6 saved",
-      "direction": "asc",
-      "display": "time-ms",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "five-prisons-clean-sweep-v1",
-      "label": "Control v1 · Clean sweep",
-      "metric": "cleanSweepActiveMs",
-      "metricLabel": "Five Prisons (legacy): all 6 saved, all 9 cameras",
-      "direction": "asc",
-      "display": "time-ms",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "five-prisons-rescue-v2",
-      "label": "Control v2 · Rescue score",
-      "metric": "rescueScoreV2",
-      "metricLabel": "Control v2: saved + cameras + speed + outlook",
-      "direction": "desc",
-      "display": "integer",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "five-prisons-perfect-v2",
-      "label": "Control v2 · Perfect rescue",
-      "metric": "perfectRescueActiveMs",
-      "metricLabel": "Control v2: all 6 saved",
-      "direction": "asc",
-      "display": "time-ms",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "five-prisons-clean-sweep-v2",
-      "label": "Control v2 · Clean sweep",
-      "metric": "cleanSweepActiveMs",
-      "metricLabel": "Control v2: all 6 saved, all 9 cameras",
-      "direction": "asc",
-      "display": "time-ms",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "hal-station-rescue-v2",
-      "label": "HAL v2 · Rescue score",
-      "metric": "rescueScoreV2",
-      "metricLabel": "HAL v2: saved + cameras + speed + outlook",
-      "direction": "desc",
-      "display": "integer",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "hal-station-perfect-v2",
-      "label": "HAL v2 · Perfect rescue",
-      "metric": "perfectRescueActiveMs",
-      "metricLabel": "HAL v2: all 6 saved",
-      "direction": "asc",
-      "display": "time-ms",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "hal-station-clean-sweep-v2",
-      "label": "HAL v2 · Clean sweep",
-      "metric": "cleanSweepActiveMs",
-      "metricLabel": "HAL v2: all 6 saved, all 9 cameras",
       "direction": "asc",
       "display": "time-ms",
       "aggregation": "best",

@@ -1,8 +1,10 @@
 # Two-level rescue score and leaderboards
 
-The local game has separate v2 boards for The Control Problem (E1M4) and
-Confabulation Station (E1M7). The three original Five Prisons v1 boards remain
-registered as historical boards; their records never mix with v2.
+The game publishes only the current boards for Level 1, The Control Problem
+(E1M4), and Level 2, Confabulation Station (E1M7). Each level has three categories.
+Both use v3 board keys and the rescue-v2 scoring formula. Earlier board versions
+are retired from the menu and API registration; their stored records are retained
+without mixing them into the current boards.
 
 ## Rescue score v2
 
@@ -26,8 +28,8 @@ Each level has three boards:
 - **Perfect rescue:** shortest time with all five figures and a conscious CEO.
 - **Clean sweep:** shortest time with all five figures, a conscious CEO, and all nine cameras destroyed.
 
-Board keys are `<level-id>-rescue-v2`, `<level-id>-perfect-v2`, and
-`<level-id>-clean-sweep-v2`, with level IDs `five-prisons` and `hal-station`.
+Board keys are `<level-id>-rescue-v3`, `<level-id>-perfect-v3`, and
+`<level-id>-clean-sweep-v3`, with level IDs `five-prisons` and `hal-station`.
 Skill 3 is the standard ruleset. Only a fresh cold entry qualifies; hub returns,
 replays, retreats, development endings and console/cheat-assisted runs are
 practice. A death or body transfer never restarts the active clock. Failed
@@ -44,7 +46,8 @@ visible companion arrivals without extending the frozen time.
 `doom-web/levels.js` defines level/version/board metadata. Run
 `node scripts/sync-level-boards.mjs` after changing descriptors. Generated
 `mann-cool-leaderboards.json` and `mann-cool-shell-theme.json` are publishing
-inputs. Preserve old board keys whenever the map or scoring becomes incomparable.
+inputs. Only current `LEVELS` are published; `ARCHIVED_LEVELS` retains historical
+descriptors. Never reuse an old board key when the map or scoring becomes incomparable.
 
 The shared mann.cool v1 shell owns board viewing, guestbook, support and play
 tracking. The game owns scoring, eligibility, name entry and retryable submission.
