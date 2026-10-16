@@ -31,7 +31,7 @@ export class LeaderboardSubmission{
     // Old saved results may still include retired time boards. Keep the frozen
     // total-score body, name and receipt without retrying removed categories.
     const variants=currentVariants(result),bodies=state?.bodies?.filter(body=>variants.has(body.variant));
-    this.bodies=bodies?.length?bodies:null;this.accepted=new Set((state?.accepted||[]).filter(variant=>variants.has(variant)));this.inflight=null;this.ticket=ticket;this.onProgress=onProgress;
+    this.bodies=bodies?.length?bodies:null;this.accepted=new Set((state?.accepted||[]).filter(variant=>variants.has(variant)));this.held=new Set();this.inflight=null;this.ticket=ticket;this.onProgress=onProgress;
   }
   submit(name){
     if(this.inflight)return this.inflight;
@@ -40,16 +40,17 @@ export class LeaderboardSubmission{
     this.inflight=this.send().finally(()=>{this.inflight=null;});return this.inflight;
   }
   async send(){
-    if(this.bodies.every(body=>this.accepted.has(body.variant)))return {accepted:[...this.accepted],complete:true};
+    if(this.bodies.every(body=>this.accepted.has(body.variant)))return {accepted:[...this.accepted],held:[...this.held],complete:true};
     const runTicket=await this.ticket();
     for(const body of this.bodies){
       if(this.accepted.has(body.variant))continue;
       const response=await this.fetcher(this.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,...(runTicket?{runTicket}:{})})});
       let data;try{data=await response.json();}catch{throw Error('No confirmation received. Retry to check this same score.');}
       if(!response.ok||data.success!==true)throw Error(data.error||'Leaderboard unavailable. Retry this score.');
-      this.accepted.add(body.variant);
+      // A held run is stored for review: submitted, but not ranked until approved.
+      this.accepted.add(body.variant);if(data.held)this.held.add(body.variant);
       this.onProgress({bodies:this.bodies,accepted:[...this.accepted]});
     }
-    return {accepted:[...this.accepted],complete:this.accepted.size===this.bodies.length};
+    return {accepted:[...this.accepted],held:[...this.held],complete:this.accepted.size===this.bodies.length};
   }
 }

@@ -34,9 +34,10 @@ export function createScoreView({level,config,block,openBoards,ceo=()=>null,retr
     const current=submission,completed=result;
     try{
       const promise=current.submit(name.value);name.disabled=true;
-      await promise;
+      const outcome=await promise;
       ranked.complete(completed.runId);onPendingChange();if(submission!==current)return;
-      el('#score-status').textContent=`Saved to the leaderboard${config.mode==='local'?' on this computer':''}.`;
+      el('#score-status').textContent=outcome.held.length?'Received. This run is held for review before it appears on the leaderboard.'
+        :`Saved to the leaderboard${config.mode==='local'?' on this computer':''}.`;
       button.textContent='Submitted';try{localStorage.setItem('pdoom-name-v1',name.value.trim());}catch{}
     }catch(error){if(submission!==current)return;el('#score-status').textContent=error.message;button.textContent='Retry submission';button.disabled=false;if(!current.bodies)name.disabled=false;}
   });

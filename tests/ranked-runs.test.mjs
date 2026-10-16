@@ -76,7 +76,13 @@ test('old three-category results submit only the original frozen total score',as
   const sent=[];const restored=new LeaderboardSubmission(oldResult,{state:{bodies,accepted:[perfect]},fetcher:async(_,request)=>{sent.push(JSON.parse(request.body));return{ok:true,json:async()=>({success:true})};}});
   assert.equal((await restored.submit('Changed name')).complete,true);assert.equal(sent.length,1);assert.deepEqual(sent[0],bodies[0]);assert.deepEqual([...restored.accepted],[rescue]);
   let reads=0;const acknowledged=new LeaderboardSubmission(oldResult,{state:{bodies,accepted:[rescue,perfect,clean]},ticket:async()=>{reads++;throw Error('Should not need a new ticket');},fetcher:async()=>{reads++;throw Error('Should not post again');}});
-  assert.deepEqual(await acknowledged.submit('Another name'),{accepted:[rescue],complete:true});assert.equal(reads,0);
+  assert.deepEqual(await acknowledged.submit('Another name'),{accepted:[rescue],held:[],complete:true});assert.equal(reads,0);
   const fresh=new LeaderboardSubmission(oldResult,{playerId:'player',fetcher:async(_,request)=>{assert.equal(JSON.parse(request.body).variant,rescue);return{ok:true,json:async()=>({success:true})};}});
   await fresh.submit('New name');assert.equal(fresh.bodies.length,1);
+});
+test('a run the server holds for review completes without retrying and reports the hold',async()=>{
+  const value=result('held-run'),sent=[];
+  const submission=new LeaderboardSubmission(value,{playerId:'player',fetcher:async(_,request)=>{sent.push(JSON.parse(request.body));return {ok:true,json:async()=>({success:true,held:true,rank:null})};}});
+  const outcome=await submission.submit('Fast player');assert.equal(outcome.complete,true);assert.deepEqual(outcome.held,[value.submissions[0].variant]);
+  assert.deepEqual(await submission.submit('Fast player'),{accepted:[value.submissions[0].variant],held:[value.submissions[0].variant],complete:true});assert.equal(sent.length,1);
 });

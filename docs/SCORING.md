@@ -84,13 +84,21 @@ simplification retain their original total-score submission identity and name;
 retired categories are filtered from both pending and accepted lists.
 
 Tickets last 90 days while unused; completed-ticket retries remain valid. There
-are no heartbeat deadlines, guessed minimum completion times, or wall-clock
-comparisons that penalize pausing, tab suspension or a lost connection. Ticket
-requests start with the native run and retry on submission if the service was
-unavailable. Acquisition failures never prevent playing. Completed eligible
-results and partial-submission progress are retained in browser storage; **Saved
-Results** in the main menu restores them after a refresh. Blocked/full browser
-storage still permits current-tab retries.
+are no heartbeat deadlines. Ticket requests start with the native run and retry on
+submission if the service was unavailable. Acquisition failures never prevent
+playing. Completed eligible results and partial-submission progress are retained in
+browser storage; **Saved Results** in the main menu restores them after a refresh.
+Blocked/full browser storage still permits current-tab retries.
+
+Two timing checks hold a run for review instead of rejecting it. A run is held if
+its active time is under the level's floor (90 seconds for now, an estimate to
+tighten once real runs exist). It is also held if its active time exceeds the real
+time since its ticket was issued. Pausing and tab suspension only add real time, so
+neither check can catch them. A ticket fetched late, after the service was
+unavailable at the start, can hold a genuine run. Held runs are stored as `pending`
+and stay off the board until approved. Retries keep that status, and the results
+card says the run is held. Moderation uses `npm run leaderboard:moderate` in the
+mann.cool repo.
 
 `validation: server-rules-v1` means the rules and calculation were checked. It
 does not prove the browser's reported events happened. A fabricated but internally
