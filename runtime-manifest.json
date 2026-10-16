@@ -8267,10 +8267,10 @@
     },
     {
       "file": "outside/outside.js",
-      "bytes": 5181507,
-      "sha256": "dcee9b3da2a9c9f8e8fb22671a336827c7f4f08aca044cbd837d5b0d5a896699",
-      "gzip": 1845560,
-      "brotli": 1601274
+      "bytes": 5181702,
+      "sha256": "46a901d8e28e9a2ac4452f08a9279b2b199cd12893cda4d0822da446bc4360f3",
+      "gzip": 1845719,
+      "brotli": 1600987
     },
     {
       "file": "pdoom.pk3",
