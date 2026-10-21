@@ -1,12 +1,13 @@
-# Two-level rescue score and leaderboards
+# Rescue score and leaderboards
 
 The game publishes only the current boards for Level 1, The Control Problem
-(E1M4), and Level 2, Confabulation Station (E1M7). Each level has one total-score
-board. The shared view has a Level 1 / Level 2 switch and displays only rank,
-name and score.
-Both use v3 board keys and the rescue-v2 scoring formula. Earlier board versions
-are retired from the menu and API registration; their stored records are retained
-without mixing them into the current boards.
+(E1M4), Level 2, Confabulation Station (E1M7), and since 2026-10-21 Level 3,
+MEG3N's Toy Factory (E2M7). Each level has one total-score board. The shared view
+has a Level 1 / Level 2 / Level 3 switch and displays only rank, name and score.
+All three use the rescue-v2 scoring formula; levels 1-2 have v3 board keys and
+level 3 starts at v1. Earlier board versions are retired from the menu and API
+registration; their stored records are retained without mixing them into the
+current boards.
 
 ## Rescue score v2
 
@@ -14,7 +15,7 @@ without mixing them into the current boards.
 | --- | ---: | --- |
 | Rescued figures | 10,000 each | Five unique figures per level; count only those who actually escape. |
 | CEO | 1,000 | Conscious at escape. A carried/downed CEO earns no CEO bonus. |
-| Cameras | 250 each | Unique destroyed cameras, nine per level. Quietly turning one away earns no destruction points. |
+| Cameras | 250 each | Unique destroyed cameras, nine per level. Quietly turning one away earns no destruction points. Level 3 counts MEG3N's 20 smashed live-feed screens instead. |
 | Speed | Up to 2,000 | `round(2000 × 600 / (600 + activeSeconds))`. |
 | Outlook | Up to 1,000 | `10 × (100 − pDoomAtCoverOpen)`. |
 
@@ -29,7 +30,19 @@ camera and timing details stay on the results card. The former Perfect rescue an
 Clean sweep time boards are retired from the menu, submissions and API; their
 stored records are retained. Existing total-score records keep their current keys.
 
-Board keys are `<level-id>-rescue-v3`, with level IDs `five-prisons` and `hal-station`.
+Board keys are `<level-id>-rescue-<board version>`: `five-prisons-rescue-v3`,
+`hal-station-rescue-v3` and `meg3n-factory-rescue-v1`.
+
+**Level 3.** The factory scores the same five figures plus you (MEG3N catching you
+restarts the level, so you are always conscious at its exit switch), 250 per smashed
+screen (20, so all side bonuses together still stay under one figure: at most
+1,000 + 5,000 + 2,000 + 990), speed, and the outlook when the break-room TV
+broadcast opens the way out. A fresh run can only leave with all five, so a ranked
+run has all five: 10 minutes, all 20 screens and 3% scores **57,970**. It ranks only
+when started from the episode menu (SPAWNING CHATS) on the campaign page; walking
+in through MEG3N.AVI's door from SAFE MODE, a `?puzzle=` or QA site, and cheats are
+practice, and the stand-alone `?level=meg3n-factory` page has no run. Its server
+review floor is 3 minutes.
 Skill 3 is the standard ruleset. Only a fresh cold entry qualifies; hub returns,
 replays, retreats, development endings and console/cheat-assisted runs are
 practice. A death or body transfer never restarts the active clock. Failed

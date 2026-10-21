@@ -57,9 +57,10 @@ export function createScoreView({level,config,block,openBoards,ceo=()=>null,retr
       el('.score-kicker').textContent=config.mode==='local'?'Local leaderboard':'p(DOOM)';
       el('#score-title').textContent=result.outcome==='escaped'?'Rescue complete':'Nobody escaped';el('#score-level').textContent=(getLevel(result.levelId)||level).title;
       const stats=el('.score-stats'),points=el('.score-points');stats.replaceChildren();points.replaceChildren();
-      row(stats,'People saved',`${result.saved}/${result.total}`);row(stats,'Cameras destroyed',`${result.camerasDestroyed}/${result.camerasTotal}`);row(stats,'Active time',formatTime(result.activeMs));
+      const scored=getLevel(result.levelId)||level;// level 3 counts MEG3N's screens where levels 1-2 count cameras
+      row(stats,'People saved',`${result.saved}/${result.total}`);row(stats,scored.camerasLabel||'Cameras destroyed',`${result.camerasDestroyed}/${result.camerasTotal}`);row(stats,'Active time',formatTime(result.activeMs));
       row(stats,'p(DOOM) before escape',result.pDoomAtCoverOpen===null?'—':`≈${result.pDoomAtCoverOpen}%`);
-      for(const [label,key]of [['Rescue points','rescue'],['CEO conscious (others are worth more)','ceo'],['Camera points','cameras'],['Speed bonus','speed'],['Outlook bonus','outlook']])row(points,label,(result.breakdown[key]||0).toLocaleString());
+      for(const [label,key]of [['Rescue points','rescue'],['CEO conscious (others are worth more)','ceo'],[scored.camerasPoints||'Camera points','cameras'],['Speed bonus','speed'],['Outlook bonus','outlook']])row(points,label,(result.breakdown[key]||0).toLocaleString());
       el('.score-total').textContent=`TOTAL ${result.totalScore.toLocaleString()}`;
       const enabled=result.eligible&&config.enabled;
       el('#score-submit').hidden=!enabled;el('#score-name').disabled=!!submission.bodies;if(submission.bodies)el('#score-name').value=submission.bodies[0].name;el('#submit-score').disabled=false;el('#submit-score').textContent='Submit score';

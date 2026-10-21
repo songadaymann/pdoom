@@ -78,3 +78,18 @@ test('loopback API persists, sorts each board, rejects unknown levels and dedupl
     for(const category of ['perfect','clean-sweep'])assert.equal((await post({...bodies[0],variant:`five-prisons-${category}-v3`})).status,400);
   }finally{await new Promise(resolve=>server.close(resolve));await rm(temp,{recursive:true,force:true});}
 });
+
+// Level 3 (2026-10-21): MEG3N's factory scores like levels 1-2, with her 20 screens as the side bonus.
+test('the factory scores all five plus you, twenty screens and its own board; walk-ins are practice',()=>{
+  const factory=getLevel('meg3n-factory');
+  const native=o=>({level_id:factory.id,level_version:factory.version,score_version:'rescue-v2',outcome:'escaped',saved:6,total:6,saved_figures:5,ceo_state:'conscious',skill:3,entry:'cold',retreat:0,active_tics:35*600,p_doom_cover:3,cameras_total:20,cameras_broken:20,practice:0,routes:['music','fabric','pause','trained','helper'],...o});
+  const best=scoreRun(native(),factory,{runId:'factory-run'});
+  assert.deepEqual(best.breakdown,{rescue:50000,ceo:1000,cameras:5000,speed:1000,outlook:970});
+  assert.equal(best.totalScore,57970);assert.equal(best.camerasTotal,20);
+  assert.deepEqual(best.submissions,[{variant:'meg3n-factory-rescue-v1',score:57970}]);
+  assert.equal(scoreRun(native({entry:'hub'}),factory,{runId:'walk-in'}).eligible,false,'Walking in through MEG3N.AVI is practice');
+  assert.equal(scoreRun(native({entry:'hub',saved:3,saved_figures:2,retreat:1}),factory,{runId:'retreat'}).submissions.length,0);
+  assert.throws(()=>scoreRun(native({cameras_total:9}),factory,{runId:'cameras'}),/Incomplete native result/);
+  // Twenty screens and every other side bonus are still worth less than one more person.
+  assert.ok(20*250+1000+2000+1000<10000);
+});

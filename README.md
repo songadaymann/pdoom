@@ -31,8 +31,9 @@ requires the source media described in ASSETS.md; it is not required to run the 
 MEG3N’s Toy Factory is E2M7, Spawning Vats, with bright toy-factory materials and five physical
 rescue puzzles. Since 2026-10-20 it is part of the campaign: in SAFE MODE, `MEG3N.AVI`’s door
 walks into it and its exit switch comes back out there (the five at camp, the clear in the save).
-It is unscored; the scoreboards still cover the first two facilities. The
-[cold-start page](http://127.0.0.1:5198/?level=meg3n-factory) starts in the showroom and takes the
+Since 2026-10-21 it has its own Level 3 scoreboard: a fresh SPAWNING CHATS run from the
+episode menu ranks (see `docs/SCORING.md`). The unscored
+[practice page](http://127.0.0.1:5198/?level=meg3n-factory) starts in the showroom and takes the
 `?puzzle=` development flags. Full guardian vent traversal and final sound/animation remain later work.
 
 With the supplied private `doom-web/local/DOOM.WAD` and existing local runtime present:

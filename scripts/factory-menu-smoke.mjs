@@ -73,12 +73,16 @@ try{
   await film(t,'SPAWNING CHATS',{shot:'1-film'});
   let s=await coldFactory(t,'SPAWNING CHATS starts the factory');
   assert.equal(await t.saved(),null,'Nothing saved before the exit');assert.equal(s.campaign.saved,0);
+  // Level 3 ranks like levels 1-2 (2026-10-21): a fresh menu start is a run that can reach its board.
+  s=await t.wait(s=>s.run?.runId&&s.run.activeTics>35,'A run starts with its active clock',15000);
+  assert.equal(s.run.practiceReason,'','A fresh menu start can rank');
   await t.shot('1-start');record('Episode menu: SPAWNING CHATS (INFERENCE) plays the E2M7 film, then starts E2M7 cold on the campaign page: its own start, no wrench, factory HUD, nothing saved');
   // 2. QA only: restart at the exit with all five safe (the ?puzzle=exit start).
   await t.command('pdoom_development 1');await t.command('pdoom_factory_site 7');
   await t.page.keyboard.press('Escape');await t.menu('main');await t.page.click('#menu-restart');await t.menu('confirm');await t.page.click('#menu-confirm');
   s=await t.wait(s=>s.mode==='playing'&&s.factory?.all_safe&&s.world?.prompt==='SPACE - leave the factory'&&s.world.people.every(p=>p.x>980&&p.x<1130&&p.y>-580&&p.y<-300),'Restarted at the exit with all five',60000);
   assert.equal(s.factory.hub_entry,0);
+  assert.ok(s.run.practiceReason,'A QA restart at the exit is practice');
   await t.page.keyboard.press('Space',{delay:80});
   s=await t.wait(s=>s.factory?.exit_done&&s.melt.phase!=='idle','The exit switch freezes the last frame',5000);
   assert.ok(s.events.some(e=>e.type==='factory-exit'&&e.saved===31&&e.hub===0&&e.committed===1),'The exit commits natively');
@@ -92,6 +96,10 @@ try{
   assert.equal(save.saved0|save.saved1|save.lost2|save.following2,0,'Only the factory');
   s=await t.wait(s=>s.outside.people.filter(p=>p.id>=10&&p.arrived).length===5,'The five come out to camp',25000);
   assert.equal(s.campaign.saved,5);assert.equal(s.outside.future.meg3n.strip,'saved,saved,saved,saved,saved');
+  // The result: all five plus you, her 20 screens in place of cameras, practice (the QA start).
+  s=await t.wait(s=>s.scoreView?.available,'The results card',20000);
+  const r=s.run.result;assert.equal(r.levelId,'meg3n-factory');assert.equal(r.saved,6);assert.equal(r.camerasTotal,20);assert.equal(r.eligible,false);
+  assert.match(await t.page.evaluate(()=>document.querySelector('.score-stats').textContent),/Screens smashed0\/20/);
   await t.shot('2-meadow');record('Its exit commits the clear (PDOOM_CAMPAIGN saved2 31): no text on the first exit, SAFE MODE at MEG3N.AVI, the save holds the five (5/20)');
   // 3. The native session agrees: walking back in, everyone is at camp.
   const yaw=-65*Math.PI/180;
@@ -121,6 +129,7 @@ try{
   await t.page.click('.iv-skip');
   s=await t.wait(s=>s.mode==='playing'&&s.world?.level==='meg3n-factory'&&s.factory?.hub_entry===1&&!s.outside&&s.world.ticks>35,'Then the factory front door',60000);
   assert.ok(Math.hypot(s.world.x-1056,s.world.y+530)<24,'At the front door the film ends on');
+  s=await t.wait(s=>s.run?.runId,'Its run',10000);assert.match(s.run.practiceReason,/Development run/,'A walk-in from SAFE MODE is practice');
   record('First walk through MEG3N.AVI: the E2M7 film plays over the paused meadow, then the factory front door');
   await t.page.close();
  }

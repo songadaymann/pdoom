@@ -25,6 +25,16 @@ const game = createStaticGameWorker({
       "display": "integer",
       "aggregation": "best",
       "minimumMatches": 1
+    },
+    {
+      "variant": "meg3n-factory-rescue-v1",
+      "label": "Level 3",
+      "metric": "rescueScoreV2",
+      "metricLabel": "Total score",
+      "direction": "desc",
+      "display": "integer",
+      "aggregation": "best",
+      "minimumMatches": 1
     }
   ],
   "shellTheme": {

@@ -20,7 +20,7 @@ async function open(options={viewport:{width:1280,height:800}}){
 async function ready(p){await p.waitForFunction(()=>window.render_game_to_text&&window.__QA_SCORE_VIEW__);}
 async function show(p,id,levelId='five-prisons'){
   await p.evaluate(async({id,levelId})=>{const {getLevel}=await import('./levels.js'),{scoreRun}=await import('./run-score.js'),l=getLevel(levelId);
-    const result=scoreRun({level_id:l.id,level_version:l.version,score_version:l.scoreVersion,outcome:'escaped',saved:6,total:6,active_tics:21000,p_doom_cover:5,cameras_broken:9,cameras_total:9,practice:0,saved_figures:5,ceo_state:'conscious',skill:3,entry:'cold',retreat:0,routes:[]},l,{runId:id});window.__QA_SCORE_VIEW__.show(result);
+    const result=scoreRun({level_id:l.id,level_version:l.version,score_version:l.scoreVersion,outcome:'escaped',saved:6,total:6,active_tics:21000,p_doom_cover:5,cameras_broken:l.camerasTotal,cameras_total:l.camerasTotal,practice:0,saved_figures:5,ceo_state:'conscious',skill:3,entry:'cold',retreat:0,routes:[]},l,{runId:id});window.__QA_SCORE_VIEW__.show(result);
   },{id,levelId});
 }
 async function restore(p){await p.reload();await ready(p);await p.click('#title-enter');assert.equal(await p.locator('#menu-saved-results').isVisible(),true);await p.click('#menu-saved-results');await p.locator('#score-dialog').waitFor({state:'visible'});}
@@ -59,6 +59,25 @@ try{
   await native.p.waitForFunction(()=>{const id=JSON.parse(window.render_game_to_text()).run.runId;return JSON.parse(localStorage.getItem('pdoom.ranked-run.v1:'+id)||'null')?.ticketId;},{},{timeout:15000});
   await native.p.keyboard.press('Escape');await native.p.waitForTimeout(350);const paused=await native.p.evaluate(()=>JSON.parse(window.render_game_to_text()).run.activeTics);await native.p.waitForTimeout(600);assert.equal(await native.p.evaluate(()=>JSON.parse(window.render_game_to_text()).run.activeTics),paused);
   await native.p.keyboard.press('Escape');await native.p.waitForFunction(t=>JSON.parse(window.render_game_to_text()).run.activeTics>t,paused);await native.p.screenshot({path:out+'/native-ticket.png'});await native.context.close();report.cases.push('A real fresh native run obtains its ticket automatically; menu pauses retain the active clock and gameplay resumes');
+  // Level 3 (2026-10-21): MEG3N's factory submits to its own board through the real Worker.
+  {const factory=await open(),id=randomUUID(),posted=[];
+   await factory.p.route(api+'/api/v1/leaderboard',async r=>{if(r.request().method()==='POST')posted.push(r.request().postDataJSON());await r.continue();});
+   await show(factory.p,id,'meg3n-factory');
+   assert.match(await factory.p.locator('.score-stats').innerText(),/Screens smashed\s*20\/20/);assert.match(await factory.p.locator('#score-level').innerText(),/MEG3N/);
+   await factory.p.fill('#score-name','Factory fixture');await factory.p.click('#submit-score');
+   await factory.p.waitForFunction(()=>document.querySelector('#submit-score').textContent==='Submitted');
+   assert.deepEqual(posted.map(b=>b.variant),['meg3n-factory-rescue-v1']);assert.equal(posted[0].metadata.camerasTotal,20);
+   assert.match(await factory.p.locator('#score-status').innerText(),/held for review/);await factory.context.close();
+   report.cases.push('Level 3 total score (all five, 20 screens) submits once to meg3n-factory-rescue-v1 through the real Worker; the fixture is held for review');}
+  // A real fresh factory run from the episode menu gets its ticket like levels 1-2.
+  {const factory=await open();const page=view=>factory.p.waitForFunction(view=>JSON.parse(window.render_game_to_text()).menu?.page===view,view,{timeout:15000});
+   await factory.p.goto(base+'?ceo=altman&levels=1');await ready(factory.p);
+   await factory.p.click('#title-enter');await page('main');await factory.p.click('#menu-new');await page('hero');await factory.p.click('#hero-next');await page('levels');await factory.p.click('#level-meg3n-factory');
+   await factory.p.waitForSelector('.iv-skip',{timeout:30000}).then(()=>factory.p.click('.iv-skip')).catch(()=>{});
+   await factory.p.waitForFunction(()=>{const s=JSON.parse(window.render_game_to_text());return s.levelId==='meg3n-factory'&&s.run?.activeTics>35&&!s.run.practiceReason;},{},{timeout:90000});
+   await factory.p.waitForFunction(()=>{const id=JSON.parse(window.render_game_to_text()).run.runId;return JSON.parse(localStorage.getItem('pdoom.ranked-run.v1:'+id)||'null')?.ticketId;},{},{timeout:15000});
+   await factory.p.screenshot({path:out+'/factory-ticket.png'});await factory.context.close();
+   report.cases.push('A fresh SPAWNING CHATS run from the episode menu obtains its ticket from the real Worker');}
   assert.deepEqual(report.errors,[]);report.passed=true;
 }catch(error){report.failure=String(error.stack||error);report.state=await active?.evaluate(()=>JSON.parse(window.render_game_to_text?.()||'{}')).catch(()=>null);await active?.screenshot({path:out+'/failure.png'}).catch(()=>{});}
 finally{await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await Promise.race([browser.close(),new Promise(resolve=>setTimeout(resolve,5000))]);}

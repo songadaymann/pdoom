@@ -42,7 +42,7 @@ Use the supplied private DOOM.WAD’s **E2M7, Spawning Vats**. The first two fac
 
 ## First-pass scope and acceptance
 
-- Native Doom level, unscored. Since 2026-10-20 it is part of the campaign through `MEG3N.AVI`'s door in SAFE MODE, and `?level=meg3n-factory` remains the cold-start page.
+- Native Doom level. Since 2026-10-20 it is part of the campaign through `MEG3N.AVI`'s door in SAFE MODE, and `?level=meg3n-factory` remains the unscored practice page. Since 2026-10-21 it is scored like levels 1-2 on its own board, `meg3n-factory-rescue-v1` (Level 3): a fresh SPAWNING CHATS run from the episode menu ranks; walk-ins, `?puzzle=`/QA sites and cheats are practice (`docs/SCORING.md`).
 - All five signatures have physical controls/props, visible intermediate states and a rescue outcome.
 - Released people physically leave their containment and can follow the player to the original start-room refuge. No teleporting companions to manufacture a successful escort. (Changed 2026-10-19 by Jonathan: freed people now move at your pace, and one left over 1024 units behind and out of your sight catches up by appearing just behind you.)
 - MEG3N walks to the music mark; looking away during the dance does not cancel the vase knock. Persistent key survives a missed pickup.

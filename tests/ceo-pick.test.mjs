@@ -65,5 +65,5 @@ test('the CEO is free-form run metadata only: never in the score, board or submi
   assert.ok(tagged.every(b=>b.metadata.ceo==='amodei'));
   assert.equal(submissionBodies(result,'Player','id-1',{ceo:'<b>'})[0].metadata.ceo,undefined,'Only known ids are recorded');
   const sent=[];const submission=new LeaderboardSubmission(result,{playerId:'id-2',ceo:'altman',fetcher:async(url,init)=>{sent.push(JSON.parse(init.body));return {ok:true,json:async()=>({success:true})};}});
-  await submission.submit('Player');assert.ok(sent.length===3&&sent.every(b=>b.metadata.ceo==='altman'));
+  await submission.submit('Player');assert.ok(sent.length===1&&sent.every(b=>b.metadata.ceo==='altman'));
 });

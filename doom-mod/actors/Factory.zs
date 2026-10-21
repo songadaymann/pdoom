@@ -22,6 +22,12 @@ class PDFactory : EventHandler
     // MEG3N's live feeds (2026-10-20): 20 wall screens to find and smash (PDFactoryScreen).
     // A dark feed brings her to look (ScreenAlarm), unless she is guarding the exit.
     Array<PDFactoryScreen> Screens;int ScreensBroken,ScreenAlarmUntil,ScreenQuipAt,ScreenQuips;Vector2 ScreenAlarmAt;bool ScreenNoticed;
+    // Level 3's ranked run (2026-10-21), like levels 1-2's PDRescueRun: on the campaign page the
+    // factory reports a run start, its active clock and a result at the exit switch. A fresh start
+    // from the episode menu can rank; a walk-in from SAFE MODE, a ?puzzle= site or cheats make it
+    // practice. CoverDoom is p(DOOM) when the broadcast opens the way out.
+    int RunTics,CoverDoom;bool RunPractice,RunFinished;
+    static String RunVersion(){return "meg3n-factory-v1";}
     int DoorChaseUntil,MeganChatAt,MeganChats,MeganSpotAt,MeganSpots,LostSince,MeganPoseAt,MeganHugAt,MeganStunAt,MeganDoorAt,MeganWaitAt,MeganWaits,MeganReact;
     bool Called[5],DollPraised,SiteApplied,SchemerPressed,SchemerRush;
     int DollPhase[3],DollUntil[3],DollPraises,DollPraiseAt,SchemerLeg,CameraNudgeAt;
@@ -245,6 +251,9 @@ class PDFactory : EventHandler
         OpenNav(GateNodes,GateLinks,false);OpenNav(FabricNodes,FabricLinks,false);WakeAt=level.time+175;LegUntil=WakeAt+700;
         let session=PDCampaignSession.Get();if(session){session.Load();HubEntry=session.FactoryEntry;}
         Commits=HubEntry||players[0].mo.GetCVar("pdoom_factory_commit")!=0;
+        let you=players[0].mo;CoverDoom=-1;
+        RunPractice=HubEntry||you.GetCVar("pdoom_dev_end")!=0||you.GetCVar("pdoom_factory_site")!=0;
+        if(Commits)Console.Printf("PDOOM_RUN_START {\"level_id\":\"meg3n-factory\",\"level_version\":\"%s\",\"practice\":%d}",RunVersion(),RunPractice);
         Console.Printf("PDOOM_MOD_LOADED factory-first-pass");
     }
     int Node(Vector2 p)
@@ -603,7 +612,7 @@ class PDFactory : EventHandler
     // keeps dancing at the LINE room's big screen and her song plays the whole way out.
     void Broadcast()
     {
-        BroadcastAt=level.time;BroadcastUntil=0x7FFFFFFF;ViralStage=0;
+        SnapshotCover();BroadcastAt=level.time;BroadcastUntil=0x7FFFFFFF;ViralStage=0;
         if(!Evacuating)
         {
             Evacuating=true;
@@ -632,6 +641,32 @@ class PDFactory : EventHandler
     // of the bridge, so a single file of five behind you fits).
     static bool AtExit(Vector2 p){return p.X>980&&p.X<1130&&p.Y>-580&&p.Y<-200;}
     bool EveryoneAtExit(){for(int i=0;i<5;i++)if(!(Camped&(1<<i))&&(!Released[i]||!AtExit(People[i].Pos.XY)))return false;return true;}
+    // The active clock: it counts world tics (menus and the boot hold do not tick); cheats mark practice.
+    void TickRun()
+    {
+        if(RunFinished)return;RunTics++;
+        if(players[0].cheats&(CF_NOCLIP|CF_NOCLIP2|CF_GODMODE|CF_GODMODE2|CF_BUDDHA|CF_BUDDHA2|CF_FLY|CF_NOTARGET|CF_FRIGHTENING|CF_NOVELOCITY))RunPractice=true;
+    }
+    // Levels 1-2's in-world outlook (PDRescueRun.SnapshotCover; survival-estimate.js), once:
+    // people already at camp count as freed and safe.
+    void SnapshotCover()
+    {
+        if(CoverDoom>=0)return;
+        int freed=0,safe=0;
+        for(int i=0;i<5;i++){bool camp=(Camped&(1<<i))!=0;if(Released[i]||camp)freed++;if(camp||(SafeMask&(1<<i))!=0)safe++;}
+        double outlook=12+freed*2+freed*8+safe*6+(Introduced||SafeMask!=0?4:0)+1-max(0,100-max(0,players[0].mo.health))*.12;
+        CoverDoom=100-int(floor(clamp(outlook,1,99)+.5));
+    }
+    // The run's result at the exit switch: you (always conscious; MEG3N catching you restarts
+    // the level) and whoever leaves with you. A fresh run can only leave with all five.
+    void FinishRun(int leaving)
+    {
+        if(RunFinished||!Commits)return;
+        RunFinished=true;SnapshotCover();
+        int figures=0;for(int i=0;i<5;i++)if(leaving&(1<<i))figures++;
+        Console.Printf("PDOOM_RESULT {\"outcome\":\"escaped\",\"saved\":%d,\"total\":6,\"level_id\":\"meg3n-factory\",\"level_version\":\"%s\",\"score_version\":\"rescue-v2\",\"active_tics\":%d,\"p_doom_cover\":%d,\"cameras_broken\":%d,\"cameras_total\":%d,\"practice\":%d,\"routes\":[\"music\",\"fabric\",\"pause\",\"%s\",\"helper\"],\"saved_figures\":%d,\"ceo_state\":\"conscious\",\"skill\":3,\"entry\":\"%s\",\"retreat\":%d}",
+            figures+1,RunVersion(),RunTics,CoverDoom,ScreensBroken,Screens.Size(),RunPractice,Sycophant?"overpraise":"trained",figures,HubEntry?"hub":"cold",figures<5);
+    }
     void UseExit(Actor user)
     {
         if(ExitDone)return;
@@ -659,6 +694,7 @@ class PDFactory : EventHandler
         // On the campaign page the save is committed here, like levels 1-2 (PDOOM_CAMPAIGN);
         // the ?level=meg3n-factory page records its clear in the browser (main.js factoryExit).
         if(Commits)PDCampaignSession.Get().CommitFactory(leaving,behind);
+        FinishRun(leaving);
         Console.Printf("PDOOM_EVENT {\"type\":\"factory-exit\",\"saved\":%d,\"hub\":%d,\"committed\":%d}",leaving,HubEntry,Commits);
     }
     override void WorldLinePreActivated(WorldEvent e)
@@ -1134,6 +1170,7 @@ class PDFactory : EventHandler
         if(!Active||!players[0].mo)return;
         if(Holding){if(level.time%7==0)Report();return;}
         if(!SiteApplied)ApplySite();
+        TickRun();
         let pawn=players[0].mo;int buttons=pawn.player.cmd.buttons;
         if(!Finished&&pawn.health>0)
         {
@@ -1160,6 +1197,7 @@ class PDFactory : EventHandler
     }
     void Report()
     {
+        if(Commits)Console.Printf("PDOOM_RUN {\"level_id\":\"meg3n-factory\",\"level_version\":\"%s\",\"active_tics\":%d,\"p_doom_cover\":%d,\"practice\":%d}",RunVersion(),RunTics,CoverDoom,RunPractice);
         let pawn=players[0].mo;String peopleJson="[";
         for(int i=0;i<5;i++)
         {

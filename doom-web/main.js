@@ -27,7 +27,9 @@ import {browserStorage,resolveCeo,mountCeoPicker} from './ceo-pick.js';
 const DEBUG_OPTIONS={logs:new URLSearchParams(location.search).has('debug')};
 const requestedLevel=new URLSearchParams(location.search).get('level')||'five-prisons';
 let LEVEL=getLevel(requestedLevel);
-const CHECKPOINT=LEVEL?.scored===true;
+// The campaign page. MEG3N's factory is scored there since 2026-10-21 (started from the episode
+// menu); its own ?level=meg3n-factory page stays the unscored practice page with ?puzzle= flags.
+const CHECKPOINT=LEVEL?.scored===true&&LEVEL.id!=='meg3n-factory';
 const FACTORY=LEVEL?.id==='meg3n-factory';
 const DEV_END=CHECKPOINT&&new URLSearchParams(location.search).get('dev')==='end';
 // Loopback development flag: ?level=meg3n-factory&puzzle=zvi starts beside that puzzle (factory-hud.js).
@@ -177,7 +179,7 @@ function onMessage(m){
       if(event.type==='factory-exit'&&LEVEL?.id==='meg3n-factory')factoryExit(event);
       if(marker==='PDOOM_RESULT '){
         state.mode=event.saved>0?'escaped':'lost';releaseKeys();
-        if(CHECKPOINT&&event.saved>0){pendingWin=event.saved;outside?.showWin(event.saved);}else if(CHECKPOINT){checkpointStatusBar()?.update(state.world,state.mode,state.escape);showCheckpointResult(event);}else showIntakeResult(event);
+        if(CHECKPOINT&&event.saved>0&&LEVEL?.id!=='meg3n-factory'){pendingWin=event.saved;outside?.showWin(event.saved);}else if(CHECKPOINT){checkpointStatusBar()?.update(state.world,state.mode,state.escape);showCheckpointResult(event);}else showIntakeResult(event);
         if(CHECKPOINT){const result=run.finish(event);scoreView.whenReady(result,()=>outside?.getState());window.dispatchEvent(new CustomEvent('pdoom:level-complete',{detail:{levelId:LEVEL.id,nextLevelId:LEVEL.nextLevelId,result}}));}
       }
     }catch(error){console.error('Native event:',error);}}
@@ -217,10 +219,11 @@ function onMessage(m){
   if(combatPos!==-1){try{state.combat=JSON.parse(m.msg.slice(combatPos+13));}catch{}}
   const pos=m.msg.indexOf('PDOOM_STATE ');
   if(pos!==-1&&nativeResume){try{const w=JSON.parse(m.msg.slice(pos+12));if(w.ticks>=nativeResume.after){const done=nativeResume.resolve;nativeResume=null;done();}}catch{}}
-  // MEG3N's factory has no scored run (no PDOOM_RUN_START): walked into from SAFE MODE, its map's
-  // load line starts the level. (Its PDOOM_STATE cannot: a factory already loaded keeps reporting
-  // until the map change, and the loading gate's release would go to that old map.)
-  // Respawning after MEG3N catches you reloads E2M7, which holds at its loading gate again: release it.
+  // On the campaign page the factory's PDOOM_RUN_START (2026-10-21) starts it like levels 1-2, above.
+  // Its own ?level=meg3n-factory page has no run: there the map's load line starts the level. (Its
+  // PDOOM_STATE cannot: a factory already loaded keeps reporting until the map change, and the
+  // loading gate's release would go to that old map.) Respawning after MEG3N catches you reloads
+  // E2M7, which holds at its loading gate again: release it.
   if(!awaitingRun&&LEVEL?.id==='meg3n-factory'&&state.mode==='playing'&&m.msg.includes('PDOOM_MOD_LOADED factory'))for(const evType of ['keydown','keyup'])send({type:'input',target:'window',evType,init:{code:'F4',key:'F4',keyCode:115,which:115,bubbles:true,cancelable:true}});
   if(awaitingRun&&LEVEL?.id==='meg3n-factory'&&m.msg.includes('PDOOM_MOD_LOADED factory')){
     awaitingRun=false;hubBeforeCommit=null;state.prologue=null;storyBeats.reset();scoreView?.reset();state.mod=`p(DOOM): ${LEVEL.title}`;playLevelMusic();
@@ -327,7 +330,7 @@ async function startEngine(id,{load=false,prologue:playPrologue=false,skipOpenin
  if(worker)throw Error('The engine is already running.');
  validateEngine(id);
  // The campaign page runs the scored levels and, from the episode menu, MEG3N's unscored factory.
- LEVEL=getLevel(id);if(!LEVEL||CHECKPOINT&&!LEVEL.scored&&LEVEL.id!=='meg3n-factory')throw Error('THIS LEVEL IS NOT AVAILABLE.');
+ LEVEL=getLevel(id);if(!LEVEL||CHECKPOINT&&!LEVEL.scored)throw Error('THIS LEVEL IS NOT AVAILABLE.');
  // The factory has no hero picker: it plays as the saved campaign's CEO, so its clear joins that save.
  runningCeo=ceoPick?.id||(FACTORY&&CEO_CHOICE.source!=='url'&&readCampaign(ceoStorage)?.ceo)||CEO_CHOICE.id;campaign=new Campaign(ceoStorage,runningCeo);run.level=LEVEL;scoreView?.setLevel(LEVEL);ceoPick?.lock();checkpointStatusBar()?.setCeo(runningCeo);
  // Started cold from the episode menu, the factory has its own HUD, as when walked in (enterLevel).
