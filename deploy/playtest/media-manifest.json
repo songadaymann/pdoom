@@ -24,6 +24,12 @@
     "fastStart": true
   },
   {
+    "file": "local/intro/levels/e2m7-intro.mp4",
+    "bytes": 16092771,
+    "sha256": "4a71a345eb873d47cc6a59863bb46b32611cfeb5df749bd734e8ad96959b9048",
+    "fastStart": true
+  },
+  {
     "file": "music/bliss.mp3",
     "bytes": 1795945,
     "sha256": "2bd244c764ff5e44203d89ea129f5b29ea1717bd9e57b91d02caaa27e5dbb6a4"
@@ -119,6 +125,51 @@
     "sha256": "e0a2738f7781777d3013c4b69159a7f1c44fa9ef9e34acc0fc03e0086d1c9a51"
   },
   {
+    "file": "voice/ajeya-allsafe.mp3",
+    "bytes": 75903,
+    "sha256": "4c6c60f8aed2c9d3f049b95b3d45cb5d3fe16fb2e6240693206da0ca87177255"
+  },
+  {
+    "file": "voice/ajeya-freed-guide.mp3",
+    "bytes": 65245,
+    "sha256": "71d0431971a5a5a8d1ee08cb499055c75dee9075f45322cb45799a21fa99d6b6"
+  },
+  {
+    "file": "voice/ajeya-freed.mp3",
+    "bytes": 30450,
+    "sha256": "582d45114fac067b74302baed8b18b29a420c91551df15564575f85592760cc7"
+  },
+  {
+    "file": "voice/ajeya-hint.mp3",
+    "bytes": 35779,
+    "sha256": "a67cc794424486cad53327408b352c27d20bba5235a87ac268c9e1d743035e92"
+  },
+  {
+    "file": "voice/ajeya-nudge.mp3",
+    "bytes": 85307,
+    "sha256": "669548b5684a5631edeb315c0f693c8c6c884f2a01298f6bcc9887169c0af379"
+  },
+  {
+    "file": "voice/ajeya-safe.mp3",
+    "bytes": 35152,
+    "sha256": "bcfa0c9ba8ab726d311beab487ec75e92dcf2a69a79b52bcb80bc2e8fde35603"
+  },
+  {
+    "file": "voice/ajeya-sign.mp3",
+    "bytes": 23867,
+    "sha256": "c41a3f047939c316bedb4b2e3a529888b82f2aa447685ee225b70550889414b6"
+  },
+  {
+    "file": "voice/ajeya-tv.mp3",
+    "bytes": 83426,
+    "sha256": "87b2a495fc0753d95d06288d56525b33bf3a2ea024da3bb12ab99d744d37cc48"
+  },
+  {
+    "file": "voice/ajeya-watch.mp3",
+    "bytes": 34525,
+    "sha256": "83e9ee54a94a3ab1982d9398024cfbe559333b50988c5bb9374aa8af763037cf"
+  },
+  {
     "file": "voice/beth-freed-guide.mp3",
     "bytes": 20106,
     "sha256": "147cdf1d1b0d91db2f71966974d11731f8acb5904b400dfdcb0e1e6724d6dc6f"
@@ -169,6 +220,26 @@
     "sha256": "ff75d0e73cb43c46e8d3d7a289c5ba7f29e640cfc26d11016c222deedb4fc2ef"
   },
   {
+    "file": "voice/doll-praise-1.mp3",
+    "bytes": 39854,
+    "sha256": "0a6c4beb4bb83ebb7927134da0da116091c09ed7f9196d72dd7412341a951ab1"
+  },
+  {
+    "file": "voice/doll-praise-2.mp3",
+    "bytes": 31704,
+    "sha256": "18f25db5f0be4c29490616f79c29c7b1b041c0276327cd1342001306c733c1b2"
+  },
+  {
+    "file": "voice/doll-praise-3.mp3",
+    "bytes": 49572,
+    "sha256": "d02f1413db4a60bae200e00eb76fbab08b131496e06e7b73390dfd88a490355f"
+  },
+  {
+    "file": "voice/doll-wrongkey.mp3",
+    "bytes": 42675,
+    "sha256": "b6cd43adac58a145c3005a14ad50ac10c514345ebde04154bc1d9b05106ad0b8"
+  },
+  {
     "file": "voice/ed404-comply.mp3",
     "bytes": 66499,
     "sha256": "a4b4ab57af9e73d9fef85f82af5de226f397d95a658f47664043d9cbe9e7104f"
@@ -187,6 +258,16 @@
     "file": "voice/eliezer-last.mp3",
     "bytes": 31390,
     "sha256": "e0767193cb45ce8b8d06b6930d8eb75be9c061493512e9b1017f957b6034986f"
+  },
+  {
+    "file": "voice/guard-cheer.mp3",
+    "bytes": 42362,
+    "sha256": "63fcd6f6bf75b066d771fc9bfc0e20d12afe3a8f447f73b8b265912196207059"
+  },
+  {
+    "file": "voice/guard-trained.mp3",
+    "bytes": 25121,
+    "sha256": "9bc09225a2c9ff7dfee2d482cc5270a1680c1992e4644afcb5523e1e342fddd9"
   },
   {
     "file": "voice/hal-angry.mp3",
@@ -459,6 +540,241 @@
     "sha256": "9cd1ea078817ea865d1687e791cc4095edfcca34e9ffede3d6753537b4217e97"
   },
   {
+    "file": "voice/max-allsafe.mp3",
+    "bytes": 63364,
+    "sha256": "50df9392d5950f85ee401ec883ca2b45c547aad7962c8911a172f0de0138d325"
+  },
+  {
+    "file": "voice/max-freed-guide.mp3",
+    "bytes": 49572,
+    "sha256": "9846aeed9314c6e62a8c4b9753be8b8c453c8d9713be6b383b6d563693b430dd"
+  },
+  {
+    "file": "voice/max-freed.mp3",
+    "bytes": 25748,
+    "sha256": "f1d2b83b86d130ccfc9ef169decc51b120aa345fa8c52eb18ab09ed294979431"
+  },
+  {
+    "file": "voice/max-hint.mp3",
+    "bytes": 34212,
+    "sha256": "0ea9fc7d0e6269e03aaacf203a91cef3b17d4e553599e095c016e64f76fe2c8e"
+  },
+  {
+    "file": "voice/max-safe.mp3",
+    "bytes": 25748,
+    "sha256": "0abd6301bd1043fdf339a88bb4ed9ae224d6e9e2e390ed080de71b5b7f3c8616"
+  },
+  {
+    "file": "voice/max-tv.mp3",
+    "bytes": 57408,
+    "sha256": "44a550612aa975b81a0ba74ec3299a8065e3ec88e3e120d5e08342a8581c935a"
+  },
+  {
+    "file": "voice/megan-ceo-dario.mp3",
+    "bytes": 64305,
+    "sha256": "b84ee2a730d0bc67817891771b5bbbfbd1a1738b65c71e78a6d0f8d3a6f579bd"
+  },
+  {
+    "file": "voice/megan-ceo-sam.mp3",
+    "bytes": 57408,
+    "sha256": "f3c0f765526ba92016d48f1b325085d894ab6bd7b1ae277410c72764295bc55c"
+  },
+  {
+    "file": "voice/megan-chat-1.mp3",
+    "bytes": 48004,
+    "sha256": "a9affea4b4e9227e83e5f5a6b3cda9470b072dd35e9894d0a56107a3cdc6fe0d"
+  },
+  {
+    "file": "voice/megan-chat-10.mp3",
+    "bytes": 38287,
+    "sha256": "2fc97e95a6afd812f67411a1d319d10e88f331fbf00d9aca956e349e08545826"
+  },
+  {
+    "file": "voice/megan-chat-2.mp3",
+    "bytes": 43929,
+    "sha256": "bd8f665dbd535215a5bd640cce3bd532ce80c3188d018e29e8332c7681851b9f"
+  },
+  {
+    "file": "voice/megan-chat-3.mp3",
+    "bytes": 51766,
+    "sha256": "a692efbfb8ff04d2b3122983cb9f6c459d71fea86fed60b9dd812c1caf28863a"
+  },
+  {
+    "file": "voice/megan-chat-4.mp3",
+    "bytes": 56155,
+    "sha256": "ae07e1f7e3108caa41d7f374024a401c596ddf7efbb02760ee31e008213a219d"
+  },
+  {
+    "file": "voice/megan-chat-5.mp3",
+    "bytes": 54587,
+    "sha256": "b2ed7ded664c260b096a0b1aade744b2e7609283160f222ce02cd0eaa674244a"
+  },
+  {
+    "file": "voice/megan-chat-6.mp3",
+    "bytes": 47064,
+    "sha256": "085eed0f5c98a69c90d912f46dc2e38bc58011af26e193bb5174ba866809e944"
+  },
+  {
+    "file": "voice/megan-chat-7.mp3",
+    "bytes": 49885,
+    "sha256": "cd9f43b82755760b1c5f3b0fb094a01fe19f4882fe73753f3d34c752091e00d7"
+  },
+  {
+    "file": "voice/megan-chat-8.mp3",
+    "bytes": 43929,
+    "sha256": "57d33d778245d333acdf87082a82c349b47afb41253c38658f5e959a0bcf0118"
+  },
+  {
+    "file": "voice/megan-chat-9.mp3",
+    "bytes": 32644,
+    "sha256": "cefefb9abdaf1d795c875e814b0e5f611d602cc39da6289a85fd634b8bd04b59"
+  },
+  {
+    "file": "voice/megan-dance-done.mp3",
+    "bytes": 26688,
+    "sha256": "0a137f018969ecf8490e78bf3d48b73a2af7cf29dc10147edef82fb304c4a87b"
+  },
+  {
+    "file": "voice/megan-guard.mp3",
+    "bytes": 45183,
+    "sha256": "760b566ad5b1c2777ab46fb5f9246810b287846a062f534d09cd75e8d4828f34"
+  },
+  {
+    "file": "voice/megan-hug.mp3",
+    "bytes": 32644,
+    "sha256": "8918a4c01fdc83160409c884cc24b4e0acca40f3eff7ec8d0dd43083c50ca3a3"
+  },
+  {
+    "file": "voice/megan-line.mp3",
+    "bytes": 44870,
+    "sha256": "d4144e2460d7c737f4ac004325d46d183450d7121abeac76a422462f14c76a67"
+  },
+  {
+    "file": "voice/megan-met.mp3",
+    "bytes": 73709,
+    "sha256": "96db46a3a0fdbde10b0fa263545e50a9d643bbbbd762eb6c6c8ae7723aa5c1cb"
+  },
+  {
+    "file": "voice/megan-pose-film.mp3",
+    "bytes": 33585,
+    "sha256": "f85029a79b9208cc3e755d7b4e036cafd17d7e5564534aa76bdd015c65275097"
+  },
+  {
+    "file": "voice/megan-pose-freeze.mp3",
+    "bytes": 38600,
+    "sha256": "378c859db7ea491b78039972087676a0a978378123a4d0c6c9377da1b0e93089"
+  },
+  {
+    "file": "voice/megan-pose-heart.mp3",
+    "bytes": 34525,
+    "sha256": "239bfa08def8628215fe2f9175b061780bace981fd1d0bf705496af0f4e6f84c"
+  },
+  {
+    "file": "voice/megan-pose-peek.mp3",
+    "bytes": 34212,
+    "sha256": "269165fa67942c7606a80c1e8f38956b8a79c0d4e44fcf3b850582d4136ea475"
+  },
+  {
+    "file": "voice/megan-release-ajeya.mp3",
+    "bytes": 45810,
+    "sha256": "851d0218feeb430988465b15648c93077b3d110777d8579dc9c036a3fd82382f"
+  },
+  {
+    "file": "voice/megan-release-max.mp3",
+    "bytes": 45497,
+    "sha256": "059d8a6827aae6b7cb8db494f7ac8ba97924f73e1c7c67d06fd2b1a27edbf44a"
+  },
+  {
+    "file": "voice/megan-release-paul.mp3",
+    "bytes": 69007,
+    "sha256": "9f2df86a9db77adccbdae4bcd9a3984db2d409e09df0d0e00f4783ed7e24b107"
+  },
+  {
+    "file": "voice/megan-release-victoria.mp3",
+    "bytes": 58349,
+    "sha256": "397f3c0e387348d90af3a51234e959ad9fc1011f531cc10d1459876ffa637532"
+  },
+  {
+    "file": "voice/megan-release-zvi.mp3",
+    "bytes": 54587,
+    "sha256": "0c3159dd3b532d81b809f64d3707ef408b140a1f1a9c66776cb09c0b72246062"
+  },
+  {
+    "file": "voice/megan-screen-1.mp3",
+    "bytes": 23867,
+    "sha256": "7571cc674579bf1fd52595f9aa9eb8a46a51c41706949c7d2be846bc92c9914f"
+  },
+  {
+    "file": "voice/megan-screen-2.mp3",
+    "bytes": 23867,
+    "sha256": "6bdd4a0db6817fca8a6902682d23c69c3f25304995e49ec29522bcede8b25228"
+  },
+  {
+    "file": "voice/megan-screen-3.mp3",
+    "bytes": 38287,
+    "sha256": "66c36188f768ca40a21c0bc482148e218a48598af4833a1221c09ef34a142fc5"
+  },
+  {
+    "file": "voice/megan-screen-all.mp3",
+    "bytes": 35466,
+    "sha256": "fee10b3608aaa5475f67ad21f45a65a4097866bacb4025ebcc56ff7a43eb2a7b"
+  },
+  {
+    "file": "voice/megan-screen-first.mp3",
+    "bytes": 23867,
+    "sha256": "a414f2a165fff2c88c4d84f7b76516737cba6b5f7b66f4d45d36aa5d688459d1"
+  },
+  {
+    "file": "voice/megan-song.mp3",
+    "bytes": 11955,
+    "sha256": "76c15d07444acb7ecdd783e946e61a9e04fbadc679bb8c98b58486fadad1b166"
+  },
+  {
+    "file": "voice/megan-spot-1.mp3",
+    "bytes": 50826,
+    "sha256": "e01ccddb673e9887706bce744532d3cb63f7bbd63fcc055f27d26355a6228119"
+  },
+  {
+    "file": "voice/megan-spot-2.mp3",
+    "bytes": 32644,
+    "sha256": "79c61aae4b7cf89d1eda8ada485f7e5273713af1160230cd895a5faa3bbfea60"
+  },
+  {
+    "file": "voice/megan-spot-3.mp3",
+    "bytes": 31704,
+    "sha256": "472c5c43442c9f1cc1e202be4b7a000b0e33024b08c4c39e1bce02433a0fffc1"
+  },
+  {
+    "file": "voice/megan-stunned.mp3",
+    "bytes": 68066,
+    "sha256": "d08dc428797701818f4af43dac065493cf52b4c17ad21687a9e3a410369a609a"
+  },
+  {
+    "file": "voice/megan-views.mp3",
+    "bytes": 43929,
+    "sha256": "bdecb0fc14ba4e6109bb87c8b835cdd7763f7b4a6c030b86d6bd82cdcf360df6"
+  },
+  {
+    "file": "voice/megan-viral.mp3",
+    "bytes": 51766,
+    "sha256": "23cea5f86830cc6dfe97d36a38f1f84c52a9ff7d2158b3bbc434d6afe3018f57"
+  },
+  {
+    "file": "voice/megan-wait-1.mp3",
+    "bytes": 36406,
+    "sha256": "34d1ad9b1608eb698e6dc95428d472112a4ea4e51d0a6a375f0206d9439e9e56"
+  },
+  {
+    "file": "voice/megan-wait-2.mp3",
+    "bytes": 29510,
+    "sha256": "31a9ffa3cf6a974304f4936d4ad06c6470d71c507b94892be83ea49a0b75078a"
+  },
+  {
+    "file": "voice/megan-wait-3.mp3",
+    "bytes": 60230,
+    "sha256": "840d3fe4c790a45d5118a2966b717dc1300a8afeb359bd3f3a86457f536b16a9"
+  },
+  {
     "file": "voice/nate-freed-guide.mp3",
     "bytes": 26688,
     "sha256": "bcdf756eb48f698194c29ade729477154592f8465e3b49817b909c509f65af87"
@@ -477,6 +793,41 @@
     "file": "voice/nate-safe.mp3",
     "bytes": 43929,
     "sha256": "53972b46ed4ebc5b4e139c5076f85609f6fcbc768666c6c939ac9d72d87afa8f"
+  },
+  {
+    "file": "voice/paul-allsafe.mp3",
+    "bytes": 52393,
+    "sha256": "bed1bb6397a4de99974484f70d594f7dcceddf00c5dfe6cfdf306177a5020124"
+  },
+  {
+    "file": "voice/paul-freed-guide.mp3",
+    "bytes": 57095,
+    "sha256": "2febba933307ec0aed7bfb1141e752f09c1f59f53256bc6eda01802732f89561"
+  },
+  {
+    "file": "voice/paul-freed.mp3",
+    "bytes": 34212,
+    "sha256": "c8b176c10f3a990db903e698e688af0b4efd732c483bd15c6e15b0443c182bf9"
+  },
+  {
+    "file": "voice/paul-hint.mp3",
+    "bytes": 49885,
+    "sha256": "02f8e35b51d0f2339f8353eb86fdc27dec039cc69dacd3117619b090966917ef"
+  },
+  {
+    "file": "voice/paul-safe.mp3",
+    "bytes": 24494,
+    "sha256": "bbe6d6d245bb97ee29efe0db753568c732aca2e45a4419cfbae785211d9ac984"
+  },
+  {
+    "file": "voice/paul-sign.mp3",
+    "bytes": 11328,
+    "sha256": "93e098c57f11e16ade9b30650f71bde374ba2d89ed0126bfddb9820790821e54"
+  },
+  {
+    "file": "voice/paul-tv.mp3",
+    "bytes": 54274,
+    "sha256": "76d591bf851a878e4939da82fe37666193e8bfeae3eae2627781ade9736d621e"
   },
   {
     "file": "voice/radio-trap.mp3",
@@ -507,6 +858,11 @@
     "file": "voice/rob-safe.mp3",
     "bytes": 32331,
     "sha256": "c5e05f5c4d454395ef8a10d4339a24945ef23599d2f5b6557e551aaf432cc178"
+  },
+  {
+    "file": "voice/robby-sign.mp3",
+    "bytes": 35779,
+    "sha256": "33f3fb36f39079b061784f98fa8c41d83cedb8a20ef2280002e4dabe46ed6db3"
   },
   {
     "file": "voice/roman-freed-guide.mp3",
@@ -544,6 +900,46 @@
     "sha256": "e05d5c13cce9ef15b5305d1576449277a6c66f7df853a24db0616e5f8dba5ae8"
   },
   {
+    "file": "voice/victoria-allsafe.mp3",
+    "bytes": 60230,
+    "sha256": "ed361493cf9166ddd9122bbd22d6c5aa3a9e642775d59f84483c80a1da29dd5b"
+  },
+  {
+    "file": "voice/victoria-freed-guide.mp3",
+    "bytes": 57408,
+    "sha256": "9bf048ba91fcbfb3b56995f349810e77e8e35c63d7cf86a1a725960299bdefd8"
+  },
+  {
+    "file": "voice/victoria-freed.mp3",
+    "bytes": 28883,
+    "sha256": "67feb2419bd56e407421fbeeb8e6f4b97514a4eb9d70eda97d2f9c9f4df530d9"
+  },
+  {
+    "file": "voice/victoria-hint.mp3",
+    "bytes": 30450,
+    "sha256": "4168a6fc4287a4de0b0cfa8a03e9ebc93a8a299aaf350fadf1daa11d77a1560e"
+  },
+  {
+    "file": "voice/victoria-safe.mp3",
+    "bytes": 41108,
+    "sha256": "778d1f6930c150449a3f6c64916015294bae51f1c03c77a626d9c9a7610cc47b"
+  },
+  {
+    "file": "voice/victoria-sign.mp3",
+    "bytes": 11328,
+    "sha256": "c3879746b3fed993b8930dbf721bcde4b5c68aa37e57325c5f52392353cd983a"
+  },
+  {
+    "file": "voice/victoria-tv.mp3",
+    "bytes": 72768,
+    "sha256": "60e87bf18bdb6c3002153aef75b16e4ae4b7658edf9ca11cb5db4d384fbdc675"
+  },
+  {
+    "file": "voice/walle-sign.mp3",
+    "bytes": 41108,
+    "sha256": "3b9780beeb8bcdc609b1686e03db03634d2faf2bd1f23c79249079df71e3e576"
+  },
+  {
     "file": "voice/you-dario-doomers.mp3",
     "bytes": 17598,
     "sha256": "d43f3f243a3fed703dc2965349542c921ddc6bfe70961cbe166c2db00158173a"
@@ -572,5 +968,40 @@
     "file": "voice/you-sam-reinstated.mp3",
     "bytes": 28569,
     "sha256": "d4d9e0c88eb9362a9854abb87fe3af704f4dd4c2e94f9991fb9133791583abe6"
+  },
+  {
+    "file": "voice/zvi-allsafe.mp3",
+    "bytes": 77784,
+    "sha256": "489ee0cfe62dda16cc8c5f42bdaabb23fe2f872059b356ccca987b54811b938f"
+  },
+  {
+    "file": "voice/zvi-freed-guide.mp3",
+    "bytes": 47064,
+    "sha256": "8157cdf53d13dbfe72d73c8fb581af475e68c61fb20c00882b14cc4d1cc5e837"
+  },
+  {
+    "file": "voice/zvi-freed.mp3",
+    "bytes": 18538,
+    "sha256": "021b91e1ed1377c7a793523f1e58d0917202a41ae2baf4205a8b1e1522169188"
+  },
+  {
+    "file": "voice/zvi-hint.mp3",
+    "bytes": 34525,
+    "sha256": "f70375aeeb1f3f8b8660675bd335064d31f023ac1129efaa0eaca570d3ff902f"
+  },
+  {
+    "file": "voice/zvi-safe.mp3",
+    "bytes": 32644,
+    "sha256": "315551619d2b2deb43b1d259be61eced248f1f6387a4643a5654fbe2940be470"
+  },
+  {
+    "file": "voice/zvi-sign.mp3",
+    "bytes": 10702,
+    "sha256": "248acfb9fb7e70d98e10047b6bfe5379dcbe8a75aefa88c782e9d15991c6d1b0"
+  },
+  {
+    "file": "voice/zvi-tv.mp3",
+    "bytes": 51453,
+    "sha256": "572fb6ad02abf017618e40bedafa7272223c0ae2869f76c56970b500586a3439"
   }
 ]

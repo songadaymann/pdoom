@@ -26,6 +26,12 @@ The existing friends playtest stays available for rollback. The game remains fre
 - Requires current desktop Chrome/Edge with WebAssembly JSPI. Phone/tablet checks are emulated UI checks; physical mobile native-engine compatibility is not claimed in the catalog.
 - The previous friends preview remains available for rollback.
 
+## Level 3 released 2026-10-21
+
+- Game `mann-cool-pdoom` version `6c920d3c-874d-41e2-9150-ebd684205d06` from `main` (`01e5c26`): MEG3N's Toy Factory (E2M7) in the campaign (episode menu SPAWNING CHATS and SAFE MODE's MEG3N.AVI door), with its voice takes, intro film, live-feed screens, the Doom status bar and levels 1-2's exit text screens. The live pk3 is byte-identical to the local build.
+- Central Worker `mann-cool` version `c87c34d3-41f4-4a3e-8d50-83f51cbbcf75` from `redesign/platform-v1` (`225f564`, on top of the already-deployed PR #4): the Level 3 board `meg3n-factory-rescue-v1` is registered and validated (20 screens, board v1, 3-minute review floor). Live reads: all three boards 200; an unknown variant 400; a ticketless POST 401.
+- Live checks: canonical host smoke (both earlier levels, Load Game into SAFE MODE, phone menu); canonical shell smoke on desktop, phone and tablet (3 total-score level tabs, Tip, Support, guestbook, single play); a fresh SPAWNING CHATS run on mann.cool boots E2M7 as a rankable run with SCRN 0/20. No score submissions, guestbook posts or email requests were made.
+
 The public `?safemode=1` shortcut is retired. SAFE MODE remains accessible through
 normal progression and Load Game. The fixture is available only on loopback with
 `dev-config.enabled: true`.

@@ -13,7 +13,7 @@ try{
  await shell.locator('[data-tip]').waitFor({state:'visible'});assert.equal(await shell.locator('[data-tip]').getAttribute('href'),'https://mann.cool/tip?from=pdoom');
  const restart=await p.locator('#restart').boundingBox(),tip=await shell.locator('[data-tip]').boundingBox();assert.ok(restart.x+restart.width<=tip.x||restart.y>=tip.y+tip.height||restart.y+restart.height<=tip.y,'restart clear of tip');
  await p.screenshot({path:`${out}/${name}-meadow.png`});
- await shell.locator('.menu-button').click();assert.equal(await shell.locator('[data-patreon]').getAttribute('href'),'http://songaday.studio');
+ await shell.locator('.menu-button').click();assert.equal(await shell.locator('[data-support]').getAttribute('href'),'https://songaday.studio/?from=pdoom#donate');
  assert.equal(await shell.getByText('Guestbook ↗',{exact:true}).getAttribute('href'),'https://mann.cool/?guestbook=1');
  await shell.locator('[data-open="leaderboard"]').click();const tabs=shell.locator('[data-leaderboard-board]');assert.equal(await tabs.count(),3);
  for(let i=0;i<3;i++){
@@ -28,7 +28,7 @@ try{
  await shell.locator('[data-modal="leaderboard"] .close').click();await shell.locator('.menu-button').click();await shell.locator('[data-open="player"]').click();await shell.locator('[data-player-step="email"] input').waitFor({state:'visible'});
  await shell.locator('[data-modal="player"] .close').click();
  if(!touch){await p.keyboard.press('f');await p.waitForFunction(()=>!!document.fullscreenElement);await p.keyboard.press('f');await p.waitForFunction(()=>!document.fullscreenElement);await p.keyboard.press('Tab');}
- assert.equal(plays,1,'one automatic play');report.cases.push(`${name}: themed shell, HUD clearance, Tip, Patreon, guestbook link, 3 total-score level tabs, player panel, single play`);await ctx.close();
+ assert.equal(plays,1,'one automatic play');report.cases.push(`${name}: themed shell, HUD clearance, Tip, Support, guestbook link, 3 total-score level tabs, player panel, single play`);await ctx.close();
  }
  const ctx=await b.newContext({viewport:{width:1280,height:800}}),p=await ctx.newPage();
  await p.goto('https://mann.cool/?guestbook=1');await p.getByRole('dialog',{name:'Guestbook'}).waitFor();await p.waitForFunction(()=>!document.querySelector('.guestbook-entries')?.textContent.includes('Loading'));
