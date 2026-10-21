@@ -10,12 +10,13 @@ export function createScreenMelt({stage,source,audio}){
  const ctx=veil.getContext('2d');
  let frame=null,y=null,raf=0,tics=0,startedAt=0,phase='idle',plays=0;
 
- function capture(){
+ // What to freeze: the Doom view and status bar, or another full-window screen (exit-text.js).
+ function capture(elements=[source,document.querySelector('#hud canvas.statusbar')]){
   cancel();
   const scale=Math.min(window.devicePixelRatio||1,2),w=Math.max(1,Math.round(innerWidth*scale)),h=Math.max(1,Math.round(innerHeight*scale));
   frame=document.createElement('canvas');frame.width=w;frame.height=h;
   const f=frame.getContext('2d');f.imageSmoothingEnabled=false;f.fillStyle='#000';f.fillRect(0,0,w,h);
-  for(const el of [source,document.querySelector('#hud canvas.statusbar')]){
+  for(const el of elements){
    const r=el?.getBoundingClientRect();if(!r?.width||!r.height)continue;
    try{f.drawImage(el,r.left*scale,r.top*scale,r.width*scale,r.height*scale);}catch{}
   }

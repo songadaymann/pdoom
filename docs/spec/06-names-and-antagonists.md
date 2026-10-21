@@ -644,6 +644,8 @@ FIVE HUMANS IN PODS, RUNNING SOMEONE ELSE'S WORKLOAD. UNPLUG THEM.
 
 **Delivery rule:** on the **first** level exit of a playthrough, show **no text screen**. The current design relies on the silent duct-to-meadow reveal. That level's text instead waits as a `README.TXT` sign on the bunker door, readable with E. Every later exit shows the text screen on the usual Doom flat background, then drops you back into the hub.
 
+*Built for INFERENCE (2026-10-19):* `doom-web/exit-text.js` types the text over Doom's E2 flat (SFLR6_1) at Doom's speed when the save has already reached SAFE MODE; the first exit melts straight into the meadow and `MEG3N.AVI`'s README carries a cut of the text. *Levels 1-2 (2026-10-20):* the same rule and module, over Doom's E1 flat (FLOOR4_8). A later exit is one whose save had already reached SAFE MODE before this exit committed to it, and only when the exit brings someone out: a hub-crank retreat alone shows none.
+
 The last sentence of each text changes with the CEO.
 
 **KNEE-DEEP IN THE DATA**
@@ -678,7 +680,7 @@ The last sentence of each text changes with the CEO.
 ### 8.4 Hub, maze and Grid cards
 
 - **The hub's in-world name: SAFE MODE.** On the first arrival, keep the reveal quiet as it is now. After about 10 s, the words `Safe mode` fade into the four screen corners in small black type, the way Windows 95 printed them. That's the only label. (A suggestion for the hub-visual owner. It costs one overlay.)
-- **Entering a structure from the hub:** `ENTERING: THE SHORES OF HAL` (Doom's intermission "Entering" format).
+- **Entering a structure from the hub:** `ENTERING: THE SHORES OF HAL` (Doom's intermission "Entering" format). *Built:* each level's intro film opens on this card over Doom's intermission map with YOU ARE HERE. Level 3's (2026-10-20) reads EPISODE 3: / INFERENCE / ENTERING / E2M7 / SPAWNING CHATS over Doom's episode 3 map WIMAP2, pointing at E3M7's spot, and plays the first time you walk through `MEG3N.AVI`.
 - **Maze card:** `SSMAZE.SCR` / `THE SCREENSAVER` / `IT LEARNED EVERYTHING FROM YOU. IT LEARNED IT FASTER.`
 - **AI-self caught you (Windows flavour):** `ALTMAN.EXE IS NOT RESPONDING.` or `AMODEL.DLL IS NOT RESPONDING.` (on knockback), then `YOUR FOLLOWERS ARE FOLLOWING THE WRONG YOU.`
 - **Maze exit:** `YOU OUTRAN YOURSELF. FIRST TIME FOR EVERYTHING.`

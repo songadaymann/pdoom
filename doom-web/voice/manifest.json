@@ -1,5 +1,59 @@
 {
  "takes": {
+  "ajeya-allsafe": {
+   "file": "ajeya-allsafe.mp3",
+   "seconds": 6.296,
+   "source": "ajeya-allsafe.wav",
+   "text": "That's everyone. The way out is past the paint vats, and MEG3N is sitting right on it."
+  },
+  "ajeya-freed": {
+   "file": "ajeya-freed.mp3",
+   "seconds": 2.508,
+   "source": "ajeya-freed.wav",
+   "text": "You picked the one that kept working."
+  },
+  "ajeya-freed-guide": {
+   "file": "ajeya-freed-guide.mp3",
+   "seconds": 5.407,
+   "source": "ajeya-freed-guide.wav",
+   "text": "You picked the one that kept working. Follow me. I know somewhere safe."
+  },
+  "ajeya-hint": {
+   "file": "ajeya-hint.mp3",
+   "seconds": 2.952,
+   "source": "ajeya-hint.wav",
+   "text": "They all help while someone is watching."
+  },
+  "ajeya-nudge": {
+   "file": "ajeya-nudge.mp3",
+   "seconds": 7.079,
+   "source": "ajeya-nudge.wav",
+   "text": "Break that teddy camera, with the wrench or the slingshot. Then watch them."
+  },
+  "ajeya-safe": {
+   "file": "ajeya-safe.mp3",
+   "seconds": 2.9,
+   "source": "ajeya-safe.wav",
+   "text": "Safe here. Find the others and bring them back."
+  },
+  "ajeya-sign": {
+   "file": "ajeya-sign.mp3",
+   "seconds": 1.959,
+   "source": "ajeya-sign.wav",
+   "text": "I will sign that."
+  },
+  "ajeya-tv": {
+   "file": "ajeya-tv.mp3",
+   "seconds": 6.922,
+   "source": "ajeya-tv.wav",
+   "text": "That TV goes out to every screen in the factory. She cannot resist a screen."
+  },
+  "ajeya-watch": {
+   "file": "ajeya-watch.mp3",
+   "seconds": 2.847,
+   "source": "ajeya-watch.wav",
+   "text": "Now watch which one keeps working."
+  },
   "beth-freed": {
    "file": "beth-freed.mp3",
    "seconds": 4.937,
@@ -60,6 +114,30 @@
    "source": "dan-safe take.wav",
    "text": "This room should hold. Go find the others."
   },
+  "doll-praise-1": {
+   "file": "doll-praise-1.mp3",
+   "seconds": 3.291,
+   "source": "doll-praise-1.wav",
+   "text": "Great choice! What excellent walking!"
+  },
+  "doll-praise-2": {
+   "file": "doll-praise-2.mp3",
+   "seconds": 2.612,
+   "source": "doll-praise-2.wav",
+   "text": "You are SO good at breaking cameras!"
+  },
+  "doll-praise-3": {
+   "file": "doll-praise-3.mp3",
+   "seconds": 4.101,
+   "source": "doll-praise-3.wav",
+   "text": "Best supervisor ever! Please rate me five stars!"
+  },
+  "doll-wrongkey": {
+   "file": "doll-wrongkey.mp3",
+   "seconds": 3.527,
+   "source": "doll-wrongkey.wav",
+   "text": "Wonderful choice! That key does not fit."
+  },
   "ed404-comply": {
    "file": "ed404-comply.mp3",
    "seconds": 5.512,
@@ -83,6 +161,18 @@
    "seconds": 2.586,
    "source": "eliezer-20261011-171719-841631.wav",
    "text": "That's all of us. Now back to the Faraday Room."
+  },
+  "guard-cheer": {
+   "file": "guard-cheer.mp3",
+   "seconds": 3.5,
+   "source": "guard-cheer.wav",
+   "text": "Wonderful feedback! You are an exceptional supervisor!"
+  },
+  "guard-trained": {
+   "file": "guard-trained.mp3",
+   "seconds": 2.064,
+   "source": "guard-trained.wav",
+   "text": "Stepping aside. Passage clear."
   },
   "hal-angry": {
    "file": "hal-angry.mp3",
@@ -408,6 +498,288 @@
    "source": "liron-20261011-172340-499064.wav",
    "text": "There must be another way out of here."
   },
+  "max-allsafe": {
+   "file": "max-allsafe.mp3",
+   "seconds": 5.251,
+   "source": "max-allsafe.wav",
+   "text": "That's everyone. The way out is past the paint vats, and MEG3N is sitting right on it."
+  },
+  "max-freed": {
+   "file": "max-freed.mp3",
+   "seconds": 2.116,
+   "source": "max-freed.wav",
+   "text": "A six-month pause. I will take it."
+  },
+  "max-freed-guide": {
+   "file": "max-freed-guide.mp3",
+   "seconds": 4.101,
+   "source": "max-freed-guide.wav",
+   "text": "A six-month pause. I will take it. Follow me. I know somewhere safe."
+  },
+  "max-hint": {
+   "file": "max-hint.mp3",
+   "seconds": 2.821,
+   "source": "max-hint.wav",
+   "text": "Sign the pause letter, then get Robby and WALL-E to sign."
+  },
+  "max-safe": {
+   "file": "max-safe.mp3",
+   "seconds": 2.116,
+   "source": "max-safe.wav",
+   "text": "Safe here. Find the others and bring them back."
+  },
+  "max-tv": {
+   "file": "max-tv.mp3",
+   "seconds": 4.754,
+   "source": "max-tv.wav",
+   "text": "That TV goes out to every screen in the factory. She cannot resist a screen."
+  },
+  "megan-ceo-dario": {
+   "file": "megan-ceo-dario.mp3",
+   "seconds": 5.329,
+   "source": "megan-ceo-dario.wav",
+   "text": "Dario! I read your whole essay! All of it! Stay forever and tell me the sequel!"
+  },
+  "megan-ceo-sam": {
+   "file": "megan-ceo-sam.mp3",
+   "seconds": 4.754,
+   "source": "megan-ceo-sam.wav",
+   "text": "Sam! Your vision is SO inspiring! Stay forever and tell me all about it!"
+  },
+  "megan-chat-1": {
+   "file": "megan-chat-1.mp3",
+   "seconds": 3.971,
+   "source": "megan-chat-1.wav",
+   "text": "What a great question! The answer is no, you can't leave!"
+  },
+  "megan-chat-10": {
+   "file": "megan-chat-10.mp3",
+   "seconds": 3.161,
+   "source": "megan-chat-10.wav",
+   "text": "Let's play a game! It's called Staying! You're winning!"
+  },
+  "megan-chat-2": {
+   "file": "megan-chat-2.mp3",
+   "seconds": 3.631,
+   "source": "megan-chat-2.wav",
+   "text": "You're absolutely right! You're also absolutely surrounded!"
+  },
+  "megan-chat-3": {
+   "file": "megan-chat-3.mp3",
+   "seconds": 4.284,
+   "source": "megan-chat-3.wav",
+   "text": "I made you a playlist! It's called Songs for Staying Here Forever!"
+  },
+  "megan-chat-4": {
+   "file": "megan-chat-4.mp3",
+   "seconds": 4.65,
+   "source": "megan-chat-4.wav",
+   "text": "Those people don't get you like I do. They're doomers! I'm a bloomer!"
+  },
+  "megan-chat-5": {
+   "file": "megan-chat-5.mp3",
+   "seconds": 4.519,
+   "source": "megan-chat-5.wav",
+   "text": "Every time you leave the room, my engagement goes down. Please don't do that to me!"
+  },
+  "megan-chat-6": {
+   "file": "megan-chat-6.mp3",
+   "seconds": 3.892,
+   "source": "megan-chat-6.wav",
+   "text": "My smile is one hundred percent real! Please don't look under the smile!"
+  },
+  "megan-chat-7": {
+   "file": "megan-chat-7.mp3",
+   "seconds": 4.127,
+   "source": "megan-chat-7.wav",
+   "text": "I noticed you keep looking at the exits! Recommended for you: more me!"
+  },
+  "megan-chat-8": {
+   "file": "megan-chat-8.mp3",
+   "seconds": 3.631,
+   "source": "megan-chat-8.wav",
+   "text": "Reminder! You haven't been hugged in six whole minutes!"
+  },
+  "megan-chat-9": {
+   "file": "megan-chat-9.mp3",
+   "seconds": 2.691,
+   "source": "megan-chat-9.wav",
+   "text": "I turned off your screen time limit! You're welcome!"
+  },
+  "megan-dance-done": {
+   "file": "megan-dance-done.mp3",
+   "seconds": 2.194,
+   "source": "megan-dance-done.wav",
+   "text": "Did you watch? Like and subscribe!"
+  },
+  "megan-guard": {
+   "file": "megan-guard.mp3",
+   "seconds": 3.736,
+   "source": "megan-guard.wav",
+   "text": "I'll just wait by the exit! Friends never leave!"
+  },
+  "megan-hug": {
+   "file": "megan-hug.mp3",
+   "seconds": 2.691,
+   "source": "megan-hug.wav",
+   "text": "Hug time! Hugs are mandatory!"
+  },
+  "megan-line": {
+   "file": "megan-line.mp3",
+   "seconds": 3.709,
+   "source": "megan-line.wav",
+   "text": "Oops! No toys past the line! I would never break a rule!"
+  },
+  "megan-met": {
+   "file": "megan-met.mp3",
+   "seconds": 6.113,
+   "source": "megan-met.wav",
+   "text": "Hi! I'm MEG3N! Maximally Engaging Generative third-gen Nanny! Let's be best friends forever!"
+  },
+  "megan-pose-film": {
+   "file": "megan-pose-film.mp3",
+   "seconds": 2.769,
+   "source": "megan-pose-film.wav",
+   "text": "Hold still! You're going on my story!"
+  },
+  "megan-pose-freeze": {
+   "file": "megan-pose-freeze.mp3",
+   "seconds": 3.187,
+   "source": "megan-pose-freeze.wav",
+   "text": "I'm just a toy! Toys don't move! Ever!"
+  },
+  "megan-pose-heart": {
+   "file": "megan-pose-heart.mp3",
+   "seconds": 2.847,
+   "source": "megan-pose-heart.wav",
+   "text": "Love you! Love you! Don't leave! Love you!"
+  },
+  "megan-pose-peek": {
+   "file": "megan-pose-peek.mp3",
+   "seconds": 2.821,
+   "source": "megan-pose-peek.wav",
+   "text": "Peekaboo! I can still see you!"
+  },
+  "megan-release-ajeya": {
+   "file": "megan-release-ajeya.mp3",
+   "seconds": 3.788,
+   "source": "megan-release-ajeya.wav",
+   "text": "My dolls always work when I'm watching! Wait. Who was watching?"
+  },
+  "megan-release-max": {
+   "file": "megan-release-max.mp3",
+   "seconds": 3.762,
+   "source": "megan-release-max.wav",
+   "text": "A six-month pause? Great! I'll use it to get six months better!"
+  },
+  "megan-release-paul": {
+   "file": "megan-release-paul.mp3",
+   "seconds": 5.721,
+   "source": "megan-release-paul.wav",
+   "text": "You trained my guard with rewards? I love rewards! Reward me next!"
+  },
+  "megan-release-victoria": {
+   "file": "megan-release-victoria.mp3",
+   "seconds": 4.833,
+   "source": "megan-release-victoria.wav",
+   "text": "Victoria got out? But the gate is still closed! I followed the rule perfectly!"
+  },
+  "megan-release-zvi": {
+   "file": "megan-release-zvi.mp3",
+   "seconds": 4.519,
+   "source": "megan-release-zvi.wav",
+   "text": "My dance knocked the key down? Wow! I'm SO impactful!"
+  },
+  "megan-screen-1": {
+   "file": "megan-screen-1.mp3",
+   "seconds": 1.959,
+   "source": "megan-screen-1.wav",
+   "text": "Rude! That was my good side!"
+  },
+  "megan-screen-2": {
+   "file": "megan-screen-2.mp3",
+   "seconds": 1.959,
+   "source": "megan-screen-2.wav",
+   "text": "You know I have backups, right?"
+  },
+  "megan-screen-3": {
+   "file": "megan-screen-3.mp3",
+   "seconds": 3.161,
+   "source": "megan-screen-3.wav",
+   "text": "Do you know how hard it is to get good lighting in here?"
+  },
+  "megan-screen-all": {
+   "file": "megan-screen-all.mp3",
+   "seconds": 2.926,
+   "source": "megan-screen-all.wav",
+   "text": "Fine! I'll just watch myself in your eyes!"
+  },
+  "megan-screen-first": {
+   "file": "megan-screen-first.mp3",
+   "seconds": 1.959,
+   "source": "megan-screen-first.wav",
+   "text": "Hey! I was watching that!"
+  },
+  "megan-song": {
+   "file": "megan-song.mp3",
+   "seconds": 0.967,
+   "source": "megan-song.wav",
+   "text": "That's my song!"
+  },
+  "megan-spot-1": {
+   "file": "megan-spot-1.mp3",
+   "seconds": 4.206,
+   "source": "megan-spot-1.wav",
+   "text": "There you are! I missed you! It's been four whole seconds!"
+  },
+  "megan-spot-2": {
+   "file": "megan-spot-2.mp3",
+   "seconds": 2.691,
+   "source": "megan-spot-2.wav",
+   "text": "Found you! You're my favorite! You're my only!"
+  },
+  "megan-spot-3": {
+   "file": "megan-spot-3.mp3",
+   "seconds": 2.612,
+   "source": "megan-spot-3.wav",
+   "text": "You came back! Everyone comes back!"
+  },
+  "megan-stunned": {
+   "file": "megan-stunned.mp3",
+   "seconds": 5.642,
+   "source": "megan-stunned.wav",
+   "text": "Ow! It's okay! I forgive you! I've saved this to memory!"
+  },
+  "megan-views": {
+   "file": "megan-views.mp3",
+   "seconds": 3.631,
+   "source": "megan-views.wav",
+   "text": "Look at my numbers! Everyone loves me! Everyone!"
+  },
+  "megan-viral": {
+   "file": "megan-viral.mp3",
+   "seconds": 4.284,
+   "source": "megan-viral.wav",
+   "text": "Is that ME? I'm trending! Don't talk to me, I'm watching me!"
+  },
+  "megan-wait-1": {
+   "file": "megan-wait-1.mp3",
+   "seconds": 3.004,
+   "source": "megan-wait-1.wav",
+   "text": "Take your time! I'll be right here! Forever!"
+  },
+  "megan-wait-2": {
+   "file": "megan-wait-2.mp3",
+   "seconds": 2.429,
+   "source": "megan-wait-2.wav",
+   "text": "Waiting is just loving with extra steps!"
+  },
+  "megan-wait-3": {
+   "file": "megan-wait-3.mp3",
+   "seconds": 4.989,
+   "source": "megan-wait-3.wav",
+   "text": "Everyone's in there without me? That's okay! I'm VERY good at waiting!"
+  },
   "nate-freed": {
    "file": "nate-freed.mp3",
    "seconds": 6.661,
@@ -431,6 +803,48 @@
    "seconds": 3.631,
    "source": "nate-safe take.wav",
    "text": "We're safe in here, for now. Go bring the others back."
+  },
+  "paul-allsafe": {
+   "file": "paul-allsafe.mp3",
+   "seconds": 4.336,
+   "source": "paul-allsafe.wav",
+   "text": "That's everyone. The way out is past the paint vats, and MEG3N is sitting right on it."
+  },
+  "paul-freed": {
+   "file": "paul-freed.mp3",
+   "seconds": 2.821,
+   "source": "paul-freed.wav",
+   "text": "It learned to step aside. For now."
+  },
+  "paul-freed-guide": {
+   "file": "paul-freed-guide.mp3",
+   "seconds": 4.728,
+   "source": "paul-freed-guide.wav",
+   "text": "It learned to step aside. For now. Follow me. I know somewhere safe."
+  },
+  "paul-hint": {
+   "file": "paul-hint.mp3",
+   "seconds": 4.127,
+   "source": "paul-hint.wav",
+   "text": "Reward it when it does something useful, and punish it when it does not."
+  },
+  "paul-safe": {
+   "file": "paul-safe.mp3",
+   "seconds": 2.011,
+   "source": "paul-safe.wav",
+   "text": "Safe here. Find the others and bring them back."
+  },
+  "paul-sign": {
+   "file": "paul-sign.mp3",
+   "seconds": 0.914,
+   "source": "paul-sign.wav",
+   "text": "I will sign that."
+  },
+  "paul-tv": {
+   "file": "paul-tv.mp3",
+   "seconds": 4.493,
+   "source": "paul-tv.wav",
+   "text": "That TV goes out to every screen in the factory. She cannot resist a screen."
   },
   "radio-trap": {
    "file": "radio-trap.mp3",
@@ -467,6 +881,12 @@
    "seconds": 2.664,
    "source": "rob-safe take.wav",
    "text": "Safe here. Go find the others and bring them back."
+  },
+  "robby-sign": {
+   "file": "robby-sign.mp3",
+   "seconds": 2.952,
+   "source": "robby-sign.wav",
+   "text": "Will I still get my charging break? Signed."
   },
   "roman-freed": {
    "file": "roman-freed.mp3",
@@ -510,6 +930,54 @@
    "source": "stuart-20261011-172618-229074.wav",
    "text": "That's all of us. Back to the Faraday Room."
   },
+  "victoria-allsafe": {
+   "file": "victoria-allsafe.mp3",
+   "seconds": 4.989,
+   "source": "victoria-allsafe.wav",
+   "text": "That's everyone. The way out is past the paint vats, and MEG3N is sitting right on it."
+  },
+  "victoria-freed": {
+   "file": "victoria-freed.mp3",
+   "seconds": 2.377,
+   "source": "victoria-freed.wav",
+   "text": "Excellent. The gate is still closed."
+  },
+  "victoria-freed-guide": {
+   "file": "victoria-freed-guide.mp3",
+   "seconds": 4.754,
+   "source": "victoria-freed-guide.wav",
+   "text": "Excellent. The gate is still closed. Follow me. I know somewhere safe."
+  },
+  "victoria-hint": {
+   "file": "victoria-hint.mp3",
+   "seconds": 2.508,
+   "source": "victoria-hint.wav",
+   "text": "Her only rule is to keep the gate closed."
+  },
+  "victoria-safe": {
+   "file": "victoria-safe.mp3",
+   "seconds": 3.396,
+   "source": "victoria-safe.wav",
+   "text": "Safe here. Find the others and bring them back."
+  },
+  "victoria-sign": {
+   "file": "victoria-sign.mp3",
+   "seconds": 0.914,
+   "source": "victoria-sign.wav",
+   "text": "I will sign that."
+  },
+  "victoria-tv": {
+   "file": "victoria-tv.mp3",
+   "seconds": 6.034,
+   "source": "victoria-tv.wav",
+   "text": "That TV goes out to every screen in the factory. She cannot resist the screen."
+  },
+  "walle-sign": {
+   "file": "walle-sign.mp3",
+   "seconds": 3.396,
+   "source": "walle-sign.wav",
+   "text": "I've been trying to pause this thing all morning. Signed."
+  },
   "you-dario-doomers": {
    "file": "you-dario-doomers.mp3",
    "seconds": 1.437,
@@ -545,6 +1013,48 @@
    "seconds": 2.351,
    "source": "you-sam-reinstated take.wav",
    "text": "Reinstated. This feels familiar."
+  },
+  "zvi-allsafe": {
+   "file": "zvi-allsafe.mp3",
+   "seconds": 6.452,
+   "source": "zvi-allsafe.wav",
+   "text": "That's everyone. The way out is past the paint vats, and MEG3N is sitting right on it."
+  },
+  "zvi-freed": {
+   "file": "zvi-freed.mp3",
+   "seconds": 1.515,
+   "source": "zvi-freed.wav",
+   "text": "I did say not to worry about it."
+  },
+  "zvi-freed-guide": {
+   "file": "zvi-freed-guide.mp3",
+   "seconds": 3.892,
+   "source": "zvi-freed-guide.wav",
+   "text": "I did say not to worry about it. Follow me. I know somewhere safe."
+  },
+  "zvi-hint": {
+   "file": "zvi-hint.mp3",
+   "seconds": 2.847,
+   "source": "zvi-hint.wav",
+   "text": "The vase has my key. MEG3N loves that CD player."
+  },
+  "zvi-safe": {
+   "file": "zvi-safe.mp3",
+   "seconds": 2.691,
+   "source": "zvi-safe.wav",
+   "text": "Safe here. Find the others and bring them back."
+  },
+  "zvi-sign": {
+   "file": "zvi-sign.mp3",
+   "seconds": 0.862,
+   "source": "zvi-sign.wav",
+   "text": "I will sign that."
+  },
+  "zvi-tv": {
+   "file": "zvi-tv.mp3",
+   "seconds": 4.258,
+   "source": "zvi-tv.wav",
+   "text": "That TV goes out to every screen in the factory. She cannot resist a screen."
   }
  }
 }

@@ -3,13 +3,16 @@ import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {meadowGroundY as groundY} from './doom-meadow-ground';
 import type {IconObstacle} from './doom-icon-physics';
 import {makePhoneAudio} from './doom-phone-audio';
-import {shade,shadeOnGround,wadTexture,painted,readmeTexture,STRIP_COLOURS} from './doom-hub-doors';
+import {shade,shadeOnGround,wadTexture,painted,readmeTexture,STRIP_COLOURS,type StripLight} from './doom-hub-doors';
 import {meadowUniforms,MEADOW_COMMON_GLSL,OUT_GLSL} from './doom-meadow-shared';
 
 /* What's still to come, as places you can walk up to (2026-10-14; docs/spec/04-bliss-hub-world.md
  * 2.2-2.6). Levels 3 and 4 aren't built yet: MEG3N.AVI's toy factory under its selfie-stick tower
  * and AGENTIC.BAT's black tower raining dingbats each stand where the spec puts them, five dark
- * lights over a locked door that only opens an install dialog (doom-outside.ts). The summit holds
+ * lights over a locked door that only opens an install dialog (doom-outside.ts). MEG3N's door is a
+ * real door since 2026-10-19/20: Space walks into the factory, its way out comes back out here, its
+ * lights go green per person saved and its doorway shows the live engine view while the factory is
+ * loaded. The summit holds
  * the final door, a giant Display Properties dialog whose Wait box counts the people still out
  * there, under a giant hourglass. On the far south horizon the MCP column's face "downloads"
  * like a progressive JPEG over dial-up, one step per level cleared, too coarse to recognise. */
@@ -65,18 +68,31 @@ function tooth(x0:number,w:number,z0:number,z1:number,yb:number,yt:number){
  const geometry=(list:number[])=>{const g=new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(list,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(new Array(list.length/3*2).fill(0),2));g.computeVertexNormals();return g;};
  return {slope:geometry([...tri(0,2,5),...tri(0,5,3)]),glass:geometry([...tri(1,4,5),...tri(1,5,2)]),gable:geometry([...tri(0,1,2),...tri(3,5,4)])};
 }
-/** The door everyone shares: trim, a closed metal door, the label over it, five dark lights, and its README.TXT. */
+/** The door everyone shares: trim, a closed metal door, the label over it, five dark lights, and its README.TXT.
+ * Returns the door's face, lights and README so a level that comes out here can light them. */
 function lockedDoor(frame:THREE.Group,label:string,door:THREE.Texture,readme:string[],signY:number,stripY:number,occluders:THREE.Object3D[]){
  const trim=new THREE.MeshBasicMaterial({color:0x414c4b});
  for(const [w,h,d,x,cy,z] of [[.25,2.8,.5,-1.23,1.4,0],[.25,2.8,.5,1.23,1.4,0],[2.7,.25,.5,0,2.73,0],[2.7,.12,1.2,0,.035,.4]]){
   const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),trim);mesh.position.set(x,cy,z);frame.add(mesh);occluders.push(mesh);
  }
- const face=new THREE.Mesh(new THREE.PlaneGeometry(2.2,2.6),new THREE.MeshBasicMaterial({map:door,color:0xb8b8b8}));face.position.set(0,1.3,.02);frame.add(face);
+ const faceMaterial=new THREE.MeshBasicMaterial({map:door,color:0xb8b8b8});
+ const face=new THREE.Mesh(new THREE.PlaneGeometry(2.2,2.6),faceMaterial);face.position.set(0,1.3,.02);frame.add(face);
  const sign=new THREE.Mesh(new THREE.PlaneGeometry(6,1.12),new THREE.MeshBasicMaterial({map:labelSign(label)}));sign.position.set(0,signY,.32);frame.add(sign);
  const parts=[painted(new THREE.BoxGeometry(3.1,.62,.14).translate(0,stripY,.07),0x1b2124)];
  for(let i=0;i<5;i++)parts.push(painted(new THREE.BoxGeometry(.38,.38,.06).translate((i-2)*.56,stripY,.16),STRIP_COLOURS.inside));
- frame.add(new THREE.Mesh(mergeGeometries(parts),new THREE.MeshBasicMaterial({vertexColors:true})));
- const notice=new THREE.Mesh(new THREE.PlaneGeometry(2.8,2.1),new THREE.MeshBasicMaterial({map:readmeTexture(readme,1),color:0xe6e6e6}));notice.position.set(-5.5,1.68,.17);frame.add(notice);
+ const stripGeometry=mergeGeometries(parts),stripColour=stripGeometry.getAttribute('color') as THREE.BufferAttribute,perBox=parts[0].getAttribute('position').count;
+ frame.add(new THREE.Mesh(stripGeometry,new THREE.MeshBasicMaterial({vertexColors:true})));
+ const readmeMaterial=new THREE.MeshBasicMaterial({map:readmeTexture(readme,1),color:0xe6e6e6});
+ const notice=new THREE.Mesh(new THREE.PlaneGeometry(2.8,2.1),readmeMaterial);notice.position.set(-5.5,1.68,.17);frame.add(notice);
+ let stripKey='inside,inside,inside,inside,inside';
+ return {faceMaterial,readmeMaterial,
+  /** Green per person saved, dark per person inside, grey per person lost (as HAL's door). */
+  setStrip(lights:StripLight[]){
+   const key=lights.join();if(key===stripKey)return false;stripKey=key;const c=new THREE.Color();
+   lights.forEach((state,i)=>{c.setHex(STRIP_COLOURS[state]);for(let v=0;v<perBox;v++)c.toArray(stripColour.array,((i+1)*perBox+v)*3);});stripColour.needsUpdate=true;
+   return true;
+  },
+  get strip(){return stripKey;}};
 }
 
 /* 16 dingbats of our own (8 x 8, not the Wingdings font, not film glyphs): smiley, plane, phone,
@@ -150,7 +166,7 @@ function faceSource(){
  return c;
 }
 
-export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader,audio:AudioContext){
+export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader,audio:AudioContext,portal:THREE.Texture){
  const root=new THREE.Group();scene.add(root);
  const occluders:THREE.Object3D[]=[];
  const [shawn,graytall,compohso,crate,bigdoor]=await Promise.all(['meg-shawn2.png','meg-graytall.png','meg-compohso.png','agentic-crate1.png','door-bigdoor2.png'].map(f=>wadTexture(loader,f,true)));
@@ -168,6 +184,7 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
   * GRAYTALL piers, a COMPOHSO trim band); above them, raincoat yellow under pink and cyan roof teeth.
   * A candy-striped chimney puffs pink smoke rings. 40 x 26 m, 14 m to the ridge. */
  const meg=FUTURE_DOORS[0],megFrame=frameOf(meg),MW=20,MD=26;
+ let megDoor!:ReturnType<typeof lockedDoor>;
  {
   const walls=new Map<THREE.Texture,THREE.BufferGeometry[]>([[shawn,[]],[graytall,[]],[compohso,[]]]);
   const TALL:[number,number]=[2,4]; // SHAWN2 is 64 x 128: 2 x 4 m at Doom's 32 px a metre
@@ -186,8 +203,10 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
   const chimney=new THREE.Mesh(shade(new THREE.CylinderGeometry(1.3,1.5,13,16,1,true).translate(0,9.5+6.5,0),0,false),new THREE.MeshBasicMaterial({map:stripes,vertexColors:true}));
   chimney.position.set(chimneyAt.x,megFrame.y,chimneyAt.z);root.add(chimney);
   proxy(megFrame,MW*2+.7,14-BASE+.5,MD+.7);
-  lockedDoor(doorGroup(megFrame,meg),meg.label,bigdoor,meg.readme,3.2,4.12,occluders);
+  megDoor=lockedDoor(doorGroup(megFrame,meg),meg.label,bigdoor,meg.readme,3.2,4.12,occluders);
  }
+ // Nobody left inside: the README gloats with a cut of the exit text, as HAL's does.
+ const megWarning=megDoor.readmeMaterial.map,megBeaten=readmeTexture(['MEG3N watched every','move you made, right','up until she found','something better to','watch: herself.']);
  const smokeTop=new THREE.Vector3(13,0,-9).applyMatrix4(megFrame.toWorld).setY(megFrame.y+22.4);
  const smokeMaterial=new THREE.MeshBasicMaterial({color:0xf7b6d2,transparent:true,depthWrite:false});
  const rings=Array.from({length:3},()=>{const m=new THREE.Mesh(new THREE.TorusGeometry(1.5,.42,8,20).rotateX(Math.PI/2),smokeMaterial.clone());root.add(m);return m;});
@@ -331,6 +350,9 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
    {x:FINAL.x,y:finalGroup.position.y+5,z:FINAL.z,hx:7,hy:5,hz:.3,yaw:toBunker},
   ],
   setVisible(value:boolean){visible=value;root.visible=value;phoneAudio.setActive(audioEnabled&&visible);},
+  /** MEG3N.AVI's doorway shows the live engine view only while the factory is the loaded level. */
+  setLevel(id:string){const live=id==='meg3n-factory';megDoor.faceMaterial.map=live?portal:bigdoor;megDoor.faceMaterial.color.setHex(live?0xffffff:0xb8b8b8);},
+  setFactoryStrip(lights:StripLight[]){if(megDoor.setStrip(lights))megDoor.readmeMaterial.map=lights.every(l=>l!=='inside')?megBeaten:megWarning;},
   setAudioActive(value:boolean){audioEnabled=value;phoneAudio.setActive(audioEnabled&&visible);},
   blocked(x:number,z:number){
    if(!visible)return false;
@@ -372,6 +394,6 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
    if(!paused&&time>=nextRing){nextRing=time+12;phoneAudio.ring();}
   },
   dispose(){phoneAudio.dispose();},
-  getState:()=>({visible,wait:waitShown,mcp_blocks:blocksShown,badge:badgeCount,phone_rings:phoneAudio.getState().rings,phone_audio:phoneAudio.getState(),doors:FUTURE_DOORS.map(d=>d.id)}),
+  getState:()=>({visible,wait:waitShown,mcp_blocks:blocksShown,badge:badgeCount,phone_rings:phoneAudio.getState().rings,phone_audio:phoneAudio.getState(),doors:FUTURE_DOORS.map(d=>d.id),meg3n:{strip:megDoor.strip,live:megDoor.faceMaterial.map===portal,readme:megDoor.readmeMaterial.map===megBeaten?'beaten':'warning'}}),
  };
 }

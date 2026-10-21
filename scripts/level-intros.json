@@ -1029,7 +1029,578 @@
      ]
     }
    }
+  },
+  "E2M7": {
+   "levelId": "meg3n-factory",
+   "capture": {
+    "ceo": "altman",
+    "settleSeconds": 2,
+    "hubEntry": true,
+    "formats": {
+     "landscape": {
+      "size": [
+       1280,
+       800
+      ],
+      "fov": 90,
+      "shots": [
+       {
+        "name": "vats",
+        "seconds": 3.0,
+        "ease": "gentle",
+        "keys": [
+         {
+          "at": [
+           480,
+           980,
+           230
+          ],
+          "look": [
+           480,
+           608,
+           105
+          ]
+         },
+         {
+          "at": [
+           480,
+           920,
+           200
+          ],
+          "look": [
+           480,
+           608,
+           102
+          ]
+         },
+         {
+          "at": [
+           480,
+           860,
+           175
+          ],
+          "look": [
+           480,
+           608,
+           100
+          ]
+         }
+        ]
+       },
+       {
+        "name": "dolls",
+        "seconds": 4.0,
+        "ease": "gentle",
+        "keys": [
+         {
+          "at": [
+           3340,
+           -105,
+           58
+          ],
+          "look": [
+           3296,
+           -384,
+           40
+          ]
+         },
+         {
+          "at": [
+           3338,
+           -150,
+           52
+          ],
+          "look": [
+           3296,
+           -384,
+           40
+          ]
+         },
+         {
+          "at": [
+           3335,
+           -195,
+           46
+          ],
+          "look": [
+           3296,
+           -384,
+           40
+          ]
+         }
+        ]
+       },
+       {
+        "name": "zvi",
+        "seconds": 3.0,
+        "ease": "gentle",
+        "face": [
+         0
+        ],
+        "keys": [
+         {
+          "at": [
+           790,
+           1850,
+           160
+          ],
+          "look": [
+           650,
+           1945,
+           145
+          ]
+         },
+         {
+          "at": [
+           762,
+           1864,
+           156
+          ],
+          "look": [
+           650,
+           1945,
+           145
+          ]
+         },
+         {
+          "at": [
+           735,
+           1878,
+           152
+          ],
+          "look": [
+           650,
+           1945,
+           145
+          ]
+         }
+        ]
+       },
+       {
+        "name": "meg",
+        "seconds": 8.6,
+        "keys": [
+         {
+          "at": [
+           1000,
+           1715,
+           113
+          ],
+          "look": [
+           1000,
+           2080,
+           100
+          ],
+          "t": 0
+         },
+         {
+          "at": [
+           1000,
+           1735,
+           113
+          ],
+          "look": [
+           1000,
+           2080,
+           100
+          ],
+          "t": 3.0
+         },
+         {
+          "at": [
+           1000,
+           1740,
+           113
+          ],
+          "look": [
+           850,
+           1790,
+           108
+          ],
+          "t": 3.7
+         },
+         {
+          "at": [
+           1000,
+           1742,
+           113
+          ],
+          "look": [
+           850,
+           1790,
+           108
+          ],
+          "t": 4.8
+         },
+         {
+          "at": [
+           1000,
+           1745,
+           113
+          ],
+          "look": [
+           1000,
+           1900,
+           100
+          ],
+          "t": 5.4
+         },
+         {
+          "at": [
+           1000,
+           1752,
+           113
+          ],
+          "look": [
+           1000,
+           1900,
+           100
+          ],
+          "t": 8.6
+         }
+        ],
+        "guardian": {
+         "keys": [
+          {
+           "at": [
+            1000,
+            2080
+           ],
+           "t": 0
+          },
+          {
+           "at": [
+            1000,
+            2080
+           ],
+           "t": 3.9
+          },
+          {
+           "at": [
+            1000,
+            1855
+           ],
+           "t": 4.7
+          }
+         ],
+         "face": "camera",
+         "mode": 9,
+         "states": [
+          {
+           "at": 3.9,
+           "mode": 1
+          },
+          {
+           "at": 4.7,
+           "mode": 10
+          }
+         ]
+        }
+       },
+       {
+        "name": "start",
+        "seconds": 2.6,
+        "player": {
+         "push": 0
+        }
+       }
+      ]
+     },
+     "vertical": {
+      "size": [
+       1080,
+       1920
+      ],
+      "fps": 30,
+      "fov": 84,
+      "shotsFrom": "landscape",
+      "overrides": {
+       "meg": {
+        "keys": [
+         {
+          "at": [
+           1000,
+           1715,
+           113
+          ],
+          "look": [
+           1000,
+           2080,
+           20
+          ],
+          "t": 0
+         },
+         {
+          "at": [
+           1000,
+           1735,
+           113
+          ],
+          "look": [
+           1000,
+           2080,
+           20
+          ],
+          "t": 3.0
+         },
+         {
+          "at": [
+           1000,
+           1740,
+           113
+          ],
+          "look": [
+           850,
+           1790,
+           60
+          ],
+          "t": 3.7
+         },
+         {
+          "at": [
+           1000,
+           1742,
+           113
+          ],
+          "look": [
+           850,
+           1790,
+           60
+          ],
+          "t": 4.8
+         },
+         {
+          "at": [
+           1000,
+           1745,
+           113
+          ],
+          "look": [
+           1000,
+           1900,
+           20
+          ],
+          "t": 5.4
+         },
+         {
+          "at": [
+           1000,
+           1752,
+           113
+          ],
+          "look": [
+           1000,
+           1900,
+           20
+          ],
+          "t": 8.6
+         }
+        ]
+       }
+      }
+     }
+    },
+    "guardianPark": {
+     "at": [
+      -60,
+      -430
+     ],
+     "hover": 0,
+     "face": 0,
+     "mode": 3
+    }
+   },
+   "film": {
+    "episode": 3,
+    "episodeName": "INFERENCE",
+    "map": "E2M7",
+    "title": "SPAWNING CHATS",
+    "vEpisodeLines": [
+     "INFERENCE"
+    ],
+    "vTitleLines": [
+     "SPAWNING",
+     "CHATS"
+    ],
+    "titleMap": "WIMAP2",
+    "mapNode": [
+     198,
+     48
+    ],
+    "mapSplats": [],
+    "music": "doom-web/local/intro/levels/music/d_e2m7.ogg",
+    "musicLevel": 0.075,
+    "footageGamma": 1.0,
+    "prisoners": [
+     {
+      "name": "ZVI MOWSHOWITZ",
+      "sprite": "FZVIA1"
+     },
+     {
+      "name": "VICTORIA KRAKOVNA",
+      "sprite": "FVICA1"
+     },
+     {
+      "name": "MAX TEGMARK",
+      "sprite": "FMAXA1"
+     },
+     {
+      "name": "PAUL CHRISTIANO",
+      "sprite": "FPAUA1"
+     },
+     {
+      "name": "AJEYA COTRA",
+      "sprite": "FAJEA1"
+     }
+    ],
+    "fiveWall": "FQ001",
+    "fiveFloor": "FQ0A1",
+    "overview": [
+     {
+      "shot": "vats",
+      "span": [
+       0.8,
+       2.6
+      ],
+      "sfx": [
+       {
+        "snd": "hum",
+        "dur": 1.8,
+        "gain": 0.08
+       }
+      ]
+     },
+     {
+      "shot": "dolls",
+      "span": [
+       1.85,
+       3.85
+      ],
+      "sfx": [
+       {
+        "snd": "DSPSTART",
+        "t": 0.3,
+        "gain": 0.12
+       }
+      ]
+     },
+     {
+      "shot": "zvi",
+      "span": [
+       1.2,
+       3.0
+      ],
+      "sfx": [
+       {
+        "snd": "chime",
+        "t": 0.2,
+        "gain": 0.12
+       }
+      ]
+     }
+    ],
+    "guardian": {
+     "shot": "meg",
+     "span": [
+      1.2,
+      null
+     ],
+     "name": "MEG3N",
+     "sub": "MAXIMALLY ENGAGING NANNY",
+     "vNameLines": [
+      "MEG3N"
+     ],
+     "mug": {
+      "sprite": "FMGNA1",
+      "box": [
+       14,
+       4,
+       50,
+       40
+      ]
+     },
+     "steps": null,
+     "cardAt": 0.12,
+     "lineAt": 0.35,
+     "barkAt": 4.25,
+     "line": "SHE ALREADY KNOWS WHERE YOU'RE GOING.",
+     "vLineLines": [
+      "SHE ALREADY",
+      "KNOWS WHERE",
+      "YOU'RE GOING."
+     ],
+     "bark": "PEEKABOO! I CAN STILL SEE YOU!",
+     "vBarkLines": [
+      "PEEKABOO!",
+      "I CAN STILL",
+      "SEE YOU!"
+     ],
+     "sfx": [
+      {
+       "snd": "chime",
+       "t": 0.1,
+       "gain": 0.25
+      },
+      {
+       "snd": "boom",
+       "t": 0.0,
+       "gain": 0.2
+      },
+      {
+       "snd": "whoosh",
+       "t": 2.7,
+       "gain": 0.18
+      }
+     ],
+     "barkSfx": [
+      {
+       "snd": "sting",
+       "t": -0.05,
+       "gain": 0.35
+      },
+      {
+       "snd": "chime",
+       "t": 0.2,
+       "gain": 0.2
+      }
+     ]
+    },
+    "objective": {
+     "text": "FIVE WHO WARNED YOU ARE LOCKED IN HERE.",
+     "vLines": [
+      "FIVE WHO WARNED",
+      "YOU ARE LOCKED",
+      "IN HERE."
+     ],
+     "cta": "FREE THEM.",
+     "ctaAt": 1.35
+    },
+    "go": {
+     "shot": "start",
+     "text": "GO.",
+     "seconds": 2.2,
+     "goAt": 0.95,
+     "cleanTail": 0.2,
+     "sfx": [
+      {
+       "snd": "DSSWTCHN",
+       "t": 0.0,
+       "gain": 0.6
+      },
+      {
+       "snd": "DSBDOPN",
+       "t": 0.1,
+       "gain": 0.5
+      }
+     ]
+    },
+    "musicSync": {
+     "at": 9.6
+    },
+    "hereOnTop": true,
+    "lineupStagger": true
+   }
   }
  },
- "_doc": "Per-level intro films (v2: title -> caption-free overview -> the rogue AI -> objective -> GO on the player's start view). 'capture' drives scripts/capture-level-flythrough.mjs (camera shots in Doom units, per-tic splines; guardian paths; 'player' shots sit on the player's own spawn view; vertical reuses the landscape shots with its own fov/fps). New captures go to doom-web/local/intro/levels/raw-v2/; the v1 footage in raw/ is only read. 'film' drives scripts/build-level-intros.py: 'span' = [start, end] seconds of a captured shot. Names come from the game code: doom-mod/actors/PDControlMap.zs / PDHalMap.zs SiteName, NamedCast.zs sprites."
+ "_doc": "Per-level intro films (v2: title -> caption-free overview -> the rogue AI -> objective -> GO on the player's start view). 'capture' drives scripts/capture-level-flythrough.mjs (camera shots in Doom units, per-tic splines; guardian paths; 'player' shots sit on the player's own spawn view; vertical reuses the landscape shots with its own fov/fps). New captures go to doom-web/local/intro/levels/raw-v2/; the v1 footage in raw/ is only read. 'film' drives scripts/build-level-intros.py: 'span' = [start, end] seconds of a captured shot. Names come from the game code: doom-mod/actors/PDControlMap.zs / PDHalMap.zs SiteName, NamedCast.zs sprites (E2M7: Factory.zs PersonName, FactoryActors.zs sprites; capture.hubEntry films the front door players walk in to, and MEG3N's shot uses timed keys)."
 }

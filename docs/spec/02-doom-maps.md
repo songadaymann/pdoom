@@ -355,6 +355,8 @@ fast way home: its one-way slot 75.
 
 ## 6. meg3n — E2M7 Spawning Vats
 
+**2026-10-15:** map retained after comparison with E1M4 and E1M7. Original vat/stockroom/yard topology plus cream, pink, teal and yellow toy-factory dressing must make the change apparent in actual first-person play. Current puzzle contracts: [LEVEL-03.md](../LEVEL-03.md); older alternate methods below do not apply to the first pass.
+
 ![E2M7 plan](maps/E2M7-plan.png)
 
 **Reading.** A toy-company factory gone wrong:
@@ -399,7 +401,7 @@ They are secrets, not routes.
 | Red card | On pedestal 77 (P4) | Original position: a reward for P4 |
 | Blue card | Yard alcove 148 (P5) | Original position |
 | Charge | Hall 19 (770, 153) | Recommended breach: **room 1 from hall 19** (64 thick at x 384..432/528..576, y 256–320; both floors 72), a loud second way into P2's room. Alternative: loft 296 (floor 112) from hall 300 (floor 72; 16 thick at (632, 1920)), with one new step sector at floor 92 inside the breach. **Not a breach:** white room 7 (floor 184) over hall 260 (floor 32) is a 152-u cliff, so that 32-thick wall at (1264, 1120) instead gets a scripted FIRE EXIT door: a one-way drop out of P3. |
-| **New tool 1 – Wind-up cymbal monkey** | The shelf in cold-start showroom 285, by the wrench (moved from dais 174 so Zvi's rescue can use it first) | Thrown noise lure. Reuses the hunter's investigate-noise logic. meg3n goes to it and does her **dance tell** before "attacking" it. |
+| **Puzzle fixture – Toy CD player** | Fixed beside the loft’s dance mark | SPACE starts persistent music, summoning MEG3N along a real route. Six-second performance, vase knock at about two seconds; looking away does not cancel it. |
 | **New tool 2 – Parental-controls remote** | Lab console 221 (2464, 928) | 3 charges; freezes meg3n (or a toy robot, e.g. NANNY-BOT's 20 s Bedtime mode) ~5 s within 12 m line of sight. Ranged version of the existing close-stun, with the same immunity window. |
 | Stimpacks ×6 | 282, 1, 260, 11, 25, 147 | Medikits ×3 in the refuge |
 

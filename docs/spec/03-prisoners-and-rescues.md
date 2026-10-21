@@ -30,6 +30,8 @@ Every in-game line here is **parody written for this game**. Lines that point at
 
 ---
 
+> **MEG3N puzzle revision, 2026-10-15:** [GAME-SPEC §3.3](../GAME-SPEC.md#33-episode-3-inference-e2m7-spawning-chats) and [LEVEL-03.md](../LEVEL-03.md) supersede the Episode 3 mechanisms below. Fixed CD-player lure and six-second dance; wrench-broken playpen panel with a closed gate; real worker-bot/companion signatures; explicit per-action guard feedback with optional overpraise; concrete three-doll behavior after camera destruction. Earlier monkey, signature-card and alternate-rescue descriptions are historical.
+
 ## 0. Decisions at a glance
 
 **The twenty, by episode.** ★ marks each person's signature rescue: the one idea nobody else uses.

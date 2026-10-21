@@ -26,6 +26,27 @@ Without those assets, `npm run dev` runs the earlier self-contained procedural T
 prototype. `npm run build` builds that fallback. The complete authoring pipeline additionally
 requires the source media described in ASSETS.md; it is not required to run the published game.
 
+## Level 3: MEG3N’s Toy Factory
+
+MEG3N’s Toy Factory is E2M7, Spawning Vats, with bright toy-factory materials and five physical
+rescue puzzles. Since 2026-10-20 it is part of the campaign: in SAFE MODE, `MEG3N.AVI`’s door
+walks into it and its exit switch comes back out there (the five at camp, the clear in the save).
+It is unscored; the scoreboards still cover the first two facilities. The
+[cold-start page](http://127.0.0.1:5198/?level=meg3n-factory) starts in the showroom and takes the
+`?puzzle=` development flags. Full guardian vent traversal and final sound/animation remain later work.
+
+With the supplied private `doom-web/local/DOOM.WAD` and existing local runtime present:
+
+```sh
+python3 scripts/build-factory-preview.py
+node scripts/serve-doom.mjs
+```
+
+The preview build needs Python with Pillow. Space/E interacts, click/Ctrl swings the wrench,
+and Esc pauses. [Level 3’s specification](docs/LEVEL-03.md) records the approved puzzle contracts.
+Run `node scripts/factory-browser-smoke.mjs` against the local server for native browser checks,
+`node scripts/factory-hub-smoke.mjs` for the SAFE MODE round trip and `node scripts/factory-exit-smoke.mjs` for the exit.
+
 ---
 
 # p(DOOM) — Five Prisons
@@ -109,7 +130,7 @@ The actual simulated forecast still requires a deliberate port: the earlier code
 
 Music is prepared once from the supplied WAD into ignored `doom-web/local/intake-music.ogg` (D_E1M1) and `doom-web/local/rescue-music.ogg` (D_E1M4), then played through Web Audio outside the engine. Live MIDI rendering caused a 75–80 ms pause roughly every half-second. To regenerate the local tracks, run `node scripts/prepare-doom-music.mjs` for Intake and `node scripts/prepare-doom-music.mjs D_E1M4 rescue` for First Rescue with the Doom server running; this requires Chrome and ffmpeg. Without the prepared track, the game starts with sound effects and no music. The engine frame limit is 120; measured rates depend on browser and hardware. The browser music volume is currently fixed at 25%, separate from the engine's music slider.
 
-SAFE MODE (Bliss) promises what's next (2026-10-14, `src/doom-hub-future.ts`). Levels 3 and 4 stand where the hub spec puts them, locked: MEG3N.AVI, a sawtooth toy factory (E2M7's own walls under raincoat yellow, a candy chimney puffing pink smoke rings) under a 35 m selfie-stick phone whose notification badge never stops counting; and AGENTIC.BAT, a 60 m black tower on an E2M2 crate plinth whose glass rains green dingbats under a "thinking..." spinner and a FIND USER to-do list, with a red phone booth that rings in threes. Each has five dark lights and a README.TXT; SPACE at its door opens a Win95 install dialog (a creeping, slipping bar; "Time remaining: calculating..."; Cancel is not available; READ THIS! or R opens READ THIS!). The summit holds the final door: a giant Display Properties dialog (Screen saver: 3D Maze, Wait: N people) under a flipping hourglass; SPACE there opens it (Preview is not available). 1 km south, the MCP column's face downloads like a progressive JPEG, 2x2 blocks before any level, 4x4 after one, 8x8 after two. Nine kickable giant desktop icons (My Computer, Winamp, Minesweeper, Solitaire, Paint, The Internet, a floppy, Recycle Bin, SECRETS.TXT) lie about the meadow and by HAL's exit: walk or sprint into one and it tumbles, bounces and settles naturally. As of 2026-10-15 these are chunky, 0.34 m thick pixel silhouettes with real Rapier rigid-body physics: off-centre kicks generate rotation, hills redirect them downhill, and toys can collide and stack. Each toy has its own mass: My Computer and Recycle Bin are heavy, while the cards, floppy and text file fly much farther from the same kick. Their separate labels face you; the toys themselves keep their physical orientation. Grass presses down under grounded toys. All of it stays hidden during the first wake-up walk, like HAL's station. To try it, open `?safemode=1`: straight into SAFE MODE as if both levels were just cleared, out of HAL's door (`&level=five-prisons` for the bunker), from an in-memory save that leaves a real save alone. `node scripts/hub-future-smoke.mjs` checks it (both levels cleared via Load Game, muted). When level 3 or 4 is built, its FUTURE_DOORS entry becomes a real HUB_DOORS entry.
+SAFE MODE (Bliss) promises what's next (2026-10-14, `src/doom-hub-future.ts`). Levels 3 and 4 stand where the hub spec puts them, locked: MEG3N.AVI, a sawtooth toy factory (E2M7's own walls under raincoat yellow, a candy chimney puffing pink smoke rings) under a 35 m selfie-stick phone whose notification badge never stops counting; and AGENTIC.BAT, a 60 m black tower on an E2M2 crate plinth whose glass rains green dingbats under a "thinking..." spinner and a FIND USER to-do list, with a red phone booth that rings in threes. Each has five dark lights and a README.TXT; SPACE at its door opens a Win95 install dialog (a creeping, slipping bar; "Time remaining: calculating..."; Cancel is not available; READ THIS! or R opens READ THIS!). The summit holds the final door: a giant Display Properties dialog (Screen saver: 3D Maze, Wait: N people) under a flipping hourglass; SPACE there opens it (Preview is not available). 1 km south, the MCP column's face downloads like a progressive JPEG, 2x2 blocks before any level, 4x4 after one, 8x8 after two. Nine kickable giant desktop icons (My Computer, Winamp, Minesweeper, Solitaire, Paint, The Internet, a floppy, Recycle Bin, SECRETS.TXT) lie about the meadow and by HAL's exit: walk or sprint into one and it tumbles, bounces and settles naturally. As of 2026-10-15 these are chunky, 0.34 m thick pixel silhouettes with real Rapier rigid-body physics: off-centre kicks generate rotation, hills redirect them downhill, and toys can collide and stack. Each toy has its own mass: My Computer and Recycle Bin are heavy, while the cards, floppy and text file fly much farther from the same kick. Their separate labels face you; the toys themselves keep their physical orientation. Grass presses down under grounded toys. All of it stays hidden during the first wake-up walk, like HAL's station. To try it, open `?safemode=1`: straight into SAFE MODE as if both levels were just cleared, out of HAL's door (`&level=five-prisons` for the bunker), from an in-memory save that leaves a real save alone. `node scripts/hub-future-smoke.mjs` checks it (both levels cleared via Load Game, muted). Since 2026-10-20 MEG3N.AVI's door is a real door (Space walks into the factory; see Level 3 above); AGENTIC.BAT still installs.
 
 After both facilities are resolved, meadow movement unlocks a faster travel pace: walking is
 6 m/s (previously 3.6), running is 10 m/s (previously 6). The opening and first return retain their
@@ -200,3 +221,5 @@ Still limited: no multiplayer/human network takeover, no procedural map generati
 No files in other projects were edited. Nothing was pushed, published, purchased or deployed.
 
 Human art update: [five distinct people, standing/crouching sheets, robot atlas and exact generation prompts](art/cast-v1/README.md). Four new identities supplement the original Milo. Each person keeps their appearance in native rescue encounters, the articulated final crawl and the meadow. The hunter now uses an original chrome endoskeleton with walking, aiming and stun views. The importer preserves unmodified generated sources, aligns feet, uses crisp nearest-neighbor scaling and emits per-character directional resources. Doom sprite families are registered through native state banks before the per-site selector uses them. Corpses retain the existing temporary death artwork.
+
+Factory cast art (local, 2026-10-16): [eight generated character sheets, directional import and provenance](docs/FACTORY-CAST-ART.md). After installing the local media, run `python3 scripts/import-factory-cast.py` then `python3 scripts/build-factory-preview.py --resources-only`. `node scripts/factory-cast-smoke.mjs` captures every identity, robot signatures and MEG3N’s animation in the native level.

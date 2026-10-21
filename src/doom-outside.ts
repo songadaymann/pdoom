@@ -18,6 +18,11 @@ import {makeFutureHub,FUTURE_DOORS,FINAL,type FutureId} from './doom-hub-future'
 import {makeDesktopIcons} from './doom-desktop-icons';
 
 type EscapeState={saved_people:number[];saved:number;outside:number};
+// Meadow art for each campaign id: levels 1-2's ten, then the factory's five (ids 10-14,
+// figure PNGs from scripts/import-factory-cast.py).
+const MEADOW_IDS=[...CAST_IDS,'zvi','victoria','max','paul','ajeya'] as const;
+// The level whose people come out of each door: CONTROL.EXE, HAL3000.SYS, MEG3N.AVI.
+const LEVEL_OFFSET:Record<string,number>={'five-prisons':0,'hal-station':5,'meg3n-factory':10};
 type Person={id:number;name:string;alive:number;controlled:number};
 type World={alive:number;people:Person[]};
 type LabelRect={name:string;depth:number;left:number;right:number;bottom:number;top:number};
@@ -94,12 +99,14 @@ export async function createOutside(options:Options){
  const hubDoors=await makeHubDoors(scene,portalTexture,loader);
  labelOccluders.push(...hubDoors.occluders);
  // Levels 3 and 4 and the endgame as promises you can walk to, and desktop icons to kick about (2026-10-14).
- const future=await makeFutureHub(scene,loader,options.audio);labelOccluders.push(...future.occluders);
+ const future=await makeFutureHub(scene,loader,options.audio,portalTexture);labelOccluders.push(...future.occluders);
  const icons=await makeDesktopIcons(scene,options.audio,[
   {x:17,y:3.5,z:12.5,hx:9.4,hy:3.5,hz:12.5},...hubDoors.physicsBoxes(),...future.physicsBoxes(),
  ]);
- const textures=await Promise.all(CAST_IDS.map((id)=>Promise.all(Array.from({length:32},async(_,n)=>{const f=Math.floor(n/8),a=n%8,t=await loadTexture(loader,`outside-assets/figure-${id}-${f}-${a}.png`);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}))));
- const people=new Map<number,{sprite:THREE.Sprite;shadow:THREE.Mesh;target:THREE.Vector3;moving:boolean;arrived:boolean;arrivedAt:number}>();
+ const textures=await Promise.all(MEADOW_IDS.map((id)=>Promise.all(Array.from({length:32},async(_,n)=>{const f=Math.floor(n/8),a=n%8,t=await loadTexture(loader,`outside-assets/figure-${id}-${f}-${a}.png`);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}))));
+ const people=new Map<number,{sprite:THREE.Sprite;shadow:THREE.Mesh;target:THREE.Vector3;moving:boolean;arrived:boolean;arrivedAt:number;emergeAt:number}>();
+ // Companions leaving a door together come out 1.2 s apart (GAME-SPEC 6.3).
+ let lastEmerge=-Infinity;
  // Soft contact shadows under the rescued people (drawn after the sward; blades in front still cover them)
  const blobCanvas=document.createElement('canvas');blobCanvas.width=blobCanvas.height=64;
  {const g=blobCanvas.getContext('2d')!,r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,'rgba(0,0,0,1)');r.addColorStop(.55,'rgba(0,0,0,.55)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.fillRect(0,0,64,64);}
@@ -121,7 +128,9 @@ export async function createOutside(options:Options){
  let guide:Awaited<ReturnType<typeof makeBlissGuide>>|null=null;
  let intro=false;
  let nearestDoor:typeof HUB_DOORS[number]|null=null;
- enterButton.onclick=()=>{if(nearestDoor)options.enter?.(nearestDoor.id);else if(nearestFuture)openDialog(nearestFuture);};replayButton.onclick=()=>{if(nearestDoor)options.enter?.(nearestDoor.id,true);};
+ // MEG3N.AVI is a real door (2026-10-20): Space walks into the factory; AGENTIC.BAT still installs.
+ const factoryDoor=()=>nearestFuture==='meg3n';
+ enterButton.onclick=()=>{if(nearestDoor)options.enter?.(nearestDoor.id);else if(factoryDoor())options.enter?.('meg3n-factory');else if(nearestFuture)openDialog(nearestFuture);};replayButton.onclick=()=>{if(nearestDoor)options.enter?.(nearestDoor.id,true);};
  let yaw=0,pitch=0,last=performance.now(),time=0,paused=false,won=0,portalFrames=0,visiblePortal=false;
  const pos=new THREE.Vector3(17,1.72,-3),velocity=new THREE.Vector3(),keys=new Set<string>();let eye=1.72;
  // buildings (not people): the player and kicked icons both collide with these
@@ -163,6 +172,7 @@ export async function createOutside(options:Options){
   if(dialogFor&&down&&(code==='Space'||code==='KeyE')){dialogAction('b');return;}
   if(dialogFor&&down&&code==='KeyR'&&dialogFor!=='final'){dialogAction('a');return;}
   if((code==='Space'||code==='KeyE')&&down&&nearestDoor){options.enter?.(nearestDoor.id);return;}
+  if((code==='Space'||code==='KeyE')&&down&&factoryDoor()&&!paused){options.enter?.('meg3n-factory');return;}
   if((code==='Space'||code==='KeyE')&&down&&nearestFuture&&!paused){openDialog(nearestFuture);return;}if(intro&&code==='Space'&&down&&!paused){guide?.skip();return;}if(down)keys.add(code);else keys.delete(code);if(code==='Escape'&&down){paused=!paused;keys.clear();syncAudio();el('message').textContent=paused?'Paused. Press Esc or Menu to continue.':'';el('message').hidden=!paused;}}
  function release(){keys.clear();}
  function look(dx:number,dy:number){if(!active||paused)return;yaw-=dx*.0025;pitch=THREE.MathUtils.clamp(pitch-dy*.0025,-1.1,1.1);}
@@ -174,14 +184,15 @@ export async function createOutside(options:Options){
  for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,()=>{drag=null;});
  const visibility=()=>{release();syncAudio();};document.addEventListener('visibilitychange',visibility);window.addEventListener('blur',()=>{release();blissAudio.setActive(false);future.setAudioActive(false);});window.addEventListener('focus',()=>{syncAudio();options.audio.resume();});
  function showWin(saved:number){won=saved;}
+ function liveDoorOf(id:string){return id==='meg3n-factory'?FUTURE_DOORS[0]:HUB_DOORS.find(d=>d.id===id)||HUB_DOORS[0];}
  function setActive(value:boolean,id='five-prisons'){
   active=value;canvas.hidden=!value;hubUi.hidden=!value;keys.clear();paused=false;currentLevel=id;
-  portalMaterial.map=id!==HUB_DOORS[0].id&&HUB_DOORS.some(d=>d.id===id)?controlStill:portalTexture;hubDoors.setLevel(id);
+  portalMaterial.map=id!==HUB_DOORS[0].id&&id in LEVEL_OFFSET?controlStill:portalTexture;hubDoors.setLevel(id);future.setLevel(id);
   if(!value){intro=false;meadow.uGuidePath.value=0;guide?.stop();hubDoors.setHalVisible(true);future.setVisible(true);icons.setVisible(true);closeDialog();options.stage.classList.remove('bliss-intro');}
   // Coming back out of a level: its last subtitle and prompt would stay frozen on screen
   // (Liron's crawl line in the meadow, 2026-10-13), since the level HUD stops updating here.
   if(value){el('prompt').hidden=true;el('message').hidden=true;el('message').classList.remove('spoken');el('message').textContent='';}
-  if(value){hubDoors.setHalVisible(!intro);future.setVisible(!intro);icons.setVisible(!intro);const door=HUB_DOORS.find(d=>d.id===id)||HUB_DOORS[0];yaw=door.yaw;pitch=0;pos.set(door.x-Math.sin(yaw)*3,1.72+groundY(door.x,door.z),door.z-Math.cos(yaw)*3);canvas.focus();}
+  if(value){hubDoors.setHalVisible(!intro);future.setVisible(!intro);icons.setVisible(!intro);const door=liveDoorOf(id);yaw=door.yaw;pitch=0;pos.set(door.x-Math.sin(yaw)*3,1.72+groundY(door.x,door.z),door.z-Math.cos(yaw)*3);canvas.focus();}
   syncAudio();
  }
 
@@ -204,7 +215,7 @@ export async function createOutside(options:Options){
   }).length,boosted=!intro&&levels===2;
   return {camp,levels,boosted,walk:boosted?6:3.6,run:boosted?10:6};
  }
- function getState(){const {walk,run,boosted}=travel();return {movement:{walk,run,boosted},intro,guide:guide?.getState()||null,scene:'meadow',active,currentLevel,nearestDoor:nearestDoor?.id||null,coordinate_system:'metres; x east, z south, y up',x:+pos.x.toFixed(2),y:+pos.y.toFixed(2),z:+pos.z.toFixed(2),yaw:+yaw.toFixed(3),pitch:+pitch.toFixed(3),paused,won,saved_visual:people.size,settled:[...people.values()].filter(p=>p.arrived).length,people:[...people.entries()].map(([id,p])=>({id,character:CAST_IDS[id],x:+p.sprite.position.x.toFixed(3),z:+p.sprite.position.z.toFixed(3),height:+p.sprite.scale.y.toFixed(4),arrived:p.arrived})),portal_frames:portalFrames,hal:hubDoors.getState(),screensavers:screensavers.getState(),future:future.getState(),icons:icons.getState(),nearest_future:nearestFuture,dialog:dialogFor?{id:dialogFor,title:dialogParts.title.textContent,status:dialogParts.status.textContent,bar:dialogParts.bar.style.width}:null,portal_visible:visiblePortal,render_width:canvas.width,render_height:canvas.height,audio:blissAudio.getState()};}
+ function getState(){const {walk,run,boosted}=travel();return {movement:{walk,run,boosted},intro,guide:guide?.getState()||null,scene:'meadow',active,currentLevel,nearestDoor:nearestDoor?.id||null,coordinate_system:'metres; x east, z south, y up',x:+pos.x.toFixed(2),y:+pos.y.toFixed(2),z:+pos.z.toFixed(2),yaw:+yaw.toFixed(3),pitch:+pitch.toFixed(3),paused,won,saved_visual:people.size,settled:[...people.values()].filter(p=>p.arrived).length,people:[...people.entries()].map(([id,p])=>({id,character:MEADOW_IDS[id],out:time>=p.emergeAt,x:+p.sprite.position.x.toFixed(3),z:+p.sprite.position.z.toFixed(3),height:+p.sprite.scale.y.toFixed(4),arrived:p.arrived})),portal_frames:portalFrames,hal:hubDoors.getState(),screensavers:screensavers.getState(),future:future.getState(),icons:icons.getState(),nearest_future:nearestFuture,dialog:dialogFor?{id:dialogFor,title:dialogParts.title.textContent,status:dialogParts.status.textContent,bar:dialogParts.bar.style.width}:null,portal_visible:visiblePortal,render_width:canvas.width,render_height:canvas.height,audio:blissAudio.getState()};}
  let frameId=0;
  function frame(now:number){frameId=requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.05);last=now;if(document.hidden||!active)return;
   const state=options.read();if(!state.world||(!state.escape&&!intro))return;
@@ -229,7 +240,7 @@ export async function createOutside(options:Options){
   meadow.uTime.value=time;meadow.uCam.value.copy(pos);sky.position.copy(pos);if(!paused)screensavers.update(dt,pos,camera);
   guide?.tick(dt,pos,paused,yaw);
   const natives=state.world.people||[];
-  const offset=currentLevel==='hal-station'?5:0;
+  const offset=LEVEL_OFFSET[currentLevel]??0;
   const arrivals=new Set(camp?.roster.filter(p=>p.state==='camp').map(p=>p.id)||[]);
   for(let i=0;i<5;i++)if(escape.saved_people[i]&&natives[i]?.alive)arrivals.add(offset+i);
   for(const i of arrivals){
@@ -239,12 +250,15 @@ export async function createOutside(options:Options){
     const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:textures[art][0],color:0xdddddd,transparent:true,alphaTest:.5}));sprite.scale.set(1.8,1.8,1);sprite.center.set(.5,0);
     const start=localArrival?layout.origin:layout.target;sprite.position.set(start.x,groundY(start.x,start.z),start.z);scene.add(sprite);
     const shadow=new THREE.Mesh(blobGeo,blobMat);shadow.renderOrder=5;scene.add(shadow);
-    people.set(i,{sprite,shadow,target:new THREE.Vector3(layout.target.x,0,layout.target.z),moving:localArrival,arrived:!localArrival,arrivedAt:time});
+    const emergeAt=localArrival?lastEmerge=Math.max(time,lastEmerge+1.2):0;
+    people.set(i,{sprite,shadow,target:new THREE.Vector3(layout.target.x,0,layout.target.z),moving:localArrival,arrived:!localArrival,arrivedAt:time,emergeAt});
    }
   }
   for(const [i,p]of people){
    const before=p.sprite.position.clone(),delta=p.target.clone().sub(before);delta.y=0;
-   if(!p.arrived&&!paused){
+   // Still inside, waiting for the one ahead to clear the door.
+   const out=time>=p.emergeAt;p.sprite.visible=p.shadow.visible=out;
+   if(!p.arrived&&!paused&&out){
     if(delta.length()>.08)p.sprite.position.addScaledVector(delta.normalize(),Math.min(dt*1.8,delta.length()));
     else {p.arrived=true;p.arrivedAt=time;}
    }
@@ -257,34 +271,38 @@ export async function createOutside(options:Options){
   }
   // Only the loaded level's doorway is live (CONTROL's for anything outside the hub);
   // the other shows its still, so it needs no updates.
-  const liveDoor=HUB_DOORS.find(door=>door.id===currentLevel)||HUB_DOORS[0];
+  const liveDoor=liveDoorOf(currentLevel);
   {const dx=liveDoor.x-pos.x,dz=liveDoor.z-pos.z,distance=Math.hypot(dx,dz);visiblePortal=distance<40&&(-Math.sin(yaw)*dx-Math.cos(yaw)*dz)>distance*.35;}
   if(visiblePortal&&!intro){portalContext.drawImage(options.source,0,0,320,200);portalTexture.needsUpdate=true;portalFrames++;}
   nearestDoor=null;
   if(!paused)for(const door of HUB_DOORS)if((!intro||door.id==='five-prisons'&&guide?.ready)&&Math.hypot(pos.x-door.x,pos.z-door.z)<4.5){nearestDoor=door;break;}
   nearestFuture=!paused&&!nearestDoor&&!intro?future.nearest(pos.x,pos.z):null;
-  const futureLabel=nearestFuture==='final'?'SPACE — Display Properties':nearestFuture?`SPACE — Open ${FUTURE_DOORS.find(d=>d.id===nearestFuture)!.label}`:'';
+  const futureLabel=nearestFuture==='final'?'SPACE — Display Properties':factoryDoor()?`SPACE — Enter ${FUTURE_DOORS[0].label}`:nearestFuture?`SPACE — Open ${FUTURE_DOORS.find(d=>d.id===nearestFuture)!.label}`:'';
   const promptText=nearestDoor?`SPACE — Enter ${nearestDoor.label}`:dialogFor?'':futureLabel;
   enterButton.hidden=!promptText;enterButton.textContent=promptText?(options.prompt?.(promptText)??promptText):'';
   if(dialogFor&&(paused||future.distanceTo(dialogFor,pos.x,pos.z)>(dialogFor==='final'?13:7)))closeDialog();
   renderDialog();
   {const unresolved=Math.max(0,20-(camp?.saved??0)-(camp?.lost??0));
    const reduced=options.stage.classList.contains('reduced-motion');
-   future.update(paused?0:dt,time,pos,yaw,reduced,paused,{unresolved,levels},pitch);
+   // The MCP's face sharpens one step per structure cleared, the factory included.
+   const factory=camp?.roster.filter(p=>p.id>=10&&p.id<15)||[],cleared=levels+(factory.length===5&&factory.every(p=>p.state==='camp'||p.state==='lost')?1:0);
+   future.update(paused?0:dt,time,pos,yaw,reduced,paused,{unresolved,levels:cleared},pitch);
    icons.update(paused?0:dt,time,pos,velocity,paused);}
   const matching=camp?.roster.filter(p=>p.id>=((nearestDoor?.id==='hal-station')?5:0)&&p.id<((nearestDoor?.id==='hal-station')?10:5))||[];
   replayButton.hidden=!nearestDoor||!matching.some(p=>p.state==='lost');
   hubUi.querySelector('#hub-count')!.textContent=camp?`FREED ${camp.saved}/20 · LOST ${camp.lost} · WORLD p(DOOM) ${camp.worldPdoom}%`:'';
   el('people').textContent=won?'You made it out':'Fresh air';el('group').textContent=won?`100% survival · ${won} ${won===1?'person':'people'} safe · Take a look back`:`${escape.saved}/${state.world.alive} outside · Waiting for the others`;
-  // HAL's status strip: green per person saved, dark per person still inside, grey per person lost
-  const strip:StripLight[]=Array.from({length:5},(_,i)=>{const state=camp?.roster.find(p=>p.id===5+i)?.state;return state==='camp'||currentLevel==='hal-station'&&escape.saved_people[i]&&natives[i]?.alive?'saved':state==='lost'?'lost':'inside';});
-  hubDoors.update(paused?0:dt,time,pos,options.stage.classList.contains('reduced-motion'),strip);
+  // Status strips (HAL's, MEG3N's): green per person out of the door, dark per person still inside, grey per person lost
+  const light=(id:number):StripLight=>{const p=people.get(id);return p?time>=p.emergeAt?'saved':'inside':camp?.roster.find(r=>r.id===id)?.state==='lost'?'lost':'inside';};
+  const strip=(first:number)=>Array.from({length:5},(_,i)=>light(first+i));
+  future.setFactoryStrip(strip(10));
+  hubDoors.update(paused?0:dt,time,pos,options.stage.classList.contains('reduced-motion'),strip(5));
   grass.update(camera);
   renderer.render(scene,camera);
   if(options.labels){
    const rects:LabelRect[]=[],right=new THREE.Vector3(1,0,0).applyQuaternion(camera.quaternion),ray=new THREE.Raycaster();
    for(const [id,person] of people){
-    const body=person.sprite,depth=body.position.distanceTo(pos);if(depth>40)continue;
+    const body=person.sprite,depth=body.position.distanceTo(pos);if(depth>40||!body.visible)continue;
     const mid=body.position.clone().add(new THREE.Vector3(0,body.scale.y*.5,0));
     ray.set(pos,mid.clone().sub(pos).normalize());ray.far=pos.distanceTo(mid);
     if(ray.intersectObjects(labelOccluders,false).length)continue;

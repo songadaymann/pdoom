@@ -41,7 +41,7 @@ def ink(image):
             if max(r, g, b) < 100: image.putpixel((x, y), (r, g, b, 0))
     return image
 
-def make_font(name, images, pixel):
+def make_font(name, images, pixel, tops=None, cap=None):
     fb = FontBuilder(1000, isTTF=True)
     order = ['.notdef', 'space'] + [f'g{code}' for code in images]
     glyphs, metrics = {}, {'.notdef': (500, 0), 'space': (400, 0)}
@@ -59,7 +59,11 @@ def make_font(name, images, pixel):
                 end = x + 1
                 while end < image.width and image.getpixel((end, y))[3]: end += 1
                 left, right = x * pixel, end * pixel
-                bottom, top = (image.height - y - 1) * pixel, (image.height - y) * pixel
+                # Doom draws each glyph patch from the line's top minus its top offset, so a
+                # short glyph keeps its height: apostrophes and quotes high, hyphens mid-line.
+                # Bottom-aligning them made "'" look like "," and "-" like "_" (fixed 2026-10-19).
+                row = (cap - (y - tops.get(code, 0)) - 1) if tops is not None else image.height - y - 1
+                bottom, top = row * pixel, (row + 1) * pixel
                 pen.moveTo((left, bottom)); pen.lineTo((left, top))
                 pen.lineTo((right, top)); pen.lineTo((right, bottom)); pen.closePath()
                 x = end
@@ -75,11 +79,12 @@ def make_font(name, images, pixel):
     fb.setupOS2(sTypoAscender=900, sTypoDescender=-100, usWinAscent=1000, usWinDescent=100)
     fb.setupPost(); fb.setupMaxp(); fb.save(out / (name.replace(' ', '-').lower() + '.ttf'))
 
-small = {}
+small, small_tops = {}, {}
 for code in range(33, 127):
     upper = ord(chr(code).upper())
     key = f'STCFN{upper:03}'
-    if key in lumps: small[code] = ink(patch(key))
+    if key in lumps:
+        small[code] = ink(patch(key)); small_tops[code] = struct.unpack_from('<HHhh', lumps[key])[3]
 def symbol(rows):
     image = Image.new('RGBA', (len(rows[0]), len(rows)))
     for y, row in enumerate(rows):
@@ -92,8 +97,8 @@ small[0x2713] = symbol(['000000','000001','000010','100100','011000','000000','0
 small[0x00d7] = symbol(['00000','10001','01010','00100','01010','10001','00000'])
 small[0x2022] = symbol(['00000','00000','01110','01110','01110','00000','00000'])
 for code in [0x2014, 0x2013]: small[code] = symbol(['000000','000000','000000','111111','000000','000000','000000'])
-for code in [0x2018, 0x2019]: small[code] = small[39]
-make_font('Doom Small', small, 100)
+for code in [0x2018, 0x2019]: small[code], small_tops[code] = small[39], small_tops[39]
+make_font('Doom Small', small, 100, small_tops, struct.unpack_from('<HHhh', lumps['STCFN065'])[1])
 numbers = {48 + i: ink(patch(f'STTNUM{i}')) for i in range(10)}
 numbers[37] = ink(patch('STTPRCNT'))
 numbers[0x2248] = small[0x2248].resize((14, 16), Image.Resampling.NEAREST)
@@ -115,6 +120,11 @@ backdrop = Image.new('RGBA', (320, 200))
 for y in range(0, 200, 64):
     for x in range(0, 320, 64): backdrop.paste(tile, (x, y))
 backdrop.save(out / 'interpic.png')
+# Doom's episode 1 text-screen flat (the same FLOOR4_8), under levels 1-2's exit text (E1M4, E1M7).
+Image.frombytes('RGB', (64, 64), b''.join(palette[c * 3:c * 3 + 3] for c in flat[:4096])).save(out / 'textscreen-e1.png')
+# Doom's episode 2 text-screen flat, under level 3's exit text (exit-text.js; the factory is E2M7).
+text_flat = lumps['SFLR6_1']
+Image.frombytes('RGB', (64, 64), b''.join(palette[c * 3:c * 3 + 3] for c in text_flat[:4096])).save(out / 'textscreen-e2.png')
 title = backdrop.copy(); title.alpha_composite(Image.new('RGBA', title.size, (0, 0, 0, 140)))
 title.alpha_composite(logo, ((title.width - logo.width) // 2, 28))
 def words(image, text, y, color):

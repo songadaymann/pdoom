@@ -38,3 +38,7 @@ p{line-height:1.6;margin:0}
 .action-pad{display:grid;grid-template-columns:repeat(3,auto);gap:4px}
 @media (pointer:coarse){#hud{max-width:calc(100vw - 112px)}.controls{font-size:13px}#restart{top:max(12px,env(safe-area-inset-top))}#message{top:140px;bottom:auto}#prompt{top:52%}#dev-badge{top:108px;bottom:auto}.outside #dev-badge{top:76px}}
 @media (pointer:coarse) and (max-width:560px){.action-pad{grid-template-columns:repeat(2,72px)}#touch .action-pad button{font-size:13px}h1{margin-bottom:0}#launcher{gap:6px}.controls{margin:6px 0}}
+/* Factory: since 2026-10-20 the stage is also .checkpoint, so it has levels 1-2's Doom
+   status bar (doom-hud.css) and text layout (level-polish.css #game-text, doom-theme.css);
+   .factory-prototype only marks the factory's own extras. */
+#stage.factory-prototype #dev-badge{top:16px;bottom:auto}

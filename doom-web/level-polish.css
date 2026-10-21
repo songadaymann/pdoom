@@ -8,12 +8,12 @@
    Their height can grow with wrapped text without colliding with one another.
    It starts above the objective line (#people) that sits on the status bar (2026-10-13). */
 #game-text{display:contents}
-#stage.checkpoint:not(.outside) #game-text{position:absolute;z-index:7;display:flex;flex-direction:column;align-items:center;gap:8px;left:0;right:0;margin:0 auto;bottom:calc(var(--bar-top) + var(--px-s) * 14 + 24px);width:min(calc(var(--px) * 400),calc(var(--gw) - 32px));pointer-events:none}
-#stage.checkpoint:not(.outside) #game-text :is(#prompt,#message,#status-line,#hal-thaw){position:static;inset:auto;transform:none;box-sizing:border-box;margin:0;max-width:100%;width:fit-content;overflow-wrap:anywhere}
-#stage.checkpoint:not(.outside) #status-line{background:#160c09e8;padding:6px 12px;line-height:var(--doom-lead);font-size:var(--doom-text)}
+#stage:is(.checkpoint:not(.outside),.factory-prototype) #game-text{position:absolute;z-index:7;display:flex;flex-direction:column;align-items:center;gap:8px;left:0;right:0;margin:0 auto;bottom:calc(var(--bar-top) + var(--px-s) * 14 + 24px);width:min(calc(var(--px) * 400),calc(var(--gw) - 32px));pointer-events:none}
+#stage:is(.checkpoint:not(.outside),.factory-prototype) #game-text :is(#prompt,#message,#status-line,#hal-thaw){position:static;inset:auto;transform:none;box-sizing:border-box;margin:0;max-width:100%;width:fit-content;overflow-wrap:anywhere}
+#stage:is(.checkpoint:not(.outside),.factory-prototype) #status-line{background:#160c09e8;padding:6px 12px;line-height:var(--doom-lead);font-size:var(--doom-text)}
 #stage.discovery-active :is(#game-text,#threat-warning){visibility:hidden}
-@media(pointer:coarse) and (orientation:portrait){#stage.checkpoint:not(.outside) #game-text{bottom:calc(max(var(--view-bottom),176px + var(--bar-h)) + 14px);width:calc(100% - 24px)}}
-@media(pointer:coarse) and (orientation:landscape){#stage.checkpoint:not(.outside) #game-text{bottom:12px;width:calc(100% - 228px)}#stage.checkpoint:not(.outside) #game-text :is(#prompt,#message,#status-line,#hal-thaw){padding:4px 8px}}
+@media(pointer:coarse) and (orientation:portrait){#stage:is(.checkpoint:not(.outside),.factory-prototype) #game-text{bottom:calc(max(var(--view-bottom),176px + var(--bar-h)) + 14px);width:calc(100% - 24px)}}
+@media(pointer:coarse) and (orientation:landscape){#stage:is(.checkpoint:not(.outside),.factory-prototype) #game-text{bottom:12px;width:calc(100% - 228px)}#stage:is(.checkpoint:not(.outside),.factory-prototype) #game-text :is(#prompt,#message,#status-line,#hal-thaw){padding:4px 8px}}
 #threat-warning{position:absolute;inset:0;pointer-events:none;color:#ff6052;text-align:center;padding-top:13vh;font:var(--doom-text) 'DoomSmall',monospace;text-shadow:var(--px) var(--px) #000}
 #threat-warning.locked{box-shadow:inset 0 0 calc(25px + var(--charge)*100px) rgba(180,0,0,.36)}
 

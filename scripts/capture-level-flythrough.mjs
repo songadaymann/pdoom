@@ -37,7 +37,10 @@
 //   {name, seconds, ease: smooth|gentle|linear|..., fov?, keys: [{at:[x,y,z], look:[x,y,z]} | {at, yaw, pitch}],
 //    lookAtGuardian?: z, guardianPitch?: deg, face?: [prisoner sites], wait?: {kind: 'tea'|'delay', arg},
 //    guardian?: {keys:[{at:[x,y]}], seconds?, hover?, face?: 'move'|'camera'|deg|[x,y], mode, states:[{at, mode, face?}]}}
-//   Doom units, z absolute. Guardian modes: 1 walk, 3 stand, 4 aim (red visor), 2/6/5 HAL cyan/amber/red eye.
+//   Doom units, z absolute. Guardian modes: 1 walk, 3 stand, 4 aim (red visor), 2/6/5 HAL cyan/amber/red eye;
+//   MEG3N (E2M7): 1 walk, 3 stand, 7 dance, 8 filming you, 9 shelf-doll freeze, 10 peekaboo, 11 heart hands, 12 stunned.
+//   capture.hubEntry: walk in through SAFE MODE's door (F2, PDCampaignSession.EnterFactory) before filming, so a
+//   'player' shot is the view a player walking in from the hub gets (the factory's front door).
 //   A vertical format may reuse the landscape shots ("shotsFrom") with per-shot "overrides".
 //
 // Output: doom-web/local/intro/levels/raw/<map>[-vertical]/<shot>/00000.png ...
@@ -140,7 +143,21 @@ function lookAngles(from, to) {
   const dx = to[0] - from[0], dy = to[1] - from[1], dz = to[2] - from[2];
   return [Math.atan2(dy, dx) * 180 / Math.PI, -Math.atan2(dz, Math.hypot(dx, dy)) * 180 / Math.PI];
 }
+// Timed keys (every key has t, in seconds): eased segment by segment, so a shot can hold still,
+// move quickly, then hold again (MEG3N moves only while you look away). Returns the value at tic f.
+function timedKeys(keys, field, kind) {
+  return f => {
+    const t = f / 35;
+    if (t <= keys[0].t) return keys[0][field].slice();
+    for (let i = 1; i < keys.length; i++) if (t < keys[i].t) {
+      const a = keys[i - 1], b = keys[i], u = ease(kind, (t - a.t) / (b.t - a.t));
+      return a[field].map((v, j) => lerp(v, b[field][j], u));
+    }
+    return keys.at(-1)[field].slice();
+  };
+}
 // A shot: {name, seconds, ease, keys:[{at:[x,y,z], look:[x,y,z]} | {at, yaw, pitch}], guardian?}
+//   keys (camera at/look keys) and guardian keys may instead all carry t (seconds): see timedKeys.
 function shotPoses(shot) {
   const n = Math.max(2, Math.round(shot.seconds * 35) + 1);   // per tic; one extra so a 30 fps capture can reach the end
   if (shot.player) {
@@ -153,17 +170,24 @@ function shotPoses(shot) {
     }
     return {n, poses, g: null};
   }
-  const at = catmull(shot.keys.map(k => k.at));
+  if (shot.keys.every(k => k.t !== undefined)) {
+    const cam = timedKeys(shot.keys, 'at', shot.segmentEase || 'smooth');
+    const lk = shot.keys.every(k => k.look) ? timedKeys(shot.keys, 'look', shot.segmentEase || 'smooth') : null;
+    shot = {...shot, ease: 'linear', lookEase: 'linear', timedAt: u => cam(u * (n - 1)), timedLook: lk && (u => lk(u * (n - 1)))};
+  }
+  const at = shot.timedAt || catmull(shot.keys.map(k => k.at));
   // guardian path (optional): keys [{at:[x,y]}], hover (z above floor), face: 'move' | 'camera' | deg | [x,y],
   // mode (1 walk, 3 stand, 4 aim, 2/5/6 HAL cyan/red/amber), states [{at: seconds, mode}], seconds (path duration)
   let g = null, gxy = null;
   if (shot.guardian) {
     const gs = shot.guardian;
-    const gp = catmull(gs.keys.map(k => k.at));
-    const gn = gs.seconds ? Math.round(gs.seconds * 35) : n - 1;   // the guardian may finish its path early and hold
+    const gTimed = gs.keys.every(k => k.t !== undefined);
+    const gn = !gTimed && gs.seconds ? Math.round(gs.seconds * 35) : n - 1;   // the guardian may finish its path early and hold
+    const gt = gTimed ? timedKeys(gs.keys, 'at', gs.segmentEase || 'smooth') : null;
+    const gp = gTimed ? (u => gt(u * gn)) : catmull(gs.keys.map(k => k.at));
     g = []; gxy = [];
     for (let f = 0; f < n; f++) {
-      const u = ease(gs.ease || 'linear', Math.min(1, f / gn));
+      const u = ease(gTimed ? 'linear' : gs.ease || 'linear', Math.min(1, f / gn));
       const p = gp(u);
       gxy.push(p);
       g.push([1, p[0], p[1], gs.hover ?? 0, 0, 0, u]);
@@ -188,7 +212,7 @@ function shotPoses(shot) {
   // look targets are splined too (so the aim glides), then converted to angles per frame;
   // lookAtGuardian: z  aims at the guardian instead (lookMix blends key looks into it)
   const hasLook = shot.keys.every(k => k.look);
-  const look = hasLook ? catmull(shot.keys.map(k => k.look)) : null;
+  const look = hasLook ? shot.timedLook || catmull(shot.keys.map(k => k.look)) : null;
   const yawK = hasLook ? null : unwrapDeg(shot.keys.map(k => k.yaw));
   const yawS = yawK ? catmull(yawK.map((y, i) => [y, shot.keys[i].pitch ?? 0])) : null;
   const poses = [];
@@ -232,6 +256,10 @@ class PDCapHandler : EventHandler
 	bool TeaEdge;
 	bool Loaded, Active, Done, Hidden;
 	PDCapCamera Cam;
+	// MEG3N's factory (E2M7): a stand-in MEG3N the factory knows nothing about, so its AI never
+	// resets her pose; the real one is hidden and held still (Factory.zs TickGuardian's stun branch).
+	PDFactoryGuardian Meg;
+	int MegMode, MegSince;
 
 	void LoadPath()
 	{
@@ -276,6 +304,13 @@ class PDCapHandler : EventHandler
 			Cam = PDCapCamera(Actor.Spawn('PDCapCamera', pawn.Pos));
 			players[0].cheats |= CF_GODMODE | CF_NOTARGET;
 			pawn.bInvisible = true;
+			let fac = PDFactory.Get();
+			if (fac && fac.Active && fac.Guardian)
+			{
+				Meg = PDFactoryGuardian(Actor.Spawn('PDFactoryGuardian', fac.Guardian.Pos));
+				fac.Guardian.bInvisible = true; fac.Guardian.bSolid = false;
+				fac.StunUntil = level.time + 10;
+			}
 			Console.Printf("PDCAP GO");
 			Console.Printf("PDCAP PLAYER %.3f %.3f %.3f %.3f %.3f %.3f %.1f", pawn.Pos.X, pawn.Pos.Y, pawn.Pos.Z, players[0].viewz, pawn.Angle, pawn.Pitch, players[0].FOV);
 		}
@@ -285,6 +320,8 @@ class PDCapHandler : EventHandler
 	override void WorldTick()
 	{
 		if (!Active || Done || !Cam) return;
+		let fac = PDFactory.Get();
+		if (Meg && fac) fac.StunUntil = level.time + 10;
 		let game = PDCheckpoint.Get();
 		if (game && game.Hal && game.Hal.Service) { TeaEdge = game.Hal.Service.Phase != TeaPhase; TeaPhase = game.Hal.Service.Phase; }
 		// A cut: the first pose of a shot is held for two extra tics, so the engine's view
@@ -330,7 +367,20 @@ class PDCapHandler : EventHandler
 		players[0].camera = Cam;
 		DriveGuardian(game, frame, first);
 		int face = ShotFace[FrameShot[frame]];
-		if (face && game && game.Cast)
+		let fac = PDFactory.Get();
+		if (face && Meg && fac)
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				let body = fac.People[i];
+				if (!(face & (1 << i)) || !body) continue;
+				if (first) HoldAt[i] = body.Pos;
+				body.SetOrigin(HoldAt[i], true);
+				body.Vel = (0, 0, 0);
+				body.A_SetAngle(atan2(Cam.Pos.Y - body.Pos.Y, Cam.Pos.X - body.Pos.X), first ? 0 : SPF_INTERPOLATE);
+			}
+		}
+		else if (face && game && game.Cast)
 		{
 			for (int i = 0; i < game.Cast.People.Size() && i < 8; i++)
 			{
@@ -351,6 +401,7 @@ class PDCapHandler : EventHandler
 	// modes: 1 walk, 3 stand, 4 aim (red visor), 2 HAL float (cyan eye), 5 HAL float red eye, 6 HAL float amber eye
 	void DriveGuardian(PDCheckpoint game, int frame, bool first)
 	{
+		if (Meg) { DriveMeg(frame, first); return; }
 		if (!game || !game.Hunter) return;
 		int b = frame * 6;
 		if (G[b] <= 0) return;
@@ -372,6 +423,23 @@ class PDCapHandler : EventHandler
 			if (mode == 4) h.SetStateLabel('Aim');
 		}
 		LastMode = mode;
+	}
+
+	// MEG3N: her actor draws her frame from these fields (FactoryActors.zs PDFactoryGuardian.Tick).
+	void DriveMeg(int frame, bool first)
+	{
+		int b = frame * 6;
+		if (G[b] <= 0) return;
+		int mode = int(G[b + 5]);
+		Vector2 xy = (G[b + 1], G[b + 2]);
+		double z = level.PointInSector(xy).floorplane.ZatPoint(xy) + G[b + 3];
+		Meg.SetOrigin((xy, z), !first);
+		Meg.A_SetAngle(G[b + 4], first ? 0 : SPF_INTERPOLATE);
+		if (first) Meg.ClearInterpolation();
+		if (first || mode != MegMode) { MegMode = mode; MegSince = level.time; }
+		Meg.Dancing = mode == 7; Meg.DanceSince = MegSince;
+		Meg.WatchPose = mode >= 8 && mode <= 11 ? mode - 7 : 0; Meg.WatchSince = MegSince;
+		Meg.ArtStunUntil = mode == 12 ? level.time + 10 : 0;
 	}
 }
 `;
@@ -579,6 +647,18 @@ try {
     if (s.mode === 'playing' && s.world?.ticks > 35) break;
     if (Date.now() - t0 > 90000) throw Error('Boot timeout: ' + JSON.stringify({mode: s.mode, logs: await page.evaluate(() => window.__PDCAP__.logs)}));
     await page.waitForTimeout(250);
+  }
+  if (cap.hubEntry) {
+    // Walk in from SAFE MODE (F2 -> PDCampaignSession.EnterFactory): the map reloads at the front door.
+    await page.evaluate(() => window.__pdcapKey('F2', 'F2', 113));
+    const t1 = Date.now();
+    while (true) {
+      const s = await read();
+      if (s.mode === 'error') throw Error('Engine error: ' + s.error);
+      if (s.factory?.hub_entry === 1 && s.mode === 'playing' && s.world?.ticks > 35) break;
+      if (Date.now() - t1 > 60000) throw Error('Hub entry timeout: ' + JSON.stringify({mode: s.mode, ticks: s.world?.ticks, hub: s.factory?.hub_entry}));
+      await page.waitForTimeout(250);
+    }
   }
   const pdlog = await page.evaluate(() => window.__DOOM_DEBUG__.logs.filter(l => /PDCAP|capture\.pk3|Script error|ZSCRIPT/i.test(l)).slice(-10));
   console.log('[pdcap] engine up', pdlog);

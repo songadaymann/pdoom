@@ -5,11 +5,24 @@ episode E1M7 { name = "Confabulation Station" key = "h" }
 gameinfo
 {
     PlayerClasses = "PDSurvivorPlayer"
-    AddEventHandlers = "PDCampaignSession", "PDGame", "PDCheckpoint", "PDPlatformPanel", "PDEnvironmentReport", "PDLastStand", "PDAutoDoors"
+    AddEventHandlers = "PDCampaignSession", "PDGame", "PDCheckpoint", "PDPlatformPanel", "PDEnvironmentReport", "PDLastStand", "PDAutoDoors", "PDFactory"
 }
 
 DoomEdNums
 {
+    15300 = PDFactoryPerson
+    15301 = PDFactoryGuardian
+    15302 = PDFactoryProp
+    15303 = PDFactoryGuard
+    15304 = PDFactoryDoll
+    15305 = PDFactoryBox
+    15306 = PDFactoryScreen
+    15307 = PDFactoryRouteScreen
+    15320 = PDToyDrum
+    15321 = PDToyLamp
+    15322 = PDToyPylon
+    15323 = PDToyColumn
+    15324 = PDToyBollard
     15000 = PDCompanion
     15001 = PDHunter
     15002 = PDCamera
@@ -103,3 +116,6 @@ map E1M4 "p(DOOM): Five Prisons"
 
 map E1M7 "p(DOOM): Computer Station"
 {next="EndGame1" secretnext="EndGame1" levelnum=7 sky1="SKY1",0 music="D_E1M7" nointermission nojump allowcrouch}
+
+map E2M7 "p(DOOM): MEG3N's Toy Factory"
+{next="EndGame2" secretnext="EndGame2" levelnum=27 sky1="FTOYSKY",0 music="D_E2M7" nointermission nojump allowcrouch}

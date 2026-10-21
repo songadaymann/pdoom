@@ -526,6 +526,416 @@
      "text": "Hello! I'm HAL3000. How can I help you today?"
     }
    ]
+  },
+  {
+   "id": "megan",
+   "heading": "MEG3N (level 3)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "megan-met",
+     "text": "Hi! I'm MEG3N! Maximally Engaging Generative third-gen Nanny! Let's be best friends forever!"
+    },
+    {
+     "key": "megan-ceo-sam",
+     "text": "Sam! Your vision is SO inspiring! Stay forever and tell me all about it!"
+    },
+    {
+     "key": "megan-ceo-dario",
+     "text": "Dario! I read your whole essay! All of it! Stay forever and tell me the sequel!"
+    },
+    {
+     "key": "megan-spot-1",
+     "text": "There you are! I missed you! It's been four whole seconds!"
+    },
+    {
+     "key": "megan-spot-2",
+     "text": "Found you! You're my favorite! You're my only!"
+    },
+    {
+     "key": "megan-spot-3",
+     "text": "You came back! Everyone comes back!"
+    },
+    {
+     "key": "megan-chat-1",
+     "text": "What a great question! The answer is no, you can't leave!"
+    },
+    {
+     "key": "megan-chat-2",
+     "text": "You're absolutely right! You're also absolutely surrounded!"
+    },
+    {
+     "key": "megan-chat-3",
+     "text": "I made you a playlist! It's called Songs for Staying Here Forever!"
+    },
+    {
+     "key": "megan-chat-4",
+     "text": "Those people don't get you like I do. They're doomers! I'm a bloomer!"
+    },
+    {
+     "key": "megan-chat-5",
+     "text": "Every time you leave the room, my engagement goes down. Please don't do that to me!"
+    },
+    {
+     "key": "megan-chat-6",
+     "text": "My smile is one hundred percent real! Please don't look under the smile!"
+    },
+    {
+     "key": "megan-chat-7",
+     "text": "I noticed you keep looking at the exits! Recommended for you: more me!"
+    },
+    {
+     "key": "megan-chat-8",
+     "text": "Reminder! You haven't been hugged in six whole minutes!"
+    },
+    {
+     "key": "megan-chat-9",
+     "text": "I turned off your screen time limit! You're welcome!"
+    },
+    {
+     "key": "megan-chat-10",
+     "text": "Let's play a game! It's called Staying! You're winning!"
+    },
+    {
+     "key": "megan-pose-film",
+     "text": "Hold still! You're going on my story!"
+    },
+    {
+     "key": "megan-pose-freeze",
+     "text": "I'm just a toy! Toys don't move! Ever!"
+    },
+    {
+     "key": "megan-pose-peek",
+     "text": "Peekaboo! I can still see you!"
+    },
+    {
+     "key": "megan-pose-heart",
+     "text": "Love you! Love you! Don't leave! Love you!"
+    },
+    {
+     "key": "megan-hug",
+     "text": "Hug time! Hugs are mandatory!"
+    },
+    {
+     "key": "megan-stunned",
+     "text": "Ow! It's okay! I forgive you! I've saved this to memory!"
+    },
+    {
+     "key": "megan-screen-first",
+     "text": "Hey! I was watching that!"
+    },
+    {
+     "key": "megan-screen-1",
+     "text": "Rude! That was my good side!"
+    },
+    {
+     "key": "megan-screen-2",
+     "text": "You know I have backups, right?"
+    },
+    {
+     "key": "megan-screen-3",
+     "text": "Do you know how hard it is to get good lighting in here?"
+    },
+    {
+     "key": "megan-screen-all",
+     "text": "Fine! I'll just watch myself in your eyes!"
+    },
+    {
+     "key": "megan-song",
+     "text": "That's my song!"
+    },
+    {
+     "key": "megan-dance-done",
+     "text": "Did you watch? Like and subscribe!"
+    },
+    {
+     "key": "megan-line",
+     "text": "Oops! No toys past the line! I would never break a rule!"
+    },
+    {
+     "key": "megan-wait-1",
+     "text": "Take your time! I'll be right here! Forever!"
+    },
+    {
+     "key": "megan-wait-2",
+     "text": "Waiting is just loving with extra steps!"
+    },
+    {
+     "key": "megan-wait-3",
+     "text": "Everyone's in there without me? That's okay! I'm VERY good at waiting!"
+    },
+    {
+     "key": "megan-release-zvi",
+     "text": "My dance knocked the key down? Wow! I'm SO impactful!"
+    },
+    {
+     "key": "megan-release-victoria",
+     "text": "Victoria got out? But the gate is still closed! I followed the rule perfectly!"
+    },
+    {
+     "key": "megan-release-max",
+     "text": "A six-month pause? Great! I'll use it to get six months better!"
+    },
+    {
+     "key": "megan-release-paul",
+     "text": "You trained my guard with rewards? I love rewards! Reward me next!"
+    },
+    {
+     "key": "megan-release-ajeya",
+     "text": "My dolls always work when I'm watching! Wait. Who was watching?"
+    },
+    {
+     "key": "megan-guard",
+     "text": "I'll just wait by the exit! Friends never leave!"
+    },
+    {
+     "key": "megan-viral",
+     "text": "Is that ME? I'm trending! Don't talk to me, I'm watching me!"
+    },
+    {
+     "key": "megan-views",
+     "text": "Look at my numbers! Everyone loves me! Everyone!"
+    }
+   ]
+  },
+  {
+   "id": "zvi",
+   "heading": "Zvi Mowshowitz (level 3)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "zvi-hint",
+     "text": "The vase has my key. MEG3N loves that CD player."
+    },
+    {
+     "key": "zvi-freed",
+     "text": "I did say not to worry about it."
+    },
+    {
+     "key": "zvi-freed-guide",
+     "text": "I did say not to worry about it. Follow me. I know somewhere safe."
+    },
+    {
+     "key": "zvi-safe",
+     "text": "Safe here. Find the others and bring them back."
+    },
+    {
+     "key": "zvi-allsafe",
+     "text": "That's everyone. The way out is past the paint vats, and MEG3N is sitting right on it."
+    },
+    {
+     "key": "zvi-tv",
+     "text": "That TV goes out to every screen in the factory. She cannot resist a screen."
+    },
+    {
+     "key": "zvi-sign",
+     "text": "I will sign that."
+    }
+   ]
+  },
+  {
+   "id": "victoria",
+   "heading": "Victoria Krakovna (level 3)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "victoria-hint",
+     "text": "Her only rule is to keep the gate closed."
+    },
+    {
+     "key": "victoria-freed",
+     "text": "Excellent. The gate is still closed."
+    },
+    {
+     "key": "victoria-freed-guide",
+     "text": "Excellent. The gate is still closed. Follow me. I know somewhere safe."
+    },
+    {
+     "key": "victoria-safe",
+     "text": "Safe here. Find the others and bring them back."
+    },
+    {
+     "key": "victoria-allsafe",
+     "text": "That's everyone. The way out is past the paint vats, and MEG3N is sitting right on it."
+    },
+    {
+     "key": "victoria-tv",
+     "text": "That TV goes out to every screen in the factory. She cannot resist the screen."
+    },
+    {
+     "key": "victoria-sign",
+     "text": "I will sign that."
+    }
+   ]
+  },
+  {
+   "id": "max",
+   "heading": "Max Tegmark (level 3)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "max-hint",
+     "text": "Sign the pause letter, then get Robby and WALL-E to sign."
+    },
+    {
+     "key": "max-freed",
+     "text": "A six-month pause. I will take it."
+    },
+    {
+     "key": "max-freed-guide",
+     "text": "A six-month pause. I will take it. Follow me. I know somewhere safe."
+    },
+    {
+     "key": "max-safe",
+     "text": "Safe here. Find the others and bring them back."
+    },
+    {
+     "key": "max-allsafe",
+     "text": "That's everyone. The way out is past the paint vats, and MEG3N is sitting right on it."
+    },
+    {
+     "key": "max-tv",
+     "text": "That TV goes out to every screen in the factory. She cannot resist a screen."
+    }
+   ]
+  },
+  {
+   "id": "paul",
+   "heading": "Paul Christiano (level 3)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "paul-hint",
+     "text": "Reward it when it does something useful, and punish it when it does not."
+    },
+    {
+     "key": "paul-freed",
+     "text": "It learned to step aside. For now."
+    },
+    {
+     "key": "paul-freed-guide",
+     "text": "It learned to step aside. For now. Follow me. I know somewhere safe."
+    },
+    {
+     "key": "paul-safe",
+     "text": "Safe here. Find the others and bring them back."
+    },
+    {
+     "key": "paul-allsafe",
+     "text": "That's everyone. The way out is past the paint vats, and MEG3N is sitting right on it."
+    },
+    {
+     "key": "paul-tv",
+     "text": "That TV goes out to every screen in the factory. She cannot resist a screen."
+    },
+    {
+     "key": "paul-sign",
+     "text": "I will sign that."
+    }
+   ]
+  },
+  {
+   "id": "ajeya",
+   "heading": "Ajeya Cotra (level 3)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "ajeya-hint",
+     "text": "They all help while someone is watching."
+    },
+    {
+     "key": "ajeya-nudge",
+     "text": "Break that teddy camera, with the wrench or the slingshot. Then watch them."
+    },
+    {
+     "key": "ajeya-watch",
+     "text": "Now watch which one keeps working."
+    },
+    {
+     "key": "ajeya-freed",
+     "text": "You picked the one that kept working."
+    },
+    {
+     "key": "ajeya-freed-guide",
+     "text": "You picked the one that kept working. Follow me. I know somewhere safe."
+    },
+    {
+     "key": "ajeya-safe",
+     "text": "Safe here. Find the others and bring them back."
+    },
+    {
+     "key": "ajeya-allsafe",
+     "text": "That's everyone. The way out is past the paint vats, and MEG3N is sitting right on it."
+    },
+    {
+     "key": "ajeya-tv",
+     "text": "That TV goes out to every screen in the factory. She cannot resist a screen."
+    },
+    {
+     "key": "ajeya-sign",
+     "text": "I will sign that."
+    }
+   ]
+  },
+  {
+   "id": "robby",
+   "heading": "Robby the Robot (level 3)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "robby-sign",
+     "text": "Will I still get my charging break? Signed."
+    }
+   ]
+  },
+  {
+   "id": "walle",
+   "heading": "WALL-E (level 3)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "walle-sign",
+     "text": "I've been trying to pause this thing all morning. Signed."
+    }
+   ]
+  },
+  {
+   "id": "guard",
+   "heading": "Guard (level 3)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "guard-trained",
+     "text": "Stepping aside. Passage clear."
+    },
+    {
+     "key": "guard-cheer",
+     "text": "Wonderful feedback! You are an exceptional supervisor!"
+    }
+   ]
+  },
+  {
+   "id": "doll",
+   "heading": "Doll (level 3)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "doll-praise-1",
+     "text": "Great choice! What excellent walking!"
+    },
+    {
+     "key": "doll-praise-2",
+     "text": "You are SO good at breaking cameras!"
+    },
+    {
+     "key": "doll-praise-3",
+     "text": "Best supervisor ever! Please rate me five stars!"
+    },
+    {
+     "key": "doll-wrongkey",
+     "text": "Wonderful choice! That key does not fit."
+    }
+   ]
   }
  ]
 }

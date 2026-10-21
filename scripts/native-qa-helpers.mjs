@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 export function nativeQA(page){
  const read=async()=>JSON.parse(await page.evaluate(()=>window.render_game_to_text()));
- async function wait(test,label,timeout=8000){const end=Date.now()+timeout;while(Date.now()<end){const s=await read();assert.notEqual(s.mode,'error',s.error);if(test(s))return s;await page.waitForTimeout(100);}throw Error(label+': '+JSON.stringify(await read()));}
+ // Deadlines are wall-clock, but a closed lid (clamshell sleep, DarkWake) freezes the
+ // engine and this loop together. A long gap between polls is the host suspended, not
+ // game time, so extend the deadline instead of failing on the last frozen frame (2026-10-17).
+ async function wait(test,label,timeout=8000){let end=Date.now()+timeout,last=Date.now(),suspended=0;while(Date.now()<end){const s=await read();assert.notEqual(s.mode,'error',s.error);if(test(s))return s;await page.waitForTimeout(100);const now=Date.now(),gap=now-last-100;last=now;if(gap>2000){end+=gap;suspended+=gap;console.warn(`[native-qa] host suspended ${Math.round(gap/1000)} s during "${label}"; deadline extended`);}}throw Error(label+(suspended?` (host suspended ${Math.round(suspended/1000)} s)`:'')+': '+JSON.stringify(await read()));}
  async function face(angle){for(let i=0;i<20;i++){const s=await read(),d=((angle-s.world.angle+540)%360)-180;if(Math.abs(d)<5)return;const k=d>0?'ArrowLeft':'ArrowRight';await page.keyboard.down(k);await page.waitForTimeout(Math.min(700,Math.max(40,Math.abs(d)*8)));await page.keyboard.up(k);await page.waitForTimeout(180);}throw Error('Facing '+angle);}
  async function rawKey(code,key,keyCode){await page.evaluate(({code,key,keyCode})=>{for(const evType of ['keydown','keyup'])window.__QA_WORKER__.postMessage({type:'input',target:'window',evType,init:{code,key,keyCode,which:keyCode,bubbles:true,cancelable:true}});},{code,key,keyCode});}
  async function consoleKey(){await rawKey('Backquote','`',192);}

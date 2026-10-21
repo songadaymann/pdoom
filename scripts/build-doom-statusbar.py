@@ -173,6 +173,8 @@ SMALL = {
     'F': (['###', '#..', '##.', '#..', '#..'], None, ('STBAR', 264, 11)),
     'I': (['###', '.#.', '.#.', '.#.', '###'], None),
     'V': (['#.#', '#.#', '#.#', '#.#', '.#.'], None),
+    # Authored for SCRN: H's stems with a diagonal between them.
+    'N': (['#..#', '##.#', '#.##', '#..#', '#..#'], None, ('STBAR', 259, 11)),
 }
 
 # New labels. Row 0 is the body's top row in bar coordinates.
@@ -180,6 +182,7 @@ P_DOOM_LABEL = 'P(DOOM)'
 FREED_LABEL = 'FREED'
 FREED_GLYPHS = 'FReeD'  # narrow E twice
 TALLY_LABELS = ['CAMS', 'FREE', 'SAFE', 'LIVE']  # replaces BULL, SHEL, RCKT, CELL
+FACTORY_TALLY_LABELS = ['SCRN', 'FREE', 'SAFE', 'LIVE']  # MEG3N's factory: her live-feed screens
 TALLY_ROWS = [5, 11, 17, 23]
 
 
@@ -483,9 +486,14 @@ def main():
     draw_text(bar, P_DOOM_LABEL, 179 + (56 - width) // 2, 23, big)
     table = label_pixels(bar, 252, 276, TALLY_ROWS, True)
     erase(bar, table, range(1, 31), 2)
+    clean = bar.copy()
     for text, y in zip(TALLY_LABELS, TALLY_ROWS):
         draw_text(bar, text, 254, y, small)
     save('PDBAR', bar)
+    # PDFBAR: MEG3N's factory counts her screens where the other levels count cameras.
+    for text, y in zip(FACTORY_TALLY_LABELS, TALLY_ROWS):
+        draw_text(clean, text, 254, y, small)
+    save('PDFBAR', clean)
 
     # PDWBAR: the combat prologue keeps vanilla AMMO / ARMS / BULL SHEL RCKT CELL;
     # only ARMOR becomes P(DOOM).
@@ -522,7 +530,7 @@ def main():
     manifest['faceSets'] = FACE_SETS
     manifest['ceoFaceSets'] = [c for c in CEO_FACE_SETS if c in manifest['faces']]
     manifest['labels'] = {'ammo': 'AMMO', 'health': 'HEALTH', 'arms': FREED_LABEL,
-                          'armor': P_DOOM_LABEL, 'table': TALLY_LABELS}
+                          'armor': P_DOOM_LABEL, 'table': TALLY_LABELS, 'factoryTable': FACTORY_TALLY_LABELS}
     (OUT / 'manifest.json').write_text(json.dumps(manifest, indent=1) + '\n')
 
     # Preview: original STBAR + STARMS at 4x above ours at 4x.

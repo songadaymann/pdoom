@@ -1,4 +1,4 @@
-// SAFE MODE after level 2 (2026-10-14): levels 3 and 4 as locked structures with install dialogs,
+// SAFE MODE after level 2 (2026-10-14): level 4 as a locked structure with an install dialog (level 3's door opens since 2026-10-20),
 // the summit's Display Properties final door, the MCP face on the horizon, and kickable desktop icons.
 // Loads a campaign with both levels cleared (ten saved), muted. Screenshots in output/hub-future/.
 import {chromium} from '@playwright/test';
@@ -31,12 +31,15 @@ try{
  await view(126,56.4,deg(210),.42);await page.waitForTimeout(800);await shot('05-agentic');report.fps.agentic=await fps();await page.evaluate(()=>window.__DOOM_DEBUG__.outside.debug.setFuture(false));report.fps.agentic_without=await fps();await page.evaluate(()=>window.__DOOM_DEBUG__.outside.debug.setFuture(true));
  await view(100,20,-2.57,.55);await page.waitForTimeout(700);await shot('05b-agentic-top');
  await view(-19.8,-54.7,.593,.3);await page.waitForTimeout(800);await shot('06-summit-dialog');
- // MEG3N's door: Space opens the install dialog; Space is Cancel, which isn't available; R opens READ THIS!.
- await view(-147.5,1.23,deg(115),0);s=await wait(s=>s.outside.nearest_future==='meg3n','Prompt at the MEG3N door');assert.match(s.outside.future?String(await page.locator('#hub-enter').textContent()):'',/Open MEG3N\.AVI/);
- await page.keyboard.press('Space');s=await wait(s=>s.outside.dialog?.id==='meg3n','Install dialog opens');assert.match(s.outside.dialog.title,/Installing MEG3N\.AVI/);assert.match(s.outside.dialog.status,/Copying /);
- await page.waitForTimeout(500);await shot('07-meg3n-install-dialog');
+ // MEG3N's door is a real door since 2026-10-20 (scripts/factory-hub-smoke.mjs walks in); AGENTIC's still installs.
+ await view(-147.5,1.23,deg(115),0);s=await wait(s=>s.outside.nearest_future==='meg3n','Prompt at the MEG3N door');assert.match(String(await page.locator('#hub-enter').textContent()),/Enter MEG3N\.AVI/);
+ report.cases.push('MEG3N.AVI: SPACE enters the factory (no install dialog)');
+ // AGENTIC's door: Space opens the install dialog; Space is Cancel, which isn't available; R opens READ THIS!.
+ await view(142,84.1,deg(210),.1);s=await wait(s=>s.outside.nearest_future==='agentic','Prompt at the AGENTIC door');assert.match(String(await page.locator('#hub-enter').textContent()),/Open AGENTIC\.BAT/);
+ await page.keyboard.press('Space');s=await wait(s=>s.outside.dialog?.id==='agentic','Install dialog opens');assert.match(s.outside.dialog.title,/Installing AGENTIC\.BAT/);assert.match(s.outside.dialog.status,/Copying /);
+ await page.waitForTimeout(500);await shot('07-agentic-install-dialog');
  await page.keyboard.press('Space');s=await wait(s=>/Cancel is not available/.test(s.outside.dialog?.status||''),'Cancel refuses');await shot('08-cancel-not-available');
- report.cases.push('MEG3N.AVI: SPACE opens "Installing MEG3N.AVI", Cancel is not available');
+ report.cases.push('AGENTIC.BAT: SPACE opens "Installing AGENTIC.BAT", Cancel is not available');
  await page.keyboard.press('KeyR');await page.waitForFunction(()=>!document.querySelector('[data-view=read]').hidden,{},{timeout:5000});s=await read();assert.equal(s.outside.dialog,null,'Dialog closes for READ THIS!');await shot('09-read-this');
  await page.keyboard.press('Escape');await page.waitForTimeout(300);await page.keyboard.press('Escape');await page.waitForFunction(()=>!JSON.parse(window.render_game_to_text()).outside.paused,{},{timeout:5000});
  report.cases.push('R in the install dialog opens READ THIS!; Esc twice returns to SAFE MODE');

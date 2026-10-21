@@ -31,6 +31,7 @@ import argparse
 import importlib.util
 import json
 import math
+import re
 import subprocess
 from pathlib import Path
 
@@ -49,6 +50,7 @@ REVIEW = ROOT / 'output' / 'intro' / 'levels'
 SCRATCH = Path('/tmp/pdoom-level-intros')
 DATA = ROOT / 'scripts' / 'level-intros.json'
 SPRITES = ROOT / 'doom-mod' / 'sprites'
+THEME = ROOT / 'doom-mod' / 'factory-theme-textures.txt'      # MEG3N's factory: IWAD art recoloured per wing
 UP, SR = 4, ic.SR
 SENT = 250                       # overlay "empty" index: PLAYPAL 250-254 are never produced by the font tables
 clamp, smooth = ic.clamp, ic.smooth
@@ -75,6 +77,7 @@ class Assets:
         self.snd = {}
         self._music = {}
         self._sprites = {}
+        self._themed = {}
 
     def sprite(self, name):
         if name not in self._sprites:
@@ -89,6 +92,37 @@ class Assets:
             else:
                 self.snd[key] = self.wad.sound(name, pitch)
         return self.snd[key]
+
+    def themed(self, name, flat=False):
+        """A wall texture (or flat) by name. The factory's FQ textures (doom-mod/factory-theme-textures.txt) are one
+        IWAD patch or flat through GZDoom's desaturated translation, recoloured here the way the engine draws them;
+        IWAD names pass straight through."""
+        key = (name, flat)
+        if key not in self._themed:
+            m = re.search(r'(?:WallTexture|Flat) "%s"[^{]*\{\s*Patch "([^"]+)"[^{]*\{ Translation ([^}]*)\}' % re.escape(name),
+                          THEME.read_text()) if THEME.exists() else None
+            if not m:
+                self._themed[key] = self.wad.flat(name) if flat else self.wad.texture(name)
+            else:
+                src, table = m.group(1), self.translation(m.group(2))
+                if flat:
+                    self._themed[key] = table[self.wad.flat(src)]
+                else:
+                    base = self.wad.texture(src) if src in self.wad.art.textures else self.wad.patch(src)
+                    self._themed[key] = base.mapped(table)
+        return self._themed[key]
+
+    def translation(self, spec):
+        """GZDoom's "a:b=%[r1,g1,b1]:[r2,g2,b2]" ranges: each colour's intensity picks a colour between the two ends."""
+        table = np.arange(256, dtype=np.uint8)
+        rgb = self.pal.pals[0].astype(np.float32)
+        num = r'([\d.]+)'
+        for a, b, *c in re.findall(r'(\d+):(\d+)=%%\[%s,%s,%s\]:\[%s,%s,%s\]' % ((num,) * 6), spec):
+            lo, hi = np.clip([float(v) for v in c[:3]], 0, 2), np.clip([float(v) for v in c[3:]], 0, 2)
+            idx = np.arange(int(a), int(b) + 1)
+            inten = (rgb[idx, 0] * 77 + rgb[idx, 1] * 143 + rgb[idx, 2] * 37) / 256
+            table[idx] = self.pal.near(np.minimum(255, lo * 255 + inten[:, None] * (hi - lo)))
+        return table
 
     def music(self, path):
         if path not in self._music:
@@ -612,8 +646,10 @@ class LevelFilm:
             g = self.enter
             ic.remap(fb, (W - g.w) // 2 - 6, ey - 4, (W + g.w) // 2 + 6, ey + g.h + 3, pal.cmap[22])
             ic.blit(fb, g, (W - g.w) // 2, ey, offsets=False)
+        self.here_xy = (hx, hy)
         if t >= self.t_here:
-            if int((t - self.t_here) * ic.FPS) % 16 < 11:          # Doom blinks YOU ARE HERE
+            # hereOnTop: a spot under the top captions (E3M7's on WIMAP2) is drawn over them instead (overlay)
+            if not F.get('hereOnTop') and int((t - self.t_here) * ic.FPS) % 16 < 11:          # Doom blinks YOU ARE HERE
                 g = self.urh[0] if hx + 2 + self.urh[0].w <= W else self.urh[1]
                 ic.blit(fb, g, hx, hy)
             ws = self.A.wad.patch('WISPLAT')
@@ -627,8 +663,8 @@ class LevelFilm:
         P = F['prisoners']
         ta = t + s['start']
         fb = np.zeros((H, W), np.uint8)
-        wall = A.wad.texture(F.get('fiveWall', 'SUPPORT3'))
-        floor = A.wad.flat(F.get('fiveFloor', 'FLOOR4_8'))
+        wall = A.themed(F.get('fiveWall', 'SUPPORT3'))
+        floor = A.themed(F.get('fiveFloor', 'FLOOR4_8'), flat=True)
         n = len(P)
         if self.vertical:
             cw, ch, gap = 44, 100, 3
@@ -639,8 +675,10 @@ class LevelFilm:
             ch, y = 92, 28
             pitch = (W - 8) / n
             cxs = [4 + pitch * (i + 0.5) for i in range(n)]
-            # names stay small; long ones are nudged apart so they never touch
-            bw = [max(self.font.width(n_) for n_ in p['name'].split(' ', 1)) for p in P]
+            # names stay small; long ones are nudged apart so they never touch. lineupStagger: every other
+            # last name drops a line (five long surnames are wider than the screen), so only first names share a row
+            stagger = F.get('lineupStagger', False)
+            bw = [self.font.width(p['name'].split(' ', 1)[0]) if stagger else max(self.font.width(n_) for n_ in p['name'].split(' ', 1)) for p in P]
             nx = list(cxs)
             for _ in range(60):
                 for i in range(n - 1):
@@ -659,7 +697,9 @@ class LevelFilm:
                     n_on = int((ta - self.obj_pop[i]) * 70)
                     tx = int(round(nx[i]))
                     self.font.draw(fb, first, tx - self.font.width(first) // 2, y + ch + 5, count=max(0, n_on), color='grey')
-                    self.font.draw(fb, last, tx - self.font.width(last) // 2, y + ch + 15, count=max(0, n_on - len(first)), color='grey')
+                    lw = self.font.width(last)
+                    self.font.draw(fb, last, int(clamp(tx - lw // 2, 3, W - 3 - lw)), y + ch + 15 + (10 if stagger and i % 2 else 0),
+                                   count=max(0, n_on - len(first)), color='grey')
         return fb
 
     def draw_cell(self, fb, wall, floor, x0, y0, cw, ch, age, p):
@@ -696,6 +736,9 @@ class LevelFilm:
             self.draw_card(t, L)
         for c in self.captions:
             draw_caption(c, t, self.font, self.pal, L)
+        if s['name'] == 'title' and self.film.get('hereOnTop') and t >= self.t_here and int((t - self.t_here) * ic.FPS) % 16 < 11:
+            hx, hy = self.here_xy
+            ic.blit(L.idx, self.urh[0] if hx + 2 + self.urh[0].w <= self.W else self.urh[1], hx, hy)
 
     def draw_card(self, t, L):
         """Guardian name card: the mugshot in a bevelled status-bar well, name and subtitle beside it."""

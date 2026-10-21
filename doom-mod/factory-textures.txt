@@ -1,0 +1,20 @@
+Texture "FWCREAM", 64, 128
+{ Patch "patches/factory/FWCREAM.png", 0, 0 }
+Texture "FWPINK", 64, 128
+{ Patch "patches/factory/FWPINK.png", 0, 0 }
+Texture "FWTEAL", 64, 128
+{ Patch "patches/factory/FWTEAL.png", 0, 0 }
+Texture "FWYELLOW", 64, 128
+{ Patch "patches/factory/FWYELLOW.png", 0, 0 }
+Texture "FBARS", 64, 64
+{ Patch "patches/factory/FBARS.png", 0, 0 }
+Texture "FGATE", 64, 80
+{ Patch "patches/factory/FGATE.png", 0, 0 }
+Texture "FFABRIC", 64, 64
+{ Patch "patches/factory/FFABRIC.png", 0, 0 }
+Texture "FFRAY", 64, 64
+{ Patch "patches/factory/FFRAY.png", 0, 0 }
+Texture "FDOOR", 64, 128
+{ Patch "patches/factory/FDOOR.png", 0, 0 }
+Texture "FTOYSKY", 1024, 256
+{ Patch "patches/factory/FTOYSKY.png", 0, 0 }

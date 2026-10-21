@@ -354,6 +354,7 @@ class PDCheckpoint : EventHandler
         if(e.Name=="pdoom_restart"){PDCampaignSession.Get().Restart();return;}
         if(e.Name=="pdoom_enter_control"||e.Name=="pdoom_enter_hal"||e.Name=="pdoom_replay_control"||e.Name=="pdoom_replay_hal")
         {PDCampaignSession.Get().Enter(e.Name=="pdoom_enter_hal"||e.Name=="pdoom_replay_hal",e.Name=="pdoom_replay_control"||e.Name=="pdoom_replay_hal");return;}
+        if(e.Name=="pdoom_enter_factory"){PDCampaignSession.Get().EnterFactory();return;}
         if (!Initialized || Ended) return;
         if(PDCampaignSession.Hal()&&Hal.Event(self,e))return;
         if (e.Name == "pdoom_tool" && HasGun) Tool = Tool == 0 ? 1 : 0;

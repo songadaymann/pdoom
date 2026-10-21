@@ -7,6 +7,9 @@ class PDCampaignSession : StaticEventHandler
     bool OpeningEntry; // resumed first XP arrival, before the first facility
     bool Replay;
     int Saved0, Saved1, Lost0, Lost1, Following0, Following1;
+    // MEG3N's factory (E2M7, 2026-10-20): the third group, and whether we walked in from SAFE MODE.
+    int Saved2, Lost2, Following2;
+    bool FactoryEntry;
     static PDCampaignSession Get(){return PDCampaignSession(StaticEventHandler.Find('PDCampaignSession'));}
     static bool Hal(){return level.MapName=="E1M7";}
     static String Id(){return Hal()?"hal-station":"five-prisons";}
@@ -18,6 +21,7 @@ class PDCampaignSession : StaticEventHandler
         Saved0=int(p.GetCVar("pdoom_saved0"));Saved1=int(p.GetCVar("pdoom_saved1"));
         Lost0=int(p.GetCVar("pdoom_lost0"));Lost1=int(p.GetCVar("pdoom_lost1"));
         Following0=int(p.GetCVar("pdoom_follow0"));Following1=int(p.GetCVar("pdoom_follow1"));
+        Saved2=int(p.GetCVar("pdoom_saved2"));Lost2=int(p.GetCVar("pdoom_lost2"));Following2=int(p.GetCVar("pdoom_follow2"));
         HubEntry=p.GetCVar("pdoom_hub_entry")!=0;
         OpeningEntry=!Hal()&&p.GetCVar("pdoom_opening_checkpoint")==1;
         GuideGift=!Hal()&&p.GetCVar("pdoom_opening_checkpoint")==2;
@@ -74,10 +78,22 @@ class PDCampaignSession : StaticEventHandler
     {
         let battle=PDLastStand.Get();
         bool fromOpening=!hal&&(OpeningEntry||battle&&battle.Active&&battle.Bliss);
-        HubEntry=!fromOpening;Replay=asReplay;OpeningEntry=false;
+        HubEntry=!fromOpening;Replay=asReplay;OpeningEntry=false;FactoryEntry=false;
         // "Take this. It's dangerous to go alone." The guide's wrench comes with us.
         GuideGift=fromOpening;
         level.ChangeLevel(hal?"E1M7":"E1M4",0,CHANGELEVEL_NOINTERMISSION|CHANGELEVEL_RESETHEALTH|CHANGELEVEL_RESETINVENTORY);
+    }
+    // MEG3N.AVI's door: the factory's front door (Factory.zs ApplyHubEntry), wrench in hand.
+    void EnterFactory()
+    {
+        Load();HubEntry=true;FactoryEntry=true;Replay=false;OpeningEntry=false;GuideGift=false;
+        level.ChangeLevel("E2M7",0,CHANGELEVEL_NOINTERMISSION|CHANGELEVEL_RESETHEALTH|CHANGELEVEL_RESETINVENTORY);
+    }
+    // Leaving the factory: who came out with you, and who you freed but left inside.
+    void CommitFactory(int leaving,int following)
+    {
+        Saved2|=leaving;Lost2&=~Saved2;Following2=following&~Saved2;
+        Console.Printf("PDOOM_CAMPAIGN {\"saved2\":%d,\"lost2\":%d,\"following2\":%d}",Saved2,Lost2,Following2);
     }
     void Restart(){level.ChangeLevel(level.MapName,0,CHANGELEVEL_NOINTERMISSION|CHANGELEVEL_RESETHEALTH|CHANGELEVEL_RESETINVENTORY);}
 }

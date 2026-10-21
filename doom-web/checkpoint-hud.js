@@ -6,6 +6,11 @@ const el=id=>document.getElementById(id);
 let statusBar=null;
 // The Doom status bar canvas; the DOM text beside it stays for screen readers/tests.
 export function checkpointStatusBar(){return statusBar;}
+// MEG3N's unscored factory page (?level=meg3n-factory) has the same bar (2026-10-20).
+export function ensureStatusBar(level,ceo){
+  if(!statusBar)statusBar=createStatusBar(document.querySelector('#hud .doom-statusbar'),{ceo,level});
+  return statusBar;
+}
 
 // ceo: the launcher's CEO choice, whose face your own body wears in the status bar.
 export function configureCheckpointLauncher(checkpoint,level,ceo){

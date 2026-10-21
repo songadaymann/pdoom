@@ -427,6 +427,7 @@ def resource_files():
 def main():
     from build_checkpoint_map import build_checkpoint
     from build_hal_map import build_hal
+    from build_factory_map import build_factory
     from build_gauntlet_map import build_prologue
     spec = json.loads((SOURCE / 'map.json').read_text())
     build_navigation(spec)
@@ -435,6 +436,7 @@ def main():
     wad = make_wad([('E1M1', b''), ('TEXTMAP', textmap), ('ENDMAP', b'')])
     checkpoint_wad = build_checkpoint(ROOT, udmf_block, make_wad)
     hal_wad=build_hal(ROOT,udmf_block,make_wad)
+    factory_wad=build_factory(ROOT,udmf_block,make_wad)
     prologue_wad=build_prologue(ROOT,udmf_block,make_wad)
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(prefix='.pdoom-', suffix='.pk3.tmp', dir=OUTPUT.parent, delete=False) as pending:
@@ -449,6 +451,11 @@ def main():
             archive.writestr('graphics/TITLEPIC.png', (ui / 'titlepic.png').read_bytes())
             archive.writestr('graphics/M_DOOM.png', (ui / 'pdoom-logo.png').read_bytes())
             archive.writestr('textures.environment', (SOURCE / 'patches/environment/textures.txt').read_bytes())
+            archive.writestr('textures.factory', (SOURCE / 'factory-textures.txt').read_bytes())
+            archive.writestr('textures.factorytheme', (SOURCE / 'factory-theme-textures.txt').read_bytes())
+            archive.writestr('animdefs.factory', (SOURCE / 'factory-theme-animdefs.txt').read_bytes())
+            archive.writestr('gldefs.factory', (SOURCE / 'factory-theme-gldefs.txt').read_bytes())
+            archive.writestr('trnslate.factory', (SOURCE / 'factory-theme-trnslate.txt').read_bytes())
             posters = ROOT / 'doom-web/local/posters'
             for asset in sorted(posters.glob('PDP??.png')):
                 archive.writestr(f'patches/posters/{asset.name}', asset.read_bytes())
@@ -456,6 +463,7 @@ def main():
             archive.writestr('maps/E1M1.wad', wad)
             archive.writestr('maps/E1M4.wad', checkpoint_wad)
             archive.writestr('maps/E1M7.wad',hal_wad)
+            archive.writestr('maps/E2M7.wad',factory_wad)
             archive.writestr('maps/E1M2.wad',prologue_wad)
         temporary.replace(OUTPUT)
     finally:

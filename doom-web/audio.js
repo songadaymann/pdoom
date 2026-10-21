@@ -17,8 +17,10 @@ export class DoomAudio {
     if(!response.ok)throw Error(`Could not load music (${response.status}).`);
     this.musicBuffer=await this.context.decodeAudioData(await response.arrayBuffer());this.musicUrl=url;
   }
+  // A level can hold its track while it plays music of its own (the factory's broadcast, 2026-10-20).
+  holdMusic(hold){if(this.musicHeld===hold)return;this.musicHeld=hold;if(hold)this.pauseMusic();}
   startMusic(){
-    if(!this.musicBuffer||this.musicSource)return;
+    if(!this.musicBuffer||this.musicSource||this.musicHeld)return;
     const source=this.context.createBufferSource(),gain=this.context.createGain();
     source.buffer=this.musicBuffer;source.loop=true;gain.gain.value=0.25;
     source.connect(gain);gain.connect(this.context.pdoomBuses.music);source.start(0,this.musicOffset);

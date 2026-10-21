@@ -20,7 +20,7 @@ export async function startGame(page,{console:allowConsole=true}={}){
  // exercise the first-visit film path. Seeded campaign fixtures use real Load.
  if(!await page.locator('#title-enter').count()||!await page.locator('#title-enter').isVisible()){await page.click('#start');return;}
  // Public New Game goes hero -> prologue; level tests keep the developer level select.
- const id=await page.evaluate(()=>{localStorage.setItem('pdoom.level-intros.v1',JSON.stringify(['five-prisons','hal-station']));localStorage.setItem('pdoom.level-select','1');return JSON.parse(window.render_game_to_text()).levelId;});
+ const id=await page.evaluate(()=>{localStorage.setItem('pdoom.level-intros.v1',JSON.stringify(['five-prisons','hal-station','meg3n-factory']));localStorage.setItem('pdoom.level-select','1');return JSON.parse(window.render_game_to_text()).levelId;});
  await page.click('#title-enter');
  if(await page.locator('#menu-load').isEnabled()){
   await page.click('#menu-load');await page.waitForFunction(()=>JSON.parse(window.render_game_to_text()).outside?.active&&!JSON.parse(window.render_game_to_text()).uiBlocked,{},{timeout:60000});

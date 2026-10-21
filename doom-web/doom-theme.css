@@ -25,16 +25,16 @@ a{color:#be714b}
 .checkpoint .hud-label{font-size:13px;font-weight:400;letter-spacing:0;color:#cab181}
 .checkpoint #health,.checkpoint #survival{font-family:DoomNumbers,monospace;font-weight:400;letter-spacing:0;font-size:34px}
 .checkpoint #survival{font-size:30px}
-.checkpoint #people,.checkpoint #group,.checkpoint #equipment,.checkpoint #doom-chance{font-size:var(--doom-small);line-height:calc(var(--px-s) * 14)}
+.checkpoint #people,.factory-prototype #people,.checkpoint #group,.checkpoint #equipment,.checkpoint #doom-chance{font-size:var(--doom-small);line-height:calc(var(--px-s) * 14)}
 .checkpoint #group{font-size:11px}
 .checkpoint #rescue-slots{margin:3px 0}
 .checkpoint .rescue-slot{font-size:18px}
-.checkpoint #prompt{font-size:var(--doom-text);color:#dfbc83;border-bottom:2px solid #77553c;background:#1a100ce8;line-height:var(--doom-lead);text-shadow:var(--px) var(--px) #100400}
-.checkpoint #message{font-size:var(--doom-text);color:#c7ae84;line-height:var(--doom-lead);background:#160c09e8;padding:8px 14px;max-width:min(760px,90vw);text-shadow:var(--px) var(--px) #180300}
-.checkpoint #message.spoken{border-left:4px solid #a92d1c;text-align:left}
+:is(.checkpoint,.factory-prototype) #prompt{font-size:var(--doom-text);color:#dfbc83;border-bottom:2px solid #77553c;background:#1a100ce8;line-height:var(--doom-lead);text-shadow:var(--px) var(--px) #100400}
+:is(.checkpoint,.factory-prototype) #message{font-size:var(--doom-text);color:#c7ae84;line-height:var(--doom-lead);background:#160c09e8;padding:8px 14px;max-width:min(760px,90vw);text-shadow:var(--px) var(--px) #180300}
+:is(.checkpoint,.factory-prototype) #message.spoken{border-left:4px solid #a92d1c;text-align:left}
 .dialogue-speaker{display:block;color:#ee5336;font-size:var(--doom-text);line-height:var(--doom-lead)}
 .dialogue-line{display:block;color:#edca93;font-size:var(--doom-text);line-height:var(--doom-lead)}
-.checkpoint #held-wrench.swinging{animation:wrench-swing .44s linear}
+:is(.checkpoint,.factory-prototype) #held-wrench.swinging{animation:wrench-swing .44s linear}
 @keyframes wrench-swing{0%{transform:rotate(-18deg)}25%{transform:translate(30px,15px) rotate(24deg)}50%{transform:translate(-90px,-20px) rotate(-75deg)}100%{transform:rotate(-18deg)}}
 #held-gun{position:absolute;left:50%;bottom:100px;width:210px;image-rendering:pixelated;pointer-events:none;transform:translateX(-50%)}
 #held-gun.firing{transform:translate(-50%,14px)}
@@ -43,7 +43,7 @@ a{color:#be714b}
  #title img,.story-logo{max-width:55vw;width:276px}
  .checkpoint .hud-label{font-size:10px}.checkpoint #health{font-size:25px}.checkpoint #survival{font-size:24px}
  .checkpoint #people,.checkpoint #equipment,.checkpoint #doom-chance{font-size:var(--doom-small)}.checkpoint #group{font-size:9px}
- .checkpoint #message{padding:7px 10px}
+ :is(.checkpoint,.factory-prototype) #message{padding:7px 10px}
  #touch button{font-family:DoomSmall,monospace;font-size:16px;color:#cfb084;background:#251b13}
  #held-gun{bottom:16%;width:150px}
  #story{gap:12px;padding:16px}#story-heading{font-size:22px;margin:10px 0}#story-text{font-size:18px;line-height:1.6}.story-panel{min-height:160px}

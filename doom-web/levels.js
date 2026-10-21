@@ -8,6 +8,9 @@ export const LEVELS=Object.freeze([
     nextLevelId:null}),
   // v3 (2026-10-11): one solution per prisoner and a new way out (HAL's breaker, then the original exit).
   Object.freeze({id:'hal-station',version:'hal-station-v3',title:'Confabulation Station',subtitle:'Computer Station',episode:1,map:7,scored:true,peopleTotal:6,camerasTotal:9,scoreVersion:'rescue-v2',boardVersion:'v3',nextLevelId:null}),
+  // Walked into from SAFE MODE through MEG3N.AVI's door since 2026-10-20; unscored, no boards yet.
+  Object.freeze({id:'meg3n-factory',version:'meg3n-factory-v1',title:"MEG3N's Toy Factory",subtitle:'Spawning Vats',
+    episode:2,map:7,scored:false,nextLevelId:null}),
   Object.freeze({id:'intake',version:'intake-prototype',title:'Intake',
     episode:1,map:1,scored:false,nextLevelId:null})
 ]);

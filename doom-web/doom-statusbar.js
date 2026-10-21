@@ -11,7 +11,8 @@ import {ceoFaceId} from './ceo-pick.js';
 //            body wears the chosen CEO's face (altman/amodei; doomguy for QA)
 //   P(DOOM)  the in-world p(DOOM) (100 - survival estimate); pulses hot at >= 90
 //   keys     wrench (steel, skull-key cell) / maintenance key (STKEYS1) / charge
-//   table    CAMS, FREE, SAFE and LIVE tallies in the small cur/max digits
+//   table    CAMS, FREE, SAFE and LIVE tallies in the small cur/max digits (MEG3N's
+//            factory, PDFBAR: SCRN, her live-feed screens, in place of CAMS)
 // 320x32 logical pixels; CSS scales the canvas with nearest-neighbour filtering.
 import {survivalEstimate} from './survival-estimate.js';
 
@@ -129,6 +130,7 @@ export function createStatusBar(container,options={}){
   let manifest=null,ready=false,error=null,last=null,values=null,tic=null,engineTic=0,acc=0,lastNow=0,paused=false;
   let lastAttackTic=-1e9,attackHeld=false,aimDiff=null,deadSet=null,drawnKey='',frame=0,running=true,drawnFace=null,drawnHealth=null,drawnHot=false;
   const loadedSets=new Set(),bodies=bodyFaceSets(options.ceo,options.level);
+  let factoryBar=options.level==='meg3n-factory';
 
   const setFor=controlled=>bodies[controlled|0]||bodies[0];
   async function loadLumps(names,path,table){
@@ -156,7 +158,7 @@ export function createStatusBar(container,options={}){
       if(!response.ok)throw Error(`status bar manifest ${response.status}`);
       manifest=await response.json();
       for(const [name,m] of Object.entries(manifest.lumps))meta.set(name,m);
-      const needed=['PDBAR','PDWBAR','STARMS','PDARMS','STTPRCNT','STTMINUS','PDHPRCNT','PDREFUG0','PDREFUG1','STKEYS1','PDWRENCH','PDCHARGE','PDARMG','PDARMB'];
+      const needed=['PDBAR','PDFBAR','PDWBAR','STARMS','PDARMS','STTPRCNT','STTMINUS','PDHPRCNT','PDREFUG0','PDREFUG1','STKEYS1','PDWRENCH','PDCHARGE','PDARMG','PDARMB'];
       for(let i=0;i<10;i++)needed.push(`STTNUM${i}`,`PDHNUM${i}`,`STYSNUM${i}`,`STGNUM${i}`,`PDRSNUM${i}`);
       await loadLumps(needed,base,manifest.lumps);
       if(!images.has(base+'PDBAR'))throw Error('status bar patches missing');
@@ -205,11 +207,11 @@ export function createStatusBar(container,options={}){
     // The dead face always shows a dead body: HEALTH reads 0% with it (also while
     // a lost body's dead face is held before the next person's face).
     const health=lump==='STFDEAD0'?0:values.health;
-    const key=JSON.stringify([values,set,lump,flash,health]);
+    const key=JSON.stringify([values,set,lump,flash,health,factoryBar]);
     if(key===drawnKey)return;
     drawnKey=key;
     ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,320,32);
-    draw(values.war?'PDWBAR':'PDBAR',0,0);
+    draw(values.war?'PDWBAR':factoryBar&&patchImage('PDFBAR')?'PDFBAR':'PDBAR',0,0);
     draw(values.war?'STARMS':'PDARMS',ST.armsBg[0],ST.armsBg[1]);
     if(values.ammo!=null)drawNum(values.ammo,ST.ammo[0],ST.ammo[1],3,'STTNUM');
     drawNum(health,ST.health[0],ST.health[1],3,'STTNUM');draw('STTPRCNT',ST.health[0],ST.health[1]);
@@ -336,6 +338,7 @@ export function createStatusBar(container,options={}){
       bodies[0]=id;drawnKey='';if(manifest)loadFaceSet(id);
     },
     setLevel(level){
+      factoryBar=level==='meg3n-factory';
       const next=castForLevel(level);if(next.every((id,i)=>bodies[i+1]===id))return;
       bodies.splice(1,5,...next);deadSet=null;drawnKey='';if(manifest)for(const id of next)loadFaceSet(id);
     },
@@ -346,7 +349,7 @@ export function createStatusBar(container,options={}){
       return {ready,error,paused,tic,engineTic,ceo:bodies[0],faceSet:currentFaceSet(),face:face.lump,faceIndex:face.index,
         priority:face.priority,painLevel:Math.floor(face.painOffset(values?.health??100)/FACESTRIDE),
         faceCount:face.count,attackHeld,aimDiff,alarm:!!values&&values.pdoom>=ALARM,
-        faceSetsLoaded:bodies.filter(id=>loadedSets.has(id)),drawnFace,drawnHealth,drawnHot,values};
+        faceSetsLoaded:bodies.filter(id=>loadedSets.has(id)),drawnFace,drawnHealth,drawnHot,bar:values?.war?'PDWBAR':factoryBar&&patchImage('PDFBAR')?'PDFBAR':'PDBAR',values};
     }
   };
 }

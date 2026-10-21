@@ -1,6 +1,13 @@
 {
   "files": [
     {
+      "file": "dev-capabilities.js",
+      "bytes": 387,
+      "sha256": "836e03dc74b1f78dd58dd80157f363b666017891a0eeb85fa2d7781da1241b14",
+      "gzip": 285,
+      "brotli": 229
+    },
+    {
       "file": "engine/brightmaps.pk3",
       "bytes": 246072,
       "sha256": "7232197c7d1edae8baa73bf3a3856fafb2aaf0518e3dac75ab2fe54de3838ebb"
@@ -8276,6 +8283,13 @@
       "file": "pdoom.pk3",
       "bytes": 6775826,
       "sha256": "131c1fd32c2b8b4fa32057f5fa140ab571fe1caee149c3ccab36125bb51fff09"
+    },
+    {
+      "file": "ranked-runs.js",
+      "bytes": 3411,
+      "sha256": "d3fbae06f69db53b93e703be2089dba5781f346fe3f4e2823af8dd7ef41b6b88",
+      "gzip": 1459,
+      "brotli": 1346
     },
     {
       "file": "slingshot-drawn.png",
