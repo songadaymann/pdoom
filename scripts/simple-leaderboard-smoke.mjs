@@ -59,17 +59,13 @@ try{
    }
    const panel=await shell.locator('[data-modal="leaderboard"] .panel').boundingBox();assert.ok(panel.x>=0&&panel.x+panel.width<=width+1&&panel.y>=0&&panel.y+panel.height<=height+1,'Panel fits the viewport');
    assert.equal(await shell.locator('[data-modal="leaderboard"] .panel').evaluate(e=>e.scrollWidth>e.clientWidth),false);
-   // The game's layout bridge (doom-web/platform.js) puts the tabs on a two-column grid:
-   // Levels 1 and 2 share the first row, and every tab is the same size, in reading order.
+   // Every level's tab on one row, left to right, all the same size (doom-web/platform.js layout bridge).
    const boxes=[];for(let j=0;j<BOARDS.length;j++)boxes.push(await tabs.nth(j).boundingBox());
-   assert.equal(boxes[1].y,boxes[0].y,'Level 1 and Level 2 share a row');
    for(const [j,b] of boxes.entries()){
-    assert.ok(Math.abs(b.width-boxes[0].width)<2&&Math.abs(b.height-boxes[0].height)<2,'Tabs the same size');assert.ok(b.height>=44,'Tab touch target');
-    assert.ok(b.x>=panel.x&&b.x+b.width<=panel.x+panel.width+1&&b.y>=panel.y&&b.y+b.height<=panel.y+panel.height+1,'Tab inside the panel');
-    if(j){const a=boxes[j-1];assert.ok(Math.abs(b.y-a.y)<1?b.x>=a.x+a.width-1:b.y>=a.y+a.height-1,'Tabs in reading order');}
-    for(const o of boxes.slice(0,j))assert.ok(b.x>=o.x+o.width-1||b.x+b.width<=o.x+1||b.y>=o.y+o.height-1||b.y+b.height<=o.y+1,'Tabs do not overlap');
+    assert.equal(b.y,boxes[0].y,'Tabs share one row');assert.ok(Math.abs(b.width-boxes[0].width)<2&&Math.abs(b.height-boxes[0].height)<2,'Tabs the same size');assert.ok(b.height>=44,'Tab touch target');
+    assert.ok(b.x>=panel.x&&b.x+b.width<=panel.x+panel.width+1,'Tab inside the panel');if(j)assert.ok(b.x>=boxes[j-1].x+boxes[j-1].width-1,'Tabs in level order');
+    assert.equal(await tabs.nth(j).evaluate(e=>e.scrollWidth<=e.clientWidth),true,'Tab label fits its tab');
    }
-   (report.tabRows??={})[name]=new Set(boxes.map(b=>Math.round(b.y))).size;
    await p.screenshot({path:`${out}/${name}-level-${i+1}.png`});
   }
   await shell.locator('[data-modal="leaderboard"] .close').click();await p.waitForFunction(()=>JSON.parse(window.render_game_to_text()).outside?.paused===false);
