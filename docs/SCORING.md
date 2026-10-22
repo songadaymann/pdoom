@@ -72,7 +72,9 @@ cover/final p(DOOM), routes and point breakdown. The total score is an integer. 
 
 The loopback server labels its boards **Local leaderboard** and stores them in
 `output/local-leaderboards/scores.json`. Browser QA uses an isolated fixture store;
-no tests submit public scores. The public p(DOOM) API now validates the rules and
+no tests submit public scores. `npm run test:doom:leaderboard-simple` checks the
+shell's board view (one tab per level) against the local server on 5198 with sample
+rows; `DOOM_URL=https://mann.cool/pdoom/` runs the same read-only check on the live boards. The public p(DOOM) API now validates the rules and
 recalculates scores as described below. This remains a casual board without proof
 of gameplay. Its normal ordering is score then
 creation time, and it lists best runs rather than guaranteeing one row per person.

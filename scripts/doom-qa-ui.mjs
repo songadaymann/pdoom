@@ -1,21 +1,7 @@
 // Existing native smoke tests deliberately skip the narrative panels; the
 // opening itself is exercised separately with real keyboard/touch navigation.
 export async function startGame(page,{console:allowConsole=true}={}){
- // Private browser-test controls; the playable build has no console binding.
- const {readFile}=await import('node:fs/promises');
- const config=await readFile(new URL('../doom-web/controls.cfg',import.meta.url),'utf8');
- if(allowConsole)await page.route('**/controls.cfg',r=>r.fulfill({contentType:'text/plain',body:config+'\nbind ` \"toggleconsole\"\n'}));
- if(allowConsole)await page.evaluate(()=>{
-  if(window.__QA_CONSOLE_KEYS__)return;window.__QA_CONSOLE_KEYS__=true;let open=false;
-  for(const evType of ['keydown','keyup','keypress'])addEventListener(evType,e=>{
-   if(!window.__QA_WORKER__)return;
-   if(e.code==='Backquote'){
-    if(evType==='keydown'&&!e.repeat)open=!open;
-   }else if(!open)return;
-   e.preventDefault();e.stopImmediatePropagation();
-   window.__QA_WORKER__.postMessage({type:'input',target:'window',evType,init:{code:e.code,key:e.key,keyCode:e.keyCode,which:e.which,charCode:e.charCode,bubbles:true,cancelable:true}});
-  },true);
- });
+ if(allowConsole)await qaConsole(page);
  // Existing gameplay tests opt out of films; the public onboarding smoke tests
  // exercise the first-visit film path. Seeded campaign fixtures use real Load.
  if(!await page.locator('#title-enter').count()||!await page.locator('#title-enter').isVisible()){await page.click('#start');return;}
@@ -38,4 +24,22 @@ export async function startGame(page,{console:allowConsole=true}={}){
   await page.waitForTimeout(250);
  }
  throw Error('startGame: not playing after 60 s');
+}
+// Private browser-test controls; the playable build has no console binding. Call it after each
+// page load, before the engine starts (it fetches controls.cfg then); ` then toggles the console.
+export async function qaConsole(page){
+ const {readFile}=await import('node:fs/promises');
+ const config=await readFile(new URL('../doom-web/controls.cfg',import.meta.url),'utf8');
+ await page.route('**/controls.cfg',r=>r.fulfill({contentType:'text/plain',body:config+'\nbind ` \"toggleconsole\"\n'}));
+ await page.evaluate(()=>{
+  if(window.__QA_CONSOLE_KEYS__)return;window.__QA_CONSOLE_KEYS__=true;let open=false;
+  for(const evType of ['keydown','keyup','keypress'])addEventListener(evType,e=>{
+   if(!window.__QA_WORKER__)return;
+   if(e.code==='Backquote'){
+    if(evType==='keydown'&&!e.repeat)open=!open;
+   }else if(!open)return;
+   e.preventDefault();e.stopImmediatePropagation();
+   window.__QA_WORKER__.postMessage({type:'input',target:'window',evType,init:{code:e.code,key:e.key,keyCode:e.keyCode,which:e.which,charCode:e.charCode,bubbles:true,cancelable:true}});
+  },true);
+ });
 }
