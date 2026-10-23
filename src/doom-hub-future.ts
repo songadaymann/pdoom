@@ -12,7 +12,8 @@ import {meadowUniforms,MEADOW_COMMON_GLSL,OUT_GLSL} from './doom-meadow-shared';
  * lights over a locked door that only opens an install dialog (doom-outside.ts). MEG3N's door is a
  * real door since 2026-10-19/20: Space walks into the factory, its way out comes back out here, its
  * lights go green per person saved and its doorway shows the live engine view while the factory is
- * loaded. The summit holds
+ * loaded. AGENTIC.BAT's door works the same way for level 4 (2026-10-21), but only in local development
+ * (doom-outside.ts options.agenticDoor); elsewhere it still installs. The summit holds
  * the final door, a giant Display Properties dialog whose Wait box counts the people still out
  * there, under a giant hourglass. On the far south horizon the MCP column's face "downloads"
  * like a progressive JPEG over dial-up, one step per level cleared, too coarse to recognise. */
@@ -245,6 +246,7 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
   * Its glass streams green dingbat rain; on top a "thinking..." spinner of eight beige dots chases
   * itself over a floating to-do list. Its red phone booth rings in threes every 12 s. */
  const ag=FUTURE_DOORS[1],agFrame=frameOf(ag),AW=13,AD=26,TOWER=[-8,8,-21,-5],TOP=60;
+ let agDoor!:ReturnType<typeof lockedDoor>;
  {
   const walls=new Map<THREE.Texture,THREE.BufferGeometry[]>([[crate,[]],[shawn,[]]]);
   slab(walls.get(crate)!,[2,4],[-AW,AW],[BASE,6],[-AD,-.3]);
@@ -252,8 +254,10 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
   slab(walls.get(shawn)!,[2,4],[-AW-.12,AW+.12],[5.4,6.3],[-AD-.12,.12],5.4);
   textured(walls,agFrame,0xa8a8a8);
   proxy(agFrame,AW*2+.7,TOP-BASE,AD+.7);
-  lockedDoor(doorGroup(agFrame,ag),ag.label,bigdoor,ag.readme,3.4,4.5,occluders);
+  agDoor=lockedDoor(doorGroup(agFrame,ag),ag.label,bigdoor,ag.readme,3.4,4.5,occluders);
  }
+ // Nobody left in the pod farm: its README gloats with a cut of level 4's exit text.
+ const agWarning=agDoor.readmeMaterial.map,agBeaten=readmeTexture(['AGENTIC SMITH had a','list, and you were','on it. Behind you a','payphone rings and','rings. Let it.']);
  const [tx0,tx1,tz0,tz1]=TOWER,tw=tx1-tx0,th=TOP-6;
  const glassGeometry=new THREE.BoxGeometry(tw,th,tz1-tz0).translate((tx0+tx1)/2,6+th/2,(tz0+tz1)/2);
  glassGeometry.setAttribute('face',new THREE.BufferAttribute(new Float32Array(glassGeometry.getAttribute('position').count).map((_,i)=>Math.floor(i/4)),1));
@@ -350,9 +354,11 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
    {x:FINAL.x,y:finalGroup.position.y+5,z:FINAL.z,hx:7,hy:5,hz:.3,yaw:toBunker},
   ],
   setVisible(value:boolean){visible=value;root.visible=value;phoneAudio.setActive(audioEnabled&&visible);},
-  /** MEG3N.AVI's doorway shows the live engine view only while the factory is the loaded level. */
-  setLevel(id:string){const live=id==='meg3n-factory';megDoor.faceMaterial.map=live?portal:bigdoor;megDoor.faceMaterial.color.setHex(live?0xffffff:0xb8b8b8);},
+  /** MEG3N.AVI's doorway shows the live engine view only while the factory is the loaded level, AGENTIC.BAT's while the pod farm is. */
+  setLevel(id:string){const live=id==='meg3n-factory';megDoor.faceMaterial.map=live?portal:bigdoor;megDoor.faceMaterial.color.setHex(live?0xffffff:0xb8b8b8);
+   const agLive=id==='agentic-pods';agDoor.faceMaterial.map=agLive?portal:bigdoor;agDoor.faceMaterial.color.setHex(agLive?0xffffff:0xb8b8b8);},
   setFactoryStrip(lights:StripLight[]){if(megDoor.setStrip(lights))megDoor.readmeMaterial.map=lights.every(l=>l!=='inside')?megBeaten:megWarning;},
+  setAgenticStrip(lights:StripLight[]){if(agDoor.setStrip(lights))agDoor.readmeMaterial.map=lights.every(l=>l!=='inside')?agBeaten:agWarning;},
   setAudioActive(value:boolean){audioEnabled=value;phoneAudio.setActive(audioEnabled&&visible);},
   blocked(x:number,z:number){
    if(!visible)return false;
@@ -394,6 +400,6 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
    if(!paused&&time>=nextRing){nextRing=time+12;phoneAudio.ring();}
   },
   dispose(){phoneAudio.dispose();},
-  getState:()=>({visible,wait:waitShown,mcp_blocks:blocksShown,badge:badgeCount,phone_rings:phoneAudio.getState().rings,phone_audio:phoneAudio.getState(),doors:FUTURE_DOORS.map(d=>d.id),meg3n:{strip:megDoor.strip,live:megDoor.faceMaterial.map===portal,readme:megDoor.readmeMaterial.map===megBeaten?'beaten':'warning'}}),
+  getState:()=>({visible,wait:waitShown,mcp_blocks:blocksShown,badge:badgeCount,phone_rings:phoneAudio.getState().rings,phone_audio:phoneAudio.getState(),doors:FUTURE_DOORS.map(d=>d.id),meg3n:{strip:megDoor.strip,live:megDoor.faceMaterial.map===portal,readme:megDoor.readmeMaterial.map===megBeaten?'beaten':'warning'},agentic:{strip:agDoor.strip,live:agDoor.faceMaterial.map===portal,readme:agDoor.readmeMaterial.map===agBeaten?'beaten':'warning'}}),
  };
 }

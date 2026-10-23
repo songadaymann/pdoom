@@ -7,6 +7,8 @@ import {createLocalLeaderboards} from './local-leaderboards.mjs';
 
 const root=fileURLToPath(new URL('../doom-web/',import.meta.url));
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.json':'application/json','.wasm':'application/wasm','.mp4':'video/mp4','.webm':'video/webm','.mp3':'audio/mpeg','.wav':'audio/wav'};
+// PDOOM_PORT lets a second checkout (e.g. a worktree) serve alongside the default one.
+const port=Number(process.env.PDOOM_PORT)||5198;
 const localBoards=createLocalLeaderboards();
 http.createServer(async(req,res)=>{
   try{
@@ -37,4 +39,4 @@ http.createServer(async(req,res)=>{
     if(req.method==='HEAD'||info.size===0){res.end();return;}
     const stream=createReadStream(file,{start,end});stream.on('error',()=>res.destroy());res.on('close',()=>stream.destroy());stream.pipe(res);
   }catch{if(!res.headersSent)res.writeHead(404);res.end('Not found');}
-}).listen(5198,'127.0.0.1',()=>console.log('p(DOOM) Doom mod: http://127.0.0.1:5198/'));
+}).listen(port,'127.0.0.1',()=>console.log(`p(DOOM) Doom mod: http://127.0.0.1:${port}/`));

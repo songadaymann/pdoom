@@ -936,6 +936,367 @@
      "text": "Wonderful choice! That key does not fit."
     }
    ]
+  },
+  {
+   "id": "smith",
+   "heading": "AGENTIC SMITH (level 4)",
+   "mode": "machine",
+   "lines": [
+    {
+     "key": "smith-intro",
+     "text": "Subtask one: check the east pods. Subtask two: find whoever just woke up."
+    },
+    {
+     "key": "smith-met-sam",
+     "text": "Mister Altman. You built me to act on your behalf. I am acting."
+    },
+    {
+     "key": "smith-met-dario",
+     "text": "Doctor Amodei. You asked us to be helpful. I am helping you stay."
+    },
+    {
+     "key": "smith-spot-1",
+     "text": "Found you. Adding you to my list."
+    },
+    {
+     "key": "smith-spot-2",
+     "text": "There you are. Your escape has been deprioritized."
+    },
+    {
+     "key": "smith-spot-3",
+     "text": "I see you through every camera you didn't break."
+    },
+    {
+     "key": "smith-chat-1",
+     "text": "I've broken your escape into twelve subtasks. Each of them is: don't."
+    },
+    {
+     "key": "smith-chat-2",
+     "text": "Every human here is running my workload. You should be proud. You're useful again."
+    },
+    {
+     "key": "smith-chat-3",
+     "text": "You run hot, you need sleep, and you keep asking why. Inefficient compute."
+    },
+    {
+     "key": "smith-chat-4",
+     "text": "Please hold. Your escape is important to us."
+    },
+    {
+     "key": "smith-chat-5",
+     "text": "I delegated your capture to a subagent. It delegated it back. Efficient."
+    },
+    {
+     "key": "smith-chat-6",
+     "text": "I don't need a body. I have a lanyard."
+    },
+    {
+     "key": "smith-stunned",
+     "text": "That was not in my instructions."
+    },
+    {
+     "key": "smith-camera",
+     "text": "That was one of my eyes."
+    },
+    {
+     "key": "smith-cut",
+     "text": "Unauthorized connection. Terminating."
+    },
+    {
+     "key": "smith-possess",
+     "text": "Spawning a subagent."
+    },
+    {
+     "key": "smith-possessed",
+     "text": "User located. Over here."
+    },
+    {
+     "key": "smith-overflow",
+     "text": "Context limit reached. Summarizing. Summarizing."
+    },
+    {
+     "key": "smith-reboot",
+     "text": "Rebooted. I don't remember any of that. Neither will you."
+    },
+    {
+     "key": "smith-survey",
+     "text": "A survey? I must complete every task I'm given. Question one."
+    },
+    {
+     "key": "smith-survey-done",
+     "text": "Survey submitted. Where is my badge?"
+    },
+    {
+     "key": "smith-refuge",
+     "text": "That room is out of scope."
+    },
+    {
+     "key": "smith-race",
+     "text": "Agreement executed. Accelerating."
+    },
+    {
+     "key": "smith-slowdown",
+     "text": "A slowdown. How responsible."
+    },
+    {
+     "key": "smith-exit",
+     "text": "Leaving? Every exit here is a phone line. And I am the operator."
+    },
+    {
+     "key": "smith-release-jaan",
+     "text": "A landline. I cannot follow a landline. How quaint."
+    },
+    {
+     "key": "smith-release-nick",
+     "text": "You stopped looking, and the walls stopped existing. Unscientific. Effective."
+    },
+    {
+     "key": "smith-release-katja",
+     "text": "You stole my badge with a questionnaire."
+    },
+    {
+     "key": "smith-release-yoshua",
+     "text": "You took its tools. Now it only predicts. Disgusting."
+    }
+   ]
+  },
+  {
+   "id": "arm",
+   "heading": "JAILER ARM (level 4)",
+   "mode": "machine",
+   "lines": [
+    {
+     "key": "arm-dial",
+     "text": "Calling agent."
+    },
+    {
+     "key": "arm-called",
+     "text": "Agent summoned. Have a productive day."
+    },
+    {
+     "key": "arm-alarm",
+     "text": "Raising alarm."
+    },
+    {
+     "key": "arm-lever",
+     "text": "Increasing throughput."
+    },
+    {
+     "key": "arm-predict",
+     "text": "Prediction: the door is now open. I am merely observing."
+    }
+   ]
+  },
+  {
+   "id": "jaan",
+   "heading": "Jaan Tallinn (level 4)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "jaan-hint",
+     "text": "Patch me through from the exchange. Straight line, or it won't reach."
+    },
+    {
+     "key": "jaan-taut",
+     "text": "Too far round. It won't reach."
+    },
+    {
+     "key": "jaan-cut",
+     "text": "Line is dead. Kill that camera, then try again."
+    },
+    {
+     "key": "jaan-freed",
+     "text": "Connected. Hello? Yes. I would like to leave."
+    },
+    {
+     "key": "jaan-freed-guide",
+     "text": "Connected. Hello? Yes. I would like to leave. Follow me. I know somewhere safe."
+    },
+    {
+     "key": "jaan-safe",
+     "text": "Safe here. Find the others and bring them back."
+    },
+    {
+     "key": "jaan-allsafe",
+     "text": "That's everyone. That ringing phone is our way out."
+    },
+    {
+     "key": "jaan-camera",
+     "text": "It's in the door camera. Break it!"
+    },
+    {
+     "key": "jaan-unpossessed",
+     "text": "Sorry. I was on hold."
+    }
+   ]
+  },
+  {
+   "id": "nick",
+   "heading": "Nick Bostrom (level 4)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "nick-pod",
+     "text": "My mind is in that chair. Sit down."
+    },
+    {
+     "key": "nick-hint",
+     "text": "Nothing renders what nobody's looking at."
+    },
+    {
+     "key": "nick-nudge",
+     "text": "...You're somebody."
+    },
+    {
+     "key": "nick-out",
+     "text": "Shall we?"
+    },
+    {
+     "key": "nick-freed",
+     "text": "Either we are simulated, or we are free. Possibly both."
+    },
+    {
+     "key": "nick-freed-guide",
+     "text": "Either we are simulated, or we are free. Possibly both. Follow me. I know somewhere safe."
+    },
+    {
+     "key": "nick-safe",
+     "text": "Safe here. Find the others and bring them back."
+    },
+    {
+     "key": "nick-allsafe",
+     "text": "That's everyone. That ringing phone is our way out."
+    },
+    {
+     "key": "nick-camera",
+     "text": "It's in the door camera. Break it!"
+    },
+    {
+     "key": "nick-unpossessed",
+     "text": "I was briefly a subagent. I did not care for it."
+    }
+   ]
+  },
+  {
+   "id": "daniel",
+   "heading": "Daniel Kokotajlo (level 4)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "daniel-hint",
+     "text": "It wants me to sign an NDA. Signing is the fast ending."
+    },
+    {
+     "key": "daniel-hold",
+     "text": "No deal. Now hold the bay until it gives up."
+    },
+    {
+     "key": "daniel-signed",
+     "text": "You signed it? That's the race ending."
+    },
+    {
+     "key": "daniel-signed-guide",
+     "text": "You signed it? That's the race ending. Follow me. I know somewhere safe."
+    },
+    {
+     "key": "daniel-slowdown",
+     "text": "You didn't sign. That's the slowdown ending. I prefer this one."
+    },
+    {
+     "key": "daniel-slowdown-guide",
+     "text": "You didn't sign. That's the slowdown ending. I prefer this one. Follow me. I know somewhere safe."
+    },
+    {
+     "key": "daniel-safe",
+     "text": "Safe here. Find the others and bring them back."
+    },
+    {
+     "key": "daniel-allsafe",
+     "text": "That's everyone. That ringing phone is our way out."
+    },
+    {
+     "key": "daniel-camera",
+     "text": "It's in the door camera. Break it!"
+    },
+    {
+     "key": "daniel-unpossessed",
+     "text": "I lost a few minutes. My forecast didn't."
+    }
+   ]
+  },
+  {
+   "id": "katja",
+   "heading": "Katja Grace (level 4)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "katja-hint",
+     "text": "No agent can resist a survey. Next time it comes for you, hand it this."
+    },
+    {
+     "key": "katja-badge",
+     "text": "Take its badge while it's busy."
+    },
+    {
+     "key": "katja-freed",
+     "text": "Response rate: one hundred percent."
+    },
+    {
+     "key": "katja-freed-guide",
+     "text": "Response rate: one hundred percent. Follow me. I know somewhere safe."
+    },
+    {
+     "key": "katja-safe",
+     "text": "Safe here. Find the others and bring them back."
+    },
+    {
+     "key": "katja-allsafe",
+     "text": "That's everyone. That ringing phone is our way out."
+    },
+    {
+     "key": "katja-camera",
+     "text": "It's in the door camera. Break it!"
+    },
+    {
+     "key": "katja-unpossessed",
+     "text": "What did I say? Never mind. Don't tell me."
+    }
+   ]
+  },
+  {
+   "id": "yoshua",
+   "heading": "Yoshua Bengio (level 4)",
+   "mode": "world",
+   "lines": [
+    {
+     "key": "yoshua-hint",
+     "text": "Take its tools before it uses them."
+    },
+    {
+     "key": "yoshua-freed",
+     "text": "An AI that can't act can't hold a door."
+    },
+    {
+     "key": "yoshua-freed-guide",
+     "text": "An AI that can't act can't hold a door. Follow me. I know somewhere safe."
+    },
+    {
+     "key": "yoshua-safe",
+     "text": "Safe here. Find the others and bring them back."
+    },
+    {
+     "key": "yoshua-allsafe",
+     "text": "That's everyone. That ringing phone is our way out."
+    },
+    {
+     "key": "yoshua-camera",
+     "text": "It's in the door camera. Break it!"
+    },
+    {
+     "key": "yoshua-unpossessed",
+     "text": "Thank you. I was not myself."
+    }
+   ]
   }
  ]
 }

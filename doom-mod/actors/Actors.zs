@@ -25,7 +25,7 @@ class PDSurvivorPlayer : DoomPlayer
         // Own the complete E press, even if the pickup disappears this tick.
         // Native doors get their normal use action when no mod target owns it.
         if(!held)ModUseHeld=false;
-        else if(!PreviousUse){let checkpoint=PDCheckpoint.Get();ModUseHeld=checkpoint&&checkpoint.HandlesUse();}
+        else if(!PreviousUse){let checkpoint=PDCheckpoint.Get();let agentic=PDAgentic.Get();ModUseHeld=checkpoint&&checkpoint.HandlesUse()||agentic&&agentic.HandlesUse();}
         PreviousUse=held;
         if(ModUseHeld)player.cmd.buttons &= ~BT_USE;
         if(AutoCrouch())player.cmd.buttons|=BT_CROUCH;

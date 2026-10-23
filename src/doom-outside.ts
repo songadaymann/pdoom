@@ -19,14 +19,17 @@ import {makeDesktopIcons} from './doom-desktop-icons';
 
 type EscapeState={saved_people:number[];saved:number;outside:number};
 // Meadow art for each campaign id: levels 1-2's ten, then the factory's five (ids 10-14,
-// figure PNGs from scripts/import-factory-cast.py).
-const MEADOW_IDS=[...CAST_IDS,'zvi','victoria','max','paul','ajeya'] as const;
-// The level whose people come out of each door: CONTROL.EXE, HAL3000.SYS, MEG3N.AVI.
-const LEVEL_OFFSET:Record<string,number>={'five-prisons':0,'hal-station':5,'meg3n-factory':10};
+// figure PNGs from scripts/import-factory-cast.py), then the pod farm's (ids 15-19, level 4). Level 4's
+// figures may not be exported yet, so from OPTIONAL_ART on they load only when one of those people first
+// comes out, and an id without them is left out of the meadow instead of breaking it.
+const MEADOW_IDS=[...CAST_IDS,'zvi','victoria','max','paul','ajeya','tallinn','bostrom','kokotajlo','grace','bengio'] as const;
+const OPTIONAL_ART=15;
+// The level whose people come out of each door: CONTROL.EXE, HAL3000.SYS, MEG3N.AVI, AGENTIC.BAT.
+const LEVEL_OFFSET:Record<string,number>={'five-prisons':0,'hal-station':5,'meg3n-factory':10,'agentic-pods':15};
 type Person={id:number;name:string;alive:number;controlled:number};
 type World={alive:number;people:Person[]};
 type LabelRect={name:string;depth:number;left:number;right:number;bottom:number;top:number};
-type Options={prompt?:(text:string)=>string;labels?:(rects:LabelRect[],surface:HTMLCanvasElement,active:boolean)=>void;source:HTMLCanvasElement;stage:HTMLElement;audio:AudioContext;read:()=>{world:World;escape:EscapeState;levelId?:string};campaign?:()=>{saved:number;lost:number;worldPdoom:number;roster:{id:number;name:string;state:string}[]};enter?:(id:string,replay?:boolean)=>void;readThis?:()=>void};
+type Options={prompt?:(text:string)=>string;labels?:(rects:LabelRect[],surface:HTMLCanvasElement,active:boolean)=>void;source:HTMLCanvasElement;stage:HTMLElement;audio:AudioContext;read:()=>{world:World;escape:EscapeState;levelId?:string};campaign?:()=>{saved:number;lost:number;worldPdoom:number;roster:{id:number;name:string;state:string}[]};enter?:(id:string,replay?:boolean)=>void;readThis?:()=>void;agenticDoor?:boolean};
 
 /** The bunker's foundation slab: weathered poured concrete, drawn procedurally once.
  * Cast in ~3 m bays (sawn joints), speckled aggregate, soft water stains and darker
@@ -103,7 +106,10 @@ export async function createOutside(options:Options){
  const icons=await makeDesktopIcons(scene,options.audio,[
   {x:17,y:3.5,z:12.5,hx:9.4,hy:3.5,hz:12.5},...hubDoors.physicsBoxes(),...future.physicsBoxes(),
  ]);
- const textures=await Promise.all(MEADOW_IDS.map((id)=>Promise.all(Array.from({length:32},async(_,n)=>{const f=Math.floor(n/8),a=n%8,t=await loadTexture(loader,`outside-assets/figure-${id}-${f}-${a}.png`);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}))));
+ const loadFigure=(id:string)=>Promise.all(Array.from({length:32},async(_,n)=>{const f=Math.floor(n/8),a=n%8,t=await loadTexture(loader,`outside-assets/figure-${id}-${f}-${a}.png`);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}));
+ const textures:(THREE.Texture[]|null|undefined)[]=await Promise.all(MEADOW_IDS.slice(0,OPTIONAL_ART).map(loadFigure));
+ // null while loading or missing (then that person stays out of the meadow)
+ const figure=(i:number)=>{if(textures[i]===undefined&&i<MEADOW_IDS.length){textures[i]=null;loadFigure(MEADOW_IDS[i]).then(t=>{textures[i]=t;},()=>console.warn(`Meadow: no figure art for ${MEADOW_IDS[i]} yet`));}return textures[i];};
  const people=new Map<number,{sprite:THREE.Sprite;shadow:THREE.Mesh;target:THREE.Vector3;moving:boolean;arrived:boolean;arrivedAt:number;emergeAt:number}>();
  // Companions leaving a door together come out 1.2 s apart (GAME-SPEC 6.3).
  let lastEmerge=-Infinity;
@@ -128,9 +134,11 @@ export async function createOutside(options:Options){
  let guide:Awaited<ReturnType<typeof makeBlissGuide>>|null=null;
  let intro=false;
  let nearestDoor:typeof HUB_DOORS[number]|null=null;
- // MEG3N.AVI is a real door (2026-10-20): Space walks into the factory; AGENTIC.BAT still installs.
+ // MEG3N.AVI is a real door (2026-10-20): Space walks into the factory. AGENTIC.BAT (level 4, 2026-10-21)
+ // walks into the pod farm only in local development (options.agenticDoor); elsewhere it still installs.
  const factoryDoor=()=>nearestFuture==='meg3n';
- enterButton.onclick=()=>{if(nearestDoor)options.enter?.(nearestDoor.id);else if(factoryDoor())options.enter?.('meg3n-factory');else if(nearestFuture)openDialog(nearestFuture);};replayButton.onclick=()=>{if(nearestDoor)options.enter?.(nearestDoor.id,true);};
+ const agenticDoor=()=>!!options.agenticDoor&&nearestFuture==='agentic';
+ enterButton.onclick=()=>{if(nearestDoor)options.enter?.(nearestDoor.id);else if(factoryDoor())options.enter?.('meg3n-factory');else if(agenticDoor())options.enter?.('agentic-pods');else if(nearestFuture)openDialog(nearestFuture);};replayButton.onclick=()=>{if(nearestDoor)options.enter?.(nearestDoor.id,true);};
  let yaw=0,pitch=0,last=performance.now(),time=0,paused=false,won=0,portalFrames=0,visiblePortal=false;
  const pos=new THREE.Vector3(17,1.72,-3),velocity=new THREE.Vector3(),keys=new Set<string>();let eye=1.72;
  // buildings (not people): the player and kicked icons both collide with these
@@ -173,6 +181,7 @@ export async function createOutside(options:Options){
   if(dialogFor&&down&&code==='KeyR'&&dialogFor!=='final'){dialogAction('a');return;}
   if((code==='Space'||code==='KeyE')&&down&&nearestDoor){options.enter?.(nearestDoor.id);return;}
   if((code==='Space'||code==='KeyE')&&down&&factoryDoor()&&!paused){options.enter?.('meg3n-factory');return;}
+  if((code==='Space'||code==='KeyE')&&down&&agenticDoor()&&!paused){options.enter?.('agentic-pods');return;}
   if((code==='Space'||code==='KeyE')&&down&&nearestFuture&&!paused){openDialog(nearestFuture);return;}if(intro&&code==='Space'&&down&&!paused){guide?.skip();return;}if(down)keys.add(code);else keys.delete(code);if(code==='Escape'&&down){paused=!paused;keys.clear();syncAudio();el('message').textContent=paused?'Paused. Press Esc or Menu to continue.':'';el('message').hidden=!paused;}}
  function release(){keys.clear();}
  function look(dx:number,dy:number){if(!active||paused)return;yaw-=dx*.0025;pitch=THREE.MathUtils.clamp(pitch-dy*.0025,-1.1,1.1);}
@@ -184,7 +193,7 @@ export async function createOutside(options:Options){
  for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,()=>{drag=null;});
  const visibility=()=>{release();syncAudio();};document.addEventListener('visibilitychange',visibility);window.addEventListener('blur',()=>{release();blissAudio.setActive(false);future.setAudioActive(false);});window.addEventListener('focus',()=>{syncAudio();options.audio.resume();});
  function showWin(saved:number){won=saved;}
- function liveDoorOf(id:string){return id==='meg3n-factory'?FUTURE_DOORS[0]:HUB_DOORS.find(d=>d.id===id)||HUB_DOORS[0];}
+ function liveDoorOf(id:string){return id==='meg3n-factory'?FUTURE_DOORS[0]:id==='agentic-pods'?FUTURE_DOORS[1]:HUB_DOORS.find(d=>d.id===id)||HUB_DOORS[0];}
  function setActive(value:boolean,id='five-prisons'){
   active=value;canvas.hidden=!value;hubUi.hidden=!value;keys.clear();paused=false;currentLevel=id;
   portalMaterial.map=id!==HUB_DOORS[0].id&&id in LEVEL_OFFSET?controlStill:portalTexture;hubDoors.setLevel(id);future.setLevel(id);
@@ -245,9 +254,10 @@ export async function createOutside(options:Options){
   for(let i=0;i<5;i++)if(escape.saved_people[i]&&natives[i]?.alive)arrivals.add(offset+i);
   for(const i of arrivals){
    const art=i;
+   if(!figure(art))continue;// level 4's figures still loading, or not exported yet (OPTIONAL_ART)
    if(!people.has(i)){
     const layout=meadowCampLayout(i),localArrival=i>=offset&&i<offset+5&&!!escape.saved_people[i-offset];
-    const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:textures[art][0],color:0xdddddd,transparent:true,alphaTest:.5}));sprite.scale.set(1.8,1.8,1);sprite.center.set(.5,0);
+    const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:textures[art]![0],color:0xdddddd,transparent:true,alphaTest:.5}));sprite.scale.set(1.8,1.8,1);sprite.center.set(.5,0);
     const start=localArrival?layout.origin:layout.target;sprite.position.set(start.x,groundY(start.x,start.z),start.z);scene.add(sprite);
     const shadow=new THREE.Mesh(blobGeo,blobMat);shadow.renderOrder=5;scene.add(shadow);
     const emergeAt=localArrival?lastEmerge=Math.max(time,lastEmerge+1.2):0;
@@ -267,7 +277,7 @@ export async function createOutside(options:Options){
    p.sprite.scale.set(idle.width,idle.height,1);
    p.moving=before.distanceTo(p.sprite.position)>.0001;p.sprite.position.y=groundY(p.sprite.position.x,p.sprite.position.z);
    {const sx=p.sprite.position.x+sunAway.x*.18,sz=p.sprite.position.z+sunAway.y*.18;p.shadow.position.set(sx,groundY(sx,sz)+.02,sz);}
-   const toCamera=Math.atan2(pos.x-p.sprite.position.x,pos.z-p.sprite.position.z),facing=p.arrived?Math.atan2(Math.cos((time-p.arrivedAt)*.8+i*1.37)*.36,-Math.sin((time-p.arrivedAt)*.8+i*1.37)*.26):Math.atan2(p.target.x-p.sprite.position.x,p.target.z-p.sprite.position.z),angle=((toCamera-facing)*180/Math.PI+360)%360,rotation=Math.round(angle/45)%8,phase=p.arrived?idle.frame:Math.floor(time*6)%4;(p.sprite.material as THREE.SpriteMaterial).map=textures[i][phase*8+rotation];
+   const toCamera=Math.atan2(pos.x-p.sprite.position.x,pos.z-p.sprite.position.z),facing=p.arrived?Math.atan2(Math.cos((time-p.arrivedAt)*.8+i*1.37)*.36,-Math.sin((time-p.arrivedAt)*.8+i*1.37)*.26):Math.atan2(p.target.x-p.sprite.position.x,p.target.z-p.sprite.position.z),angle=((toCamera-facing)*180/Math.PI+360)%360,rotation=Math.round(angle/45)%8,phase=p.arrived?idle.frame:Math.floor(time*6)%4;(p.sprite.material as THREE.SpriteMaterial).map=textures[i]![phase*8+rotation];
   }
   // Only the loaded level's doorway is live (CONTROL's for anything outside the hub);
   // the other shows its still, so it needs no updates.
@@ -277,15 +287,15 @@ export async function createOutside(options:Options){
   nearestDoor=null;
   if(!paused)for(const door of HUB_DOORS)if((!intro||door.id==='five-prisons'&&guide?.ready)&&Math.hypot(pos.x-door.x,pos.z-door.z)<4.5){nearestDoor=door;break;}
   nearestFuture=!paused&&!nearestDoor&&!intro?future.nearest(pos.x,pos.z):null;
-  const futureLabel=nearestFuture==='final'?'SPACE — Display Properties':factoryDoor()?`SPACE — Enter ${FUTURE_DOORS[0].label}`:nearestFuture?`SPACE — Open ${FUTURE_DOORS.find(d=>d.id===nearestFuture)!.label}`:'';
+  const futureLabel=nearestFuture==='final'?'SPACE — Display Properties':factoryDoor()?`SPACE — Enter ${FUTURE_DOORS[0].label}`:agenticDoor()?`SPACE — Enter ${FUTURE_DOORS[1].label}`:nearestFuture?`SPACE — Open ${FUTURE_DOORS.find(d=>d.id===nearestFuture)!.label}`:'';
   const promptText=nearestDoor?`SPACE — Enter ${nearestDoor.label}`:dialogFor?'':futureLabel;
   enterButton.hidden=!promptText;enterButton.textContent=promptText?(options.prompt?.(promptText)??promptText):'';
   if(dialogFor&&(paused||future.distanceTo(dialogFor,pos.x,pos.z)>(dialogFor==='final'?13:7)))closeDialog();
   renderDialog();
   {const unresolved=Math.max(0,20-(camp?.saved??0)-(camp?.lost??0));
    const reduced=options.stage.classList.contains('reduced-motion');
-   // The MCP's face sharpens one step per structure cleared, the factory included.
-   const factory=camp?.roster.filter(p=>p.id>=10&&p.id<15)||[],cleared=levels+(factory.length===5&&factory.every(p=>p.state==='camp'||p.state==='lost')?1:0);
+   // The MCP's face sharpens one step per structure cleared, the factory and the pod farm included.
+   const done=(first:number)=>{const group=camp?.roster.filter(p=>p.id>=first&&p.id<first+5)||[];return group.length===5&&group.every(p=>p.state==='camp'||p.state==='lost')?1:0;},cleared=levels+done(10)+done(15);
    future.update(paused?0:dt,time,pos,yaw,reduced,paused,{unresolved,levels:cleared},pitch);
    icons.update(paused?0:dt,time,pos,velocity,paused);}
   const matching=camp?.roster.filter(p=>p.id>=((nearestDoor?.id==='hal-station')?5:0)&&p.id<((nearestDoor?.id==='hal-station')?10:5))||[];
@@ -293,9 +303,10 @@ export async function createOutside(options:Options){
   hubUi.querySelector('#hub-count')!.textContent=camp?`FREED ${camp.saved}/20 · LOST ${camp.lost} · WORLD p(DOOM) ${camp.worldPdoom}%`:'';
   el('people').textContent=won?'You made it out':'Fresh air';el('group').textContent=won?`100% survival · ${won} ${won===1?'person':'people'} safe · Take a look back`:`${escape.saved}/${state.world.alive} outside · Waiting for the others`;
   // Status strips (HAL's, MEG3N's): green per person out of the door, dark per person still inside, grey per person lost
-  const light=(id:number):StripLight=>{const p=people.get(id);return p?time>=p.emergeAt?'saved':'inside':camp?.roster.find(r=>r.id===id)?.state==='lost'?'lost':'inside';};
+  // (someone at camp with no figure art yet, level 4's, still lights green)
+  const light=(id:number):StripLight=>{const p=people.get(id),state=camp?.roster.find(r=>r.id===id)?.state;return p?time>=p.emergeAt?'saved':'inside':state==='lost'?'lost':state==='camp'?'saved':'inside';};
   const strip=(first:number)=>Array.from({length:5},(_,i)=>light(first+i));
-  future.setFactoryStrip(strip(10));
+  future.setFactoryStrip(strip(10));future.setAgenticStrip(strip(15));
   hubDoors.update(paused?0:dt,time,pos,options.stage.classList.contains('reduced-motion'),strip(5));
   grass.update(camera);
   renderer.render(scene,camera);

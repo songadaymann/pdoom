@@ -8,6 +8,8 @@ import {createHash} from 'node:crypto';
 const lump=process.argv[2]||'D_E1M1',name=process.argv[3]||'intake';
 if(!/^D_[A-Z0-9_]{1,6}$/.test(lump)||! /^[a-z0-9-]+$/.test(name))throw Error('Use a Doom music lump and a lowercase output name.');
 const output=`doom-web/local/${name}-music`;
+// PDOOM_PORT=<port> (or PDOOM_ORIGIN) renders against another checkout's server, such as a worktree's.
+const origin=(process.env.PDOOM_ORIGIN||`http://127.0.0.1:${process.env.PDOOM_PORT||5198}`).replace(/\/$/,'');
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--mute-audio']});
 const page=await browser.newPage();
 await page.route('**/main.js',async route=>{const source=await fs.readFile('doom-web/main.js','utf8');await route.fulfill({contentType:'text/javascript',body:source.replace(/await audio\.prepareMusic\([^;]+\);/,'')});});
@@ -24,7 +26,7 @@ await page.addInitScript(()=>{
 });
 async function command(text){await page.evaluate(text=>{for(const key of text){const c=key.charCodeAt(0);window.__MUSIC_WORKER__.postMessage({type:'input',target:'window',evType:'keypress',init:{key,keyCode:c,which:c,charCode:c,bubbles:true,cancelable:true}});}},text);await page.keyboard.press('Enter');}
 try{
- await page.goto('http://127.0.0.1:5198/');await startGame(page);await page.waitForFunction(()=>window.__DOOM_DEBUG__?.state.mode==='playing',null,{timeout:45000});await page.keyboard.press('Backquote');await page.waitForTimeout(200);
+ await page.goto(origin+'/');await startGame(page);await page.waitForFunction(()=>window.__DOOM_DEBUG__?.state.mode==='playing',null,{timeout:45000});await page.keyboard.press('Backquote');await page.waitForTimeout(200);
  await command(`writewave ${lump} /intake.wav 0 22050 OPL 1`);
  await page.waitForTimeout(1000);await page.evaluate(()=>window.__MUSIC_WORKER__.postMessage({type:'export-music'}));
  await page.waitForFunction(()=>window.__MUSIC_PCM__||window.__MUSIC_ERROR__,null,{timeout:45000});if(await page.evaluate(()=>window.__MUSIC_ERROR__))throw Error(await page.evaluate(()=>window.__MUSIC_ERROR__));

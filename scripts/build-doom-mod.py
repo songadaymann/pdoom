@@ -14,6 +14,10 @@ import zlib
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'doom-mod'
 OUTPUT = ROOT / 'doom-web' / 'pdoom.pk3'
+# Level 4 (E2M2) text lumps -> doom-mod sources; each is packed only when its file exists.
+AGENTIC_LUMPS = [('textures.agentic', 'agentic-textures.txt'), ('textures.agentictheme', 'agentic-theme-textures.txt'),
+                 ('animdefs.agentic', 'agentic-theme-animdefs.txt'), ('gldefs.agentic', 'agentic-theme-gldefs.txt'),
+                 ('trnslate.agentic', 'agentic-theme-trnslate.txt')]
 KINDS = {'H': 3, 'S': 1, 'M': 1, 'A': 1, 'D': 4, 'B': 5, 'G': 6,
          'K': 8, 'R': 1, 'r': 2, '.': 2, 'P': 7}
 OUTDOOR = {'.', 'P', 'r', 'C', 'roof'}
@@ -428,6 +432,7 @@ def main():
     from build_checkpoint_map import build_checkpoint
     from build_hal_map import build_hal
     from build_factory_map import build_factory
+    from build_agentic_map import build_agentic
     from build_gauntlet_map import build_prologue
     spec = json.loads((SOURCE / 'map.json').read_text())
     build_navigation(spec)
@@ -437,6 +442,7 @@ def main():
     checkpoint_wad = build_checkpoint(ROOT, udmf_block, make_wad)
     hal_wad=build_hal(ROOT,udmf_block,make_wad)
     factory_wad=build_factory(ROOT,udmf_block,make_wad)
+    agentic_wad=build_agentic(ROOT,udmf_block,make_wad)
     prologue_wad=build_prologue(ROOT,udmf_block,make_wad)
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(prefix='.pdoom-', suffix='.pk3.tmp', dir=OUTPUT.parent, delete=False) as pending:
@@ -456,6 +462,8 @@ def main():
             archive.writestr('animdefs.factory', (SOURCE / 'factory-theme-animdefs.txt').read_bytes())
             archive.writestr('gldefs.factory', (SOURCE / 'factory-theme-gldefs.txt').read_bytes())
             archive.writestr('trnslate.factory', (SOURCE / 'factory-theme-trnslate.txt').read_bytes())
+            for lump, name in AGENTIC_LUMPS:
+                if (SOURCE / name).exists(): archive.writestr(lump, (SOURCE / name).read_bytes())
             posters = ROOT / 'doom-web/local/posters'
             for asset in sorted(posters.glob('PDP??.png')):
                 archive.writestr(f'patches/posters/{asset.name}', asset.read_bytes())
@@ -464,6 +472,7 @@ def main():
             archive.writestr('maps/E1M4.wad', checkpoint_wad)
             archive.writestr('maps/E1M7.wad',hal_wad)
             archive.writestr('maps/E2M7.wad',factory_wad)
+            archive.writestr('maps/E2M2.wad',agentic_wad)
             archive.writestr('maps/E1M2.wad',prologue_wad)
         temporary.replace(OUTPUT)
     finally:

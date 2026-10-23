@@ -94,7 +94,7 @@ SUBJECT: a stern, expressionless 1999 government agent. Clean-shaven middle-aged
 ### 7. SMITH's extra poses — `smith-poses.png`
 
 ```text
-Sprite sheet for a 1993 Doom-style game. Transparent PNG background. EXACTLY 4 equal columns in 1 row, the same character facing the viewer in every cell, same scale and baseline, generous margins, no labels, floor or shadows. Painted chunky pixel art like 1993 Doom, limited palette, light from upper left. Attached image 1 is the character to match exactly (from its atlas); image 2 is a style reference.
+Sprite sheet for a 1993 Doom-style game. Transparent PNG background. EXACTLY 4 equal columns in 1 row, the same character facing the viewer in every cell, same scale and baseline, generous margins, no labels, floor or shadows. Painted chunky pixel art like 1993 Doom, limited palette, light from upper left. Attached image 1 is the character to match exactly (from its atlas): same head size, shoulder width, body bulk and pixel scale as image 1's front idle figure, so he reads as the same sprite, not a slimmer redraw. Image 2 is a style reference.
 SUBJECT: the stern agent in a black suit, narrow black tie, dark sunglasses, coiled earpiece and white lanyard badge. Columns: 1 two fingers pressed to his earpiece, head tilted slightly up as if reading something floating above him; 2 filling in a paper survey on a brown clipboard held at chest height, head bowed over it, pencil in hand, completely absorbed; 3 pointing one arm straight at the viewer, both sunglasses lenses glowing bright green; 4 rebooting, slumped forward, head drooping, sunglasses slipped down his nose, lenses dark.
 ```
 

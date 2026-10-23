@@ -10,7 +10,8 @@ const BARKS={
  "RADIO: IT'S A TRAP. THEY'RE EVERYWHERE. THEY'RE":'radio-trap',
  'ED-404: PLEASE PUT DOWN YOUR WEAPON. YOU HAVE TWENTY SECONDS TO COMPLY.':'ed404-comply'
 };
-const MODES={you:'self',hal:'pa',inferminator:'machine',radio:'radio',ed404:'loud'};
+// AGENTIC SMITH and the jailer arm (level 4) are machines, placed where they stand.
+const MODES={you:'self',hal:'pa',inferminator:'machine',radio:'radio',ed404:'loud',smith:'machine',arm:'machine'};
 const modeFor=key=>MODES[key.startsWith('you-')?'you':key.split('-')[0]]||'world';
 
 // Seeded noise with an exponential tail: a facility room, or the station's long hall.
@@ -94,6 +95,9 @@ export function createVoiceOver(audio){
     if(key)start(key,{...d,x:w?.x,y:w?.y,angle:w?.angle});
     else{if(d.voice)missing.add(d.voice);if(d.remaining>0)stop();}
    }
+   // Level 4 cuts a line short (the jailer arm's tool pulled, SMITH grabbing the hardline): its take stops
+   // with it. A line otherwise lasts as long as its take (Agentic.zs Show), so this never clips one.
+   if(levelId==='agentic-pods'&&voice&&d&&d.serial===serial&&d.remaining===0&&voice.key===d.voice&&!paused)stop();
    if(voice&&d&&w&&voice.place&&d.serial===serial){voice.place={...d,x:w.x,y:w.y,angle:w.angle};position(voice,voice.place,false);}
    const said=state?.prologue?.prompt||'';
    if(said!==bark){bark=said;const key=take(BARKS[said]);if(key)start(key,null);}

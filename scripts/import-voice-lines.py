@@ -33,6 +33,11 @@ for first, sid in [('liron', 'liron'), ('stuart', 'stuart'), ('eliezer', 'elieze
                    ('hal3000', 'hal'), ('hal', 'hal'), ('terminator', 'inferminator'), ('inferminator', 'inferminator'), ('arnold', 'inferminator'),
                    ('radio', 'radio'), ('soldier', 'radio'), ('ed404', 'ed404'), ('robot', 'ed404'), ('lead', 'lead')]:
     ALIASES.setdefault(first, sid)
+# Level 4 (2026-10-21): its speakers are keyed by first name (jaan, nick, daniel, katja, yoshua; 'daniel' outranks
+# Hendrycks's 'dan' as the longer alias); surnames and SMITH's longer names work too, once lines.json has them.
+for other, sid in [('tallinn', 'jaan'), ('bostrom', 'nick'), ('kokotajlo', 'daniel'), ('grace', 'katja'), ('bengio', 'yoshua'),
+                   ('agenticsmith', 'smith'), ('agent', 'smith'), ('jailerarm', 'arm')]:
+    if sid in SPEAKERS: ALIASES.setdefault(other, sid)
 
 def speaker_of(path, forced):
     if forced: return forced

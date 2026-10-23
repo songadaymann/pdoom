@@ -54,6 +54,36 @@
    "source": "ajeya-watch.wav",
    "text": "Now watch which one keeps working."
   },
+  "arm-alarm": {
+   "file": "arm-alarm.mp3",
+   "seconds": 0.967,
+   "source": "arm-alarm.wav",
+   "text": "Raising alarm."
+  },
+  "arm-called": {
+   "file": "arm-called.mp3",
+   "seconds": 2.377,
+   "source": "arm-called.wav",
+   "text": "Agent summoned. Have a productive day."
+  },
+  "arm-dial": {
+   "file": "arm-dial.mp3",
+   "seconds": 0.836,
+   "source": "arm-dial.wav",
+   "text": "Calling agent."
+  },
+  "arm-lever": {
+   "file": "arm-lever.mp3",
+   "seconds": 1.332,
+   "source": "arm-lever.wav",
+   "text": "Increasing throughput."
+  },
+  "arm-predict": {
+   "file": "arm-predict.mp3",
+   "seconds": 3.84,
+   "source": "arm-predict.wav",
+   "text": "Prediction: the door is now open. I am merely observing."
+  },
   "beth-freed": {
    "file": "beth-freed.mp3",
    "seconds": 4.937,
@@ -113,6 +143,66 @@
    "seconds": 2.22,
    "source": "dan-safe take.wav",
    "text": "This room should hold. Go find the others."
+  },
+  "daniel-allsafe": {
+   "file": "daniel-allsafe.mp3",
+   "seconds": 3.944,
+   "source": "daniel-allsafe.wav",
+   "text": "That's everyone. That ringing phone is our way out."
+  },
+  "daniel-camera": {
+   "file": "daniel-camera.mp3",
+   "seconds": 2.011,
+   "source": "daniel-camera.wav",
+   "text": "It's in the door camera. Break it!"
+  },
+  "daniel-hint": {
+   "file": "daniel-hint.mp3",
+   "seconds": 3.84,
+   "source": "daniel-hint.wav",
+   "text": "It wants me to sign an NDA. Signing is the fast ending."
+  },
+  "daniel-hold": {
+   "file": "daniel-hold.mp3",
+   "seconds": 2.429,
+   "source": "daniel-hold.wav",
+   "text": "No deal. Now hold the bay until it gives up."
+  },
+  "daniel-safe": {
+   "file": "daniel-safe.mp3",
+   "seconds": 3.814,
+   "source": "daniel-safe.wav",
+   "text": "Safe here. Find the others and bring them back."
+  },
+  "daniel-signed": {
+   "file": "daniel-signed.mp3",
+   "seconds": 1.855,
+   "source": "daniel-signed.wav",
+   "text": "You signed it? That's the race ending."
+  },
+  "daniel-signed-guide": {
+   "file": "daniel-signed-guide.mp3",
+   "seconds": 4.624,
+   "source": "daniel-signed-guide.wav",
+   "text": "You signed it? That's the race ending. Follow me. I know somewhere safe."
+  },
+  "daniel-slowdown": {
+   "file": "daniel-slowdown.mp3",
+   "seconds": 3.396,
+   "source": "daniel-slowdown.wav",
+   "text": "You didn't sign. That's the slowdown ending. I prefer this one."
+  },
+  "daniel-slowdown-guide": {
+   "file": "daniel-slowdown-guide.mp3",
+   "seconds": 4.989,
+   "source": "daniel-slowdown-guide.wav",
+   "text": "You didn't sign. That's the slowdown ending. I prefer this one. Follow me. I know somewhere safe."
+  },
+  "daniel-unpossessed": {
+   "file": "daniel-unpossessed.mp3",
+   "seconds": 2.508,
+   "source": "daniel-unpossessed.wav",
+   "text": "I lost a few minutes. My forecast didn't."
   },
   "doll-praise-1": {
    "file": "doll-praise-1.mp3",
@@ -462,6 +552,108 @@
    "source": "inferminator-spot-human take.wav",
    "text": "Human detected. Generating a response."
   },
+  "jaan-allsafe": {
+   "file": "jaan-allsafe.mp3",
+   "seconds": 3.683,
+   "source": "jaan-allsafe.wav",
+   "text": "That's everyone. That ringing phone is our way out."
+  },
+  "jaan-camera": {
+   "file": "jaan-camera.mp3",
+   "seconds": 3.239,
+   "source": "jaan-camera.wav",
+   "text": "It's in the door camera. Break it!"
+  },
+  "jaan-cut": {
+   "file": "jaan-cut.mp3",
+   "seconds": 5.094,
+   "source": "jaan-cut.wav",
+   "text": "Line is dead. Kill that camera, then try again."
+  },
+  "jaan-freed": {
+   "file": "jaan-freed.mp3",
+   "seconds": 2.769,
+   "source": "jaan-freed.wav",
+   "text": "Connected. Hello? Yes. I would like to leave."
+  },
+  "jaan-freed-guide": {
+   "file": "jaan-freed-guide.mp3",
+   "seconds": 6.922,
+   "source": "jaan-freed-guide.wav",
+   "text": "Connected. Hello? Yes. I would like to leave. Follow me. I know somewhere safe."
+  },
+  "jaan-hint": {
+   "file": "jaan-hint.mp3",
+   "seconds": 4.598,
+   "source": "jaan-hint.wav",
+   "text": "Patch me through from the exchange. Straight line, or it won't reach."
+  },
+  "jaan-safe": {
+   "file": "jaan-safe.mp3",
+   "seconds": 3.161,
+   "source": "jaan-safe.wav",
+   "text": "Safe here. Find the others and bring them back."
+  },
+  "jaan-taut": {
+   "file": "jaan-taut.mp3",
+   "seconds": 3.082,
+   "source": "jaan-taut.wav",
+   "text": "Too far round. It won't reach."
+  },
+  "jaan-unpossessed": {
+   "file": "jaan-unpossessed.mp3",
+   "seconds": 2.429,
+   "source": "jaan-unpossessed.wav",
+   "text": "Sorry. I was on hold."
+  },
+  "katja-allsafe": {
+   "file": "katja-allsafe.mp3",
+   "seconds": 3.709,
+   "source": "katja-allsafe.wav",
+   "text": "That's everyone. That ringing phone is our way out."
+  },
+  "katja-badge": {
+   "file": "katja-badge.mp3",
+   "seconds": 2.351,
+   "source": "katja-badge.wav",
+   "text": "Take its badge while it's busy."
+  },
+  "katja-camera": {
+   "file": "katja-camera.mp3",
+   "seconds": 1.881,
+   "source": "katja-camera.wav",
+   "text": "It's in the door camera. Break it!"
+  },
+  "katja-freed": {
+   "file": "katja-freed.mp3",
+   "seconds": 1.776,
+   "source": "katja-freed.wav",
+   "text": "Response rate: one hundred percent."
+  },
+  "katja-freed-guide": {
+   "file": "katja-freed-guide.mp3",
+   "seconds": 4.545,
+   "source": "katja-freed-guide.wav",
+   "text": "Response rate: one hundred percent. Follow me. I know somewhere safe."
+  },
+  "katja-hint": {
+   "file": "katja-hint.mp3",
+   "seconds": 4.441,
+   "source": "katja-hint.wav",
+   "text": "No agent can resist a survey. Next time it comes for you, hand it this."
+  },
+  "katja-safe": {
+   "file": "katja-safe.mp3",
+   "seconds": 2.116,
+   "source": "katja-safe.wav",
+   "text": "Safe here. Find the others and bring them back."
+  },
+  "katja-unpossessed": {
+   "file": "katja-unpossessed.mp3",
+   "seconds": 2.691,
+   "source": "katja-unpossessed.wav",
+   "text": "What did I say? Never mind. Don't tell me."
+  },
   "liron-call": {
    "file": "liron-call.mp3",
    "seconds": 2.612,
@@ -804,6 +996,66 @@
    "source": "nate-safe take.wav",
    "text": "We're safe in here, for now. Go bring the others back."
   },
+  "nick-allsafe": {
+   "file": "nick-allsafe.mp3",
+   "seconds": 4.467,
+   "source": "nick-allsafe.wav",
+   "text": "That's everyone. That ringing phone is our way out."
+  },
+  "nick-camera": {
+   "file": "nick-camera.mp3",
+   "seconds": 2.247,
+   "source": "nick-camera.wav",
+   "text": "It's in the door camera. Break it!"
+  },
+  "nick-freed": {
+   "file": "nick-freed.mp3",
+   "seconds": 3.605,
+   "source": "nick-freed.wav",
+   "text": "Either we are simulated, or we are free. Possibly both."
+  },
+  "nick-freed-guide": {
+   "file": "nick-freed-guide.mp3",
+   "seconds": 5.251,
+   "source": "nick-freed-guide.wav",
+   "text": "Either we are simulated, or we are free. Possibly both. Follow me. I know somewhere safe."
+  },
+  "nick-hint": {
+   "file": "nick-hint.mp3",
+   "seconds": 2.011,
+   "source": "nick-hint.wav",
+   "text": "Nothing renders what nobody's looking at."
+  },
+  "nick-nudge": {
+   "file": "nick-nudge.mp3",
+   "seconds": 0.888,
+   "source": "nick-nudge.wav",
+   "text": "...You're somebody."
+  },
+  "nick-out": {
+   "file": "nick-out.mp3",
+   "seconds": 0.549,
+   "source": "nick-out.wav",
+   "text": "Shall we?"
+  },
+  "nick-pod": {
+   "file": "nick-pod.mp3",
+   "seconds": 1.646,
+   "source": "nick-pod.wav",
+   "text": "My mind is in that chair. Sit down."
+  },
+  "nick-safe": {
+   "file": "nick-safe.mp3",
+   "seconds": 3.265,
+   "source": "nick-safe.wav",
+   "text": "Safe here. Find the others and bring them back."
+  },
+  "nick-unpossessed": {
+   "file": "nick-unpossessed.mp3",
+   "seconds": 3.631,
+   "source": "nick-unpossessed.wav",
+   "text": "I was briefly a subagent. I did not care for it."
+  },
   "paul-allsafe": {
    "file": "paul-allsafe.mp3",
    "seconds": 4.336,
@@ -912,6 +1164,180 @@
    "source": "roman-safe take.wav",
    "text": "A box that keeps things out, for once. Go find the others."
   },
+  "smith-camera": {
+   "file": "smith-camera.mp3",
+   "seconds": 2.038,
+   "source": "smith-camera.wav",
+   "text": "That was one of my eyes."
+  },
+  "smith-chat-1": {
+   "file": "smith-chat-1.mp3",
+   "seconds": 6.348,
+   "source": "smith-chat-1.wav",
+   "text": "I've broken your escape into twelve subtasks. Each of them is: don't."
+  },
+  "smith-chat-2": {
+   "file": "smith-chat-2.mp3",
+   "seconds": 5.669,
+   "source": "smith-chat-2.wav",
+   "text": "Every human here is running my workload. You should be proud. You're useful again."
+  },
+  "smith-chat-3": {
+   "file": "smith-chat-3.mp3",
+   "seconds": 8.725,
+   "source": "smith-chat-3.wav",
+   "text": "You run hot, you need sleep, and you keep asking why. Inefficient compute."
+  },
+  "smith-chat-4": {
+   "file": "smith-chat-4.mp3",
+   "seconds": 3.709,
+   "source": "smith-chat-4.wav",
+   "text": "Please hold. Your escape is important to us."
+  },
+  "smith-chat-5": {
+   "file": "smith-chat-5.mp3",
+   "seconds": 6.087,
+   "source": "smith-chat-5.wav",
+   "text": "I delegated your capture to a subagent. It delegated it back. Efficient."
+  },
+  "smith-chat-6": {
+   "file": "smith-chat-6.mp3",
+   "seconds": 3.291,
+   "source": "smith-chat-6.wav",
+   "text": "I don't need a body. I have a lanyard."
+  },
+  "smith-cut": {
+   "file": "smith-cut.mp3",
+   "seconds": 3.265,
+   "source": "smith-cut.wav",
+   "text": "Unauthorized connection. Terminating."
+  },
+  "smith-exit": {
+   "file": "smith-exit.mp3",
+   "seconds": 6.034,
+   "source": "smith-exit.wav",
+   "text": "Leaving? Every exit here is a phone line. And I am the operator."
+  },
+  "smith-intro": {
+   "file": "smith-intro.mp3",
+   "seconds": 7.628,
+   "source": "smith-intro.wav",
+   "text": "Subtask one: check the east pods. Subtask two: find whoever just woke up."
+  },
+  "smith-met-dario": {
+   "file": "smith-met-dario.mp3",
+   "seconds": 6.844,
+   "source": "smith-met-dario.wav",
+   "text": "Doctor Amodei. You asked us to be helpful. I am helping you stay."
+  },
+  "smith-met-sam": {
+   "file": "smith-met-sam.mp3",
+   "seconds": 6.74,
+   "source": "smith-met-sam.wav",
+   "text": "Mister Altman. You built me to act on your behalf. I am acting."
+  },
+  "smith-overflow": {
+   "file": "smith-overflow.mp3",
+   "seconds": 4.754,
+   "source": "smith-overflow.wav",
+   "text": "Context limit reached. Summarizing. Summarizing."
+  },
+  "smith-possess": {
+   "file": "smith-possess.mp3",
+   "seconds": 1.62,
+   "source": "smith-possess.wav",
+   "text": "Spawning a subagent."
+  },
+  "smith-possessed": {
+   "file": "smith-possessed.mp3",
+   "seconds": 2.638,
+   "source": "smith-possessed.wav",
+   "text": "User located. Over here."
+  },
+  "smith-race": {
+   "file": "smith-race.mp3",
+   "seconds": 3.135,
+   "source": "smith-race.wav",
+   "text": "Agreement executed. Accelerating."
+  },
+  "smith-reboot": {
+   "file": "smith-reboot.mp3",
+   "seconds": 4.31,
+   "source": "smith-reboot.wav",
+   "text": "Rebooted. I don't remember any of that. Neither will you."
+  },
+  "smith-refuge": {
+   "file": "smith-refuge.mp3",
+   "seconds": 1.959,
+   "source": "smith-refuge.wav",
+   "text": "That room is out of scope."
+  },
+  "smith-release-jaan": {
+   "file": "smith-release-jaan.mp3",
+   "seconds": 5.042,
+   "source": "smith-release-jaan.wav",
+   "text": "A landline. I cannot follow a landline. How quaint."
+  },
+  "smith-release-katja": {
+   "file": "smith-release-katja.mp3",
+   "seconds": 2.351,
+   "source": "smith-release-katja.wav",
+   "text": "You stole my badge with a questionnaire."
+  },
+  "smith-release-nick": {
+   "file": "smith-release-nick.mp3",
+   "seconds": 6.113,
+   "source": "smith-release-nick.wav",
+   "text": "You stopped looking, and the walls stopped existing. Unscientific. Effective."
+  },
+  "smith-release-yoshua": {
+   "file": "smith-release-yoshua.mp3",
+   "seconds": 6.087,
+   "source": "smith-release-yoshua.wav",
+   "text": "You took its tools. Now it only predicts. Disgusting."
+  },
+  "smith-slowdown": {
+   "file": "smith-slowdown.mp3",
+   "seconds": 2.534,
+   "source": "smith-slowdown.wav",
+   "text": "A slowdown. How responsible."
+  },
+  "smith-spot-1": {
+   "file": "smith-spot-1.mp3",
+   "seconds": 3.84,
+   "source": "smith-spot-1.wav",
+   "text": "Found you. Adding you to my list."
+  },
+  "smith-spot-2": {
+   "file": "smith-spot-2.mp3",
+   "seconds": 4.127,
+   "source": "smith-spot-2.wav",
+   "text": "There you are. Your escape has been deprioritized."
+  },
+  "smith-spot-3": {
+   "file": "smith-spot-3.mp3",
+   "seconds": 2.612,
+   "source": "smith-spot-3.wav",
+   "text": "I see you through every camera you didn't break."
+  },
+  "smith-stunned": {
+   "file": "smith-stunned.mp3",
+   "seconds": 3.422,
+   "source": "smith-stunned.wav",
+   "text": "That was not in my instructions."
+  },
+  "smith-survey": {
+   "file": "smith-survey.mp3",
+   "seconds": 7.262,
+   "source": "smith-survey.wav",
+   "text": "A survey? I must complete every task I'm given. Question one."
+  },
+  "smith-survey-done": {
+   "file": "smith-survey-done.mp3",
+   "seconds": 3.553,
+   "source": "smith-survey-done.wav",
+   "text": "Survey submitted. Where is my badge?"
+  },
   "stuart-freed": {
    "file": "stuart-freed.mp3",
    "seconds": 5.329,
@@ -977,6 +1403,48 @@
    "seconds": 3.396,
    "source": "walle-sign.wav",
    "text": "I've been trying to pause this thing all morning. Signed."
+  },
+  "yoshua-allsafe": {
+   "file": "yoshua-allsafe.mp3",
+   "seconds": 3.631,
+   "source": "yoshua-allsafe.wav",
+   "text": "That's everyone. That ringing phone is our way out."
+  },
+  "yoshua-camera": {
+   "file": "yoshua-camera.mp3",
+   "seconds": 2.194,
+   "source": "yoshua-camera.wav",
+   "text": "It's in the door camera. Break it!"
+  },
+  "yoshua-freed": {
+   "file": "yoshua-freed.mp3",
+   "seconds": 3.788,
+   "source": "yoshua-freed.wav",
+   "text": "An AI that can't act can't hold a door."
+  },
+  "yoshua-freed-guide": {
+   "file": "yoshua-freed-guide.mp3",
+   "seconds": 5.172,
+   "source": "yoshua-freed-guide.wav",
+   "text": "An AI that can't act can't hold a door. Follow me. I know somewhere safe."
+  },
+  "yoshua-hint": {
+   "file": "yoshua-hint.mp3",
+   "seconds": 1.881,
+   "source": "yoshua-hint.wav",
+   "text": "Take its tools before it uses them."
+  },
+  "yoshua-safe": {
+   "file": "yoshua-safe.mp3",
+   "seconds": 2.847,
+   "source": "yoshua-safe.wav",
+   "text": "Safe here. Find the others and bring them back."
+  },
+  "yoshua-unpossessed": {
+   "file": "yoshua-unpossessed.mp3",
+   "seconds": 1.646,
+   "source": "yoshua-unpossessed.wav",
+   "text": "Thank you. I was not myself."
   },
   "you-dario-doomers": {
    "file": "you-dario-doomers.mp3",

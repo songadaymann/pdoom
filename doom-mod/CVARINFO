@@ -19,3 +19,16 @@ server int pdoom_hub_entry = 0;
 server int pdoom_opening_checkpoint = 0;
 // Local development: start the factory at a puzzle (1-5 prisoners, 6 break room).
 server int pdoom_factory_site = 0;
+// AGENTIC SMITH's pod farm (E2M2, level 4, 2026-10-21): the fourth group.
+server int pdoom_saved3 = 0;
+server int pdoom_lost3 = 0;
+server int pdoom_follow3 = 0;
+// The campaign page: a pod farm run there commits its clear to the campaign save natively.
+server bool pdoom_agentic_commit = false;
+// Local development: start the pod farm at a puzzle (1-5 prisoners, 6 refuge, 7 exit).
+server int pdoom_agentic_site = 0;
+// Daniel Kokotajlo's NDA ending in the pod farm (0 none yet, 1 race, 2 slowdown), kept with group 3.
+server int pdoom_ending3 = 0;
+// Level 4 is local development only: the browser sets this on loopback with dev-config.json on, and
+// AGENTIC.BAT's door (netevent pdoom_enter_agentic, Checkpoint.zs) does nothing without it. Remove at release.
+server bool pdoom_agentic_enabled = false;

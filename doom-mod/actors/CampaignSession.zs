@@ -10,6 +10,10 @@ class PDCampaignSession : StaticEventHandler
     // MEG3N's factory (E2M7, 2026-10-20): the third group, and whether we walked in from SAFE MODE.
     int Saved2, Lost2, Following2;
     bool FactoryEntry;
+    // AGENTIC SMITH's pod farm (E2M2, 2026-10-21): the fourth group, and whether we walked in.
+    int Saved3, Lost3, Following3;
+    int Ending3;   // Daniel's NDA ending: 0 none yet, 1 race, 2 slowdown (SMITH's pace for the rest of the level)
+    bool AgenticEntry;
     static PDCampaignSession Get(){return PDCampaignSession(StaticEventHandler.Find('PDCampaignSession'));}
     static bool Hal(){return level.MapName=="E1M7";}
     static String Id(){return Hal()?"hal-station":"five-prisons";}
@@ -22,6 +26,8 @@ class PDCampaignSession : StaticEventHandler
         Lost0=int(p.GetCVar("pdoom_lost0"));Lost1=int(p.GetCVar("pdoom_lost1"));
         Following0=int(p.GetCVar("pdoom_follow0"));Following1=int(p.GetCVar("pdoom_follow1"));
         Saved2=int(p.GetCVar("pdoom_saved2"));Lost2=int(p.GetCVar("pdoom_lost2"));Following2=int(p.GetCVar("pdoom_follow2"));
+        Saved3=int(p.GetCVar("pdoom_saved3"));Lost3=int(p.GetCVar("pdoom_lost3"));Following3=int(p.GetCVar("pdoom_follow3"));
+        Ending3=int(p.GetCVar("pdoom_ending3"));
         HubEntry=p.GetCVar("pdoom_hub_entry")!=0;
         OpeningEntry=!Hal()&&p.GetCVar("pdoom_opening_checkpoint")==1;
         GuideGift=!Hal()&&p.GetCVar("pdoom_opening_checkpoint")==2;
@@ -78,7 +84,7 @@ class PDCampaignSession : StaticEventHandler
     {
         let battle=PDLastStand.Get();
         bool fromOpening=!hal&&(OpeningEntry||battle&&battle.Active&&battle.Bliss);
-        HubEntry=!fromOpening;Replay=asReplay;OpeningEntry=false;FactoryEntry=false;
+        HubEntry=!fromOpening;Replay=asReplay;OpeningEntry=false;FactoryEntry=false;AgenticEntry=false;
         // "Take this. It's dangerous to go alone." The guide's wrench comes with us.
         GuideGift=fromOpening;
         level.ChangeLevel(hal?"E1M7":"E1M4",0,CHANGELEVEL_NOINTERMISSION|CHANGELEVEL_RESETHEALTH|CHANGELEVEL_RESETINVENTORY);
@@ -86,7 +92,7 @@ class PDCampaignSession : StaticEventHandler
     // MEG3N.AVI's door: the factory's front door (Factory.zs ApplyHubEntry), wrench in hand.
     void EnterFactory()
     {
-        Load();HubEntry=true;FactoryEntry=true;Replay=false;OpeningEntry=false;GuideGift=false;
+        Load();HubEntry=true;FactoryEntry=true;AgenticEntry=false;Replay=false;OpeningEntry=false;GuideGift=false;
         level.ChangeLevel("E2M7",0,CHANGELEVEL_NOINTERMISSION|CHANGELEVEL_RESETHEALTH|CHANGELEVEL_RESETINVENTORY);
     }
     // Leaving the factory: who came out with you, and who you freed but left inside.
@@ -94,6 +100,18 @@ class PDCampaignSession : StaticEventHandler
     {
         Saved2|=leaving;Lost2&=~Saved2;Following2=following&~Saved2;
         Console.Printf("PDOOM_CAMPAIGN {\"saved2\":%d,\"lost2\":%d,\"following2\":%d}",Saved2,Lost2,Following2);
+    }
+    // AGENTIC.BAT's door: room 3 of the pod farm, wrench in hand, the bridge up (Agentic.zs ApplyHubEntry).
+    void EnterAgentic()
+    {
+        Load();HubEntry=true;AgenticEntry=true;FactoryEntry=false;Replay=false;OpeningEntry=false;GuideGift=false;
+        level.ChangeLevel("E2M2",0,CHANGELEVEL_NOINTERMISSION|CHANGELEVEL_RESETHEALTH|CHANGELEVEL_RESETINVENTORY);
+    }
+    // Answering the refuge payphone: who came out with you, and who you freed but left inside.
+    void CommitAgentic(int leaving,int following,int ending=0)
+    {
+        Saved3|=leaving;Lost3&=~Saved3;Following3=following&~Saved3;if(ending==1||ending==2)Ending3=ending;
+        Console.Printf("PDOOM_CAMPAIGN {\"saved3\":%d,\"lost3\":%d,\"following3\":%d,\"ending3\":%d}",Saved3,Lost3,Following3,Ending3);
     }
     void Restart(){level.ChangeLevel(level.MapName,0,CHANGELEVEL_NOINTERMISSION|CHANGELEVEL_RESETHEALTH|CHANGELEVEL_RESETINVENTORY);}
 }

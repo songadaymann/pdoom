@@ -5,7 +5,7 @@ episode E1M7 { name = "Confabulation Station" key = "h" }
 gameinfo
 {
     PlayerClasses = "PDSurvivorPlayer"
-    AddEventHandlers = "PDCampaignSession", "PDGame", "PDCheckpoint", "PDPlatformPanel", "PDEnvironmentReport", "PDLastStand", "PDAutoDoors", "PDFactory"
+    AddEventHandlers = "PDCampaignSession", "PDGame", "PDCheckpoint", "PDPlatformPanel", "PDEnvironmentReport", "PDLastStand", "PDAutoDoors", "PDFactory", "PDAgentic"
 }
 
 DoomEdNums
@@ -23,6 +23,11 @@ DoomEdNums
     15322 = PDToyPylon
     15323 = PDToyColumn
     15324 = PDToyBollard
+    15400 = PDAgenticPerson
+    15401 = PDAgenticSmith
+    15402 = PDAgenticProp
+    15403 = PDAgenticCamera
+    15404 = PDAgenticDecor
     15000 = PDCompanion
     15001 = PDHunter
     15002 = PDCamera
@@ -119,3 +124,7 @@ map E1M7 "p(DOOM): Computer Station"
 
 map E2M7 "p(DOOM): MEG3N's Toy Factory"
 {next="EndGame2" secretnext="EndGame2" levelnum=27 sky1="FTOYSKY",0 music="D_E2M7" nointermission nojump allowcrouch}
+
+// Level 4 (2026-10-21): no exit line runs here; the refuge payphone ends it (Agentic.zs).
+map E2M2 "p(DOOM): AGENTIC SMITH's Pod Farm"
+{next="EndGame2" secretnext="EndGame2" levelnum=22 sky1="SKY2",0 music="D_E2M2" nointermission nojump allowcrouch}

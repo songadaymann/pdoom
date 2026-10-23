@@ -42,3 +42,22 @@ p{line-height:1.6;margin:0}
    status bar (doom-hud.css) and text layout (level-polish.css #game-text, doom-theme.css);
    .factory-prototype only marks the factory's own extras. */
 #stage.factory-prototype #dev-badge{top:16px;bottom:auto}
+/* Level 4, AGENTIC SMITH's pod farm (agentic-hud.js): .checkpoint as the factory, .agentic-prototype for
+   its extras. Tallinn's hardline (hardline.png, both hands on the plug) replaces the wrench while you
+   carry it. hardline.png is drawn at slingshot.png's 96x80, so it is sized like the slingshot (#held-gun)
+   and stands on the bar where the slingshot does. */
+#stage.agentic-prototype #dev-badge{top:16px;bottom:auto}
+#held-cable{position:absolute;left:50%;bottom:8%;width:210px;height:auto;image-rendering:pixelated;pointer-events:none;transform:translateX(-50%)}
+#stage.checkpoint:not(.outside) #held-cable{bottom:var(--bar-top)}
+/* SMITH's to-do list over its head, after the red-team pill: Doom's small font on the whole-pixel grid. */
+#smith-todo{position:absolute;z-index:8;display:flex;flex-direction:column;padding:calc(var(--px-s) * 2) calc(var(--px-s) * 4);background:#06140ad9;border-left:var(--px-s) solid #3fcf6a;color:#8dffb0;font:var(--doom-small)/calc(var(--px-s) * 13) DoomSmall,monospace;white-space:pre;text-shadow:var(--px-s) var(--px-s) #000;pointer-events:none;-webkit-font-smoothing:none;font-smooth:never}
+/* Katja's rescue: SMITH's badge in your other hand (held-badge.png; agentic-hud.js sets its whole-pixel size and
+   puts it under #hud), at the view's lower-left corner standing on the bar: clear of the wrench (58%), the
+   slingshot (centre) and the speaker box (the middle ~71%). On touch it moves in, clear of the move pad. */
+#held-badge{position:absolute;left:calc(50% - min(100vw,160dvh) * .47);bottom:8%;image-rendering:pixelated;pointer-events:none}
+#stage.checkpoint:not(.outside) #held-badge{left:calc(50% - var(--gw) * .47);bottom:var(--bar-top)}
+#stage:is(.outside,.game-paused,.discovery-active,.prologue) #smith-todo,#stage:is(.outside,.prologue) :is(#held-cable,#held-badge){display:none}
+@media(pointer:coarse){#stage.checkpoint:not(.outside) #held-cable{bottom:16%;width:150px}#stage.checkpoint:not(.outside) #held-badge{bottom:16%;left:calc(50% - var(--gw) * .24)}}
+@media(pointer:coarse) and (orientation:portrait){#stage.checkpoint:not(.outside) :is(#held-cable,#held-badge){bottom:max(var(--view-bottom),calc(176px + var(--bar-h)))}
+ /* The move pad sits below the view in portrait, so the badge goes back to the corner, clear of the wrench. */
+ #stage.checkpoint:not(.outside) #held-badge{left:calc(50% - var(--gw) * .46)}}

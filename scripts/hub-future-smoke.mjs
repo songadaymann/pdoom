@@ -1,13 +1,18 @@
 // SAFE MODE after level 2 (2026-10-14): level 4 as a locked structure with an install dialog (level 3's door opens since 2026-10-20),
 // the summit's Display Properties final door, the MCP face on the horizon, and kickable desktop icons.
 // Loads a campaign with both levels cleared (ten saved), muted. Screenshots in output/hub-future/.
+// By default it checks what mann.cool players see: dev-config.json is served off, so AGENTIC.BAT is the
+// install dialog. Level 4's door is live only in local development (dev-config.json on, 2026-10-21):
+// HUB_FUTURE_DEV=1 leaves dev-config.json alone and checks "Enter AGENTIC.BAT" instead (not pressed: that
+// loads E2M2). PDOOM_ORIGIN (e.g. http://127.0.0.1:5208) points it at another server.
 import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-const out=process.env.DOOM_OUT||'output/hub-future',url=process.env.DOOM_URL||'http://127.0.0.1:5198/';await fs.mkdir(out,{recursive:true});
+const out=process.env.DOOM_OUT||'output/hub-future',url=process.env.DOOM_URL||(process.env.PDOOM_ORIGIN||'http://127.0.0.1:5198').replace(/\/?$/,'/');await fs.mkdir(out,{recursive:true});
 const browser=await chromium.launch({channel:'chrome',args:['--mute-audio']}),page=await browser.newPage({viewport:{width:1280,height:800}}),report={cases:[],errors:[],fps:{}};
-page.on('pageerror',e=>report.errors.push(String(e)));
+page.on('pageerror',e=>report.errors.push(String(e)));page.on('response',r=>{if(r.status()>=400)(report.notFound??=[]).push(r.status()+' '+r.url());});
 page.on('console',m=>{if(m.type()==='error'||/THREE\.WebGLProgram|shader/i.test(m.text()))report.errors.push('console: '+m.text());});
+if(process.env.HUB_FUTURE_DEV!=='1')await page.route('**/dev-config.json',r=>r.fulfill({json:{enabled:false}}));
 await page.addInitScript(()=>localStorage.setItem('pdoom.campaign.v1',JSON.stringify({version:1,ceo:'altman',hub:true,saved0:31,saved1:31,lost0:0,lost1:0,following0:0,following1:0})));
 const read=()=>page.evaluate(()=>JSON.parse(window.render_game_to_text()));
 const view=(x,z,yaw,pitch=0)=>page.evaluate(([x,z,yaw,pitch])=>window.__DOOM_DEBUG__.outside.debug.setView(x,z,yaw,pitch),[x,z,yaw,pitch]);
@@ -15,8 +20,10 @@ const shot=name=>page.screenshot({path:`${out}/${name}.png`});
 const wait=async(test,label,ms=8000)=>{const end=Date.now()+ms;while(Date.now()<end){const s=await read();if(test(s))return s;await page.waitForTimeout(100);}throw Error(label+': '+JSON.stringify((await read()).outside?.dialog??null));};
 const fps=async()=>page.evaluate(()=>new Promise(r=>{let n=0;const t0=performance.now();const f=()=>{n++;if(performance.now()-t0<2500)requestAnimationFrame(f);else r(Math.round(n/((performance.now()-t0)/1000)));};requestAnimationFrame(f);}));
 const deg=d=>d*Math.PI/180;
+let dev=false;
 try{
- await page.goto(url+'?ceo=altman');await page.waitForFunction(()=>window.render_game_to_text);await page.click('#title-enter');await page.click('#menu-load');
+ await page.goto(url+'?ceo=altman');await page.waitForFunction(()=>window.render_game_to_text);
+ dev=await page.evaluate(()=>['127.0.0.1','localhost','[::1]'].includes(location.hostname)&&fetch('dev-config.json').then(r=>r.json()).then(j=>j.enabled===true).catch(()=>false));report.dev=dev;await page.click('#title-enter');await page.click('#menu-load');
  await page.waitForFunction(()=>JSON.parse(window.render_game_to_text()).outside?.saved_visual===10,{},{timeout:60000});
  let s=await read();
  assert.equal(s.outside.future.visible,true);assert.equal(s.outside.future.wait,10,'Wait box counts the ten still out there');assert.equal(s.outside.future.mcp_blocks,8,'MCP face at 8 x 8 after two levels');
@@ -34,6 +41,12 @@ try{
  // MEG3N's door is a real door since 2026-10-20 (scripts/factory-hub-smoke.mjs walks in); AGENTIC's still installs.
  await view(-147.5,1.23,deg(115),0);s=await wait(s=>s.outside.nearest_future==='meg3n','Prompt at the MEG3N door');assert.match(String(await page.locator('#hub-enter').textContent()),/Enter MEG3N\.AVI/);
  report.cases.push('MEG3N.AVI: SPACE enters the factory (no install dialog)');
+ // Local development: AGENTIC.BAT is a real door too (scripts/agentic-*-smoke.mjs play the level); not walked into here.
+ if(dev){
+  await view(142,84.1,deg(210),.1);s=await wait(s=>s.outside.nearest_future==='agentic','Prompt at the AGENTIC door');assert.match(String(await page.locator('#hub-enter').textContent()),/Enter AGENTIC\.BAT/);
+  assert.equal(s.outside.dialog,null,'No install dialog');assert.equal(s.outside.future.agentic.live,false,'Its doorway is a still while level 4 is not loaded');assert.equal(s.outside.future.agentic.strip,'inside,inside,inside,inside,inside');
+  await page.waitForTimeout(400);await shot('07-agentic-live-door');report.cases.push('AGENTIC.BAT (local development): SPACE enters the pod farm (no install dialog)');
+ }else{
  // AGENTIC's door: Space opens the install dialog; Space is Cancel, which isn't available; R opens READ THIS!.
  await view(142,84.1,deg(210),.1);s=await wait(s=>s.outside.nearest_future==='agentic','Prompt at the AGENTIC door');assert.match(String(await page.locator('#hub-enter').textContent()),/Open AGENTIC\.BAT/);
  await page.keyboard.press('Space');s=await wait(s=>s.outside.dialog?.id==='agentic','Install dialog opens');assert.match(s.outside.dialog.title,/Installing AGENTIC\.BAT/);assert.match(s.outside.dialog.status,/Copying /);
@@ -47,6 +60,7 @@ try{
  await view(142,84.1,deg(210),.1);await wait(s=>s.outside.nearest_future==='agentic','Prompt at the AGENTIC door');await page.keyboard.press('Space');
  s=await wait(s=>s.outside.dialog?.id==='agentic','AGENTIC install dialog');assert.match(s.outside.dialog.title,/Installing AGENTIC\.BAT/);await page.waitForTimeout(400);await shot('10-agentic-install-dialog');
  await view(120,60,deg(210));await wait(s=>s.outside.dialog===null,'Walking away closes the dialog');report.cases.push('AGENTIC.BAT: install dialog, closes when you walk away');
+ }
  // The final door: Display Properties, Wait 10 people, Preview not available, OK closes.
  await view(-41.6,-87,.593,.05);await wait(s=>s.outside.nearest_future==='final','Prompt at the final door');await page.keyboard.press('Space');
  s=await wait(s=>s.outside.dialog?.id==='final','Display Properties dialog');assert.match(await page.locator('#hub-dialog .win95-text').textContent(),/Wait: 10 people/);await page.waitForTimeout(400);await shot('11-display-properties');
@@ -67,4 +81,4 @@ try{
  report.final=await read();assert.deepEqual(report.errors,[]);report.passed=true;
 }catch(e){report.failure=String(e?.stack||e);report.final=await read().catch(()=>null);await page.screenshot({path:out+'/failure.png'}).catch(()=>{});}
 finally{await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await browser.close();}
-console.log(JSON.stringify({passed:report.passed,cases:report.cases,fps:report.fps,errors:report.errors.slice(0,5),failure:report.failure?.slice(0,800)}));process.exit(report.passed?0:1);
+console.log(JSON.stringify({passed:report.passed,cases:report.cases,fps:report.fps,errors:report.errors.slice(0,5),notFound:report.notFound?.slice(0,5),failure:report.failure?.slice(0,800)}));process.exit(report.passed?0:1);

@@ -57,6 +57,18 @@ game shows subtitles when the takes are absent. Lines and keys: `docs/LEVEL-03-L
 A second batch on 2026-10-21 added 18 takes from the same saved profiles (MEG3N's screen,
 guard and broadcast lines; each researcher's all-safe and TV lines), under the same terms.
 
+**Level 4 voice takes, 2026-10-23.** 78 synthetic takes for AGENTIC SMITH's Pod Farm, made
+by Jonathan in the same local Breeze TTS voice lab and imported by
+`scripts/import-voice-lines.py` into ignored `doom-web/voice/<key>.mp3`. The five researchers
+(Jaan Tallinn, Nick Bostrom, Daniel Kokotajlo, Katja Grace, Yoshua Bengio) and SMITH use
+saved reference-conditioned voice profiles: the researchers from public YouTube speech
+excerpts of the real people, SMITH from a clip of Hugo Weaving as Agent Smith in The Matrix
+(source URLs and excerpts are recorded with the lab's private references). These are
+voice-likeness media outside the CC BY grant above, under the same Breeze research and
+non-commercial limit. The jailer arm uses the original designed voice of level 3's factory
+guard. The game shows subtitles when the takes are absent. Lines and keys:
+`docs/LEVEL-04-LINES.md`.
+
 ## Public source distribution
 
 ### Local factory prototype, 2026-10-15
@@ -156,8 +168,36 @@ Five photographs were downloaded for face/hair reference only from these pages:
 These photographs remain in ignored `private-assets/level-04-references/`, with
 exact image URLs and checksums; they are not packaged or relicensed. Level 3 cast
 and prop lineups were style references only. No purchased assets were added.
-See [level 4 generated art](docs/LEVEL-04-ART-GENERATED.md). Generated media remains
-ignored and is saved for future level 4 import.
+See [level 4 generated art](docs/LEVEL-04-ART-GENERATED.md). The generated media itself
+remains ignored by Git.
+
+Since 2026-10-22 the level 4 build imports it into the runtime (local development only
+while level 4 is unreleased): `scripts/import-agentic-art.py` slices the pack into
+`doom-mod/sprites/` and `doom-mod/patches/agentic/` (packed into `pdoom.pk3`), writes the
+HUD image `doom-web/hardline.png`, and copies the five captives' frames to ignored
+`doom-web/outside-assets/figure-{tallinn,bostrom,kokotajlo,grace,bengio}-*.png` for the
+meadow. The same CC BY 4.0 grant and real-person likeness carve-out apply to every
+imported frame. `scripts/build-agentic-assets.py` draws the rest from scratch in code:
+the Construct textures, glyph-rain screens, SIGN / DON'T SIGN panels, wall notes,
+possession spinner, cable segment, glyph dissolve, and the 13 `AG*` sound lumps
+(payphone ring, cable, snap, plug, chime and so on). Without the art pack it also draws
+simple stand-ins under every imported name. All of that procedural media is original
+project media under CC BY 4.0, attributed to Jonathan Mann.
+
+The level's map is E2M2 from the separately supplied private DOOM.WAD. Its geometry, wall
+textures, flats and decoration sprites keep that third-party data's terms, and the derived
+map (`output/agentic/`) and PK3 stay ignored. `scripts/agentic_theme.py` recolours them at
+load time; the generated `doom-mod/agentic-theme-*.txt` name IWAD lumps and hold
+palette-translation numbers only, never IWAD pixels. The level 4 voice takes (2026-10-23)
+are listed in section 4 above; without them the game shows subtitles. The level's ignored `local/agentic-music.ogg` (2026-10-23) is Doom's
+D_E2M2 track, rendered by `scripts/prepare-doom-music.mjs D_E2M2 agentic` like the other levels' tracks.
+
+Until level 4 is released, `scripts/audit-doom-assets.mjs` (the deploy allowlist) leaves out
+`hardline.png`, `held-badge.png`, the five captives' meadow figures and the 78 level 4 voice
+takes (`voice/{smith,arm,jaan,nick,daniel,katja,yoshua}-*.mp3`), so a mann.cool deploy does not
+publish real-person likenesses for a hidden level. The cast sprites still travel inside
+`pdoom.pk3`. At release, remove that exclusion and add `local/agentic-music.ogg`
+(E2M2's track, optional) to the allowlist, as `factory-music.ogg` is.
 
 ### Factory helper-doll animations, 2026-10-18
 
@@ -173,3 +213,26 @@ The local animation preview normalizes figure scale and shoe baseline. The same 
 `scripts/import-factory-dolls.py` imported the sheets into the native `FDOL` sprite used
 in game (the v1 side view stands in when the local pack is absent). See
 [factory puzzle art](docs/FACTORY-PUZZLE-ART.md). All media remains ignored by Git.
+
+### Level 4 Smith redo and optional visuals, 2026-10-23
+
+OpenAI's built-in image generator created two human-agent Smith replacement sheets
+and 11 optional visual additions in ignored `art/level-04-redo-2026-10-23/`: 13 PNGs,
+61 frames, 9.47 MB total. Exact prompts, input references, unchanged selected source
+PNGs, source hashes, equal-cell bounds, browser previews and all generation attempts
+remain with the local pack. No new external reference downloads or purchased assets
+were added; inputs were existing project cast/prop sheets and style lineups.
+
+The two Smith sheets are also installed at their existing `art/level-04-v1/` paths.
+Prior mannequin sheets and metadata are preserved under
+`art/level-04-v1/history/2026-10-23-before-smith-redo/`. All other 20 original sheets
+were verified unchanged against both their source checksums and the level-4 native
+import manifest. Since 2026-10-23 the level 4 build imports the
+new Smith and all 11 optional files (`scripts/import-agentic-art.py`; the badge-less `ASMU`
+frames are painted from the Smith sheets, and `held-badge.png` is a HUD image), with the
+procedural stand-ins kept as fallbacks. Status: `docs/LEVEL-04-NEEDS.md`.
+
+Original generic agent costume, machinery, signs, props and HUD art are Jonathan Mann
+project media under CC BY 4.0. Real-person likenesses and any third-party reference
+or character rights remain separate from that grant. All images, native import-check
+output and previews remain ignored by Git.

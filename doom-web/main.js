@@ -22,11 +22,15 @@ import {connectPlatform} from './platform.js';
 import {createScoreView} from './score-view.js';
 import {localDevelopmentEnabled} from './dev-capabilities.js';
 import {configureFactory,updateFactory,pauseFactory,factorySite,FACTORY_SITES,factoryExitText,useFactoryHud} from './factory-hud.js';
+import {configureAgentic,updateAgentic,pauseAgentic,agenticSite,AGENTIC_SITES,AGENTIC_ENDINGS,agenticExitText,useAgenticHud,hideAgenticExtras,agenticHudState} from './agentic-hud.js';
 import {browserStorage,resolveCeo,mountCeoPicker} from './ceo-pick.js';
 
 const DEBUG_OPTIONS={logs:new URLSearchParams(location.search).has('debug')};
 const requestedLevel=new URLSearchParams(location.search).get('level')||'five-prisons';
 let LEVEL=getLevel(requestedLevel);
+// Level 4 is local development only for now (levels.js local:true): off loopback, or with dev-config.json
+// off, its ?level= opens level 1's campaign page instead.
+if(LEVEL?.local&&!await localDevelopmentEnabled())LEVEL=getLevel('five-prisons');
 // The campaign page. MEG3N's factory is scored there since 2026-10-21 (started from the episode
 // menu); its own ?level=meg3n-factory page stays the unscored practice page with ?puzzle= flags.
 const CHECKPOINT=LEVEL?.scored===true&&LEVEL.id!=='meg3n-factory';
@@ -34,6 +38,9 @@ const FACTORY=LEVEL?.id==='meg3n-factory';
 const DEV_END=CHECKPOINT&&new URLSearchParams(location.search).get('dev')==='end';
 // Loopback development flag: ?level=meg3n-factory&puzzle=zvi starts beside that puzzle (factory-hud.js).
 const FACTORY_SITE=FACTORY?factorySite(new URLSearchParams(location.search).get('puzzle')):0;
+// Level 4, AGENTIC SMITH's pod farm: its own unscored page, as the factory's (agentic-hud.js), ?puzzle= too.
+const AGENTIC=LEVEL?.id==='agentic-pods';
+const AGENTIC_SITE=AGENTIC?agenticSite(new URLSearchParams(location.search).get('puzzle')):0;
 // Keep links/saved hero selection; fresh onboarding starts with Samwise.
 const realStorage=browserStorage(),CEO_CHOICE=resolveCeo({search:location.search,storage:realStorage,random:()=>0});
 // Loopback development fixture only: pretend levels 1 and 2 were cleared (ten saved),
@@ -52,6 +59,7 @@ if(SAFE_MODE){
 }
 configureCheckpointLauncher(CHECKPOINT,LEVEL,CEO_CHOICE.id);
 if(FACTORY)configureFactory();
+if(AGENTIC)configureAgentic();
 const canvas=document.querySelector('#canvas'),launcher=document.querySelector('#launcher');
 const start=document.querySelector('#start'),status=document.querySelector('#status');
 const ceoPick=CHECKPOINT?mountCeoPicker(document.querySelector('#ceo-pick'),{choice:CEO_CHOICE,storage:ceoStorage,
@@ -67,7 +75,7 @@ launcher.hidden=CHECKPOINT;
 if(!CHECKPOINT)document.querySelector('#onboarding').hidden=true;
 const run=new RunTracker(LEVEL),panels=new Set();let uiBlocked=false,meadowPanelPaused=false;
 let nativePanelPaused=false,mouseAttack=false;
-let factoryPaused=false;
+let factoryPaused=false,agenticPaused=false;
 // The save's SAFE MODE flag from just before this level's exit committed to it (levelExit()).
 let hubBeforeCommit=null;
 function nativePanelKey(open){const code=open?'F10':'F11',kc=open?121:122;for(const evType of ['keydown','keyup'])send({type:'input',target:'window',evType,init:{code,key:code,keyCode:kc,which:kc,bubbles:true,cancelable:true}});}
@@ -104,7 +112,7 @@ const storyBeats=createStoryBeats(blockPanel,()=>audio.playCue());
 const platform=LEVEL?await connectPlatform(LEVEL,{block:blockPanel}):null;
 scoreView=CHECKPOINT?createScoreView({level:LEVEL,config:platform.config,block:blockPanel,openBoards:platform.openBoards,ceo:()=>ceoPick?.id,retry:()=>enterLevel(LEVEL.id,false,true),onPendingChange:()=>gamePause.refreshSavedResults?.()}):null;
 gamePause.refreshSavedResults?.();
-window.render_game_to_text=()=>JSON.stringify({...state,voiceOver:voiceOver.getState(),melt:screenMelt.getState(),exitText:exitText.getState(),levelId:LEVEL?.id,ceo:ceoPick?.id??null,ceoPick:ceoPick?.getState()??null,campaign:campaign.getState(),run:CHECKPOINT?run.getState():null,scoreView:scoreView?.getState()||null,uiBlocked,personLabel:personLabel.getState(),gamePaused:gamePause.isOpen()||factoryPaused,menu:gamePause.getState(),opening:openingState(),prologueUi:prologue.getState(),survivalEstimate:prologue.active?{doom:state.prologue?.pdoom,kind:'historical in-world estimate'}:CHECKPOINT?survivalEstimate(state.world,state.mode,state.escape):null,statusBar:(CHECKPOINT||FACTORY)&&!prologue.active?checkpointStatusBar()?.getState()??null:null,outside:outside?.getState()||null,audioBuffers:audio.played,sound:audio.getState(),audioState:audio.context?.state||'uninitialized',musicPlaying:!!audio.musicSource,coordinateSystem:'Native world: Doom units; x east, y north, z up. Outside: metres; x east, z south, y up.'});
+window.render_game_to_text=()=>JSON.stringify({...state,voiceOver:voiceOver.getState(),melt:screenMelt.getState(),exitText:exitText.getState(),levelId:LEVEL?.id,ceo:ceoPick?.id??null,ceoPick:ceoPick?.getState()??null,campaign:campaign.getState(),run:CHECKPOINT?run.getState():null,scoreView:scoreView?.getState()||null,uiBlocked,personLabel:personLabel.getState(),gamePaused:gamePause.isOpen()||factoryPaused||agenticPaused,menu:gamePause.getState(),opening:openingState(),prologueUi:prologue.getState(),survivalEstimate:prologue.active?{doom:state.prologue?.pdoom,kind:'historical in-world estimate'}:CHECKPOINT?survivalEstimate(state.world,state.mode,state.escape):null,statusBar:(CHECKPOINT||FACTORY||AGENTIC)&&!prologue.active?checkpointStatusBar()?.getState()??null:null,...(LEVEL?.id==='agentic-pods'?{agenticHud:agenticHudState()}:{}),outside:outside?.getState()||null,audioBuffers:audio.played,sound:audio.getState(),audioState:audio.context?.state||'uninitialized',musicPlaying:!!audio.musicSource,coordinateSystem:'Native world: Doom units; x east, y north, z up. Outside: metres; x east, z south, y up.'});
 window.__DOOM_DEBUG__={state,logs};
 
 function send(message){worker?.postMessage(message);}
@@ -177,6 +185,7 @@ function onMessage(m){
       if(event.type==='person-outside'&&state.escape?.saved_people)state.escape.saved_people[event.id-1]=1;
       if(event.type==='outside-reveal')levelExit();
       if(event.type==='factory-exit'&&LEVEL?.id==='meg3n-factory')factoryExit(event);
+      if(event.type==='agentic-exit'&&LEVEL?.id==='agentic-pods')agenticExit(event);
       if(marker==='PDOOM_RESULT '){
         state.mode=event.saved>0?'escaped':'lost';releaseKeys();
         if(CHECKPOINT&&event.saved>0&&LEVEL?.id!=='meg3n-factory'){pendingWin=event.saved;outside?.showWin(event.saved);}else if(CHECKPOINT){checkpointStatusBar()?.update(state.world,state.mode,state.escape);showCheckpointResult(event);}else showIntakeResult(event);
@@ -199,6 +208,9 @@ function onMessage(m){
     // MEG3N.AVI on air: her song plays in the engine until you leave, so the level's track waits.
     audio.holdMusic(!!state.factory.on_air);}catch{}}
   if(halPos!==-1){try{state.hal=JSON.parse(m.msg.slice(halPos+10));}catch{}}
+  // The pod farm's own state (Agentic.zs), likewise only while it is the level.
+  const agenticPos=m.msg.indexOf('PDOOM_AGENTIC ');
+  if(agenticPos!==-1&&LEVEL?.id==='agentic-pods'){try{state.agentic=JSON.parse(m.msg.slice(agenticPos+14));}catch{}}
   const livesPos=m.msg.indexOf('PDOOM_LIVES ');
   if(livesPos!==-1){try{state.lives=JSON.parse(m.msg.slice(livesPos+12));}catch{}}
   const polishPos=m.msg.indexOf('PDOOM_POLISH ');
@@ -228,6 +240,11 @@ function onMessage(m){
   if(awaitingRun&&LEVEL?.id==='meg3n-factory'&&m.msg.includes('PDOOM_MOD_LOADED factory')){
     awaitingRun=false;hubBeforeCommit=null;state.prologue=null;storyBeats.reset();scoreView?.reset();state.mod=`p(DOOM): ${LEVEL.title}`;playLevelMusic();
   }
+  // The pod farm (unscored) the same way: SMITH's catch reloads E2M2, and AGENTIC.BAT's door has no run.
+  if(!awaitingRun&&LEVEL?.id==='agentic-pods'&&state.mode==='playing'&&m.msg.includes('PDOOM_MOD_LOADED agentic'))for(const evType of ['keydown','keyup'])send({type:'input',target:'window',evType,init:{code:'F4',key:'F4',keyCode:115,which:115,bubbles:true,cancelable:true}});
+  if(awaitingRun&&LEVEL?.id==='agentic-pods'&&m.msg.includes('PDOOM_MOD_LOADED agentic')){
+    awaitingRun=false;hubBeforeCommit=null;state.prologue=null;storyBeats.reset();scoreView?.reset();state.mod=`p(DOOM): ${LEVEL.title}`;playLevelMusic();
+  }
   if(pos!==-1&&!awaitingRun){
     try{state.world={...JSON.parse(m.msg.slice(pos+12)),...state.combat,...state.polish,...state.lives};}catch{state.world={raw:m.msg.slice(pos+12)};}
     if(state.mode==='loading'){
@@ -243,7 +260,7 @@ function onMessage(m){
       if(!resumeHub)for(const evType of ['keydown','keyup'])send({type:'input',target:'window',evType,init:{code:'F4',key:'F4',keyCode:115,which:115,bubbles:true,cancelable:true}});
       if(bootResolve){const resolve=bootResolve;bootResolve=null;bootReject=null;resolve();}else if(gamePause.getState()?.page==='loading')gamePause.close();else syncPanelPause();
     }
-    if(LEVEL?.id==='meg3n-factory'){if(outside||outsideLoading)voiceOver.stop();else{voiceOver.update(state,{levelId:LEVEL?.id,paused:uiBlocked||document.hidden||factoryPaused});updateFactory(state.world,state.factory,state.dialogue);updateLevelPolish(state.world);const prompt=document.querySelector('#prompt');if(prompt&&!prompt.hidden)prompt.textContent=preferences.prompt(prompt.textContent);personLabel.update(nativePersonRects(state.world),canvas,!uiBlocked&&state.mode==='playing'&&!factoryPaused);}}else if(CHECKPOINT){if(outside||outsideLoading)voiceOver.stop();else voiceOver.update(state,{levelId:LEVEL?.id,paused:uiBlocked||document.hidden});if(!outsideLoading&&!outside){updateCheckpointHud(state.world,state.mode,state.escape,state.dialogue,state.evaluationSign,LEVEL.id==='hal-station'?state.hal:null);updateLevelPolish(state.world);updateHalHud(state.world,LEVEL.id==='hal-station'?state.hal:null);const prompt=document.querySelector('#prompt');if(prompt&&!prompt.hidden)prompt.textContent=preferences.prompt(prompt.textContent);personLabel.update(nativePersonRects(state.world,state.escape?.view_height),canvas,!uiBlocked&&state.mode==='playing'&&!state.hal?.menu);}}else updateIntakeHud(state.world,state.mode);
+    if(LEVEL?.id==='meg3n-factory'){if(outside||outsideLoading)voiceOver.stop();else{voiceOver.update(state,{levelId:LEVEL?.id,paused:uiBlocked||document.hidden||factoryPaused});updateFactory(state.world,state.factory,state.dialogue);updateLevelPolish(state.world);const prompt=document.querySelector('#prompt');if(prompt&&!prompt.hidden)prompt.textContent=preferences.prompt(prompt.textContent);personLabel.update(nativePersonRects(state.world),canvas,!uiBlocked&&state.mode==='playing'&&!factoryPaused);}}else if(LEVEL?.id==='agentic-pods'){if(outside||outsideLoading)voiceOver.stop();else{const active=!uiBlocked&&state.mode==='playing'&&!agenticPaused;voiceOver.update(state,{levelId:LEVEL.id,paused:uiBlocked||document.hidden||agenticPaused});updateAgentic(state.world,state.agentic,state.dialogue,{canvas,active});updateLevelPolish(state.world);const prompt=document.querySelector('#prompt');if(prompt&&!prompt.hidden)prompt.textContent=preferences.prompt(prompt.textContent);personLabel.update(nativePersonRects(state.world),canvas,active);}}else if(CHECKPOINT){if(outside||outsideLoading)voiceOver.stop();else voiceOver.update(state,{levelId:LEVEL?.id,paused:uiBlocked||document.hidden});if(!outsideLoading&&!outside){updateCheckpointHud(state.world,state.mode,state.escape,state.dialogue,state.evaluationSign,LEVEL.id==='hal-station'?state.hal:null);updateLevelPolish(state.world);updateHalHud(state.world,LEVEL.id==='hal-station'?state.hal:null);const prompt=document.querySelector('#prompt');if(prompt&&!prompt.hidden)prompt.textContent=preferences.prompt(prompt.textContent);personLabel.update(nativePersonRects(state.world,state.escape?.view_height),canvas,!uiBlocked&&state.mode==='playing'&&!state.hal?.menu);}}else updateIntakeHud(state.world,state.mode);
   }
   if(/Script error|Execution could not continue|Unknown identifier|Unknown flag|VM execution aborted|virtual override not allowed/i.test(m.msg))fail(m.msg);
 }
@@ -254,7 +271,8 @@ async function enterOutside({intro=false,melt=false}={}){
   // ready behind it, then melts away (screen-melt.js). It used to be a straight cut.
   if(melt)screenMelt.capture();
   // The level's HUD stops updating out here: put its tools away (the factory's would stay drawn).
-  if(CHECKPOINT)useFactoryHud(false);
+  if(CHECKPOINT){useFactoryHud(false);useAgenticHud(false);}
+  hideAgenticExtras();
   for(const id of ['held-wrench','held-gun'])document.getElementById(id).hidden=true;
   personLabel.hide();outsideLoading=true;state.mode='outside';releaseKeys();audio.pauseMusic();
   for(const source of audio.sources.values()){try{source.stop();}catch{}}
@@ -262,7 +280,7 @@ async function enterOutside({intro=false,melt=false}={}){
   try{
     if(hub){outside=hub;outside.setActive(true,LEVEL.id);}
     else{const {createOutside}=await import('./outside/outside.js');
-      outside=hub=await createOutside({source:canvas,stage:document.querySelector('#stage'),audio:audio.context,read:()=>state,campaign:()=>campaign.getState(),enter:enterLevel,prompt:text=>preferences.prompt(text),readThis:()=>gamePause?.openRead?.(),labels:(rects,surface,active)=>personLabel.update(rects,surface,active&&!uiBlocked)});}
+      outside=hub=await createOutside({source:canvas,agenticDoor:await localDevelopmentEnabled(),stage:document.querySelector('#stage'),audio:audio.context,read:()=>state,campaign:()=>campaign.getState(),enter:enterLevel,prompt:text=>preferences.prompt(text),readThis:()=>gamePause?.openRead?.(),labels:(rects,surface,active)=>personLabel.update(rects,surface,active&&!uiBlocked)});}
     outside.setActive(true,LEVEL.id);
     if(intro){await outside.startIntro(runningCeo);campaign.saveOpening('xp-intro');prologue.reset();document.querySelector('#reticle').hidden=true;}
     window.__DOOM_DEBUG__.outside=outside;document.querySelector('#hal-thaw').hidden=true;
@@ -297,6 +315,23 @@ async function factoryExit(event){
  await exitThroughText(text);
 }
 
+// Level 4's way out (2026-10-21): answering the refuge payphone, as the factory's exit switch (above):
+// group 3, its text screen when this exit finishes the pod farm on a save that had reached SAFE MODE.
+let agenticExiting=false;
+async function agenticExit(event){
+ if(agenticExiting)return;agenticExiting=true;
+ const mask=Number.isInteger(event?.saved)?event.saved:31,out=[0,1,2,3,4].map(i=>mask>>i&1),count=out.filter(Boolean).length;
+ const later=!!event?.hub||(hubBeforeCommit??campaign.data.hub);hubBeforeCommit=null;
+ state.escape={saved_people:out,saved:count,outside:count};pendingWin=count;
+ // Daniel's ending (race/slowdown) is kept with group 3 (campaign.js ending3), so a clear on a later visit still names it.
+ const ending=state.agentic?.ending||AGENTIC_ENDINGS[campaign.data.ending3]||'';
+ if(!event?.committed)campaign.commitGroup(3,mask,AGENTIC_ENDINGS.indexOf(ending));
+ const text=later&&count>0&&campaign.data.saved3===31?exitText.prepare(agenticExitText(runningCeo,ending)):null;
+ await new Promise(resolve=>setTimeout(resolve,700));// the receiver goes down
+ if(!text){await enterOutside({melt:true});return;}
+ await exitThroughText(text);
+}
+
 // Levels 1-2's way out (2026-10-20), on the same rule: the first exit melts straight into the meadow;
 // a later one that saved someone types the level's exit text over Doom's episode 1 flat first. The
 // hub crank's exit commits to the campaign before its outside-reveal (RescueLives.zs), so "later"
@@ -323,16 +358,18 @@ async function exitThroughText(prepared){
 
 function validateEngine(id){
  if(!window.Worker||!canvas.transferControlToOffscreen||!WebAssembly.Suspending)throw Error('PLAY IN CURRENT CHROME OR EDGE — THIS ENGINE NEEDS WEBASSEMBLY JSPI.');
- if(!getLevel(id))throw Error('THIS LEVEL IS NOT AVAILABLE.');
+ // Refuse here whatever startEngine will refuse (the campaign page runs only scored levels), so a crafted
+ // ?start=/?level=…&play=1 link is turned away before onboarding.js launch() replaces the save.
+ const level=getLevel(id);if(!level||CHECKPOINT&&!level.scored)throw Error('THIS LEVEL IS NOT AVAILABLE.');
 }
 async function startEngine(id,{load=false,prologue:playPrologue=false,skipOpening=false}={}){
   yardMusic=false;
  if(worker)throw Error('The engine is already running.');
  validateEngine(id);
  // The campaign page runs the scored levels and, from the episode menu, MEG3N's unscored factory.
- LEVEL=getLevel(id);if(!LEVEL||CHECKPOINT&&!LEVEL.scored)throw Error('THIS LEVEL IS NOT AVAILABLE.');
+ const next=getLevel(id);if(!next||CHECKPOINT&&!next.scored)throw Error('THIS LEVEL IS NOT AVAILABLE.');LEVEL=next;
  // The factory has no hero picker: it plays as the saved campaign's CEO, so its clear joins that save.
- runningCeo=ceoPick?.id||(FACTORY&&CEO_CHOICE.source!=='url'&&readCampaign(ceoStorage)?.ceo)||CEO_CHOICE.id;campaign=new Campaign(ceoStorage,runningCeo);run.level=LEVEL;scoreView?.setLevel(LEVEL);ceoPick?.lock();checkpointStatusBar()?.setCeo(runningCeo);
+ runningCeo=ceoPick?.id||((FACTORY||AGENTIC)&&CEO_CHOICE.source!=='url'&&readCampaign(ceoStorage)?.ceo)||CEO_CHOICE.id;campaign=new Campaign(ceoStorage,runningCeo);run.level=LEVEL;scoreView?.setLevel(LEVEL);ceoPick?.lock();checkpointStatusBar()?.setCeo(runningCeo);
  // Started cold from the episode menu, the factory has its own HUD, as when walked in (enterLevel).
  if(CHECKPOINT&&LEVEL.id==='meg3n-factory'){useFactoryHud(true);state.mod=`p(DOOM): ${LEVEL.title}`;}
  const resume=load?campaignResumePoint(campaign.data):null;resumeHub=resume==='hub'||resume==='xp-intro';openingCheckpointPending=skipOpening;
@@ -341,7 +378,7 @@ async function startEngine(id,{load=false,prologue:playPrologue=false,skipOpenin
     state.mode='loading';start.disabled=true;status.textContent='Loading Doom…';await audio.unlock();
     // Decode once before starting; live MIDI synthesis stalls the WASM loop.
     if(CHECKPOINT)try{await audio.prepareCue('local/ui/doom-success.wav');}catch(error){console.warn(error.message);}
-    try{await audio.prepareMusic(playPrologue?'local/prologue-music.ogg':CHECKPOINT||FACTORY?levelMusic(LEVEL.id):'local/intake-music.ogg');}catch(error){console.warn(error.message);}
+    try{await audio.prepareMusic(playPrologue?'local/prologue-music.ogg':CHECKPOINT||FACTORY||AGENTIC?levelMusic(LEVEL.id):'local/intake-music.ogg');}catch(error){console.warn(error.message);}
     const {files,wasm}=await assets.files();
     let development=false;
     if(DEV_END&&['127.0.0.1','localhost','[::1]'].includes(location.hostname)){
@@ -351,6 +388,9 @@ async function startEngine(id,{load=false,prologue:playPrologue=false,skipOpenin
     document.querySelector('#dev-badge').hidden=!development;
     const site=FACTORY_SITE&&await localDevelopmentEnabled()?FACTORY_SITE:0;
     if(site){const badge=document.querySelector('#dev-badge');badge.textContent=`Dev: start at ${FACTORY_SITES[site-1]} · `;const a=document.createElement('a');a.href='?level=meg3n-factory';a.textContent='Start normally';badge.append(a);badge.hidden=false;}
+    // Level 4 is local development only: the engine refuses AGENTIC.BAT's door (pdoom_enter_agentic) without this.
+    const agenticEnabled=await localDevelopmentEnabled(),agenticAt=AGENTIC_SITE&&agenticEnabled?AGENTIC_SITE:0;
+    if(agenticAt){const badge=document.querySelector('#dev-badge');badge.textContent=`Dev: start at ${AGENTIC_SITES[agenticAt-1]} · `;const a=document.createElement('a');a.href='?level=agentic-pods';a.textContent='Start normally';badge.append(a);badge.hidden=false;}
     const width=960,height=600;canvas.width=width;canvas.height=height;
     const offscreen=canvas.transferControlToOffscreen();
     worker=new Worker('engine/engine.worker.js');worker.onmessage=e=>onMessage(e.data);worker.onerror=e=>{fail(e.message);worker?.terminate();};
@@ -358,6 +398,7 @@ async function startEngine(id,{load=false,prologue:playPrologue=false,skipOpenin
     worker.postMessage({type:'boot',wasmBinary:wasm,canvas:offscreen,pinW:width,pinH:height,files,args:[
       '-iwad','DOOM.WAD','-file','pdoom.pk3','-exec','pdoom.cfg','-warp',String(LEVEL.episode),String(playPrologue?2:LEVEL.map),'-skill','3','-nomusic',
       ...campaign.bootArgs(skipOpening?{opening:'level-one'}:{}),'+set','pdoom_boot_hold','1','+set','pdoom_ceo',runningCeo==='amodei'?'1':'0','+set','pdoom_development',development?'1':'0','+set','pdoom_dev_end',development?'1':'0','+set','pdoom_factory_site',String(site),'+set','pdoom_factory_commit',CHECKPOINT?'1':'0',
+      '+set','pdoom_agentic_site',String(agenticAt),'+set','pdoom_agentic_commit',CHECKPOINT?'1':'0','+set','pdoom_agentic_enabled',agenticEnabled?'1':'0',
       '+vid_rendermode','4','+vid_preferbackend','1','+vid_fullscreen','0',
       '+vid_defwidth',String(width),'+vid_defheight',String(height),'+win_w',String(width),'+win_h',String(height),
       '+vid_maxfps','120','+vid_vsync','0','+cl_capfps','0','+gl_texture_filter','0',
@@ -374,6 +415,10 @@ start.addEventListener('click',()=>{if(CHECKPOINT)gamePause.heroNext();else star
 function key(evType,code,keyValue,keyCode){
   if(FACTORY&&code==='Escape'){
     if(evType==='keydown'&&worker){factoryPaused=!factoryPaused;blockPanel('factory-pause',factoryPaused);pauseFactory(factoryPaused);}
+    return;
+  }
+  if(AGENTIC&&code==='Escape'){
+    if(evType==='keydown'&&worker){agenticPaused=!agenticPaused;blockPanel('agentic-pause',agenticPaused);pauseAgentic(agenticPaused);}
     return;
   }
   if(code==='Escape'){if(evType==='keydown'&&worker&&(!uiBlocked||gamePause.isOpen()))gamePause.toggle();return;}
@@ -440,7 +485,7 @@ document.querySelector('#finish').addEventListener('click',()=>{key('keydown','K
 
 // Each facility has its own Doom track: E1M4's for the Control Problem, E1M7's for the
 // Computer Station (2026-10-13). A level start reloads only when the track differs.
-function levelMusic(id){return id==='hal-station'?'local/station-music.ogg':id==='meg3n-factory'?'local/factory-music.ogg':'local/rescue-music.ogg';}
+function levelMusic(id){return id==='hal-station'?'local/station-music.ogg':id==='meg3n-factory'?'local/factory-music.ogg':id==='agentic-pods'?'local/agentic-music.ogg':'local/rescue-music.ogg';}
 function playLevelMusic(){
  const url=levelMusic(LEVEL?.id);if(audio.musicUrl===url&&audio.musicBuffer)return;
  audio.pauseMusic();audio.musicOffset=0;audio.musicBuffer=null;audio.musicUrl=null;
@@ -451,11 +496,11 @@ function playLevelMusic(){
 function pageFor(id){
  const u=new URL(location.pathname,location.href);u.searchParams.set('level',id);
  const save=readCampaign(ceoStorage);
- if(id!=='meg3n-factory'&&save?.hub){u.searchParams.set('ceo',save.ceo);u.searchParams.set('play','1');u.searchParams.set('load','1');}
+ if(id!=='meg3n-factory'&&id!=='agentic-pods'&&save?.hub){u.searchParams.set('ceo',save.ceo);u.searchParams.set('play','1');u.searchParams.set('load','1');}
  return u.href;
 }
 async function enterLevel(id,replay=false,restart=false){
- if(!CHECKPOINT){if(FACTORY&&outside&&id!=='meg3n-factory')location.assign(pageFor(id));else location.reload();return;}
+ if(!CHECKPOINT){if(FACTORY&&outside&&id!=='meg3n-factory'||AGENTIC&&outside&&id!=='agentic-pods')location.assign(pageFor(id));else location.reload();return;}
  if(!worker||(!restart&&!getLevel(id)))return;
  openingCheckpointPending=!restart&&id==='five-prisons'&&outside?.getState().intro===true;
  if(!restart&&!outside?.getState().intro){blockPanel('level-transition',true);try{await gamePause.levelFilm(id);}finally{blockPanel('level-transition',false);}}
@@ -465,6 +510,8 @@ async function enterLevel(id,replay=false,restart=false){
  LEVEL=getLevel(id)||LEVEL;run.level=LEVEL;scoreView.setLevel(LEVEL);
  // MEG3N.AVI's door (2026-10-20): the factory, walked into from SAFE MODE, with its own HUD.
  useFactoryHud(LEVEL.id==='meg3n-factory');factoryExiting=false;state.factory=null;audio.holdMusic(false);
+ // AGENTIC.BAT's door (local development only, doom-outside.ts): the pod farm, with its own HUD.
+ useAgenticHud(LEVEL.id==='agentic-pods');agenticExiting=false;state.agentic=null;
  awaitingRun=true;state.mode='loading';state.escape=null;state.dialogue=null;state.polish=null;state.lives=null;state.hal=null;state.doors=null;state.evaluationSign=null;state.world=null;
  gamePause.loading('ENTERING THE FACILITY');blockPanel('onboarding',true);clearTimeout(timeout);timeout=setTimeout(()=>fail('The facility did not finish loading. Reload to try again.'),45000);
  canvas.hidden=false;document.querySelector('#stage').classList.remove('outside');checkpointStatusBar()?.setPaused(false);
@@ -474,7 +521,7 @@ async function enterLevel(id,replay=false,restart=false){
  // Native menu closure is deferred by GZDoom. Wait for resumed ticks before
  // sending a map command, so that command cannot be swallowed by the old menu.
  if(pausedTic!=null){try{await new Promise((resolve,reject)=>{const deadline=setTimeout(()=>{nativeResume=null;reject(Error('The paused facility could not resume. Reload to try again.'));},5000);nativeResume={after:pausedTic+14,resolve:()=>{clearTimeout(deadline);resolve();}};});}catch(error){fail(error.message);return;}}
- const code=restart?'F5':id==='meg3n-factory'?'F2':id==='hal-station'?(replay?'F9':'F7'):(replay?'F8':'F6'),kc={F2:113,F5:116,F6:117,F7:118,F8:119,F9:120}[code];
+ const code=restart?'F5':id==='agentic-pods'?'F1':id==='meg3n-factory'?'F2':id==='hal-station'?(replay?'F9':'F7'):(replay?'F8':'F6'),kc={F1:112,F2:113,F5:116,F6:117,F7:118,F8:119,F9:120}[code];
  for(const evType of ['keydown','keyup'])send({type:'input',target:'window',evType,init:{code,key:code,keyCode:kc,which:kc,bubbles:true,cancelable:true}});
  canvas.focus();
 }
