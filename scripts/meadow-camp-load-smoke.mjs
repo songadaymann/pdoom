@@ -7,13 +7,15 @@ page.on('pageerror',e=>report.errors.push(String(e)));
 await page.addInitScript(()=>localStorage.setItem('pdoom.campaign.v1',JSON.stringify({version:1,ceo:'altman',hub:true,saved0:31,saved1:31,lost0:0,lost1:0,following0:0,following1:0})));
 const read=()=>page.evaluate(()=>JSON.parse(window.render_game_to_text()));
 try{
- await page.goto('http://127.0.0.1:5198/?ceo=altman');await page.waitForFunction(()=>window.render_game_to_text);await page.click('#title-enter');await page.click('#menu-load');
+ await page.goto((process.env.PDOOM_ORIGIN||'http://127.0.0.1:5198').replace(/\/?$/,'/')+'?ceo=altman');await page.waitForFunction(()=>window.render_game_to_text);await page.click('#title-enter');await page.click('#menu-load');
  await page.waitForFunction(()=>JSON.parse(window.render_game_to_text()).outside?.saved_visual===10,{},{timeout:60000});
  let s=await read();assert.equal(s.outside.settled,10);assert.equal(s.campaign.saved,10);
- assert.ok(s.outside.people.filter(p=>p.id<5).every(p=>Math.abs(p.x-17)<4&&p.z<-6&&p.z>-10));
+ // Since 2026-10-23 (docs/SAFE-MODE-PROGRESSION.md): the newest group (HAL's, on this load) stays near its exit;
+ // level 1's five have moved up to their zone on the hill (doom-camp-layout.ts HILL_ZONES[0]).
+ assert.ok(s.outside.people.filter(p=>p.id<5).every(p=>p.home==='hill'&&Math.hypot(p.x+30,p.z+72)<10),'Level 1\'s five on the hilltop');
  const n={x:-Math.sin(-223*Math.PI/180),z:-Math.cos(-223*Math.PI/180)};
- assert.ok(s.outside.people.filter(p=>p.id>=5).every(p=>(p.x-2.6)*n.x+(p.z+200.1)*n.z>6));
- report.cases.push('Load places all ten saved humans directly at their own two camps');
+ assert.ok(s.outside.people.filter(p=>p.id>=5).every(p=>p.home==='door'&&(p.x-2.6)*n.x+(p.z+200.1)*n.z>4.4));
+ report.cases.push('Load places level 1\'s five on the hilltop and level 2\'s outside HAL\'s door');
  await page.evaluate(n=>window.__DOOM_DEBUG__.outside.debug.setView(2.6+n.x*12,-200.1+n.z*12,-43*Math.PI/180,0),n);await page.waitForTimeout(700);await page.screenshot({path:out+'/restored-hal-camp.png'});
  await page.keyboard.press('Escape');await page.waitForFunction(()=>JSON.parse(window.render_game_to_text()).outside.paused);const before=(await read()).outside.people;await page.waitForTimeout(500);assert.deepEqual((await read()).outside.people,before);await page.keyboard.press('Escape');await page.waitForTimeout(600);assert.notDeepEqual((await read()).outside.people,before);report.cases.push('Esc freezes and resumes camp idle movement');
  report.final=await read();assert.deepEqual(report.errors,[]);report.passed=true;

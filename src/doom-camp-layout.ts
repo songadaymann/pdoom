@@ -15,3 +15,16 @@ export function meadowCampLayout(id:number){
   target:group?{x:door.x+outward.x*reach+side.x*spread,z:door.z+outward.z*reach+side.z*spread}:{x:17+spread,z:-reach}
  };
 }
+
+/* Where the rescued live once a later group has come out (Jonathan, 2026-10-23: "not just be still right outside
+ * their level - maybe more spread out but generally up on top of the hill"). The newest group stays near its own
+ * exit (meadowCampLayout's target); every earlier group has a 9 m zone below the summit to wander in, clear of the
+ * final dialog's front, the Crest Trail and its spur, and HAL's torch trail (docs/SAFE-MODE-PROGRESSION.md section 5). */
+// (on the dome's sunny south faces, so you see them up there from the bunker and the camp)
+export const HILL_ZONES=[{x:-30,z:-72},{x:-58,z:-66},{x:-74,z:-82},{x:-28,z:-118}];
+export const HILL_RADIUS=9,DOOR_WANDER=2.5,DOOR_CLEAR=5;
+/** Is (x, z) a fine place for person id to stand while at their own door (never within 5 m of it, never behind it)? */
+export function clearOfDoor(id:number,x:number,z:number){
+ const {door}=meadowCampLayout(id),dx=x-door.x,dz=z-door.z;
+ return Math.hypot(dx,dz)>=DOOR_CLEAR&&-Math.sin(door.yaw)*dx-Math.cos(door.yaw)*dz>=DOOR_CLEAR;
+}

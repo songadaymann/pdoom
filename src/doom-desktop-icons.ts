@@ -3,9 +3,11 @@ import {meadowGroundY as groundY} from './doom-meadow-ground';
 import {makeIconToy} from './doom-icon-toy';
 import {meadowUniforms} from './doom-meadow-shared';
 import {makeIconPhysics,type IconObstacle} from './doom-icon-physics';
+import {DETRITUS,DETRITUS_ART,detritusPiles} from './doom-desktop-detritus';
 
-/* Nine chunky desktop toys. Pixel silhouettes have solid edges; Rapier owns all
- * positions and rotations. Only their separate, readable labels face the player. */
+/* Nine chunky desktop toys, and more digital detritus landing with each level cleared (doom-desktop-detritus.ts).
+ * Pixel silhouettes have solid edges; Rapier owns all positions and rotations. Only their separate, readable
+ * labels face the player. */
 
 type Draw=(g:CanvasRenderingContext2D)=>void;
 const px=(g:CanvasRenderingContext2D,c:string,x:number,y:number,w=1,h=1)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
@@ -49,24 +51,38 @@ function labelTexture(label:string,selected:boolean){
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;return t;
 }
 
+// stage: levels cleared before it lands (the nine originals are there from the start); labelRange: how close you
+// must be to read its label
+const toys=(coarse:boolean)=>[...DESKTOP_ICONS.map(s=>({...s,art:s.id,stage:1,scale:1,labelRange:70})),...[...DETRITUS,...detritusPiles(coarse)].map(s=>({scale:1,labelRange:70,...s}))];
+// a kick that plays something: Winamp's riff, the all-in-one's startup chord, the handheld's chime, the bell's ding
+const TUNES:Record<string,number[]>={winamp:[523.25,659.25,783.99,1046.5],allinone:[261.63,329.63,392,523.25],handheld:[987.77,1975.53],bell:[1318.51,1318.51]};
+
 export async function makeDesktopIcons(scene:THREE.Scene,audio:AudioContext,obstacles:IconObstacle[]){
  const root=new THREE.Group();scene.add(root);
  const bus=(audio as AudioContext&{pdoomBuses?:{sfx:GainNode}}).pdoomBuses?.sfx??audio.destination;
  const shadowCanvas=document.createElement('canvas');shadowCanvas.width=shadowCanvas.height=64;
  {const g=shadowCanvas.getContext('2d')!,r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,'rgba(0,0,0,1)');r.addColorStop(.6,'rgba(0,0,0,.5)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.fillRect(0,0,64,64);}
  const shadowMap=new THREE.CanvasTexture(shadowCanvas),shadowGeometry=new THREE.PlaneGeometry(1.9,1.4).rotateX(-Math.PI/2);
- const icons=DESKTOP_ICONS.map(spec=>{
-  const toy=makeIconToy(ART[spec.id]);root.add(toy.mesh);
+ // copies share one built drawing (its geometry and hull); each keeps its own material for the selection tint
+ const built=new Map<string,ReturnType<typeof makeIconToy>>();
+ const icons=toys(matchMedia('(pointer:coarse)').matches).map(spec=>{
+  const key=spec.art+'@'+spec.scale,cached=built.get(key),base=cached??makeIconToy(ART[spec.art]??DETRITUS_ART[spec.art],spec.scale);built.set(key,base);
+  const material=cached?base.material.clone():base.material,mesh=cached?new THREE.Mesh(base.mesh.geometry,material):base.mesh;
+  const toy={...base,material,mesh};root.add(mesh);
   const textures=[labelTexture(spec.label,false),labelTexture(spec.label,true)];
   const label=new THREE.Mesh(new THREE.PlaneGeometry(2.5,.625),new THREE.MeshBasicMaterial({map:textures[0],transparent:true,alphaTest:.5,side:THREE.DoubleSide}));root.add(label);
   const shadow=new THREE.Mesh(shadowGeometry,new THREE.MeshBasicMaterial({map:shadowMap,color:0,transparent:true,opacity:.34,depthWrite:false}));shadow.renderOrder=5;root.add(shadow);
-  return {...spec,...toy,textures,label,shadow,selected:false};
+  shadow.scale.setScalar(spec.scale);
+  return {...spec,...toy,textures,label,shadow,selected:false,active:spec.stage<=1};
  });
  const physics=await makeIconPhysics(icons,obstacles),pressedGrass=meadowUniforms().uToys.value;
- function voice(kind:'kick'|'bounce'|'tune',strength:number,distance:number){
+ // later detritus waits, switched off, until enough levels are cleared
+ icons.forEach((icon,i)=>{if(!icon.active){physics.toys[i].body.setEnabled(false);icon.mesh.visible=icon.label.visible=icon.shadow.visible=false;}});
+ let stage=1,landed=0;
+ function voice(kind:'kick'|'bounce'|'tune',strength:number,distance:number,notes?:number[]){
   const level=Math.min(.32,.05+strength*.035)*Math.max(0,1-distance/45);if(level<.004)return;
   const now=audio.currentTime,out=audio.createGain();out.gain.value=level;out.connect(bus);
-  if(kind==='tune'){[523.25,659.25,783.99,1046.5].forEach((f,i)=>{const o=audio.createOscillator(),e=audio.createGain(),t=now+.06+i*.085;o.type='square';o.frequency.value=f;e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(.35,t+.01);e.gain.exponentialRampToValueAtTime(.001,t+.16);o.connect(e).connect(out);o.start(t);o.stop(t+.17);});}
+  if(kind==='tune'){(notes??TUNES.winamp).forEach((f,i)=>{const o=audio.createOscillator(),e=audio.createGain(),t=now+.06+i*.085;o.type='square';o.frequency.value=f;e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(.35,t+.01);e.gain.exponentialRampToValueAtTime(.001,t+.16);o.connect(e).connect(out);o.start(t);o.stop(t+.17);});}
   else{
    const body=audio.createOscillator(),e=audio.createGain();body.type='sine';body.frequency.setValueAtTime(kind==='kick'?170:120,now);body.frequency.exponentialRampToValueAtTime(55,now+.09);
    e.gain.setValueAtTime(1,now);e.gain.exponentialRampToValueAtTime(.001,now+(kind==='kick'?.16:.11));body.connect(e).connect(out);body.start(now);body.stop(now+.18);
@@ -78,37 +94,53 @@ export async function makeDesktopIcons(scene:THREE.Scene,audio:AudioContext,obst
  let visible=true,total=0,disposed=false;
  return {
   setVisible(value:boolean){visible=value;root.visible=value;if(!value)pressedGrass.forEach(v=>v.w=0);},
+  /** Levels cleared. New detritus drops out of the sky when you walk out into it; on a load it is already lying there. */
+  setStage(value:number,instant:boolean){
+   if(value===stage)return;stage=value;
+   icons.forEach((icon,i)=>{
+    const want=icon.stage<=stage;if(want===icon.active)return;icon.active=want;const body=physics.toys[i].body;
+    icon.mesh.visible=icon.shadow.visible=want;if(!want){icon.label.visible=false;body.setEnabled(false);return;}
+    const drop=instant?0:16+((i*7919)%13);
+    body.setTranslation({x:icon.x,y:groundY(icon.x,icon.z)+icon.halfHeight+.08+drop,z:icon.z},true);body.setLinvel({x:0,y:0,z:0},true);
+    body.setAngvel(instant?{x:0,y:0,z:0}:{x:Math.sin(i)*2,y:Math.cos(i*1.7)*2,z:Math.sin(i*2.3)*2},true);body.setEnabled(true);body.wakeUp();if(!instant)landed++;
+   });
+  },
   update(dt:number,_time:number,player:THREE.Vector3,velocity:THREE.Vector3,paused:boolean){
    if(!visible||disposed)return;
-   if(!paused)physics.update(dt,player,velocity,(id,speed,d)=>{total++;voice('kick',speed,d);if(id==='winamp'&&speed>.6)voice('tune',3,d);},(strength,d)=>voice('bounce',strength,d));
-   let nearest=-1,best=3.2;
+   if(!paused)physics.update(dt,player,velocity,(id,speed,d)=>{total++;voice('kick',speed,d);const art=icons.find(t=>t.id===id)?.art;if(art&&TUNES[art]&&speed>.6)voice('tune',3,d,TUNES[art]);},(strength,d)=>voice('bounce',strength,d));
+   let nearest=-1,best=3.2;const near:{i:number;d:number}[]=[];
    for(let i=0;i<icons.length;i++){
+    if(!icons[i].active)continue;
     const p=physics.toys[i].body.translation(),d=Math.hypot(p.x-player.x,p.z-player.z);
-    if(d<best){best=d;nearest=i;}
+    if(d<best){best=d;nearest=i;}near.push({i,d});
    }
+   // the grass under the nine toys nearest you is pressed down (the blades read nine slots)
+   near.sort((a,b)=>a.d-b.d);const pressing=new Map(near.slice(0,pressedGrass.length).map(({i},slot)=>[i,slot]));
+   for(let slot=near.length;slot<pressedGrass.length;slot++)pressedGrass[slot].w=0;
    icons.forEach((icon,i)=>{
+    if(!icon.active)return;
     const body=physics.toys[i].body,p=body.translation(),r=body.rotation();
     icon.mesh.position.set(p.x,p.y,p.z);icon.mesh.quaternion.set(r.x,r.y,r.z,r.w);
     const ground=groundY(p.x,p.z),air=Math.max(0,p.y-ground);
     const normalY=1-2*(r.x*r.x+r.z*r.z); // local up in world y
-    pressedGrass[i].set(p.x,p.z,1.15,Math.max(0,Math.min(1,(1.15-air)*3))*(1-Math.abs(normalY)*.25));
-    // Labels stay out of the player's face during a close kick or high bounce.
-    icon.label.visible=Math.hypot(p.x-player.x,p.z-player.z)>2&&air<1.4;
+    const slot=pressing.get(i);if(slot!==undefined)pressedGrass[slot].set(p.x,p.z,1.15*icon.scale,Math.max(0,Math.min(1,(1.15*icon.scale-air)*3))*(1-Math.abs(normalY)*.25));
+    // Labels stay out of the player's face during a close kick or high bounce, and far off they rest.
+    const away=Math.hypot(p.x-player.x,p.z-player.z);icon.label.visible=away>2&&away<icon.labelRange&&air<1.4*icon.scale;
     // Separate labels remain legible when the physical art lies on its side.
-    icon.label.position.set(p.x,Math.max(ground+.65,p.y+1.2),p.z);
+    icon.label.position.set(p.x,Math.max(ground+.65*icon.scale,p.y+icon.halfHeight+.35),p.z);
     icon.label.rotation.y=Math.atan2(player.x-p.x,player.z-p.z);
-    icon.shadow.position.set(p.x,ground+.03,p.z);icon.shadow.scale.setScalar(1/(1+air*.3));(icon.shadow.material as THREE.MeshBasicMaterial).opacity=.34/(1+air*.5);
+    icon.shadow.position.set(p.x,ground+.03,p.z);icon.shadow.scale.setScalar(icon.scale/(1+air*.3));(icon.shadow.material as THREE.MeshBasicMaterial).opacity=.34/(1+air*.5);
     const selected=i===nearest;if(selected!==icon.selected){icon.selected=selected;icon.label.material.map=icon.textures[selected?1:0];icon.material.color.setHex(selected?0xc4d4ff:0xffffff);}
    });
   },
-  getState:()=>({visible,kicks:total,physics:physics.getState(),icons:icons.map((icon,i)=>{
+  getState:()=>({visible,kicks:total,stage,landed,physics:physics.getState(),icons:icons.flatMap((icon,i)=>{if(!icon.active)return [];
    const toy=physics.toys[i],p=toy.body.translation(),q=toy.body.rotation(),v=toy.body.linvel(),a=toy.body.angvel();
    // air is clearance at the lowest point of the collision hull, not its centre.
    let lowest=Infinity;const vertex=new THREE.Vector3(),position=new THREE.Vector3(p.x,p.y,p.z),rotation=new THREE.Quaternion(q.x,q.y,q.z,q.w);
    for(let n=0;n<icon.hull.length;n+=3){vertex.fromArray(icon.hull,n).applyQuaternion(rotation).add(position);lowest=Math.min(lowest,vertex.y-groundY(vertex.x,vertex.z));}
-   return {id:icon.id,x:+p.x.toFixed(2),y:+p.y.toFixed(2),z:+p.z.toFixed(2),air:+Math.max(0,lowest).toFixed(2),
+   return [{id:icon.id,x:+p.x.toFixed(2),y:+p.y.toFixed(2),z:+p.z.toFixed(2),air:+Math.max(0,lowest).toFixed(2),
     mass:toy.mass,kicks:toy.kicks,selected:icon.selected,sleeping:toy.body.isSleeping(),speed:+Math.hypot(v.x,v.y,v.z).toFixed(3),
-    angular_speed:+Math.hypot(a.x,a.y,a.z).toFixed(3),rotation:{x:q.x,y:q.y,z:q.z,w:q.w}};
+    angular_speed:+Math.hypot(a.x,a.y,a.z).toFixed(3),rotation:{x:q.x,y:q.y,z:q.z,w:q.w}}];
   })}),
   debug:{place(id:string,x:number,z:number,yaw=0,height=0,flat=false){
    const t=physics.toys.find(t=>t.id===id);if(!t)return;

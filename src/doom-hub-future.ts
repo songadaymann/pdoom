@@ -5,6 +5,7 @@ import type {IconObstacle} from './doom-icon-physics';
 import {makePhoneAudio} from './doom-phone-audio';
 import {shade,shadeOnGround,wadTexture,painted,readmeTexture,STRIP_COLOURS,type StripLight} from './doom-hub-doors';
 import {meadowUniforms,MEADOW_COMMON_GLSL,OUT_GLSL} from './doom-meadow-shared';
+import {TRON} from './doom-hub-traces';
 
 /* What's still to come, as places you can walk up to (2026-10-14; docs/spec/04-bliss-hub-world.md
  * 2.2-2.6). Levels 3 and 4 aren't built yet: MEG3N.AVI's toy factory under its selfie-stick tower
@@ -28,7 +29,8 @@ export const FUTURE_DOORS=[
   readme:['AGENTIC SMITH v0.9','Five humans in pods.','TODO:','1. FIND USER','2. FIND USER']},
 ];
 export const FINAL={x:-45,z:-92,label:'Display Properties'};
-const MCP={x:60,z:1000},MCP_TOP=420;
+// The MCP column: the final tall building. The endgame's walk south ends at its north face (shared with that lane).
+export const MCP={x:60,z:1000},MCP_TOP=420;
 
 type Frame={y:number;heading:number;normal:THREE.Vector2;side:THREE.Vector2;toWorld:THREE.Matrix4};
 // x along the facade, z out of the door, y up from the door's ground (HAL's construction frame)
@@ -115,9 +117,9 @@ function dingbatAtlas(){
 /** AGENTIC's glass: green dingbat rain falling down every face, a head and a fading trail per column. */
 function rainMaterial(atlas:THREE.Texture,width:number,height:number){
  atlas.colorSpace=THREE.NoColorSpace;
- return new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uGlyphs:{value:atlas},uSize:{value:new THREE.Vector2(width,height)},uRain:{value:1}},
+ return new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uGlyphs:{value:atlas},uSize:{value:new THREE.Vector2(width,height)},uRain:{value:1},uCalm:{value:0}},
   vertexShader:'attribute float face;varying vec2 vUv;varying float vFace;void main(){vUv=uv;vFace=face;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-  fragmentShader:/* glsl */`uniform float uTime,uRain;uniform sampler2D uGlyphs;uniform vec2 uSize;varying vec2 vUv;varying float vFace;
+  fragmentShader:/* glsl */`uniform float uTime,uRain,uCalm;uniform sampler2D uGlyphs;uniform vec2 uSize;varying vec2 vUv;varying float vFace;
    float h(float n){return fract(sin(n)*43758.5453);}
    void main(){
     vec2 m=vUv*uSize/.9,cell=floor(m),f=fract(m);
@@ -129,6 +131,7 @@ function rainMaterial(atlas:THREE.Texture,width:number,height:number){
     vec2 at=vec2(mod(g,4.),floor(g/4.));
     float ink=texture2D(uGlyphs,vec2((at.x+f.x)/4.,1.-(at.y+1.-f.y)/4.)).r;
     vec3 glass=vec3(.012,.02,.026)+vec3(.01,.025,.035)*vUv.y;
+    glass=mix(glass,mix(vec3(.30,.42,.75),vec3(.05,.10,.40),vUv.y),uCalm*.8); // cleared: the rain stops, the glass reflects the sky
     vec3 rain=mix(vec3(.08,.85,.28),vec3(.75,1.,.82),step(dist,1.))*glow;
     gl_FragColor=vec4(glass+rain*ink,1.);
     #include <colorspace_fragment>
@@ -227,8 +230,9 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
   g.fillStyle='rgba(255,120,170,.75)';for(const x of [40,152]){g.beginPath();g.ellipse(x,196,15,9,0,0,Math.PI*2);g.fill();}
  });
  const screens=[smile(false),smile(true)];
+ const moon=canvasTexture(192,352,g=>{g.fillStyle='#0b1440';g.fillRect(0,0,192,352);g.fillStyle='#f3e9b5';g.beginPath();g.arc(96,176,46,0,Math.PI*2);g.fill();g.fillStyle='#0b1440';g.beginPath();g.arc(118,160,42,0,Math.PI*2);g.fill();});
  const screen=new THREE.Mesh(new THREE.PlaneGeometry(3.3,6.1),new THREE.MeshBasicMaterial({map:screens[0]}));screen.position.z=.26;phone.add(screen);
- phone.add(new THREE.Mesh(new THREE.TorusGeometry(4.7,.4,10,48),new THREE.MeshBasicMaterial({color:0xfff9ee})));
+ const ringLight=new THREE.MeshBasicMaterial({color:0xfff9ee});phone.add(new THREE.Mesh(new THREE.TorusGeometry(4.7,.4,10,48),ringLight));
  const badgeCanvas=document.createElement('canvas');badgeCanvas.width=256;badgeCanvas.height=128;const badgeContext=badgeCanvas.getContext('2d')!;
  const badgeTexture=new THREE.CanvasTexture(badgeCanvas);badgeTexture.colorSpace=THREE.SRGBColorSpace;
  const badge=new THREE.Mesh(new THREE.PlaneGeometry(2.2,1.1),new THREE.MeshBasicMaterial({map:badgeTexture,transparent:true,alphaTest:.5}));badge.position.set(1.75,3.3,.32);phone.add(badge);
@@ -267,6 +271,8 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
  const towerTop=new THREE.Vector3((tx0+tx1)/2,0,(tz0+tz1)/2).applyMatrix4(agFrame.toWorld);
  const spinner=new THREE.Group();spinner.position.set(towerTop.x,agFrame.y+TOP+10.5,towerTop.z);root.add(spinner);
  const dots=Array.from({length:8},(_,i)=>{const m=new THREE.Mesh(new THREE.CircleGeometry(.95,20),new THREE.MeshBasicMaterial({color:0xe8dcc0,side:THREE.DoubleSide}));const a=i/8*Math.PI*2;m.position.set(Math.sin(a)*4.1,Math.cos(a)*4.1,0);spinner.add(m);return m;});
+ const checkShape=new THREE.Shape();checkShape.moveTo(-4.2,.4);checkShape.lineTo(-2.6,1.9);checkShape.lineTo(-.9,.2);checkShape.lineTo(3.4,4.6);checkShape.lineTo(4.9,3.1);checkShape.lineTo(-.9,-2.8);checkShape.closePath();
+ const check=new THREE.Mesh(new THREE.ShapeGeometry(checkShape),new THREE.MeshBasicMaterial({color:0x3cf06a,side:THREE.DoubleSide}));check.visible=false;spinner.add(check);
  const todo=new THREE.Mesh(new THREE.PlaneGeometry(11,4.6),new THREE.MeshBasicMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,
   map:canvasTexture(512,214,g=>{g.fillStyle='rgba(60,255,120,.10)';g.fillRect(0,0,512,214);g.fillStyle='#66ff9a';g.font='bold 46px monospace';['1. FIND USER','2. FIND USER','3. FIND USER'].forEach((l,i)=>g.fillText(l,34,62+i*62));g.fillStyle='rgba(0,0,0,.35)';for(let y=0;y<214;y+=4)g.fillRect(0,y,512,2);})}));
  // floating just off the front glass near the top (the roof edge hides anything above the roof from the ground)
@@ -321,6 +327,13 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
    const at=Math.floor((40-rows.length)/2);rows.forEach((r,y)=>{for(let x=0;x<24;x++){const k=r[x];if(k==='.')continue;g.fillStyle=k==='X'?'#000':k==='S'?'#d9b34a':'#fff';g.fillRect(x,y+at,1,1);}});
   },true)}));
  hourglass.rotation.order='YXZ';hourglass.position.set(FINAL.x,low+10+25,FINAL.z);root.add(hourglass);
+ // At 20/20 the hourglass becomes the arrow and points back down the hill: south, past the bunker, at the MCP column.
+ const ARROW=['X','XX','XWX','XWWX','XWWWX','XWWWWX','XWWWWWX','XWWWWWWX','XWWWWWWWX','XWWWWWWWWX','XWWWWWXXXXX','XWWXWWX','XWX.XWWX','XX..XWWX','X....XWWX','.....XWWX','......XX'];
+ const arrowPivot=new THREE.Group();arrowPivot.position.copy(hourglass.position);arrowPivot.rotation.order='YXZ';arrowPivot.visible=false;root.add(arrowPivot);
+ // drawn with its tip at the pivot, turned so it points along the plane's +x (the cursor leans 22 degrees off vertical)
+ const arrow=new THREE.Mesh(new THREE.PlaneGeometry(9,13.5).translate(4.5,-6.75,0).rotateZ(-112*Math.PI/180),new THREE.MeshBasicMaterial({transparent:true,alphaTest:.5,side:THREE.DoubleSide,
+  map:canvasTexture(12,18,g=>{ARROW.forEach((row,y)=>{for(let x=0;x<row.length;x++){if(row[x]==='.')continue;g.fillStyle=row[x]==='X'?'#000':'#fff';g.fillRect(x,y,1,1);}});},true)}));
+ arrowPivot.add(arrow);
 
  /* The MCP column (spec 2.6): 900 m south, behind you as you leave the bunker. A faceted
   * stainless column under an X crown, rocket bells at its foot, and the face band. */
@@ -335,12 +348,21 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
  const faceCanvas=document.createElement('canvas');faceCanvas.width=faceCanvas.height=8;const faceContext=faceCanvas.getContext('2d')!;
  const faceTexture=new THREE.CanvasTexture(faceCanvas);faceTexture.colorSpace=THREE.NoColorSpace;faceTexture.magFilter=faceTexture.minFilter=THREE.NearestFilter;faceTexture.generateMipmaps=false;
  const faceBand=new THREE.Mesh(tint(new THREE.PlaneGeometry(66,66),0xffffff,false),hazed(faceTexture,.34));faceBand.position.set(0,MCP_TOP-72,27);mcp.add(faceBand);
+ // As SAFE MODE comes apart (after 3, and fully after 4) the haze lifts off the column and its edges burn
+ // the MCP's red-orange through it: the one thing on the horizon calling you south.
+ const mcpEdgeMaterial=new THREE.MeshBasicMaterial({color:TRON.mcp,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+ {const parts:THREE.BufferGeometry[]=[],up=new THREE.Vector3(0,1,0),corner=(k:number,r:number,y:number)=>new THREE.Vector3(Math.sin(k*Math.PI/3)*r,y,Math.cos(k*Math.PI/3)*r);
+  const bar=(a:THREE.Vector3,b:THREE.Vector3,w:number)=>{const d=b.clone().sub(a);parts.push(new THREE.BoxGeometry(w,d.length(),w).applyQuaternion(new THREE.Quaternion().setFromUnitVectors(up,d.clone().normalize())).translate((a.x+b.x)/2,(a.y+b.y)/2,(a.z+b.z)/2));};
+  for(let k=0;k<6;k++){bar(corner(k,28.4,0),corner(k,22.4,MCP_TOP),2.6);for(const y of [0,MCP_TOP*.33,MCP_TOP*.66,MCP_TOP]){const r=28.4-6*y/MCP_TOP;bar(corner(k,r,y),corner(k+1,r,y),2.2);}}
+  const f=[[-34,MCP_TOP-106],[34,MCP_TOP-106],[34,MCP_TOP-38],[-34,MCP_TOP-38]].map(([x,y])=>new THREE.Vector3(x,y,27.6));for(let k=0;k<4;k++)bar(f[k],f[(k+1)%4],2.4);
+  mcp.add(new THREE.Mesh(mergeGeometries(parts),mcpEdgeMaterial));}
+ const faceMaterial=faceBand.material as THREE.ShaderMaterial;let mcpGlow=0;
  const source=faceSource();let blocksShown=-1;
  function drawFace(levels:number){
   const n=2**Math.min(5,levels+1);blocksShown=n;faceCanvas.width=faceCanvas.height=n;faceContext.imageSmoothingEnabled=true;faceContext.imageSmoothingQuality='high';faceContext.drawImage(source,0,0,n,n);faceTexture.dispose();faceTexture.image=faceCanvas;faceTexture.needsUpdate=true;
  }
 
- let visible=true,audioEnabled=true;const look=new THREE.Vector3();
+ let visible=true,audioEnabled=true,megDone=false,agDone=false;const look=new THREE.Vector3(),toColumn=new THREE.Vector3();
  return {occluders,
   physicsBoxes:():IconObstacle[]=>[
    ...([{door:meg,frame:megFrame,hw:MW,depth:MD,top:14.6},
@@ -379,16 +401,25 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
    if(Math.min(5,progress.levels+1)!==Math.log2(Math.max(1,blocksShown)))drawFace(progress.levels);
    if(!visible)return;
    const t=reduced?0:time;
-   rain.uniforms.uTime.value=t;rain.uniforms.uRain.value=reduced?.55:1;
+   rain.uniforms.uTime.value=t;rain.uniforms.uRain.value=agDone?0:reduced?.55:1;
    // the spinner chases itself; both it and the to-do list turn to face you
    const lead=Math.floor(t*9)%8;
    dots.forEach((dot,i)=>{const k=(lead-i+8)%8,s=1.3-k*.1;dot.scale.setScalar(s);(dot.material as THREE.MeshBasicMaterial).color.setRGB(.91-k*.08,.86-k*.08,.75-k*.07);});
    for(const o of [spinner,todo])o.rotation.y=Math.atan2(player.x-o.position.x,player.z-o.position.z);
    hourglass.rotation.y=Math.atan2(player.x-hourglass.position.x,player.z-hourglass.position.z);
    const flip=reduced?0:Math.min(1,((time%3.2)-2.8)/.4);hourglass.rotation.z=flip>0?Math.PI*flip*flip*(3-2*flip):0;
+   const pointing=progress.unresolved===0;hourglass.visible=!pointing;arrowPivot.visible=pointing;
+   if(pointing){
+    // face you, and in that plane point at the column, biased downhill so it always says "go back down"
+    arrowPivot.rotation.y=hourglass.rotation.y;
+    toColumn.set(MCP.x-arrowPivot.position.x,0,MCP.z-arrowPivot.position.z).normalize();toColumn.y=-.9;
+    const right=Math.cos(arrowPivot.rotation.y)*toColumn.x-Math.sin(arrowPivot.rotation.y)*toColumn.z;
+    arrowPivot.rotation.z=Math.atan2(toColumn.y,right)+(reduced?0:Math.sin(time*3)*.06);
+    arrowPivot.position.y=hourglass.position.y+(reduced?0:Math.abs(Math.sin(time*2.4))*1.6);
+   }
    // MEG3N's phone: blinks, counts notifications, watches you within 200 m
-   (screen.material as THREE.MeshBasicMaterial).map=screens[!reduced&&time%3.4<.16?1:0];
-   if(!paused&&time>=badgeAt){badgeCount+=1+Math.floor(Math.random()*3);badgeAt=time+.5+Math.random()*1.1;}
+   (screen.material as THREE.MeshBasicMaterial).map=megDone?moon:screens[!reduced&&time%3.4<.16?1:0];
+   if(megDone)badgeCount=0;else if(!paused&&time>=badgeAt){badgeCount+=1+Math.floor(Math.random()*3);badgeAt=time+.5+Math.random()*1.1;}
    if(badgeCount!==badgeShown)drawBadge();
    const range=Math.hypot(player.x-stick.position.x,player.z-stick.position.z);
    look.set(player.x,0,player.z);const want=range<200?Math.atan2(look.x-stick.position.x,look.z-stick.position.z):Math.sin(reduced?0:time*.2)*.6+Math.atan2(17-stick.position.x,-stick.position.z);
@@ -399,7 +430,18 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
    phoneAudio.update(player,yaw,pitch,!paused);
    if(!paused&&time>=nextRing){nextRing=time+12;phoneAudio.ring();}
   },
+  /** SAFE MODE coming apart (levels cleared - 1, eased): the column's haze lifts and its edges burn. */
+  setCorruption(c:number,time:number,reduced:boolean){
+   const c2=THREE.MathUtils.clamp(c-1,0,1),c3=THREE.MathUtils.clamp(c-2,0,1);
+   steel.uniforms.uExtra.value=.42-.12*c2-.16*c3;faceMaterial.uniforms.uExtra.value=.34-.10*c2-.16*c3;
+   mcpGlow=(.22*c2+.78*c3)*(reduced?1:.8+.2*Math.sin(time*1.7));mcpEdgeMaterial.opacity=mcpGlow;
+  },
+  /** MEG3N.AVI and AGENTIC.BAT resolved (GAME-SPEC 6.4): her phone sleeps, the rain stops and the spinner is a check. */
+  setCleared(meg3n:boolean,agentic:boolean){
+   megDone=meg3n;agDone=agentic;ringLight.color.setHex(meg3n?0x5a5850:0xfff9ee);
+   check.visible=agentic;dots.forEach(d=>{d.visible=!agentic;});todo.visible=!agentic;rain.uniforms.uCalm.value=agentic?1:0;
+  },
   dispose(){phoneAudio.dispose();},
-  getState:()=>({visible,wait:waitShown,mcp_blocks:blocksShown,badge:badgeCount,phone_rings:phoneAudio.getState().rings,phone_audio:phoneAudio.getState(),doors:FUTURE_DOORS.map(d=>d.id),meg3n:{strip:megDoor.strip,live:megDoor.faceMaterial.map===portal,readme:megDoor.readmeMaterial.map===megBeaten?'beaten':'warning'},agentic:{strip:agDoor.strip,live:agDoor.faceMaterial.map===portal,readme:agDoor.readmeMaterial.map===agBeaten?'beaten':'warning'}}),
+  getState:()=>({visible,wait:waitShown,mcp_blocks:blocksShown,mcp_glow:+mcpGlow.toFixed(2),badge:badgeCount,phone_rings:phoneAudio.getState().rings,phone_audio:phoneAudio.getState(),doors:FUTURE_DOORS.map(d=>d.id),meg3n:{strip:megDoor.strip,live:megDoor.faceMaterial.map===portal,readme:megDoor.readmeMaterial.map===megBeaten?'beaten':'warning'},agentic:{strip:agDoor.strip,live:agDoor.faceMaterial.map===portal,readme:agDoor.readmeMaterial.map===agBeaten?'beaten':'warning'}}),
  };
 }

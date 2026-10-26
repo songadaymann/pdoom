@@ -19,7 +19,9 @@ async function load(options){
 try{
  const p=await load({viewport:{width:1280,height:800}});
  const start=await read(p);assert.equal(start.icons.physics.engine,'Rapier');
- assert.equal(new Set(start.icons.icons.map(i=>i.mass)).size,9,'Every toy has an authored weight');
+ // (after two levels the first wave of detritus has landed too; the nine originals keep their own weights)
+ const nine=['computer','recycle','winamp','mines','cards','paint','globe','floppy','txt'];
+ assert.equal(new Set(start.icons.icons.filter(i=>nine.includes(i.id)).map(i=>i.mass)).size,9,'Every toy has an authored weight');
  assert.ok(icon(start,'txt').mass<icon(start,'cards').mass&&icon(start,'cards').mass<icon(start).mass);
  report.cases.push('All nine real toy bodies expose distinct weights, with paper and cards lighter than the computer');
  await view(p,3,-6.5,0,-.08);await place(p,'computer',3,-13,.5);

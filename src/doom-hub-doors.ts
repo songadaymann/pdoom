@@ -84,6 +84,8 @@ export type StripLight='saved'|'inside'|'lost';
 export const STRIP_COLOURS:Record<StripLight,number>={saved:0x3cf06a,inside:0x0d1512,lost:0x777a76};
 const IRIS={idle:0x45e3ee,near:0xffae2a,sees:0xff2b20};
 const EYE={radius:6,height:70,orbit:15,period:90,near:110,sees:45,turn:20*Math.PI/180};
+// Cleared (GAME-SPEC 6.4): the eye greys, sinks over 20 s and comes to rest in the valley as a giant inert mouse ball you can shove.
+const BALL={x:30,z:-185,sink:20,dead:0x6b6f73,rubber:0x55595e};
 
 export async function makeHubDoors(scene:THREE.Scene,portal:THREE.Texture,loader:THREE.TextureLoader){
  const occluders:THREE.Object3D[]=[];
@@ -193,7 +195,7 @@ export async function makeHubDoors(scene:THREE.Scene,portal:THREE.Texture,loader
   * up close. Five draw calls. Reduced motion stops its drift and sway and stills the LEDs and torches. */
  const centre=new THREE.Vector3(door.x-normal.x*DEPTH/2,y+EYE.height,door.z-normal.y*DEPTH/2);
  const eye=new THREE.Group();eye.position.copy(centre);hal.add(eye);
- eye.add(new THREE.Mesh(shade(new THREE.SphereGeometry(EYE.radius,28,18),0,false),new THREE.MeshBasicMaterial({color:0xf1efe7,vertexColors:true})));
+ const shell=new THREE.MeshBasicMaterial({color:0xf1efe7,vertexColors:true});eye.add(new THREE.Mesh(shade(new THREE.SphereGeometry(EYE.radius,28,18),0,false),shell));
  const gaze=new THREE.Group();eye.add(gaze);
  const cap=(r:number,angle:number,hex:number)=>painted(new THREE.SphereGeometry(r,32,3,0,Math.PI*2,0,angle).rotateX(Math.PI/2),hex);
  const glint=cap(EYE.radius+.1,.04,0xf6fbff).rotateY(-.1).rotateX(-.1);
@@ -209,21 +211,45 @@ export async function makeHubDoors(scene:THREE.Scene,portal:THREE.Texture,loader
  const torches=await makeTorchTrail(hal,loader,'blue',{x:16,z:-20},{x:door.x+normal.x*10+side.x*7,z:door.z+normal.y*10+side.y*7});
 
  let mood:keyof typeof IRIS='idle',orbit=0;
+ let cleared=false,sinkFrom:THREE.Vector3|null=null,sinkT=1,pinned=false;const ball=new THREE.Vector3(BALL.x,groundY(BALL.x,BALL.z)+EYE.radius,BALL.z),lastPlayer=new THREE.Vector3(NaN,0,0),axis=new THREE.Vector3(),roll=new THREE.Quaternion();
+ const hallHit=(x:number,z:number,pad:number)=>{const dx=x-door.x,dz=z-door.z,u=dx*side.x+dz*side.y,v=dx*normal.x+dz*normal.y;return Math.abs(u)<HW+pad&&v<.45+pad&&v>-DEPTH-pad;};
  const look=new THREE.Quaternion(),toward=new THREE.Vector3(),probe=new THREE.Object3D(),ledColour=leds.uniforms.uColor.value as THREE.Color;
  return {occluders,
   physicsBoxes:():IconObstacle[]=>[{x:door.x-normal.x*DEPTH/2,y:y+(TOP+BASE)/2,z:door.z-normal.y*DEPTH/2,
    hx:HW,hy:(TOP-BASE)/2,hz:DEPTH/2,yaw:heading}],
   setHalVisible:(visible:boolean)=>{hal.visible=visible;},
+  /** HAL3000.SYS resolved: instant on a load, otherwise the eye sinks into the valley where you can see it. */
+  setCleared(value:boolean,instant:boolean){
+   if(value===cleared)return;cleared=value;cableBundle.visible=!value;
+   if(!value){sinkFrom=null;shell.color.setHex(0xf1efe7);return;}
+   irisMaterial.color.setHex(BALL.dead);ledColour.setHex(BALL.dead);shell.color.setHex(BALL.rubber);mood='idle';
+   if(instant){sinkFrom=null;sinkT=1;eye.position.copy(ball);}else{sinkFrom=eye.position.clone();sinkT=0;}
+  },
   /** Which picture HAL's doorway shows: the live engine view only while HAL is the loaded level. */
   setLevel:(id:string)=>{faceMaterial.map=id===door.id?portal:halStill;},
   blocked:(x:number,z:number)=>{
    if(!hal.visible)return false;const dx=x-door.x,dz=z-door.z,u=dx*side.x+dz*side.y,v=dx*normal.x+dz*normal.y;
-   return Math.abs(u)<HW+.6&&v<.45&&v>-DEPTH-.6||torches.blocked(x,z);
+   return Math.abs(u)<HW+.6&&v<.45&&v>-DEPTH-.6||torches.blocked(x,z)||cleared&&pinned&&Math.hypot(x-ball.x,z-ball.z)<EYE.radius+.4;
   },
   update(dt:number,time:number,player:THREE.Vector3,reduced:boolean,lights:StripLight[]){
    setStrip(lights);if(!hal.visible)return;
    torches.update(time,reduced);
    leds.uniforms.uTime.value=reduced?Math.PI/2.7:time;
+   if(cleared){
+    if(sinkFrom&&sinkT<1){sinkT=Math.min(1,sinkT+dt/BALL.sink);const k=sinkT*sinkT*(3-2*sinkT);eye.position.lerpVectors(sinkFrom,ball,k);}
+    else{
+     // shove it: walking into the ball rolls it ahead of you, until the hall or the valley's edge stops it
+     const d=Math.hypot(player.x-ball.x,player.z-ball.z),reach=EYE.radius+.4;pinned=false;
+     if(d<reach&&lastPlayer.x===lastPlayer.x&&Math.hypot(player.x-lastPlayer.x,player.z-lastPlayer.z)>1e-4){
+      const ux=(ball.x-player.x)/(d||1),uz=(ball.z-player.z)/(d||1),push=reach-d,nx=ball.x+ux*push,nz=ball.z+uz*push;
+      if(hallHit(nx,nz,EYE.radius)||nx<-60||nx>80||nz<-245||nz>-140)pinned=true;
+      else{axis.set(uz,0,-ux);roll.setFromAxisAngle(axis,push/EYE.radius);eye.quaternion.premultiply(roll);ball.set(nx,groundY(nx,nz)+EYE.radius,nz);}
+     }
+     eye.position.copy(ball);
+    }
+    lastPlayer.copy(player);
+    return;
+   }
    if(!reduced)orbit+=dt;
    const w=orbit*Math.PI*2/EYE.period;
    eye.position.set(centre.x+EYE.orbit*Math.sin(w),centre.y+1.2*Math.sin(w*3),centre.z+EYE.orbit*.6*Math.sin(w*2));
@@ -236,5 +262,5 @@ export async function makeHubDoors(scene:THREE.Scene,portal:THREE.Texture,loader
    mood=!near?'idle':range<EYE.sees&&gaze.quaternion.angleTo(look)<.1?'sees':'near';
    irisMaterial.color.setHex(IRIS[mood]);ledColour.setHex(IRIS[mood]);
   },
-  getState:()=>({eye:mood==='idle'?'cyan':mood==='near'?'amber':'red',eye_at:eye.position.toArray().map(v=>+v.toFixed(2)),strip:stripKey})};
+  getState:()=>({eye:cleared?sinkT<1?'sinking':'mouse ball':mood==='idle'?'cyan':mood==='near'?'amber':'red',eye_at:eye.position.toArray().map(v=>+v.toFixed(2)),strip:stripKey})};
 }

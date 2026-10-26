@@ -27,8 +27,8 @@ try{
  await page.waitForFunction(()=>JSON.parse(window.render_game_to_text()).outside?.saved_visual===10,{},{timeout:60000});
  let s=await read();
  assert.equal(s.outside.future.visible,true);assert.equal(s.outside.future.wait,10,'Wait box counts the ten still out there');assert.equal(s.outside.future.mcp_blocks,8,'MCP face at 8 x 8 after two levels');
- assert.equal(s.outside.icons.visible,true);assert.equal(s.outside.icons.icons.length,9);
- report.cases.push('Both levels cleared: future structures and nine icons visible, Wait 10, MCP face 8 x 8');
+ assert.equal(s.outside.icons.visible,true);assert.equal(s.outside.icons.icons.length,45,'The nine desktop icons plus the first wave of detritus and its piles (after two levels)');
+ report.cases.push('Both levels cleared: future structures and 45 toys visible, Wait 10, MCP face 8 x 8');
  // Views: the bunker exit, the look back south (AGENTIC, MCP), west to MEG3N, the summit.
  await view(17,-3,0);await page.waitForTimeout(900);await shot('01-bunker-exit-north');report.fps.bunker=await fps();
  await page.evaluate(()=>window.__DOOM_DEBUG__.outside.debug.setFuture(false));report.fps.bunker_without=await fps();await page.evaluate(()=>window.__DOOM_DEBUG__.outside.debug.setFuture(true));

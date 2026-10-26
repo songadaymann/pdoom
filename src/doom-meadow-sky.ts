@@ -16,10 +16,11 @@ import {NOISE_TEX_GLSL} from './doom-meadow-noise';
 export function makeMeadowSky(cheap=false):THREE.Mesh {
   const U=meadowUniforms();
   const mat=new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,fog:false,defines:cheap?{CHEAP_SKY:1}:{},
-    uniforms:{uTime:U.uTime,uSun:U.uSun,uNoise:U.uNoise},
+    uniforms:{uTime:U.uTime,uSun:U.uSun,uNoise:U.uNoise,uCorrupt:U.uCorrupt,uDusk:U.uDusk},
     vertexShader:'varying vec3 vDir;void main(){vDir=position;vec4 p=projectionMatrix*modelViewMatrix*vec4(position,1.);gl_Position=p.xyww;}',
     fragmentShader:NOISE_TEX_GLSL+/* glsl */`
-      varying vec3 vDir;uniform float uTime;uniform vec3 uSun;
+      varying vec3 vDir;uniform float uTime,uCorrupt,uDusk;uniform vec3 uSun;
+      vec2 h22(vec2 p){return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);}
       const vec3 HOR=vec3(.42,.53,.73);
       const mat2 OCT=mat2(1.6,1.2,-1.2,1.6);
       float fbm3(vec2 p){float s=nzF(p).r*.5;p=OCT*p+vec2(3.1,1.7);s+=nzF(p).g*.25;p=OCT*p+vec2(1.3,5.9);s+=nzF(p).b*.125;return s/.875;}
@@ -117,6 +118,32 @@ export function makeMeadowSky(cheap=false):THREE.Mesh {
         }
         // ---- sun glow ----
         float sd=max(dot(d,uSun),0.);col+=vec3(1.,.97,.88)*(pow(sd,64.)*.25+pow(sd,6.)*.06);
+        // ---- SAFE MODE coming apart (doom-hub-traces.ts): after 3 the sky cracks out of the south, where the
+        // MCP stands; after 4 the cracks reach overhead, shards fall out to show the Grid, and the light drains ----
+        col*=mix(vec3(1.),vec3(.62,.64,.88),uDusk);
+        if(uCorrupt>1.){
+          float c2=clamp(uCorrupt-1.,0.,1.),c3=clamp(uCorrupt-2.,0.,1.);
+          float s=acos(clamp(dot(d,normalize(vec3(.04,.08,1.))),-1.,1.)),reach=.62*c2+1.55*c3;
+          float zone=1.-smoothstep(reach-.4,reach,s);
+          col+=vec3(1.,.23,.12)*exp(-s*5.)*.30*c3*(1.-smoothstep(0.,.3,h));  // the MCP's red-orange on the south horizon
+          if(zone>0.){
+            // a struck screen: rays out of the impact (low in the south, behind the MCP) and broken rings round it
+            vec3 I=normalize(vec3(.04,.08,1.)),e1=normalize(cross(I,vec3(0.,1.,0.))),e2=cross(e1,I);
+            float th=atan(dot(d,e2),dot(d,e1))/6.2831853+.5,N=19.,sinS=max(sin(s),.05);
+            float kw=th*N+.09*sin(s*6.+floor(th*N)*1.7),k=floor(kw);
+            float ray=min(fract(kw),1.-fract(kw))/N*6.2831853*sinS;                 // arc distance to the nearest ray
+            float ringR[7];ringR[0]=.10;ringR[1]=.22;ringR[2]=.38;ringR[3]=.6;ringR[4]=.88;ringR[5]=1.22;ringR[6]=1.6;
+            float ring=9.;int ri=7;
+            for(int r=0;r<7;r++){float rr=ringR[r]*(1.+.05*sin(th*40.+float(r)));if(s<rr&&ri==7)ri=r;if(h22(vec2(k,float(r))).x>.35)ring=min(ring,abs(s-rr));}
+            vec2 cellId=vec2(k,float(ri));
+            float aw=fwidth(s)*1.5+.0015,w=.0035+.0045*c3;
+            float crack=(1.-smoothstep(w,w+aw,min(ray,ring)))*zone;
+            float shard=step(h22(cellId+7.3).x,zone*(.08*c2+.42*c3)*(1.-.5*smoothstep(.2,1.5,s)))*step(w*2.,min(ray,ring));
+            vec2 gq=abs(fract(vec2(th*N*4.,s*14.)+.5)-.5);float grid=1.-smoothstep(.03,.03+fwidth(s*14.)*1.5,min(gq.x,gq.y));
+            col=mix(col,vec3(.006,.018,.03)+vec3(.22,.957,1.)*grid*.55,shard);
+            col=mix(col,vec3(.02,.03,.08),crack*.75);col+=vec3(.22,.957,1.)*crack*(.55+.45*c3)+vec3(.85,.99,1.)*crack*crack*.35;
+          }
+        }
         gl_FragColor=vec4(pow(col,vec3(2.2)),1.);
         #include <colorspace_fragment>
       }`});

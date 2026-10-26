@@ -12,10 +12,12 @@ import {meadowUniforms} from './doom-meadow-shared';
 import {SUN_DIR} from './bliss';
 import {meadowHumanIdle} from './doom-human-idle';
 import {createBlissAudio} from './doom-bliss-audio';
-import {meadowCampLayout} from './doom-camp-layout';
+import {meadowCampLayout,HILL_ZONES,HILL_RADIUS,DOOR_WANDER,clearOfDoor} from './doom-camp-layout';
 import {makeBlissGuide,INTRO_START} from './doom-bliss-guide';
 import {makeFutureHub,FUTURE_DOORS,FINAL,type FutureId} from './doom-hub-future';
 import {makeDesktopIcons} from './doom-desktop-icons';
+import {makeHubCorruption} from './doom-hub-corruption';
+import {makeHubDressing} from './doom-hub-dressing';
 
 type EscapeState={saved_people:number[];saved:number;outside:number};
 // Meadow art for each campaign id: levels 1-2's ten, then the factory's five (ids 10-14,
@@ -103,14 +105,36 @@ export async function createOutside(options:Options){
  labelOccluders.push(...hubDoors.occluders);
  // Levels 3 and 4 and the endgame as promises you can walk to, and desktop icons to kick about (2026-10-14).
  const future=await makeFutureHub(scene,loader,options.audio,portalTexture);labelOccluders.push(...future.occluders);
+ // each structure as a desktop file come to life, and its cleared state (docs/SAFE-MODE-PROGRESSION.md section 4)
+ const dressing=await makeHubDressing(scene);labelOccluders.push(...dressing.occluders);
  const icons=await makeDesktopIcons(scene,options.audio,[
   {x:17,y:3.5,z:12.5,hx:9.4,hy:3.5,hz:12.5},...hubDoors.physicsBoxes(),...future.physicsBoxes(),
  ]);
+ // SAFE MODE comes apart one stage per level cleared after the first (docs/SAFE-MODE-PROGRESSION.md): these
+ // are the boxes whose edges rez up in Tron light once their structure is cleared.
+ const futureBoxes=future.physicsBoxes();
+ const corruption=makeHubCorruption(scene,[[{x:17,y:3.5,z:8.1,hx:9,hy:3.5,hz:8}],hubDoors.physicsBoxes(),[futureBoxes[0],futureBoxes[3]],[futureBoxes[1],futureBoxes[2],futureBoxes[4]]]);
+ let corruptionPrimed=false;
  const loadFigure=(id:string)=>Promise.all(Array.from({length:32},async(_,n)=>{const f=Math.floor(n/8),a=n%8,t=await loadTexture(loader,`outside-assets/figure-${id}-${f}-${a}.png`);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;return t;}));
  const textures:(THREE.Texture[]|null|undefined)[]=await Promise.all(MEADOW_IDS.slice(0,OPTIONAL_ART).map(loadFigure));
  // null while loading or missing (then that person stays out of the meadow)
  const figure=(i:number)=>{if(textures[i]===undefined&&i<MEADOW_IDS.length){textures[i]=null;loadFigure(MEADOW_IDS[i]).then(t=>{textures[i]=t;},()=>console.warn(`Meadow: no figure art for ${MEADOW_IDS[i]} yet`));}return textures[i];};
- const people=new Map<number,{sprite:THREE.Sprite;shadow:THREE.Mesh;target:THREE.Vector3;moving:boolean;arrived:boolean;arrivedAt:number;emergeAt:number}>();
+ // home: 'door' for the newest group (near its own exit), 'hill' for every earlier one (docs/SAFE-MODE-PROGRESSION.md
+ // section 5). target is where they're walking, anchor where they rest; settled once they first reach home.
+ type Person={sprite:THREE.Sprite;shadow:THREE.Mesh;target:THREE.Vector3;anchor:THREE.Vector3;moving:boolean;arrived:boolean;settled:boolean;arrivedAt:number;emergeAt:number;home:'door'|'hill';restUntil:number;seed:number;speed:number};
+ const people=new Map<number,Person>();
+ const rand=(p:Person)=>{p.seed=(p.seed*1664525+1013904223)>>>0;return p.seed/4294967296;};
+ /** A free spot for person i at home: within their hill zone, or near their door but never in its way. */
+ function wanderSpot(i:number,p:Person,home:'door'|'hill'){
+  const centre=home==='hill'?HILL_ZONES[Math.floor(i/5)]:meadowCampLayout(i).target,radius=home==='hill'?HILL_RADIUS:DOOR_WANDER;let x=centre.x,z=centre.z;
+  for(let k=0;k<10;k++){
+   const a=rand(p)*Math.PI*2,r=Math.sqrt(rand(p))*radius;x=centre.x+Math.cos(a)*r;z=centre.z+Math.sin(a)*r;
+   if(home==='door'&&!clearOfDoor(i,x,z))continue;
+   let free=true;for(const [j,o] of people)if(j!==i&&(Math.hypot(o.anchor.x-x,o.anchor.z-z)<1.4||Math.hypot(o.target.x-x,o.target.z-z)<1.4)){free=false;break;}
+   if(free)break;
+  }
+  return home==='door'&&!clearOfDoor(i,x,z)?{x:centre.x,z:centre.z}:{x,z};
+ }
  // Companions leaving a door together come out 1.2 s apart (GAME-SPEC 6.3).
  let lastEmerge=-Infinity;
  // Soft contact shadows under the rescued people (drawn after the sward; blades in front still cover them)
@@ -197,11 +221,11 @@ export async function createOutside(options:Options){
  function setActive(value:boolean,id='five-prisons'){
   active=value;canvas.hidden=!value;hubUi.hidden=!value;keys.clear();paused=false;currentLevel=id;
   portalMaterial.map=id!==HUB_DOORS[0].id&&id in LEVEL_OFFSET?controlStill:portalTexture;hubDoors.setLevel(id);future.setLevel(id);
-  if(!value){intro=false;meadow.uGuidePath.value=0;guide?.stop();hubDoors.setHalVisible(true);future.setVisible(true);icons.setVisible(true);closeDialog();options.stage.classList.remove('bliss-intro');}
+  if(!value){intro=false;meadow.uGuidePath.value=0;guide?.stop();hubDoors.setHalVisible(true);future.setVisible(true);icons.setVisible(true);corruption.setVisible(true);dressing.setVisible(true);closeDialog();options.stage.classList.remove('bliss-intro');}
   // Coming back out of a level: its last subtitle and prompt would stay frozen on screen
   // (Liron's crawl line in the meadow, 2026-10-13), since the level HUD stops updating here.
   if(value){el('prompt').hidden=true;el('message').hidden=true;el('message').classList.remove('spoken');el('message').textContent='';}
-  if(value){hubDoors.setHalVisible(!intro);future.setVisible(!intro);icons.setVisible(!intro);const door=liveDoorOf(id);yaw=door.yaw;pitch=0;pos.set(door.x-Math.sin(yaw)*3,1.72+groundY(door.x,door.z),door.z-Math.cos(yaw)*3);canvas.focus();}
+  if(value){hubDoors.setHalVisible(!intro);future.setVisible(!intro);icons.setVisible(!intro);corruption.setVisible(!intro);dressing.setVisible(!intro);const door=liveDoorOf(id);yaw=door.yaw;pitch=0;pos.set(door.x-Math.sin(yaw)*3,1.72+groundY(door.x,door.z),door.z-Math.cos(yaw)*3);canvas.focus();}
   syncAudio();
  }
 
@@ -209,7 +233,7 @@ export async function createOutside(options:Options){
   guide??=await makeBlissGuide(scene,options.stage,options.audio);intro=true;guide.start(ceo);
   // Wake low behind the big dome, facing away: no bunker in sight, the other founder up
   // the slope behind you. No mown path; the HAL station waits until after the first level.
-  hubDoors.setHalVisible(false);future.setVisible(false);icons.setVisible(false);
+  hubDoors.setHalVisible(false);future.setVisible(false);icons.setVisible(false);corruption.setVisible(false);dressing.setVisible(false);
   guide.onSkip=()=>{yaw=Math.PI;pitch=0;pos.set(17,groundY(17,-12)+eye,-12);};
   yaw=INTRO_START.yaw;pitch=0;pos.set(INTRO_START.x,groundY(INTRO_START.x,INTRO_START.z)+eye,INTRO_START.z);nearestDoor=null;won=0;
   options.stage.classList.add('bliss-intro');
@@ -224,7 +248,7 @@ export async function createOutside(options:Options){
   }).length,boosted=!intro&&levels===2;
   return {camp,levels,boosted,walk:boosted?6:3.6,run:boosted?10:6};
  }
- function getState(){const {walk,run,boosted}=travel();return {movement:{walk,run,boosted},intro,guide:guide?.getState()||null,scene:'meadow',active,currentLevel,nearestDoor:nearestDoor?.id||null,coordinate_system:'metres; x east, z south, y up',x:+pos.x.toFixed(2),y:+pos.y.toFixed(2),z:+pos.z.toFixed(2),yaw:+yaw.toFixed(3),pitch:+pitch.toFixed(3),paused,won,saved_visual:people.size,settled:[...people.values()].filter(p=>p.arrived).length,people:[...people.entries()].map(([id,p])=>({id,character:MEADOW_IDS[id],out:time>=p.emergeAt,x:+p.sprite.position.x.toFixed(3),z:+p.sprite.position.z.toFixed(3),height:+p.sprite.scale.y.toFixed(4),arrived:p.arrived})),portal_frames:portalFrames,hal:hubDoors.getState(),screensavers:screensavers.getState(),future:future.getState(),icons:icons.getState(),nearest_future:nearestFuture,dialog:dialogFor?{id:dialogFor,title:dialogParts.title.textContent,status:dialogParts.status.textContent,bar:dialogParts.bar.style.width}:null,portal_visible:visiblePortal,render_width:canvas.width,render_height:canvas.height,audio:blissAudio.getState()};}
+ function getState(){const {walk,run,boosted}=travel();return {movement:{walk,run,boosted},intro,guide:guide?.getState()||null,scene:'meadow',active,currentLevel,nearestDoor:nearestDoor?.id||null,coordinate_system:'metres; x east, z south, y up',x:+pos.x.toFixed(2),y:+pos.y.toFixed(2),z:+pos.z.toFixed(2),yaw:+yaw.toFixed(3),pitch:+pitch.toFixed(3),paused,won,saved_visual:people.size,settled:[...people.values()].filter(p=>p.settled).length,people:[...people.entries()].map(([id,p])=>({id,character:MEADOW_IDS[id],out:time>=p.emergeAt,x:+p.sprite.position.x.toFixed(3),z:+p.sprite.position.z.toFixed(3),height:+p.sprite.scale.y.toFixed(4),arrived:p.settled,home:p.home,walking:!p.arrived})),portal_frames:portalFrames,hal:hubDoors.getState(),screensavers:screensavers.getState(),future:future.getState(),corruption:corruption.getState(),dressing:dressing.getState(),icons:icons.getState(),nearest_future:nearestFuture,dialog:dialogFor?{id:dialogFor,title:dialogParts.title.textContent,status:dialogParts.status.textContent,bar:dialogParts.bar.style.width}:null,portal_visible:visiblePortal,render_width:canvas.width,render_height:canvas.height,audio:blissAudio.getState()};}
  let frameId=0;
  function frame(now:number){frameId=requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.05);last=now;if(document.hidden||!active)return;
   const state=options.read();if(!state.world||(!state.escape&&!intro))return;
@@ -252,32 +276,52 @@ export async function createOutside(options:Options){
   const offset=LEVEL_OFFSET[currentLevel]??0;
   const arrivals=new Set(camp?.roster.filter(p=>p.state==='camp').map(p=>p.id)||[]);
   for(let i=0;i<5;i++)if(escape.saved_people[i]&&natives[i]?.alive)arrivals.add(offset+i);
+  // The newest group (the level you just walked out of; on a load, the latest group cleared) stays near its exit;
+  // every earlier group lives on the hilltop. Only one group out: it stays at its door (after 1, as approved).
+  const localGroup=escape.saved_people.some(Boolean)&&currentLevel in LEVEL_OFFSET?offset/5:-1;
+  const newest=localGroup>=0?localGroup:Math.max(-1,...[...arrivals].map(id=>Math.floor(id/5)));
+  const homeOf=(i:number)=>Math.floor(i/5)===newest?'door' as const:'hill' as const;
+  const reduced=options.stage.classList.contains('reduced-motion');
   for(const i of arrivals){
    const art=i;
    if(!figure(art))continue;// level 4's figures still loading, or not exported yet (OPTIONAL_ART)
    if(!people.has(i)){
     const layout=meadowCampLayout(i),localArrival=i>=offset&&i<offset+5&&!!escape.saved_people[i-offset];
     const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:textures[art]![0],color:0xdddddd,transparent:true,alphaTest:.5}));sprite.scale.set(1.8,1.8,1);sprite.center.set(.5,0);
-    const start=localArrival?layout.origin:layout.target;sprite.position.set(start.x,groundY(start.x,start.z),start.z);scene.add(sprite);
-    const shadow=new THREE.Mesh(blobGeo,blobMat);shadow.renderOrder=5;scene.add(shadow);
-    const emergeAt=localArrival?lastEmerge=Math.max(time,lastEmerge+1.2):0;
-    people.set(i,{sprite,shadow,target:new THREE.Vector3(layout.target.x,0,layout.target.z),moving:localArrival,arrived:!localArrival,arrivedAt:time,emergeAt});
+    const shadow=new THREE.Mesh(blobGeo,blobMat);shadow.renderOrder=5;scene.add(shadow);scene.add(sprite);
+    const emergeAt=localArrival?lastEmerge=Math.max(time,lastEmerge+1.2):0,home=localArrival?'door':homeOf(i);
+    const person:Person={sprite,shadow,target:new THREE.Vector3(layout.target.x,0,layout.target.z),anchor:new THREE.Vector3(layout.target.x,0,layout.target.z),moving:localArrival,arrived:!localArrival,settled:!localArrival,arrivedAt:time,emergeAt,home,restUntil:time+2+(i%5),seed:i*7919+17,speed:.9+(i%5)*.08};
+    people.set(i,person);
+    if(home==='hill'){const spot=wanderSpot(i,person,'hill');person.anchor.set(spot.x,0,spot.z);person.target.copy(person.anchor);}
+    const start=localArrival?layout.origin:person.anchor;sprite.position.set(start.x,groundY(start.x,start.z),start.z);
    }
   }
   for(const [i,p]of people){
-   const before=p.sprite.position.clone(),delta=p.target.clone().sub(before);delta.y=0;
+   const before=p.sprite.position.clone();
    // Still inside, waiting for the one ahead to clear the door.
    const out=time>=p.emergeAt;p.sprite.visible=p.shadow.visible=out;
+   // A later group came out: this one moves up the hill, at once if you're far off, otherwise on foot.
+   const home=homeOf(i);
+   if(home!==p.home&&out){
+    p.home=home;const spot=wanderSpot(i,p,home);p.target.set(spot.x,0,spot.z);
+    if(Math.hypot(pos.x-p.sprite.position.x,pos.z-p.sprite.position.z)>45){p.anchor.copy(p.target);p.sprite.position.set(spot.x,0,spot.z);p.arrived=true;p.arrivedAt=time;}
+    else p.arrived=false;
+   }
+   // Wandering: rest a few seconds, then stroll to another free spot at home.
+   if(p.arrived&&p.settled&&!paused&&!reduced&&time>=p.restUntil){const spot=wanderSpot(i,p,p.home);p.target.set(spot.x,0,spot.z);p.arrived=false;}
    if(!p.arrived&&!paused&&out){
-    if(delta.length()>.08)p.sprite.position.addScaledVector(delta.normalize(),Math.min(dt*1.8,delta.length()));
-    else {p.arrived=true;p.arrivedAt=time;}
+    const delta=p.target.clone().sub(p.sprite.position);delta.y=0;const left=delta.length(),pace=p.settled?p.speed*(left>30?1.4:1):1.8;
+    const step=delta.normalize().multiplyScalar(Math.min(dt*pace,left));
+    // a wanderer never walks into you (waits until you step aside); someone coming out of a door walks on past
+    if(left>.08&&(!p.settled||Math.hypot(pos.x-(p.sprite.position.x+step.x*8),pos.z-(p.sprite.position.z+step.z*8))>.9))p.sprite.position.add(step);
+    else if(left<=.08){p.arrived=p.settled=true;p.arrivedAt=time;p.anchor.copy(p.target);p.restUntil=time+3+rand(p)*6;}
    }
    const idle=meadowHumanIdle(i,time,time-p.arrivedAt);
-   if(p.arrived){p.sprite.position.x=p.target.x+idle.x;p.sprite.position.z=p.target.z+idle.z;}
+   if(p.arrived){p.sprite.position.x=p.anchor.x+idle.x;p.sprite.position.z=p.anchor.z+idle.z;}
    p.sprite.scale.set(idle.width,idle.height,1);
    p.moving=before.distanceTo(p.sprite.position)>.0001;p.sprite.position.y=groundY(p.sprite.position.x,p.sprite.position.z);
    {const sx=p.sprite.position.x+sunAway.x*.18,sz=p.sprite.position.z+sunAway.y*.18;p.shadow.position.set(sx,groundY(sx,sz)+.02,sz);}
-   const toCamera=Math.atan2(pos.x-p.sprite.position.x,pos.z-p.sprite.position.z),facing=p.arrived?Math.atan2(Math.cos((time-p.arrivedAt)*.8+i*1.37)*.36,-Math.sin((time-p.arrivedAt)*.8+i*1.37)*.26):Math.atan2(p.target.x-p.sprite.position.x,p.target.z-p.sprite.position.z),angle=((toCamera-facing)*180/Math.PI+360)%360,rotation=Math.round(angle/45)%8,phase=p.arrived?idle.frame:Math.floor(time*6)%4;(p.sprite.material as THREE.SpriteMaterial).map=textures[i]![phase*8+rotation];
+   const toCamera=Math.atan2(pos.x-p.sprite.position.x,pos.z-p.sprite.position.z),facing=p.arrived?Math.atan2(Math.cos((time-p.arrivedAt)*.8+i*1.37)*.36,-Math.sin((time-p.arrivedAt)*.8+i*1.37)*.26):Math.atan2(p.target.x-p.sprite.position.x,p.target.z-p.sprite.position.z),angle=((toCamera-facing)*180/Math.PI+360)%360,rotation=Math.round(angle/45)%8,phase=p.arrived?idle.frame:Math.floor(time*(p.settled?4.5:6))%4;(p.sprite.material as THREE.SpriteMaterial).map=textures[i]![phase*8+rotation];
   }
   // Only the loaded level's doorway is live (CONTROL's for anything outside the hub);
   // the other shows its still, so it needs no updates.
@@ -297,11 +341,21 @@ export async function createOutside(options:Options){
    // The MCP's face sharpens one step per structure cleared, the factory and the pod farm included.
    const done=(first:number)=>{const group=camp?.roster.filter(p=>p.id>=first&&p.id<first+5)||[];return group.length===5&&group.every(p=>p.state==='camp'||p.state==='lost')?1:0;},cleared=levels+done(10)+done(15);
    future.update(paused?0:dt,time,pos,yaw,reduced,paused,{unresolved,levels:cleared},pitch);
+   // eased on arrival (you walk out into the change), set at once on a load
+   const resolved=[0,5,10,15].map(first=>!!done(first));
+   // (the wake-up walk is always the untouched wallpaper)
+   const stage=corruption.update(paused?0:dt,time,pos,intro?[false,false,false,false]:resolved,!corruptionPrimed||intro,reduced);
+   hubDoors.setCleared(resolved[1],!corruptionPrimed);future.setCleared(resolved[2],resolved[3]);icons.setStage(Math.max(1,resolved.filter(Boolean).length),!corruptionPrimed);dressing.update(paused?0:dt,time,pos,resolved,reduced);corruptionPrimed=true;
+   future.setCorruption(stage,time,reduced);
    icons.update(paused?0:dt,time,pos,velocity,paused);}
   const matching=camp?.roster.filter(p=>p.id>=((nearestDoor?.id==='hal-station')?5:0)&&p.id<((nearestDoor?.id==='hal-station')?10:5))||[];
   replayButton.hidden=!nearestDoor||!matching.some(p=>p.state==='lost');
   hubUi.querySelector('#hub-count')!.textContent=camp?`FREED ${camp.saved}/20 · LOST ${camp.lost} · WORLD p(DOOM) ${camp.worldPdoom}%`:'';
-  el('people').textContent=won?'You made it out':'Fresh air';el('group').textContent=won?`100% survival · ${won} ${won===1?'person':'people'} safe · Take a look back`:`${escape.saved}/${state.world.alive} outside · Waiting for the others`;
+  el('people').textContent=won?'You made it out':'Fresh air';
+  // Nobody came out with you this visit (a Load Game, or back out empty-handed): the last level's escape line would
+  // read as someone missing, so show who's still out there instead (and drop its camera tally).
+  const fresh=won>0||escape.saved>0;el('camera-tally').hidden||=!fresh;
+  el('group').textContent=won?`100% survival · ${won} ${won===1?'person':'people'} safe · Take a look back`:fresh?`${escape.saved}/${state.world.alive} outside · Waiting for the others`:`${Math.max(0,20-(camp?.saved??0)-(camp?.lost??0))} still out there`;
   // Status strips (HAL's, MEG3N's): green per person out of the door, dark per person still inside, grey per person lost
   // (someone at camp with no figure art yet, level 4's, still lights green)
   const light=(id:number):StripLight=>{const p=people.get(id),state=camp?.roster.find(r=>r.id===id)?.state;return p?time>=p.emergeAt?'saved':'inside':state==='lost'?'lost':state==='camp'?'saved':'inside';};
@@ -327,7 +381,9 @@ export async function createOutside(options:Options){
  frameId=requestAnimationFrame(frame);canvas.focus();
  // Camera hook for the grass lab and QA captures (identical fixed views); harmless in play.
  const debug={setView(x:number,z:number,yawValue:number,pitchValue:number,eyeHeight=1.72){pos.set(x,groundY(x,z)+eyeHeight,z);eye=eyeHeight;yaw=yawValue;pitch=pitchValue;},getTime:()=>time,
-  setFuture(value:boolean){future.setVisible(value);icons.setVisible(value);},icons:icons.debug};
+  setFuture(value:boolean){future.setVisible(value);icons.setVisible(value);},icons:icons.debug,
+  // dev mock-ups of the hub's buildings (docs/SAFE-MODE-PROGRESSION.md) add scenery through these
+  scene,THREE,groundY};
  return {key,release,showWin,setActive,startIntro,getState,debug,
   dispose(){active=false;cancelAnimationFrame(frameId);icons.dispose();future.dispose();renderer.dispose();canvas.remove();hubUi.remove();dialog.remove();window.removeEventListener('resize',resize);}
  };

@@ -119,6 +119,9 @@ void main(){
   float edge=max(fq.x,fq.y);
   if(edge<1.2)vis*=smoothstep(0.,.8,edge+(nzL(base*1.3).r-.5)*.6-.1);
   if(vis<=0.){hide();return;}
+  // no grass where the wallpaper has cracked or peeled away (doom-hub-traces.ts)
+  Tron tf=tronField(base,max(0.,log2(d*.0018/.25)));
+  if(tf.peel>.5||tf.crack>.5){hide();return;}
 
   float r=B.w;
   float r2=hash11(r*713.1+1.3),r3=hash11(r*291.7+4.1),r4=hash11(r*937.3+7.7),r5=hash11(r*113.9+2.9),r6=hash11(r*57.3+9.1);
@@ -238,6 +241,9 @@ void main(){
   float hz=atmosHaze(d);
   vGlow=(G_TIP*.26+vec3(.09,.06,0.))*back*t*cs; // sun behind the blades: glowing tips
   vAdd=(sw*conv+atmosLift(d))*(1.-hz)+HAZE*hz;
+  // blades on a trace light up along it, those beside it catch its light at the root; tiles about to fall out flicker
+  float tg=tf.line*tf.glow*(.7+.5*t)+tf.glow*(1.-tf.line)*(1.-t)*.35+tf.loose*.3*tronFlicker(base);
+  vBase*=1.-.75*tf.line;vGlow+=TRON_LINE*tg;vAdd+=TRON_LINE*tf.glow*.5*conv*(1.-hz);
   vK=vec3((1.-conv)*(1.-hz),.53+.40*diffG,(.12+.88*back)*t*own);
   // leaves are lit more and more like the sward they melt into
   vNG=vec4(nG,smoothstep(8.,28.,d));

@@ -66,7 +66,13 @@ export function makeMeadowTerrain():THREE.Mesh {
         // (the gaps only show between near leaves: by ~24 m the ground is the sward the
         // blades there converge on, so blades and ground share one value)
         vec3 col=mix(under,sward,smoothstep(3.,24.,d));
+        // SAFE MODE coming apart (doom-hub-traces.ts): cracks, and peeled patches showing the Grid underneath
+        float fw=max(max(fwidth(p.x),fwidth(p.y)),1e-4);
+        Tron tf=tronField(p,max(0.,log2(fw/.25)));
+        col=mix(col,tronFloor(p,fw*1.5),tf.peel);
+        col=mix(col,TRON_FLOOR,max(tf.crack,tf.line)*.9);
         col=atmosphere(col,d);
+        col+=min(vec3(1.3),TRON_LINE*(tf.glow+tf.crack*.55+tf.loose*.25*tronFlicker(p))+TRON_CORE*tf.line*tf.glow*.4)*(1.-.6*atmosHaze(d));
         gl_FragColor=meadowOut(col);
         #include <colorspace_fragment>
       }`});

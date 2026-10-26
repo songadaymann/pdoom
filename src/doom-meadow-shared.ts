@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {SUN_DIR} from './bliss';
 import {noiseTexture,NOISE_TEX_GLSL} from './doom-meadow-noise';
 import {groundTexture,GROUND_TEX,RELIEF_GLSL} from './doom-meadow-ground';
+import {traceTextures,TRON_GLSL} from './doom-hub-traces';
 
 /** The meadow's wind: from the reference viewpoints (looking north-west at the hill)
  * the blades sweep to the left and slightly toward the camera. The old prototype keeps
@@ -13,12 +14,15 @@ export const MEADOW_WIND=new THREE.Vector2(-.70,.71).normalize();
 export type MeadowUniforms={
   uTime:{value:number};uGuidePath:{value:number};uCam:{value:THREE.Vector3};uWind:{value:THREE.Vector2};uSun:{value:THREE.Vector3};
   uNoise:{value:THREE.Texture};uGround:{value:THREE.Texture};uToys:{value:THREE.Vector4[]};
+  // SAFE MODE coming apart, one stage per level cleared (doom-hub-traces.ts)
+  uTraceA:{value:THREE.Texture};uTraceB:{value:THREE.Texture};uCleared:{value:THREE.Vector4};uCorrupt:{value:number};uDusk:{value:number};uTronMotion:{value:number};
 };
 let uniforms:MeadowUniforms|null=null;
 
 export function meadowUniforms():MeadowUniforms {
-  if(!uniforms)uniforms={uTime:{value:0},uGuidePath:{value:0},uCam:{value:new THREE.Vector3()},uWind:{value:MEADOW_WIND.clone()},uSun:{value:SUN_DIR.clone()},
-    uNoise:{value:noiseTexture()},uGround:{value:groundTexture()},uToys:{value:Array.from({length:9},()=>new THREE.Vector4(0,0,0,0))}};
+  if(!uniforms){const traces=traceTextures();uniforms={uTime:{value:0},uGuidePath:{value:0},uCam:{value:new THREE.Vector3()},uWind:{value:MEADOW_WIND.clone()},uSun:{value:SUN_DIR.clone()},
+    uNoise:{value:noiseTexture()},uGround:{value:groundTexture()},uToys:{value:Array.from({length:9},()=>new THREE.Vector4(0,0,0,0))},
+    uTraceA:{value:traces.a},uTraceB:{value:traces.b},uCleared:{value:new THREE.Vector4()},uCorrupt:{value:0},uDusk:{value:0},uTronMotion:{value:1}};}
   return uniforms;
 }
 
@@ -109,7 +113,8 @@ float cloudShadow(vec2 p){
   float c=nzL(q/140.).a*.75+nzL(q/52.+vec2(3.1,7.7)).r*.25;
   return 1.-.09*smoothstep(.50,.66,c);
 }
-`;
+`+TRON_GLSL;
 
 /** Display-space colour -> what the framebuffer expects (pairs with <colorspace_fragment>). */
-export const OUT_GLSL=/* glsl */`vec4 meadowOut(vec3 c){return vec4(pow(max(c,vec3(0.)),vec3(2.2)),1.);}`;
+// uDusk: after the fourth level the wallpaper's light drains toward a cold dusk (the Grid's glow stays bright).
+export const OUT_GLSL=/* glsl */`uniform float uDusk;vec4 meadowOut(vec3 c){c*=mix(vec3(1.),vec3(.70,.74,.92),uDusk);return vec4(pow(max(c,vec3(0.)),vec3(2.2)),1.);}`;

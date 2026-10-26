@@ -4,10 +4,10 @@ export const TOY_SIZE=1.8,TOY_DEPTH=.34;
 
 /** Opaque pixel faces and exposed, shaded edges. The collision hull is deliberately
  * simpler than the drawing: one convex silhouette, not a collider for every pixel. */
-export function makeIconToy(draw:(g:CanvasRenderingContext2D)=>void){
+export function makeIconToy(draw:(g:CanvasRenderingContext2D)=>void,scale=1){
  const canvas=document.createElement('canvas');canvas.width=canvas.height=32;
  const g=canvas.getContext('2d')!;draw(g);
- const pixels=g.getImageData(0,0,32,32).data,step=TOY_SIZE/32;
+ const pixels=g.getImageData(0,0,32,32).data,step=TOY_SIZE*scale/32;
  const occupied=(x:number,y:number)=>x>=0&&x<32&&y>=0&&y<32&&pixels[(y*32+x)*4+3]>=128;
  const positions:number[]=[],colors:number[]=[],hull:number[]=[];
  const colour=new THREE.Color();
@@ -17,7 +17,7 @@ export function makeIconToy(draw:(g:CanvasRenderingContext2D)=>void){
  }
  for(let y=0;y<32;y++)for(let x=0;x<32;x++){
   if(!occupied(x,y))continue;
-  const k=(y*32+x)*4,x0=(x-16)*step,x1=x0+step,y1=(16-y)*step,y0=y1-step,z=TOY_DEPTH/2;
+  const k=(y*32+x)*4,x0=(x-16)*step,x1=x0+step,y1=(16-y)*step,y0=y1-step,z=TOY_DEPTH*scale/2;
   colour.setRGB(pixels[k]/255,pixels[k+1]/255,pixels[k+2]/255,THREE.SRGBColorSpace);
   face([[x0,y0,z],[x1,y0,z],[x1,y1,z],[x0,y1,z]],1);
   // Pixel colours continue on the back as well.

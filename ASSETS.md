@@ -12,6 +12,14 @@ created for this project on 2026-10-14 and 2026-10-15. The media is CC BY 4.0,
 attributed to Jonathan Mann. The artwork is drawn in code; no operating-system icon
 bitmaps or product artwork were imported for these toys. Product names label the toys.
 
+The SAFE MODE progression art added on 2026-10-23 is original, drawn in code, and CC BY 4.0,
+attributed to Jonathan Mann. That covers:
+- the 30 detritus drawings in `src/doom-desktop-detritus.ts`: generic old computers, disks, game
+  gadgets and dialogs, with no company logo, name, icon or product sound;
+- the building dressings in `src/doom-hub-dressing.ts`: the title bars, monitor feeds, the .SYS
+  page and gear, the media player and filmstrip, and the suited agents;
+- the Tron traces, cracks and Grid in `src/doom-hub-traces.ts` and the meadow shaders.
+
 The favicon in `doom-web/favicon.svg` is original vector artwork created for this project
 on 2026-10-15: a cream italic p and red parentheses on black. It uses paths rather than
 a font or third-party image and is CC BY 4.0, attributed to Jonathan Mann.

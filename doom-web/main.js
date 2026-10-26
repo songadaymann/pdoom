@@ -46,14 +46,18 @@ const realStorage=browserStorage(),CEO_CHOICE=resolveCeo({search:location.search
 // Loopback development fixture only: pretend levels 1 and 2 were cleared (ten saved),
 // out of HAL's door (add &level=five-prisons to come out of the bunker instead). It plays from an
 // in-memory save, so a real save in this browser is left alone; the menu's own Load Game hand-off launches it.
+// &after=N (1-4) previews SAFE MODE after N levels instead (docs/SAFE-MODE-PROGRESSION.md); after 2 comes out of
+// HAL's door, the others out of the bunker's.
 const SAFE_MODE=CHECKPOINT&&new URLSearchParams(location.search).get('safemode')==='1'&&await localDevelopmentEnabled();
+const SAFE_MODE_AFTER=Math.min(4,Math.max(1,Number(new URLSearchParams(location.search).get('after'))||2));
 function campaignSandbox(storage,ceo){
- let save=JSON.stringify({version:1,ceo:['altman','amodei'].includes(ceo)?ceo:'altman',hub:true,saved0:31,saved1:31,lost0:0,lost1:0,following0:0,following1:0}),openingComplete='1';
+ const groups=Object.fromEntries([0,1,2,3].flatMap(i=>[['saved'+i,i<SAFE_MODE_AFTER?31:0],['lost'+i,0],['following'+i,0]]));
+ let save=JSON.stringify({version:1,ceo:['altman','amodei'].includes(ceo)?ceo:'altman',hub:true,...groups}),openingComplete='1';
  return {getItem:k=>k===CAMPAIGN_KEY?save:k===OPENING_COMPLETE_KEY?openingComplete:storage?.getItem(k)??null,setItem:(k,v)=>{if(k===CAMPAIGN_KEY)save=String(v);else if(k===OPENING_COMPLETE_KEY)openingComplete=String(v);else storage?.setItem(k,v);},removeItem:k=>{if(k===CAMPAIGN_KEY)save=null;else if(k===OPENING_COMPLETE_KEY)openingComplete=null;else storage?.removeItem(k);}};
 }
 const ceoStorage=SAFE_MODE?campaignSandbox(realStorage,CEO_CHOICE.id):realStorage;
 if(SAFE_MODE){
- const u=new URL(location.href);u.searchParams.set('play','1');u.searchParams.set('load','1');if(!u.searchParams.get('level'))u.searchParams.set('level','hal-station');history.replaceState(null,'',u);
+ const u=new URL(location.href);u.searchParams.set('play','1');u.searchParams.set('load','1');if(!u.searchParams.get('level'))u.searchParams.set('level',SAFE_MODE_AFTER===2?'hal-station':'five-prisons');history.replaceState(null,'',u);
  // no title click to unlock sound: the first click or key does it
  for(const type of ['pointerdown','keydown'])window.addEventListener(type,()=>audio.unlock(),{once:true,capture:true});
 }

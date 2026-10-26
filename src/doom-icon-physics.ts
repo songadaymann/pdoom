@@ -46,7 +46,7 @@ export async function makeIconPhysics(specs:ToySpec[],obstacles:IconObstacle[]){
    if(disposed)return;
    const speed=Math.hypot(velocity.x,velocity.z),foot={x:player.x,y:groundY(player.x,player.z)+.4,z:player.z};
    if(speed>.15)for(const t of toys){
-    if(elapsed-t.lastKick<.38)continue;
+    if(elapsed-t.lastKick<.38||!t.body.isEnabled())continue;
     const p=t.body.translation(),dx=p.x-player.x,dz=p.z-player.z,d=Math.hypot(dx,dz);
     if(d>1.8)continue;
     const contact=t.collider.projectPoint(foot,true);if(!contact)continue;
