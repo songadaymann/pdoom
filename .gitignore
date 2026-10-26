@@ -48,3 +48,4 @@ docs/spec/maps/
 __pycache__/
 *.pyc
 *.lmp
+doom-web/endgame-proto/

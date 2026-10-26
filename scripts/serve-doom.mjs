@@ -21,7 +21,7 @@ http.createServer(async(req,res)=>{
       res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});
       res.end(req.method==='HEAD'?undefined:body);return;
     }
-    const file=path.resolve(root,'.'+(requested==='/'?'/index.html':requested));
+    const file=path.resolve(root,'.'+(requested.endsWith('/')?requested+'index.html':requested));
     if(!file.startsWith(root)){res.writeHead(403);res.end();return;}
     const info=await stat(file);if(!info.isFile())throw Error('Not a file');
     const headers={'Content-Type':types[path.extname(file)]||'application/octet-stream','Content-Length':info.size,'Cache-Control':'no-store, no-transform','X-Content-Type-Options':'nosniff','Accept-Ranges':'bytes'};

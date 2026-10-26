@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>p(DOOM) endgame prototype</title>
+<style>
+:root{--line:#38f4ff;--core:#d8fdff;--bg:#02060a;--enemy:#ff3b1f;--enemy-core:#ffd2a0}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:"Courier New",monospace;color:var(--core)}
+canvas{display:block;width:100vw;height:100vh;cursor:crosshair;outline:none}
+#hud{position:fixed;inset:0;pointer-events:none}
+#modes{position:fixed;top:10px;left:12px;font-size:12px;letter-spacing:.08em;pointer-events:auto}
+#modes a{color:#5f8f99;text-decoration:none;margin-right:12px}
+#modes a.on{color:var(--line);text-shadow:0 0 8px var(--line)}
+#keys{position:fixed;top:28px;left:12px;font-size:11px;color:#4d7480}
+#boss{position:fixed;top:14px;left:50%;transform:translateX(-50%);width:min(520px,60vw);text-align:center;font-size:12px;letter-spacing:.2em;color:var(--enemy-core)}
+#boss .track{height:8px;border:1px solid var(--enemy);margin-top:4px;box-shadow:0 0 10px var(--enemy)}
+#boss-fill{height:100%;width:100%;background:var(--enemy);box-shadow:0 0 12px var(--enemy)}
+#caption{position:fixed;top:58px;left:50%;transform:translateX(-50%);width:min(900px,86vw);text-align:center;font-size:22px;font-weight:900;color:var(--enemy-core);text-shadow:0 0 12px var(--enemy),0 0 2px #fff;letter-spacing:.06em}
+#toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);width:max-content;max-width:min(720px,86vw);text-align:center;font-size:16px;line-height:1.35;background:rgba(2,8,12,.72);padding:8px 14px;border:1px solid rgba(56,244,255,.35)}
+#toast b{color:var(--line)}
+#hint{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);width:max-content;max-width:90vw;font-size:14px;color:#9fdcea;text-align:center;letter-spacing:.04em}
+#reticle{position:fixed;left:50%;top:50%;width:18px;height:18px;margin:-10px 0 0 -10px;border:1px solid rgba(216,253,255,.6);border-radius:50%;box-shadow:0 0 6px var(--line);transition:transform .08s}
+#reticle.hot{border-color:#fff;box-shadow:0 0 14px #fff,0 0 4px var(--line);transform:scale(1.6)}
+#reticle::after{content:'';position:absolute;left:8px;top:8px;width:2px;height:2px;background:var(--core)}
+#pop{position:fixed;left:50%;top:calc(50% + 28px);transform:translateX(-50%);font-weight:900;font-size:18px;text-shadow:0 0 10px currentColor;white-space:nowrap}
+#pop.go{animation:pop .7s ease-out forwards}
+@keyframes pop{from{transform:translateX(-50%) scale(1.5);opacity:1}to{transform:translateX(-50%) translateY(-18px) scale(1);opacity:0}}
+#health{position:fixed;left:16px;bottom:18px;width:160px;font-size:11px;letter-spacing:.2em;color:var(--line)}
+#health .track{height:6px;border:1px solid var(--line);margin-top:4px}
+#health-fill{height:100%;width:100%;background:var(--line)}
+#vignette{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(255,40,20,.55));opacity:0}
+#down{position:fixed;top:40%;width:100%;text-align:center;font-size:26px;color:var(--line);text-shadow:0 0 12px var(--line)}
+#start,#loading{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(2,6,10,.84);pointer-events:auto;cursor:pointer;text-align:center;padding:16px;box-sizing:border-box}
+#start h1{font-size:28px;color:var(--line);text-shadow:0 0 14px var(--line);margin:0 0 12px;letter-spacing:.12em}
+#start p{max-width:580px;color:#9fdcea;line-height:1.5;margin:4px 0}
+#start .go{margin-top:18px;color:var(--core);letter-spacing:.2em}
+#loading{cursor:default;color:var(--line);letter-spacing:.2em}
+#dialog{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,92vw);background:#c0c0c0;color:#000;font:13px/1.4 Tahoma,"MS Sans Serif",Arial,sans-serif;border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:1px 1px 0 #000;pointer-events:auto}
+#dialog .bar{background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;padding:3px 6px}
+#dialog .body{display:flex;gap:14px;padding:16px 14px;align-items:flex-start}
+#dialog .x{width:32px;height:32px;border-radius:50%;background:#e00;color:#fff;font-weight:bold;display:flex;align-items:center;justify-content:center;flex:none;border:1px solid #800}
+#dialog .btns{display:flex;justify-content:flex-end;gap:8px;padding:0 14px 14px}
+#dialog button{min-width:86px;background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff;font:inherit;padding:3px 8px;cursor:pointer}
+#dialog-more{margin:0 14px 14px;padding:6px 8px;background:#fff;border:2px solid;border-color:#404040 #fff #fff #404040;font-family:"Courier New",monospace}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<canvas id="view" tabindex="0"></canvas>
+<div id="hud">
+ <div id="modes"><a data-m="ricochet" href="?m=ricochet">A RICOCHET</a><a data-m="tennis" href="?m=tennis">B TENNIS</a><a data-m="volley" href="?m=volley">C VOLLEY</a><a data-m="boss" href="?m=boss">THE BOSS</a><a href="./">ABOUT</a></div>
+ <div id="keys">WASD move · Shift run · click throw · N skip ahead · R restart · M mute · THE BOSS: 1 2 3 jump to a part, T tunes the trick shot</div>
+ <div id="boss" hidden>MCP — MUSK CONTROL PROGRAM<div class="track"><div id="boss-fill"></div></div></div>
+ <div id="caption" hidden></div>
+ <div id="reticle"></div>
+ <div id="pop" hidden></div>
+ <div id="toast" hidden></div>
+ <div id="hint" hidden></div>
+ <div id="health">INTEGRITY<div class="track"><div id="health-fill"></div></div></div>
+ <div id="vignette"></div>
+ <div id="down" hidden>DEREZZED. REBUILDING…</div>
+ <div id="start"><h1 id="mode-title"></h1><p id="mode-blurb"></p><p class="go">CLICK TO PLAY</p></div>
+ <div id="dialog" hidden>
+  <div class="bar">MCP.EXE</div>
+  <div class="body"><div class="x">✕</div><div>This program has performed an illegal operation and will be shut down.</div></div>
+  <div id="dialog-more" hidden>p(DOOM): 0%.</div>
+  <div class="btns"><button id="dialog-close" type="button">Close</button><button id="dialog-details" type="button">Details &gt;&gt;</button></div>
+ </div>
+ <div id="loading">LOADING THE GRID…</div>
+</div>
+<script type="module" src="./proto.js"></script>
+</body>
+</html>
