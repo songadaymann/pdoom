@@ -185,6 +185,11 @@ export function makeSfx(){
   whistle(){tone(2100,1.6,'sine',.05,-1500);},
   boom(){tone(45,1.6,'sine',.6,-15);noise(1.4,.45,180,.5);for(let i=0;i<5;i++)noise(.3,.2,400+i*300,.8,0,.25*i);},
   spot(){tone(990,.08,'square',.05);tone(1320,.1,'square',.05,0,.09);},
+  bark(){tone(780,.07,'square',.08,-260);tone(640,.09,'square',.07,-200,.11);},
+  zap(){noise(.07,.1,4200,3);tone(2600+Math.random()*2200,.05,'sawtooth',.025,-1500);},
+  pulse(){tone(70,1.1,'sawtooth',.3,160);noise(.9,.3,500,.6,2600);},
+  grok(){tone(660,.07,'sine',.07);tone(990,.09,'sine',.06,0,.08);},
+  tick(){tone(1760,.05,'square',.04);},
  };
  return {ensure,play,toggle(){muted=!muted;if(master)master.gain.value=muted?0:.55;return muted;},get muted(){return muted;}};
 }

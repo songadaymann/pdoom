@@ -23,6 +23,7 @@ export async function loadCast(guide:'mario'|'samwise'){
 export class Person{
  sprite:THREE.Sprite;ring:THREE.Mesh;pos=new THREE.Vector3();target=new THREE.Vector3();dodge=new THREE.Vector3();dodgeUntil=0;dodgeAt=-1;pendingDodge=new THREE.Vector3();
  facing=Math.PI;moving=false;down=0;hasDisc=true;nextThrow=rand(3,9);reaction=rand(.3,.9);hop=0;isPlayer=false;
+ override:THREE.Vector3|null=null;overrideUntil=0;// somewhere to be instead of the formation (cover from the update)
  constructor(scene:THREE.Scene,public index:number,public id:string,public name:string,private frames:(THREE.Texture|null)[],public guide=false,private idle:(THREE.Texture|null)[]=[]){
   this.sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:frames[0],color:guide?0xd8e4e8:0xa9cbd4,transparent:true,alphaTest:.5}));
   this.sprite.center.set(.5,0);this.sprite.scale.set(1.8,1.8,1);scene.add(this.sprite);
@@ -45,7 +46,7 @@ export class Person{
   if(this.dodgeAt>=0&&t>=this.dodgeAt){this.dodge.copy(this.pendingDodge);this.dodgeUntil=t+2.6;this.dodgeAt=-1;}
   if(t>this.dodgeUntil)this.dodge.multiplyScalar(Math.exp(-dt*2));
   this.down=Math.max(0,this.down-dt);this.hop=Math.max(0,this.hop-dt);
-  const goal=this.target.clone().add(this.dodge),to=goal.sub(this.pos);to.y=0;const dist=to.length();
+  const goal=this.override&&t<this.overrideUntil?this.override.clone():this.target.clone().add(this.dodge),to=goal.sub(this.pos);to.y=0;const dist=to.length();
   this.moving=false;
   if(this.down<=0&&dist>.25){const speed=(this.guide?8.5:5.5)*(dist>6?1.4:1);this.pos.addScaledVector(to.normalize(),Math.min(dist,speed*dt));this.facing=Math.atan2(to.x,to.z);this.moving=true;}
   else if(this.down<=0)this.facing=Math.atan2(look.x-this.pos.x,look.z-this.pos.z);

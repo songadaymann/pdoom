@@ -13,6 +13,7 @@ export class Recognizer{
  group=new THREE.Group();core:THREE.Mesh;coreGlow:THREE.Sprite;shadow=new THREE.Group();shadowFill:THREE.MeshBasicMaterial;shadowRing:THREE.MeshBasicMaterial;
  state:'enter'|'hunt'|'telegraph'|'slam'|'ground'|'rise'|'hover'|'charge'='enter';t=0;hp=3;alive=true;
  target:()=>THREE.Vector3;lockAt=new THREE.Vector3();vel=new THREE.Vector3();heading=0;flash=0;fireCd=2.2;orbit=0;telegraphFor=1.7;
+ orbitR=18;orbitY=9.5;orbitDir=1;refire=3.2;// 'bolt': how far off, how high, which way round, how often
  boxes:Box[]=[];lineMats:THREE.LineBasicMaterial[]=[];
  constructor(scene:THREE.Scene,public style:'slam'|'bolt',from:THREE.Vector3,target:()=>THREE.Vector3,hp=3){
   this.target=target;this.hp=hp;
@@ -65,13 +66,14 @@ export class Recognizer{
    if(d>.01){p.x+=dx/d*step;p.z+=dz/d*step;this.face(dx,dz,dt);}p.y+=(y-p.y)*Math.min(1,dt*2);return d;
   };
   if(this.style==='bolt'){
-   // Keep 18 m off, drift round you, face you, charge and fire.
+   // Keep orbitR off (18 m), drift round you, face you, charge and fire; stay clear of the column and inside the wall.
    const away=new THREE.Vector2(p.x-player.x,p.z-player.z);if(away.lengthSq()<.01)away.set(0,1);away.normalize();
-   this.orbit+=dt*.14;const a=Math.atan2(away.y,away.x)+dt*.14,tx=player.x+Math.cos(a)*18,tz=player.z+Math.sin(a)*18;
-   const speed=this.state==='enter'?16:5;flyTo(tx,9.5,tz,speed);this.face(player.x-p.x,player.z-p.z,dt,5);
+   this.orbit+=dt*.14;const a=Math.atan2(away.y,away.x)+dt*.14*this.orbitDir;let tx=player.x+Math.cos(a)*this.orbitR,tz=player.z+Math.sin(a)*this.orbitR;
+   const tr=Math.hypot(tx,tz),fit=tr<15?15/tr:tr>42?42/tr:1;tx*=fit;tz*=fit;
+   const speed=this.state==='enter'?16:5;flyTo(tx,this.orbitY,tz,speed);this.face(player.x-p.x,player.z-p.z,dt,5);
    if(this.state==='enter'&&Math.hypot(p.x-tx,p.z-tz)<3){this.state='hover';this.t=0;}
    if(this.state==='hover'){this.fireCd-=dt;if(this.fireCd<=0){this.state='charge';this.t=0;}}
-   if(this.state==='charge'&&this.t>=.8){this.state='hover';this.t=0;this.fireCd=3.2;ev.fire(this,this.corePos());}
+   if(this.state==='charge'&&this.t>=.8){this.state='hover';this.t=0;this.fireCd=this.refire;ev.fire(this,this.corePos());}
    return;
   }
   switch(this.state){

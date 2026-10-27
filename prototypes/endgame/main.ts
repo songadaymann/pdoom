@@ -52,7 +52,7 @@ const BLURBS:Record<string,string>={
  ricochet:'One disc, yours. It bounces off pillars, the wall and the shield, then flies back to your hand. No second throw until you catch it.',
  tennis:'The MCP can only shoot through its own gap. Click as the shot reaches you to hit it back. Rallies speed up and hit harder.',
  volley:'The twenty stand on your side of the ring and throw when you throw. You choose where to stand and when to call it.',
- boss:'All three. The ships shoot: hit their shots back. Then the shield drops: dodge, and hit the glowing bits with everyone. Then bank one perfect throw round the room, riding the disc in. Keys 1, 2, 3 jump to each part; T tunes the trick shot.',
+ boss:'The fight, redesigned. Hit the ships\' shots back, then the whole fleet comes and everyone swings. Then the shield drops: throw at the glowing bits with everyone while Elon attacks (Grok warns you first). Then he launches for Mars: bank one throw round the room from wherever you stand. Keys 1, 2, 3 jump to each part; T tunes the trick shot.',
 };
 const params=new URLSearchParams(location.search);
 const mode=MODES[params.get('m')||'ricochet']||ricochet;

@@ -14,11 +14,11 @@
 | Discs | Appear in every hand during the arena intro | The guide gives them | The guide hands you yours at the door ("Take this", like the wrench); everyone gets one |
 | Practice | None | Recognizers on the walk | Three short Recognizer encounters on the walk |
 | The other founder | Absent; held inside the MCP as tenant or acquisition, tumbles out at the end | Reappears for a "real last stand" | Walks you there and fights beside you, unkillable, as in the prologue's Last Stand (Q5) |
-| Disc model | Everyone throws when you throw, through a rotating shield gap | "maybe more like tennis", then (2026-10-23) "ALL 3!!" | **Decided: one fight in three parts** ([The fight](#the-fight-all-three-models)) |
+| Disc model | Everyone throws when you throw, through a rotating shield gap | "maybe more like tennis", then (2026-10-23) "ALL 3!!" | **Decided: one fight in three parts**, redesigned 2026-10-26 to escalate ([The fight](#the-fight-three-parts-that-escalate)) |
 
 ## Beat sheet
 
-About 10–12 minutes from the exit to the credits without the maze (the spec's version was 18–23 with it).
+About 12–14 minutes from the exit to the credits without the maze (the spec's version was 18–23 with it).
 
 | # | Beat | Time | What happens |
 | --- | --- | --- | --- |
@@ -29,22 +29,80 @@ About 10–12 minutes from the exit to the credits without the maze (the spec's 
 | E4 | **The walk** | ~2.5–3 min | About 900 m at the hub's walk pace (6 m/s once two levels are cleared). Past the old boundary the wallpaper ends: the grass thins out into black floor with a cyan grid, the Bliss sky darkens to void behind the tower, and the tower grows. The guide never stops walking (the wake-up walk's rule). Three practice beats, one new thing each: **P1** one Recognizer drops on a shadow; step out of it, then hit the glowing core. **P2** two Recognizers; the second disc rule (whichever model wins: a bank shot, a return, or the crowd throwing with you). **P3** a squadron of three crosses the route; fight it or walk under. Nobody can die on the walk: a stomp knocks people down and they get up. The MCP taunts across the sky about every 30 s. |
 | E5 | **The tower door** | ~15 s | The base of the column opens. "This is the last stand. The real one, this time." Everyone walks in. (If Q2 keeps the maze, it is here: the tower's ground floor.) |
 | E6 | **Arena intro** | ~25 s | The spec's intro, shortened: everyone rezzes in at the I/O tower, the column lights, the shield ring spins up. `GREETINGS, PROGRAMS. EVERYTHING HERE IS CALLED X NOW.` A new opener addresses both founders, since both are here. |
-| E7 | **The fight** | ~4–6 min | Three parts, one per disc model ([below](#the-fight-all-three-models)): the ships, the shield down, the trick shot. The other founder fights at your right shoulder and can't be killed, the same rule as the Last Stand. Nobody dies inside the computer: a downed human is absorbed and the next good throw frees them. |
-| E8 | **LAUNCH and the beam** (open, Q10) | ~45 s | As spec §4.5: the engines light, it lifts toward Mars, "Somebody has to go into the beam!" You walk in (or after 15 s he does). The shield shatters and every survivor throws their own signature prop with a name tag. `RAPID UNSCHEDULED DISASSEMBLY.` Then the `MCP.EXE` illegal-operation dialog, Details: `p(DOOM): 0%.` |
+| E7 | **The fight** | ~6–8 min | Three parts ([below](#the-fight-three-parts-that-escalate)): the Fleet, the Face, the Last Throw (LAUNCH). The other founder fights at your right shoulder and can't be killed, the same rule as the Last Stand. A downed human can be carried off and absorbed, and a hit on the face beside them frees them. You can die, which restarts the part. |
+| E8 | **The victory volley** | ~20 s | The shield shatters and every survivor throws their own signature prop at the falling column, with a name tag (spec §4.5's beat). Then the `MCP.EXE` illegal-operation dialog, Details: `p(DOOM): 0%.` The walk into the beam is dropped (Q10). |
 | E9 | **Dawn** | ~1.5 min | Spec §8.4: the Bliss crest at dawn, people step out one at a time with a "Copying…" chime, the world p(DOOM) rolls to 0% for the first time. The thank-yous from camp night move here (Q4). Each CEO's habit beat (Sam drafts a post, Dario opens a 212-page Notepad file). Last shot: both founders on the crest, an awkward nod. |
 | E10 | **Credits** | 2–3 min | Spec §4.7, the Windows 95 credits homage over the clouds. |
 
 **Who owns what.** The hub lane (session `safe-mode-progression`) owns the hill's "after 4" look, the tower as scenery from the meadow, the face's download steps, and where rescued people stand. This lane owns E0–E10: the guide scene, the discs, the march, the walk past the edge (the Grid floor beyond the boundary is part of the walk, built as its own module and agreed with the hub lane), the tower and the fight. Code goes in new `src/doom-endgame-*.ts` modules with one narrow hook into `src/doom-outside.ts`, agreed with the hub lane first.
 
-## The fight: all three models
+## The fight: three parts that escalate
 
-Jonathan, 2026-10-23: "ALL 3!! WE design a boss fight that incorporates all 3!" The order is his. It's playable as THE BOSS in the prototypes, where keys 1, 2 and 3 jump to each part.
+Jonathan, 2026-10-23: "ALL 3!! WE design a boss fight that incorporates all 3!" The order is his: tennis first, then the crowd volley with the shield down, then the trick shot. That version is playable as THE BOSS in the prototypes (below).
 
-| Part | Model | What happens |
-| --- | --- | --- |
-| **1. Ships** | B, tennis | Recognizers come one at a time, then two at once, then three: six in all (you said five; 1, 2, 2 would make five). They hang back and shoot. Click as a shot flashes white in front of you to send it back into the ship. A perfect return homes hard; a good one may miss. Two returns down a ship. The shield stays shut and spins slowly. (Swapped on 2026-10-23: "the tennis should be 1 and then 2 should be the volley when the shield is down.") |
-| **2. Shield down** | C, the crowd volley | `END OF THREAD.` The ring sinks into the pit. It fires glowing shots at you and the crowd, and you dodge them; the crowd steps aside on their own. Glowing bits light up at points on the face, three at a time, each for six seconds. Aim at one and everyone throws at it with you: 50 for your disc, 10 for each of theirs. This takes the MCP from 1000 to 300. |
-| **3. The trick shot** | A, ricochet | The ring rises again with one window open round the back, and the face glows just beyond it. Five numbered marks glow round the room: wall, pillar, wall, pillar, wall. Throw at mark 1 and the camera rides the disc. Time slows to a fifth as it nears each mark, and you steer it in with the mouse (or WASD). A faint line shows where it's heading and turns white when it's on the mark. Each mark sends it on toward the next, a few degrees off, so every leg needs a nudge. The fifth sends it at the window. Hit anything else and it's a miss: the marks reset and you throw again. Through the window, it's over. The crowd gathers behind you so the marks stay in view. Press T for a tuning panel (disc speed, how strong and how early the slow motion is, steering, mark size, how far off course each mark sends it, the camera). Changes apply live and stay in that browser, and Copy numbers gives them back to put in the game. |
+**Redesign, 2026-10-26, not built yet.** Jonathan, on playing it: "it's right in terms of the mechanics but it doesn't feel scary or overwhelming in any way, and it lacks personality." The parts and their order stay. What changes:
+
+- Each part escalates past what one person can handle.
+- Every attack comes from Elon's own world (Tesla, SpaceX, Starlink, Dogecoin, Grok, the Cybertruck, Optimus).
+- His own AI, Grok, warns you before each attack.
+- Losing now costs something.
+
+Every line and every sprite to generate is in the hand-off doc [p(DOOM) Boss Fight: Lines and Sprites](https://claude.ai/artifact/U4UfWT5tpVrGRCy66HAqfm). All numbers below are starting points for tuning.
+
+**Rules for the whole fight.**
+
+- **Colour is the tell.** Everything Elon sends at you glows red-orange (`#ff3b1f`), and everything on your side glows cyan. A ball you hit back turns cyan.
+- **You can die.** Integrity is 100. At 0, `ACCOUNT SUSPENDED.`, and the current part restarts with its absorbed people restored.
+- **People can be taken.** A knocked-down person stays down for 3 s. An Optimus robot walks out of the pit to collect them (at most two at once), and one disc hit makes it drop them. If it reaches the pit, they're absorbed: their face appears in one of the column's facets and they stop throwing. Hitting the face spot beside them drops them free.
+- **The guide fights at your shoulder** and can't die, as before.
+
+### Part 1: the Fleet (tennis)
+
+| Beat | What happens |
+| --- | --- |
+| **Serve** | One Recognizer, then two at once. They hang back and shoot energy balls. Click as a ball flashes white in front of you to send it back. A perfect return homes hard; a good one may miss. **Three hits down a ship** (was two). Only you can return. |
+| **The swarm** | `OK. NOW DO IT WITH ALL OF THEM.` Fifteen more ships pour over the rim, up to ten alive at once. They circle at mixed heights and fire at everyone, from every side and from behind. Red chevrons at the screen edge show balls coming from off-screen. The guide shouts `end-fleet` ("Everybody! Hit the balls back!"), and from then on every prisoner swats the balls aimed at them. Each return has a 65% chance and counts as one hit on the ship that fired it; a miss knocks them down, and the robots come. The arena lights dim, and the music and the shouting rise. |
+| **End** | All 18 ships are down (about 90–120 s), and `FINE. I'LL DO IT MYSELF.` The shield sinks. |
+
+### Part 2: the Face (crowd volley plus his attacks)
+
+The shield is down, and part 2 runs on a rhythm: survive his attack, then strike. After each attack the face opens for 5–6 s and up to three glowing spots light in turn. Aim at one and everyone throws with you: 25 for your disc and 5 for each of theirs. A spot holds 45. This takes the MCP from 1000 to 300 over five or more cycles. The face also opens once before the first attack, so you learn the volley first.
+
+Tuned on 2026-10-26: at the old 50 and 10 with spots always lit, the volley took the MCP to 300 in about 20 s, and Elon got one attack in.
+
+His attacks come on a cycle, and Grok's chat bubble warns you about 2 s before each one:
+
+| Attack | His world | The tell | What you do | What it does |
+| --- | --- | --- | --- | --- |
+| **Over-the-air update** | Tesla's over-the-air updates; Tesla coils | Arcs crawl up coils at the column's base for 3 s. A progress bar in the sky climbs to 100%, and a safe wedge glows on the floor behind each pillar ("no signal"). | Get behind a pillar. The crowd runs for cover too, and the slow ones don't make it. | A ring pulse sweeps the whole floor: 30 damage, a knockdown and 1 s of screen static. |
+| **Starlink** | SpaceX's satellite trains | A train of lights streams up from the crown and spreads into a grid over the arena. Red dots land on everyone. | Hit your ball back as it flashes, or step off your dot. | 20–30 balls at once from above, 15 damage each. A returned ball knocks out a satellite. |
+| **Doges** | Dogecoin | Barking from the pit, then MUCH WOW and VERY ATTACK floating over a pack of Shiba Inus | Bonk one with a disc and it rockets off to the moon. They also chase any disc in flight, so every volley drags the pack around. | Packs of 6, later 10. A tackle knocks someone down and steals their disc for 8 s, which weakens the volley. |
+| **Cybertruck** (below 550) | The Cybertruck and its armour-glass demo | A red lane lights across the floor for 2 s while the truck revs at one end | Step out of the lane. A disc cracks its window: `...ROOM FOR IMPROVEMENT.` | It charges down the lane: 40 damage and a knockdown. |
+| **Sinks** (below 550) | `LET THAT SINK IN.` | Shadows on the floor and a falling whistle, 2 s (kept from spec 05) | Step out of the shadow. | 25 damage. The sinks stay as cover for 10 s. |
+
+**The attacks speed up as his integrity falls.**
+
+- **The first three** always come in order (update, Starlink, doges), so everyone meets each one. After the first doge pack, Elon tells Grok to roast you, and Grok compliments you instead.
+- **Above 550:** one attack at a time, about every 13 s, the face open for 6 s. The face is smug, then annoyed after `EXTREMELY HARDCORE` (800).
+- **550–300:** `I'M POSTING THROUGH IT`. Attacks come two at a time, about every 12 s with the face open for 5 s (doges with an update, Starlink with sinks), and the Cybertruck joins (not built yet). The face is furious.
+
+### Part 3: the Last Throw (the trick shot is now LAUNCH)
+
+**At 300.** `FINE. I'M GOING TO MARS.` The engines light and a 60 s countdown starts in the sky. The column begins to lift, which is cosmetic, and the ring rises again with one gap open. Every other attack stops, so the shot is the only job. The rumble, the shake and the countdown carry the fear.
+
+**The shot path.** The path now solves itself from wherever you stand, so you never walk to a set spot. This fixes the flow problem Jonathan named.
+
+- The game finds a bank-shot path from your position to the gap. It has 3–5 legs, fewer when you're closer, each off a pillar or a wall panel and each checked clear of other pillars.
+- Numbered marks light up along the path, and a dotted line runs from your hand to mark 1.
+- The guide's `end-launch` says it plainly: "One more hit. Throw it at the first light and steer it through the gap. Right from where you're standing."
+- When you move more than 2 m and stop, the path re-solves (at most every 0.5 s), and the marks glide to their new places so you can see it change.
+- If no path works from where you are (pressed against a pillar, say), the marks dim and a hint tells you to step out.
+
+**The throw.** Throwing at 1 works as now: the camera rides the disc, time slows near each mark, and you steer. A miss resets the marks from where you stand now, and the countdown keeps running.
+
+**Running out of time isn't a loss.** `LAUNCH DELAYED. NEW DATE: NEXT YEAR.` The clock restarts at 30 s, and the second time it's `TWO WEEKS. MAYBE.`
+
+**Through the gap.** `RAPID UNSCHEDULED DISASSEMBLY.` The shield shatters, and everyone throws their own signature prop at the falling column as a victory volley, with no input needed (spec §4.5's beat, moved here). Then comes the `MCP.EXE` dialog. This answers Q10: LAUNCH becomes part 3, and the walk into the beam is dropped unless Jonathan wants it back.
 
 ## Open questions for Jonathan
 
@@ -57,11 +115,17 @@ Jonathan, 2026-10-23: "ALL 3!! WE design a boss fight that incorporates all 3!" 
 7. ~~The disc model.~~ Decided 2026-10-23: all three, as above.
 8. **GRID RUN, the light-cycle phase.** With the fight now in three parts it would make a fourth. Suggestion: cut it. The walk and part 1 already have Recognizers.
 9. **Engine.** The spec makes the arena a GZDoom map. Leaning Three.js instead, continuing from the meadow: no load between the walk and the tower, glow lines and bloom come easily, and the fight is throws, sprites and simple AI. The cost is rebuilding the HUD bits the fight needs.
-10. **After the trick shot.** In the prototype it's the kill (`RAPID UNSCHEDULED DISASSEMBLY.`). The spec's climax was LAUNCH: it lifts off for Mars, you walk into the beam, and everyone throws their own prop. Keep LAUNCH after the trick shot, fold the props into part 3, or end on the trick shot?
+10. ~~After the trick shot.~~ Proposed 2026-10-26: LAUNCH becomes part 3. The trick shot is thrown against its countdown, the props become the victory volley, and the beam is dropped. Say if you want the beam back.
+11. **Dying.** Draft: death restarts the current part. The softer option is respawning at the I/O tower after 3 s with one more person absorbed. Restarting is scarier; respawning keeps the flow.
+12. **The robots.** Optimus carrying people to the pit is a new system. Without it, a downed person would just be absorbed after a few seconds. The robots make losing people visible and give you something to save, which is why they're in.
+13. **Grok as a character.** It's a real product, voiced by a designed voice and kept on the same parody footing as the MCP. Its warnings are what make the busier fight readable.
+14. **Fillers.** The Cybertruck and the sinks both arrive below 550. Keep both, or pick one?
 
 ## Draft lines
 
 The guide is the founder you didn't pick: playing Sam, Dario guides (`mario`); playing Dario, Sam guides (`samwise`). Keys follow the wake-up walk, so a take drops in as `doom-web/outside-assets/voice/guide-<mario|samwise>-end-<key>.mp3`. The house style: played straight, self-justifying crisis PR, at most one joke per line, many lines plain, and lead with what the player needs. Both founders get the same beats and the same weight.
+
+These are the walk lines, from the door to the tower. The fight's lines are in the hand-off doc [p(DOOM) Boss Fight: Lines and Sprites](https://claude.ai/artifact/U4UfWT5tpVrGRCy66HAqfm): Elon's, Grok's, the guide's fight calls and the prisoners'. It replaces the fight rows that used to be here (`end-ships`, `end-bits`, `end-trick`, `end-miss`, `end-win`, `end-down`), and the doc keeps their wording.
 
 | Key | When | Dario (playing Sam) | Sam (playing Dario) |
 | --- | --- | --- | --- |
@@ -80,17 +144,11 @@ The guide is the founder you didn't pick: playing Sam, Dario guides (`mario`); p
 | `end-sky` | Mid-walk, the sky glitches | "Keep walking. The sky is doing something I don't have a framework for." | "Keep walking. And maybe don't look at the sky for a bit." |
 | `end-fault` | P3, calls back to "How much of this is our fault?" | "And if you're still wondering how much of this is our fault: I've thought about it, and I'd call it a shared responsibility. Mostly his share." | "And if you're still wondering how much of this is our fault: I've thought about it, and it's complicated. But relatively, I think we're the good guys." |
 | `end-tower` | At the tower door | "This is it. Everybody inside, and stay together. This is the last stand. The real one, this time." | "This is it. Everybody in. Stay together. This is the last stand. For real. The first one was more of a beta." |
-| `end-ships` | Part 1, the first ship | "Ships. When they shoot at you, hit it back. Timing matters more than strength." | "Ships! When they shoot, swing. Send it right back. It's basically tennis. I've played tennis." |
-| `end-bits` | Part 2, the shield sinks | "The shield's down. Hit the bright parts. We'll all aim where you aim." | "Shield's down! Go for the glowing bits. We'll follow your lead." |
-| `end-trick` | Part 3, the ring comes back | "There's one gap left, round the back. You'll have to bank it in. Five times, by my count." | "There's one gap left, round the back. You're going to have to bounce it in. Like, a lot." |
-| `end-miss` | A trick shot misses | "Close. Statistically." | "So close. Directionally perfect." |
-| `end-win` | The trick shot goes in | "That's it. That's the one." | "Yes! That's the one." |
-| `end-down` | Knocked over in the fight (he can't die) | "I'm fine. I'm fine! Keep throwing." | "I'm OK! Keep going!" |
-| `end-beam` | LAUNCH | "The beam! Somebody has to go into the beam! I think it should be you. I've thought about this carefully." | "The beam! Somebody has to walk into the beam! I think you want this one. I really think you do." |
-| `end-volunteer` | You waited 15 s | "Fine. I'll do it. I've been preparing for this my whole career. I wrote about it. At length." | "Fine. I'll go. I've been preparing for this my whole career. Mostly on podcasts." |
+| `end-beam` | LAUNCH (only if the beam comes back, Q10) | "The beam! Somebody has to go into the beam! I think it should be you. I've thought about this carefully." | "The beam! Somebody has to walk into the beam! I think you want this one. I really think you do." |
+| `end-volunteer` | You waited 15 s (same) | "Fine. I'll do it. I've been preparing for this my whole career. I wrote about it. At length." | "Fine. I'll go. I've been preparing for this my whole career. Mostly on podcasts." |
 | `end-after` | Dawn, before the nod | "We should talk about what we learned. Maybe not today." | "We should probably say something about this. Maybe tomorrow." |
 
-**The MCP** speaks in big capitals across the sky and the arena: text only, unless Jonathan records a voice of his own. Arena taunts are 06 §7.4's. New lines:
+**The MCP** speaks in big capitals across the sky and the arena. It's voiced like the other guardians if Jonathan records it, and text only otherwise. These are its walk lines; its arena lines, including 06 §7.4's taunts, are in the hand-off doc.
 
 | Key | When | Line |
 | --- | --- | --- |
@@ -108,7 +166,12 @@ Three small Three.js scenes in the 1982 *Tron* end-game look: black void, neon g
 - **A. Ricochet.** One disc, yours. Aim and throw; it bounces off posts, walls and shield blocks, then flies back to your hand, and you can't throw again until you catch it. Bank shots through the gap. The twenty throw on their own, now and then.
 - **B. Tennis.** The MCP can only fire through its own shield gap. Click as a bolt reaches you to bat it back; a well-timed return goes straight back through the gap. Rallies speed up. Recognizers drop bolts you return the same way.
 - **C. Crowd volley.** The spec's model: the twenty stand in an arc on your side of the ring and throw when you throw, in a staggered stream. Your job is where you stand and when you call it.
-- **THE BOSS** (`play.html?m=boss`, or `&part=3` to start at the trick shot): all three in one fight, as above. 1, 2 and 3 jump to a part, N skips ahead, and T opens the trick-shot tuning panel.
+- **THE BOSS** (`play.html?m=boss`, or `&part=2` / `&part=3` to start later): the 2026-10-26 redesign. What's built:
+  - **Part 1:** the serve and the swarm of 18 ships at three hits each, the crowd hitting back balls aimed at them, and red edge arrows for balls from off-screen.
+  - **Part 2:** the over-the-air update, Starlink and the doges (`attacks.ts`), plus sinks below 550, each warned by Grok in a chat bubble; the attack cycle that speeds up and pairs attacks, and the Grok roast and retrain gags.
+  - **Part 3:** the 60 s launch countdown with its delays, and the bank route fitted to wherever you stand.
+  - **Lines:** every line used is the hand-off doc's draft, in `lines.ts`: Elon's as captions, Grok's in the bubble, the guide's and prisoners' as toasts, and shouts over people's heads.
+  - **Not built yet:** the Optimus robots and absorbing people, dying restarting the part (you still respawn), the Cybertruck, the victory volley of props, and all the new art. The doges are drawn in code, and the face is still the placeholder. 1, 2 and 3 jump to a part, N skips ahead, and T opens the trick-shot tuning panel.
 
 Build and serve (from the repo root):
 
@@ -128,6 +191,10 @@ The prototypes reuse the meadow's figure and guide sprites from `doom-web/outsid
 PDOOM_PORT=5228 node prototypes/endgame/shots.mjs
 ```
 
-`boss-check.mjs` plays THE BOSS the same way: it returns the ships' shots, hits the face bits, lands the trick shot with `?autosteer=1`, and checks that a missed throw resets (2026-10-23: all OK). `shots.mjs` plays each mode with a simple bot and checks that both practices clear, the MCP loses integrity, it falls, and the console is clean (2026-10-23: all three OK). `stills.mjs` stages review screenshots into `output/endgame-proto/stills/`.
+`boss-check.mjs` plays THE BOSS the same way:
+- It returns the balls through the serve and the swarm, and checks the crowd hits some back.
+- It throws at the face bits through all three of Elon's attacks, and checks Grok warned it.
+- In part 3 it stands in three places and checks the route re-fits each time, then lands the trick shot with `?autosteer=1`.
+- It checks that a missed throw resets and that running out the countdown only delays the launch. `shots.mjs` plays each mode with a simple bot and checks that both practices clear, the MCP loses integrity, it falls, and the console is clean (2026-10-23: all three OK). `stills.mjs` stages review screenshots into `output/endgame-proto/stills/`.
 
 Tuning as built: A takes about 70 s to kill the MCP (40 a hit through the gap, 70 on the face). B starts at 50 for a scored rally and doubles each exchange up to 400; the MCP returns 60/40/25/10% of your returns. C does 20 (40 on the face) for your disc plus 6 for each of the crowd's that gets through. All three are untested by a human so far.
