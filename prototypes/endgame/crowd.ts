@@ -1,9 +1,12 @@
 import * as THREE from 'three';
 import {PAL,rand,resolve} from './kit';
+import {poses,type Pic} from './art';
+import {VOICE} from './lines';
 
 /* Everyone you saved, using the meadow's own figure sprites (doom-web/outside-assets: 4 walk
  * frames x 8 directions), lightly tinted as if digitised, plus the guide (the founder you didn't
- * pick), who keeps to your right shoulder and can't be hurt for long. */
+ * pick), who keeps to your right shoulder and can't be hurt for long. Once the doc's fight sheets load
+ * (art.ts), each also swats, throws, lies flat when knocked down and cheers. */
 export const CAST=[['liron','Liron Shapira'],['stuart','Stuart Russell'],['eliezer','Eliezer Yudkowsky'],['hinton','Geoffrey Hinton'],['holly','Holly Elmore'],
  ['rob','Rob Miles'],['dan','Dan Hendrycks'],['nate','Nate Soares'],['roman','Roman Yampolskiy'],['beth','Beth Barnes'],
  ['zvi','Zvi Mowshowitz'],['victoria','Victoria Krakovna'],['max','Max Tegmark'],['paul','Paul Christiano'],['ajeya','Ajeya Cotra'],
@@ -27,17 +30,25 @@ export async function loadCast(guide:'mario'|'samwise'){
  return {people,walk,idle};
 }
 
+// everyone's fight poses, sized to their meadow figure; anyone without a sheet keeps the old knocked-over tilt
+export async function loadPoses(people:Person[]){
+ await Promise.all(people.map(async p=>{p.poses=await poses(p.guide?'guide-'+p.id:VOICE[p.id]??p.id,p.standFrame());}));
+}
+
 export class Person{
  sprite:THREE.Sprite;ring:THREE.Mesh;pos=new THREE.Vector3();target=new THREE.Vector3();dodge=new THREE.Vector3();dodgeUntil=0;dodgeAt=-1;pendingDodge=new THREE.Vector3();
  facing=Math.PI;moving=false;down=0;hasDisc=true;nextThrow=rand(3,9);reaction=rand(.3,.9);hop=0;isPlayer=false;
  override:THREE.Vector3|null=null;overrideUntil=0;// somewhere to be instead of the formation (cover from the update)
  faceTo:THREE.Vector3|null=null;// something to look at instead of the MCP (the ending)
+ poses:Pic[]|null=null;pose=-1;poseUntil=0;// art.ts POSE: swat, throw, flat, carried, cheer, stare
  constructor(scene:THREE.Scene,public index:number,public id:string,public name:string,private frames:(THREE.Texture|null)[],public guide=false,private idle:(THREE.Texture|null)[]=[]){
   this.sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:frames[0],color:guide?0xd8e4e8:0xa9cbd4,transparent:true,alphaTest:.5}));
   this.sprite.center.set(.5,0);this.sprite.scale.set(1.8,1.8,1);scene.add(this.sprite);
   this.ring=new THREE.Mesh(new THREE.RingGeometry(.34,.5,28).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:guide?PAL.core:PAL.line,transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false}));
   scene.add(this.ring);
  }
+ standFrame(){return this.guide?this.idle[0]??this.frames[0]:this.frames[0];}
+ setPose(i:number,sec:number,t:number){if(this.poses){this.pose=i;this.poseUntil=t+sec;}}
  hand(out:THREE.Vector3){return out.set(this.pos.x+Math.sin(this.facing)*.45,1.25,this.pos.z+Math.cos(this.facing)*.45);}
  caught(){this.hasDisc=true;}
  knock(from:THREE.Vector3){
@@ -61,9 +72,10 @@ export class Person{
   resolve(this.pos,.4);
   const m=this.sprite.material,angle=((Math.atan2(cam.x-this.pos.x,cam.z-this.pos.z)-this.facing)*180/Math.PI+720)%360,rot=Math.round(angle/45)%8;
   const frame=this.guide?(this.moving?this.frames[(Math.floor(t*5)%2)*8+rot]:this.idle[rot]||this.frames[rot]):this.frames[(this.moving?Math.floor(t*6+this.index)%4:0)*8+rot];
-  if(frame)m.map=frame;
-  if(this.down>0){m.rotation=Math.PI/2;this.sprite.center.set(.5,.5);this.sprite.position.set(this.pos.x,.5,this.pos.z);}
-  else{m.rotation=0;this.sprite.center.set(.5,0);this.sprite.position.set(this.pos.x,Math.sin(Math.min(1,this.hop/.3)*Math.PI)*.25,this.pos.z);}
+  const pose=this.poses?.[this.down>0?2:t<this.poseUntil?this.pose:-1];
+  if(pose){m.map=pose.tex;this.sprite.scale.set(pose.w,pose.h,1);}else{if(frame)m.map=frame;this.sprite.scale.set(1.8,1.8,1);}
+  if(this.down>0&&!pose){m.rotation=Math.PI/2;this.sprite.center.set(.5,.5);this.sprite.position.set(this.pos.x,.5,this.pos.z);}
+  else{m.rotation=0;this.sprite.center.set(.5,0);this.sprite.position.set(this.pos.x,this.down>0?0:Math.sin(Math.min(1,this.hop/.3)*Math.PI)*.25,this.pos.z);}
   this.ring.position.set(this.pos.x,.03,this.pos.z);(this.ring.material as THREE.MeshBasicMaterial).opacity=this.down>0?.25:.8;
  }
 }

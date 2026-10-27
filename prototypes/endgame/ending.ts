@@ -2,12 +2,16 @@ import * as THREE from 'three';
 import type {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {PILLARS,TAU,rand,glow,glowSprite,edged,type Stage} from './kit';
 import type {Person} from './crowd';
+import {POSE,props,type Pic} from './art';
 
 /* The ending (docs/ENDGAME.md E9, 2026-10-26). Close the MCP.EXE dialog and everyone is standing in an
  * apocalyptic wasteland: ash falling, dead trees, the Windows hill burnt brown on the horizon, and the
  * MCP's stump still smoking behind them. The founder you didn't pick delivers the line to you; everyone
- * turns and looks into the camera; cut to black. Drawn in code; a scene of its own, swapped into the
- * renderer. Everyone stands near (0, 0, 33) so the arena's walking rules leave them where they're put. */
+ * turns and looks into the camera; cut to black. Drawn in code, dressed with the doc's props (dead trees,
+ * smoking stumps, half-buried monitors, melted wastebaskets, craters) once they load; a scene of its own,
+ * swapped into the renderer. Everyone stands near (0, 0, 33) so the arena's walking rules leave them where they're put. */
+// the ash dunes, flat where everyone stands
+const ground=(x:number,z:number)=>{const far=Math.min(1,Math.hypot(x,z-36)/34);return (Math.sin(x*.05)*Math.cos(z*.043)*2.4+Math.sin(x*.13+z*.09)*.7+Math.sin(z*.021)*3)*far*far;};
 export const CAM_FROM=new THREE.Vector3(0,1.75,47),CAM_TO=new THREE.Vector3(0,1.62,40.5),CAM_LOOK=new THREE.Vector3(0,1.5,31);
 
 export class Wasteland{
@@ -23,7 +27,7 @@ export class Wasteland{
   s.add(new THREE.HemisphereLight('#d98a52','#1a100c',1.15));const key=new THREE.DirectionalLight('#ffa060',1.5);key.position.set(-70,26,-120);s.add(key);
   // the ground: ash and dirt in low dunes, flat where everyone stands
   const g=new THREE.PlaneGeometry(760,760,150,150).rotateX(-Math.PI/2),p=g.attributes.position as THREE.BufferAttribute;
-  for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),far=Math.min(1,Math.hypot(x,z-36)/34);p.setY(i,(Math.sin(x*.05)*Math.cos(z*.043)*2.4+Math.sin(x*.13+z*.09)*.7+Math.sin(z*.021)*3)*far*far);}
+  for(let i=0;i<p.count;i++)p.setY(i,ground(p.getX(i),p.getZ(i)));
   g.computeVertexNormals();s.add(new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#3a2a20',roughness:1,flatShading:true})));
   // the Windows hill, dead: a long brown swell on the horizon
   const hill=new THREE.Mesh(new THREE.SphereGeometry(1,56,24,0,TAU,0,Math.PI/2),new THREE.MeshStandardMaterial({color:'#5b4126',roughness:1,flatShading:true}));
@@ -34,7 +38,7 @@ export class Wasteland{
    const a=rand(0,TAU),r=rand(22,170),x=Math.cos(a)*r,z=Math.sin(a)*r;if(Math.abs(x)<9&&z>14)continue;
    const tree=new THREE.Group(),h=rand(3,7.5);tree.add(new THREE.Mesh(new THREE.CylinderGeometry(.1,.26,h,6).translate(0,h/2,0),bark));
    for(let b=0;b<4;b++){const len=rand(1,2.6),br=new THREE.Mesh(new THREE.CylinderGeometry(.04,.09,len,5).translate(0,len/2,0),bark);br.position.y=h*rand(.45,.9);br.rotation.set(rand(-1.1,1.1),rand(0,TAU),rand(-1.1,1.1));tree.add(br);}
-   tree.position.set(x,0,z);tree.rotation.set(rand(-.15,.15),rand(0,TAU),rand(-.15,.15));s.add(tree);
+   tree.position.set(x,ground(x,z),z);tree.rotation.set(rand(-.15,.15),rand(0,TAU),rand(-.15,.15));s.add(tree);
   }
   // what's left of the Grid: the MCP's stump, a few broken pillars with dead cyan edges, fallen shield panels
   const stump=edged(new THREE.CylinderGeometry(4.6,5.6,8,8).translate(0,4,0),0x26272a,'#ff3b1f',.45);s.add(stump);
@@ -48,19 +52,29 @@ export class Wasteland{
   for(let i=0;i<n;i++){ap[i*3]=rand(-26,26);ap[i*3+1]=rand(0,16);ap[i*3+2]=rand(10,43);this.ashV[i]=rand(.4,1.1);}
   const ag=new THREE.BufferGeometry();ag.setAttribute('position',new THREE.BufferAttribute(ap,3));
   this.ash=new THREE.Points(ag,new THREE.PointsMaterial({color:'#cfc6bd',size:.045,transparent:true,opacity:.75,depthWrite:false}));this.ash.frustumCulled=false;s.add(this.ash);
+  void props().then(a=>{if(a)this.dress(a);});
+ }
+ // the props, as billboards in the dusk light, none in the middle of the shot
+ private dress(a:Pic[]){
+  const put=(i:number,x:number,z:number,tint='#b89a86')=>{const m=new THREE.SpriteMaterial({map:Math.random()<.5?a[i].tex:a[i].flip,color:tint,transparent:true,alphaTest:.5}),sp=new THREE.Sprite(m);
+   sp.center.set(.5,.04);sp.scale.set(a[i].w,a[i].h,1);sp.position.set(x,ground(x,z),z);this.scene.add(sp);};
+  const scatter=(i:number,n:number,r0:number,r1:number)=>{for(let k=0;k<n;k++){const ang=rand(0,TAU),r=rand(r0,r1),x=Math.cos(ang)*r,z=36+Math.sin(ang)*r;if(Math.abs(x)<10&&z>8&&z<60)continue;put(i,x,z);}};
+  scatter(0,22,16,90);scatter(1,9,12,60);scatter(4,8,10,55);
+  // the office that was: monitors and wastebaskets half-sunk in the ash round the crowd
+  for(const [i,x,z] of [[2,-8.2,31],[2,9,34.5],[2,-5.6,25.5],[3,7.4,28],[3,-10.5,36.5],[2,12.5,26],[3,3.2,22.5],[4,-14,29]] as [number,number,number][])put(i,x,z);
  }
  private puff(){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:glow(),color:'#2b2421',transparent:true,opacity:0,depthWrite:false}));this.scene.add(s);return s;}
  // everyone in a loose crowd, the two founders in front facing each other; the twenty look round at the ruin.
  // (Kept more than 1.1 m apart, or main.ts's crowd spacing nudges them and they walk on the spot.)
  stand(people:Person[],guide:Person,you:Person){
   this.cast=[...people,guide,you];
-  for(const p of this.cast){this.scene.add(p.sprite);p.sprite.visible=true;p.ring.visible=false;p.sprite.material.color.set(p===guide||p===you?'#d9c8b8':'#b9a898');p.down=0;p.dodge.set(0,0,0);}
+  for(const p of this.cast){this.scene.add(p.sprite);p.sprite.visible=true;p.ring.visible=false;p.pose=-1;p.sprite.material.color.set(p===guide||p===you?'#d9c8b8':'#b9a898');p.down=0;p.dodge.set(0,0,0);}
   const put=(p:Person,x:number,z:number)=>{p.pos.set(x,0,z);p.target.copy(p.pos);p.override=p.pos.clone();p.overrideUntil=Infinity;};
   put(guide,-1.05,35.2);put(you,1.05,35.2);guide.faceTo=you.pos.clone();you.faceTo=guide.pos.clone();
   people.forEach((p,i)=>{const row=i<7?0:i<14?1:2,col=row===0?i:row===1?i-7:i-14,inRow=row===2?6:7;put(p,(col-(inRow-1)/2)*1.75+(row%2)*.85+rand(-.1,.1),33.3-row*1.65+rand(-.1,.1));p.faceTo=new THREE.Vector3(rand(-70,70),1.5,rand(-90,10));});
  }
- // and then, one by one, everyone looks into the camera
- stare(cam:THREE.Vector3,later:(sec:number,f:()=>void)=>void){this.cast.forEach((p,i)=>later(i>=this.cast.length-2?0:.15+Math.random()*.7,()=>{p.faceTo=cam.clone();}));}
+ // and then, one by one, everyone looks into the camera, deadpan (the stare pose, where it's loaded)
+ stare(cam:THREE.Vector3,later:(sec:number,f:()=>void)=>void){this.cast.forEach((p,i)=>later(i>=this.cast.length-2?0:.15+Math.random()*.7,()=>{p.faceTo=cam.clone();p.setPose(POSE.stare,Infinity,0);}));}
  show(stage:Stage){(stage.composer.passes[0] as RenderPass).scene=this.scene;this.scene.add(stage.camera);}
  update(dt:number){
   const ap=this.ash.geometry.attributes.position as THREE.BufferAttribute;

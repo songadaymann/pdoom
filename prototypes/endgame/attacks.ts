@@ -3,6 +3,7 @@ import {ARENA,PAL,PILLARS,TAU,rand,clamp,resolve,glowSprite,textSprite,edged} fr
 import type {Ctx} from './main';
 import type {Person} from './crowd';
 import type {Disc} from './discs';
+import {doges,type Pic} from './art';
 
 /* Elon's attacks in part 2 of THE BOSS (docs/ENDGAME.md, 2026-10-26), each from his own world and each
  * warned by Grok first. Everything he sends glows red-orange; anything you send back turns cyan.
@@ -119,11 +120,14 @@ export class Starlink implements Attack{
   }
   if(!left||this.t>14)this.dispose();
  }
- kill(s:Sat,byPlayer:boolean){if(!s.alive)return;s.alive=false;this.e.c.sparks.burst(s.g.position,PAL.enemy,70,9);this.e.c.sfx.play.derez();s.g.removeFromParent();s.dot.removeFromParent();this.e.event('sat-down',byPlayer);}
+ kill(s:Sat,byPlayer:boolean){if(!s.alive)return;s.alive=false;this.e.c.sparks.burst(s.g.position,PAL.enemy,70,9);this.e.c.sfx.play.derez(s.g.position);s.g.removeFromParent();s.dot.removeFromParent();this.e.event('sat-down',byPlayer);}
  dispose(){if(this.done)return;this.done=true;for(const s of this.sats){s.g.removeFromParent();s.dot.removeFromParent();s.alive=false;}}
 }
 
-// A pixel Shiba, drawn in code until the doge sheet exists: two running frames, facing right and left.
+// The doc's doge sheet (art.ts) once it's loaded: the run, the tackle, a disc in the mouth, running at you,
+// bonked, and off on a rocket. Until then, a pixel Shiba drawn in code: two running frames, each way.
+let dogeArt:Pic[]|null=null;
+export const loadDoges=()=>doges().then(a=>{dogeArt=a;});
 let dogeFrames:THREE.Texture[]|null=null;
 function dogeTextures(){
  if(dogeFrames)return dogeFrames;dogeFrames=[];
@@ -143,20 +147,22 @@ function dogeTextures(){
  }
  return dogeFrames;
 }
-const WOW=['MUCH WOW','VERY ATTACK','SUCH SPEED','WOW'];
-type Doge={sprite:THREE.Sprite;glow:THREE.Sprite;pos:THREE.Vector3;vel:THREE.Vector3;state:'run'|'carry'|'moon'|'leave'|'gone';target:Hitter|null;chase:Disc|null;chaseT:number;holding:Person|null;holdT:number;cool:number;vy:number};
+const WOW=['MUCH WOW','VERY ATTACK','SUCH SPEED','WOW'],tmp=new THREE.Vector3();
+type Doge={sprite:THREE.Sprite;glow:THREE.Sprite;pos:THREE.Vector3;vel:THREE.Vector3;state:'run'|'carry'|'moon'|'leave'|'gone';target:Hitter|null;chase:Disc|null;chaseT:number;holding:Person|null;holdT:number;cool:number;vy:number;barkAt:number};
 export class Doges implements Attack{
  kind='doge';done=false;t=0;list:Doge[]=[];words:{s:THREE.Sprite;t:number}[]=[];cool=new Map<Person,number>();scan=0;
  constructor(private e:Env,n:number){
   const c=e.c,s=c.stage.scene;
   for(let i=0;i<n;i++){
-   const a=rand(0,TAU),sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:dogeTextures()[0],transparent:true,alphaTest:.5}));sprite.center.set(.5,0);sprite.scale.set(1.5,1,1);
-   const glow=glowSprite(PAL.enemy,1.8,.35);sprite.visible=glow.visible=false;s.add(sprite,glow);
-   const d:Doge={sprite,glow,pos:new THREE.Vector3(Math.cos(a)*(ARENA.block+.8),0,Math.sin(a)*(ARENA.block+.8)),vel:new THREE.Vector3(),state:'run',target:null,chase:null,chaseT:0,holding:null,holdT:0,cool:i*.15,vy:0};
+   // the drawn dogs dimmed, or the bloom whites them out
+   const a=rand(0,TAU),sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:dogeArt?.[0].tex??dogeTextures()[0],color:dogeArt?0x8f7f70:0xffffff,transparent:true,alphaTest:.5}));sprite.center.set(.5,0);sprite.scale.set(1.5,1,1);
+   // Elon's red glow: round the little code-drawn dog, or a halo at the feet of the drawn one
+   const glow=dogeArt?glowSprite(PAL.enemy,1.6,.22):glowSprite(PAL.enemy,1.8,.35);sprite.visible=glow.visible=false;s.add(sprite,glow);
+   const d:Doge={sprite,glow,pos:new THREE.Vector3(Math.cos(a)*(ARENA.block+.8),0,Math.sin(a)*(ARENA.block+.8)),vel:new THREE.Vector3(),state:'run',target:null,chase:null,chaseT:0,holding:null,holdT:0,cool:i*.15,vy:0,barkAt:rand(1,3.5)};
    this.list.push(d);
   }
-  for(let i=0;i<3;i++){const w=textSprite(WOW[(i+Math.floor(rand(0,4)))%4],'#ffd75e',1.2,'700'),a=rand(0,TAU);w.position.set(Math.cos(a)*16,3+i,Math.sin(a)*16);s.add(w);this.words.push({s:w,t:-i*.5});}
-  c.sfx.play.bark();c.later(.25,()=>c.sfx.play.bark());
+  for(let i=0;i<3;i++){const w=textSprite(WOW[(i+Math.floor(rand(0,4)))%4],'#ffd75e',1.2),a=rand(0,TAU);w.position.set(Math.cos(a)*16,3+i,Math.sin(a)*16);s.add(w);this.words.push({s:w,t:-i*.5});}
+  c.sfx.play.bark(this.list[0]?.pos);c.later(.3,()=>c.sfx.play.bark(this.list[1]?.pos));
  }
  // a target: whoever still has a disc, nearest first; sometimes you
  private pick(d:Doge):Hitter{
@@ -172,6 +178,8 @@ export class Doges implements Attack{
    d.cool-=dt;if(d.cool>0)continue;d.sprite.visible=d.glow.visible=true;
    let goal:THREE.Vector3|null=null,speed=8.5;
    if(d.state==='run'){
+    // barking as they run (not with a disc in their mouth)
+    if(this.t>d.barkAt){d.barkAt=this.t+rand(1.6,4.5);c.sfx.play.bark(d.pos,Math.random()<.6);}
     if(this.t>16){d.state='leave';}
     // frisbee: chase any disc flying past
     if(!d.chase)for(const disc of c.discs.list)if(disc.state==='out'&&Math.hypot(disc.pos.x-d.pos.x,disc.pos.z-d.pos.z)<8){d.chase=disc;d.chaseT=0;break;}
@@ -182,17 +190,23 @@ export class Doges implements Attack{
      if(d.pos.distanceTo(goal)<1){
       if(d.target!.kind==='person'){const p=d.target!.p;this.e.knock(p,d.pos);if(p.hasDisc){p.hasDisc=false;d.holding=p;d.state='carry';d.holdT=0;this.e.event('disc-stolen',p);}}
       else{this.e.hurtPlayer(10,d.pos);d.cool=.6;}
-      d.target=null;c.sfx.play.bark();
+      d.target=null;c.sfx.play.growl(d.pos);
      }
     }
    }
    if(d.state==='carry'){d.holdT+=dt;speed=7;const a=Math.atan2(d.pos.z,d.pos.x);goal=new THREE.Vector3(Math.cos(a)*(ARENA.block+1),0,Math.sin(a)*(ARENA.block+1));if(d.holdT>8){this.release(d);d.state='run';}}
    if(d.state==='leave'){speed=10;const a=Math.atan2(d.pos.z,d.pos.x);goal=new THREE.Vector3(Math.cos(a)*ARENA.block,0,Math.sin(a)*ARENA.block);if(d.pos.distanceTo(goal)<1.2)this.vanish(d);}
-   if(d.state==='moon'){d.vy+=14*dt;d.pos.y+=d.vy*dt;d.sprite.material.rotation+=dt*9;if(Math.random()<dt*40)c.sparks.burst(d.pos.clone().setY(d.pos.y-.3),'#ffd75e',3,2,{gravity:-2});if(d.pos.y>45)this.vanish(d);}
+   if(d.state==='moon'){d.vy+=14*dt;d.pos.y+=d.vy*dt;if(Math.random()<dt*40)c.sparks.burst(d.pos.clone().setY(d.pos.y-.3),'#ffd75e',3,2,{gravity:-2});if(d.pos.y>45)this.vanish(d);}
    else if(goal){const to=goal.sub(d.pos).setY(0),dist=to.length();if(dist>.05){d.vel.copy(to.multiplyScalar(Math.min(speed,dist/dt)/dist));d.pos.addScaledVector(d.vel,dt);}resolve(d.pos,.35);}
-   const right=d.vel.dot(camRight)>=0,step=Math.floor(this.t*10+d.cool*7)%2;
-   d.sprite.material.map=dogeTextures()[(right?0:2)+(d.state==='moon'?0:step)];
-   d.sprite.position.set(d.pos.x,d.pos.y+(d.state==='moon'?0:Math.abs(Math.sin(this.t*14))*.12),d.pos.z);d.glow.position.set(d.pos.x,d.pos.y+.45,d.pos.z);
+   const right=d.vel.dot(camRight)>=0,m=d.sprite.material;
+   if(dogeArt){
+    // tackling when close, running at you when that's the way it's going, bonked and then on the rocket
+    const speed=d.vel.length(),toCam=tmp.copy(c.stage.camera.position).sub(d.pos).setY(0).normalize();
+    const lunge=d.state==='run'&&!d.chase&&!!d.target&&hitterPos(c,d.target).distanceTo(d.pos)<2.4;
+    const cell=d.state==='moon'?((d.vy-8)/14<.45?7:8):d.state==='carry'?5:lunge?4:speed>.5&&d.vel.dot(toCam)>speed*.75?6:Math.floor(this.t*12+d.cool*7)%4;
+    const pic=dogeArt[cell];m.map=right?pic.tex:pic.flip;d.sprite.scale.set(pic.w,pic.h,1);m.rotation=cell===7?m.rotation+dt*9:0;
+   }else{m.map=dogeTextures()[(right?0:2)+(d.state==='moon'?0:Math.floor(this.t*10+d.cool*7)%2)];if(d.state==='moon')m.rotation+=dt*9;}
+   d.sprite.position.set(d.pos.x,d.pos.y+(d.state==='moon'?0:Math.abs(Math.sin(this.t*14))*.12),d.pos.z);d.glow.position.set(d.pos.x,d.pos.y+(dogeArt?.1:.45),d.pos.z);
   }
   for(const w of this.words){w.t+=dt;w.s.position.y+=dt*.8;w.s.material.opacity=clamp(w.t<0?0:w.t<.3?w.t/.3:1-(w.t-1.6)/1.2,0,1);}
   // the crowd defends itself: bonk the nearest doge that's coming
@@ -211,7 +225,7 @@ export class Doges implements Attack{
  probe(disc:Disc){
   for(const d of this.list){
    if((d.state!=='run'&&d.state!=='carry')||d.cool>0||disc.pos.y>2.3||Math.hypot(disc.pos.x-d.pos.x,disc.pos.z-d.pos.z)>1.3)continue;
-   this.release(d);d.state='moon';d.vy=8;this.e.c.sfx.play.bark();this.e.c.sparks.burst(d.pos.clone().setY(.6),'#ffd75e',50,7);this.e.event('bonk',disc.owner.isPlayer);return true;
+   this.release(d);d.state='moon';d.vy=8;this.e.c.sfx.play.yelp(d.pos);this.e.c.sparks.burst(d.pos.clone().setY(.6),'#ffd75e',50,7);this.e.event('bonk',disc.owner.isPlayer);return true;
   }
   return false;
  }

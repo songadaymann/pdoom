@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {PAL,textSprite,glowSprite,edged,type Sparks} from './kit';
+import {sinks,type Pic} from './art';
 
 /* The MCP's two Phase 1 threats from spec 05 §4.4.4: POSTS, slow one-word bars that drift
  * toward a human (a disc shatters them), and LET THAT SINK IN, a pixel kitchen sink that drops
@@ -23,24 +24,29 @@ export class Post{
  remove(){this.alive=false;this.group.removeFromParent();}
 }
 
+let sinkArt:Pic[]|null=null;
+export const loadSinks=()=>sinks().then(a=>{sinkArt=a;});
 export class Sink{
  t=0;state:'shadow'|'fall'|'stay'|'gone'='shadow';group=new THREE.Group();shadow=new THREE.Group();ringMat:THREE.MeshBasicMaterial;fillMat:THREE.MeshBasicMaterial;
- static RADIUS=2.4;static WARN=2;
+ static RADIUS=2.4;static WARN=2;sprite:THREE.Sprite|null=null;
  constructor(scene:THREE.Scene,public at:THREE.Vector3){
   this.ringMat=new THREE.MeshBasicMaterial({color:PAL.white,transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false});
   this.fillMat=new THREE.MeshBasicMaterial({color:PAL.white,transparent:true,opacity:.05,blending:THREE.AdditiveBlending,depthWrite:false});
   this.shadow.add(new THREE.Mesh(new THREE.RingGeometry(Sink.RADIUS-.16,Sink.RADIUS,48).rotateX(-Math.PI/2),this.ringMat),new THREE.Mesh(new THREE.CircleGeometry(Sink.RADIUS,40).rotateX(-Math.PI/2),this.fillMat));
   this.shadow.position.set(at.x,.05,at.z);scene.add(this.shadow);
-  // a kitchen sink in glowing white lines: basin, rim, tap
-  const basin=edged(new THREE.BoxGeometry(2.4,.9,1.7).translate(0,.45,0),0x0b0f14,PAL.white);
-  const tap=edged(new THREE.BoxGeometry(.2,.9,.2).translate(0,1.3,-.7),0x0b0f14,PAL.white),spout=edged(new THREE.BoxGeometry(.2,.18,.7).translate(0,1.72,-.4),0x0b0f14,PAL.white);
-  this.group.add(basin,tap,spout);this.group.position.set(at.x,22,at.z);this.group.rotation.y=Math.random()*Math.PI;this.group.visible=false;scene.add(this.group);
+  // the doc's porcelain sink (art.ts), falling and then cracked; until it loads, one in glowing white lines
+  if(sinkArt){this.sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:sinkArt[0].tex,color:0xa4adb4,transparent:true,alphaTest:.5}));this.sprite.center.set(.5,0);this.sprite.scale.set(sinkArt[0].w,sinkArt[0].h,1);this.group.add(this.sprite);}
+  else{
+   const basin=edged(new THREE.BoxGeometry(2.4,.9,1.7).translate(0,.45,0),0x0b0f14,PAL.white);
+   const tap=edged(new THREE.BoxGeometry(.2,.9,.2).translate(0,1.3,-.7),0x0b0f14,PAL.white),spout=edged(new THREE.BoxGeometry(.2,.18,.7).translate(0,1.72,-.4),0x0b0f14,PAL.white);
+   this.group.add(basin,tap,spout);
+  }this.group.position.set(at.x,22,at.z);this.group.rotation.y=Math.random()*Math.PI;this.group.visible=false;scene.add(this.group);
  }
  // returns true on the frame it lands
  update(dt:number,sparks:Sparks){
   this.t+=dt;
   if(this.state==='shadow'){const k=Math.min(1,this.t/Sink.WARN);this.fillMat.opacity=.05+.25*k;this.ringMat.opacity=.5+.5*Math.abs(Math.sin(this.t*9));this.shadow.scale.setScalar(1.3-.3*k);if(this.t>=Sink.WARN){this.state='fall';this.t=0;this.group.visible=true;}}
-  else if(this.state==='fall'){this.group.position.y=Math.max(0,22-this.t*this.t*140);if(this.group.position.y<=0){this.state='stay';this.t=0;this.shadow.visible=false;sparks.burst(this.at.clone().setY(.3),PAL.white,80,8,{gravity:-12});return true;}}
+  else if(this.state==='fall'){this.group.position.y=Math.max(0,22-this.t*this.t*140);if(this.group.position.y<=0){this.state='stay';this.t=0;this.shadow.visible=false;if(this.sprite&&sinkArt){this.sprite.material.map=sinkArt[1].tex;this.sprite.scale.set(sinkArt[1].w,sinkArt[1].h,1);}sparks.burst(this.at.clone().setY(.3),PAL.white,80,8,{gravity:-12});return true;}}
   else if(this.state==='stay'&&this.t>5){this.state='gone';sparks.burst(this.at.clone().setY(.8),PAL.white,90,2.5,{gravity:-3,life:1.4});this.group.removeFromParent();this.shadow.removeFromParent();}
   return false;
  }

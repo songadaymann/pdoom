@@ -1,10 +1,13 @@
 import * as THREE from 'three';
-import {ARENA,PAL,rand,wrap,bearingOf,makeStage,makeInput,makeHud,makeSfx,makeFloppy,Player,Sparks,type Stage,type Input,type Hud,type Sfx} from './kit';
+import {ARENA,PAL,rand,wrap,bearingOf,makeStage,makeInput,makeHud,makeSfx,makeFloppy,Player,Sparks,type Stage,type Input,type Hud,type Sfx,type Engine} from './kit';
 import {MCP} from './mcp';
 import {Recognizer} from './recognizer';
-import {Post,Sink} from './threats';
+import {Post,Sink,loadSinks} from './threats';
 import {Discs,type DiscOpts,type Thrower} from './discs';
-import {CAST,Person,loadCast} from './crowd';
+import {CAST,Person,loadCast,loadPoses} from './crowd';
+import {loadDoges} from './attacks';
+import {Voices} from './voice';
+import {hands as loadHands,POSE,type Hand} from './art';
 import {ricochet} from './mode-ricochet';
 import {tennis} from './mode-tennis';
 import {volley} from './mode-volley';
@@ -24,9 +27,11 @@ export interface Mode{
  run?(c:Ctx,dt:number):void;key?(c:Ctx,code:string):void;crowdRecDamage?:number;
  // the MCP.EXE dialog's Close (default: restart)
  dialogClose?(c:Ctx):void;
+ // which of the hands to show (art.ts; default: by what you're doing)
+ hand?(c:Ctx):number|null;
 }
 export interface Ctx{
- stage:Stage;input:Input;player:Player;hud:Hud;sfx:Sfx;sparks:Sparks;mcp:MCP;discs:Discs;mode:Mode;
+ stage:Stage;input:Input;player:Player;hud:Hud;sfx:Sfx;voices:Voices;sparks:Sparks;mcp:MCP;discs:Discs;mode:Mode;
  people:Person[];guide:Person;recs:Recognizer[];posts:Post[];sinks:Sink[];
  t:number;phase:Phase;phaseT:number;held:boolean;viewmodel:THREE.Group;swing:number;
  later(sec:number,f:()=>void):void;everyone():Person[];say(key:LineKey):void;
@@ -67,11 +72,17 @@ async function boot(){
  (document.getElementById('mode-title') as HTMLElement).textContent=mode.title;
  (document.getElementById('mode-blurb') as HTMLElement).textContent=BLURBS[mode.id];
  for(const a of document.querySelectorAll<HTMLAnchorElement>('#modes a'))a.classList.toggle('on',a.dataset.m===mode.id);
- const stage=makeStage(canvas),input=makeInput(canvas),hud=makeHud(),sfx=makeSfx(),sparks=new Sparks(stage.scene);
+ const stage=makeStage(canvas),input=makeInput(canvas),hud=makeHud(),sfx=makeSfx(),voices=new Voices(()=>sfx.audio()),sparks=new Sparks(stage.scene);
  const player=new Player(input),mcp=new MCP(stage.scene,sparks);
- const art=await loadCast(who);
+ // the words drawn on canvases need Doom's font in first
+ const [art]=await Promise.all([loadCast(who),document.fonts.load('64px DoomSmall').catch(()=>null)]);
  const people=CAST.map(([id,name],i)=>new Person(stage.scene,i,id,name,art.people[i]));
  const guide=new Person(stage.scene,20,who,LINES[who].name,art.walk,true,art.idle);
+ // the doc's art batch (art.ts), where it's been imported: fight poses, doges, sinks, the first-person hands
+ void loadPoses([...people,guide]);void loadDoges();void loadSinks();
+ const engines=new Map<Recognizer,Engine>();
+ let hands:Hand[]|null=null,handShown=-1,threwAt=-9,wasHeld=true;const handEl=document.getElementById('hands') as HTMLImageElement;
+ void loadHands().then(h=>{hands=h;});
  people.forEach((p,i)=>{const a=Math.PI/2+(i/19-.5)*1.3;p.pos.set(Math.cos(a)*41,0,Math.sin(a)*41);p.target.copy(p.pos);});
  guide.pos.set(2.4,0,37);guide.target.copy(guide.pos);
  const recs:Recognizer[]=[],posts:Post[]=[],sinks:Sink[]=[];
@@ -79,7 +90,7 @@ async function boot(){
  const timers:{at:number;f:()=>void}[]=[];
  const playerThrower:Thrower={hand:(o)=>player.hand(o),caught:()=>{c.held=true;},isPlayer:true,name:'you'};
  const discs=new Discs(stage.scene,mcp,()=>recs,()=>posts,sparks,sfx);
- const c:Ctx={stage,input,player,hud,sfx,sparks,mcp,discs,mode,people,guide,recs,posts,sinks,t:0,phase:'practice1',phaseT:0,held:true,viewmodel,swing:0,
+ const c:Ctx={stage,input,player,hud,sfx,voices,sparks,mcp,discs,mode,people,guide,recs,posts,sinks,t:0,phase:'practice1',phaseT:0,held:true,viewmodel,swing:0,
   later:(sec,f)=>timers.push({at:c.t+sec,f}),
   hitRec:(rec)=>hitRec(rec),
   timeScale:1,realDt:0,cam:null,
@@ -94,7 +105,7 @@ async function boot(){
   throwAt:(p,at,opts,error=.05)=>{
    if(!p.hasDisc||p.down>0)return;p.hasDisc=false;p.hop=.3;
    const from=p.hand(new THREE.Vector3()),dir=at.clone().sub(from).normalize();
-   dir.applyAxisAngle(new THREE.Vector3(0,1,0),(Math.random()-.5)*2*error);dir.y+=(Math.random()-.5)*error;p.facing=Math.atan2(dir.x,dir.z);
+   dir.applyAxisAngle(new THREE.Vector3(0,1,0),(Math.random()-.5)*2*error);dir.y+=(Math.random()-.5)*error;p.facing=Math.atan2(dir.x,dir.z);p.setPose(POSE.throw,.4,c.t);
    discs.throw(p,from,dir,opts);
   },
   aim:()=>{
@@ -127,7 +138,7 @@ async function boot(){
  discs.onRecHit=(rec,d)=>{hitRec(rec,d.owner.isPlayer?1:mode.crowdRecDamage??1);};
  function hitRec(rec:Recognizer,amount=1){
   const killed=rec.hit(amount);if(amount>=1||Math.random()<.3)sfx.play.hit();
-  if(killed){rec.derez(sparks);sfx.play.derez();if(c.phase==='practice1'&&!saidHit){saidHit=true;c.later(.6,()=>c.say('hit'));}}
+  if(killed){rec.derez(sparks);sfx.play.derez(rec.pos);if(c.phase==='practice1'&&!saidHit){saidHit=true;c.later(.6,()=>c.say('hit'));}}
  }
  let spectate:{at:THREE.Vector3;look:THREE.Vector3}|null=null,frozen=false;
  let saidHit=false,spawned1=false,spawned2=false,tauntAt=0,shake=0,started=auto,slamSaid=0;
@@ -163,7 +174,7 @@ async function boot(){
  const overlay=document.getElementById('start') as HTMLElement;
  document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement===canvas){started=true;overlay.hidden=true;sfx.ensure();}else if(c.phase!=='down')overlay.hidden=false;});
  overlay.onclick=()=>canvas.requestPointerLock?.();
- if(auto)overlay.hidden=true;
+ if(auto){overlay.hidden=true;sfx.ensure();}
  (document.getElementById('loading') as HTMLElement).hidden=true;
  go('practice1');
 
@@ -200,7 +211,7 @@ async function boot(){
   render();
  }
  function step(dt:number){
-  c.realDt=dt;dt*=c.timeScale;
+  c.realDt=dt;dt*=c.timeScale;voices.tick();
   c.t+=dt;c.phaseT+=dt;hud.tick(c.t);
   for(const t of timers.filter(t=>t.at<=c.t)){timers.splice(timers.indexOf(t),1);t.f();}
   player.update(dt);
@@ -227,6 +238,9 @@ async function boot(){
   mode.update(c,dt);
   for(const r of recs)r.update(dt,recEvents,player.pos);
   for(let i=recs.length-1;i>=0;i--)if(!recs[i].alive)recs.splice(i,1);
+  // each ship's engine, heard from it; one shot down winds down as it goes
+  for(const r of recs)if(!engines.has(r)){const e=sfx.engine();if(e)engines.set(r,e);}
+  for(const [r,e] of engines)if(r.alive)e.move(r.pos,r.state==='charge'?Math.min(1,r.t/.8):0,dt);else{e.stop(r.hp<=1e-6);engines.delete(r);}
   for(const p of posts){
    p.update(dt);if(!p.alive)continue;
    if(!player.down&&p.pos.distanceTo(player.eyePos(tmp).setY(1.3))<1.3){if(player.damage(15,p.pos))sfx.play.hurt();p.shatter(sparks);continue;}
@@ -234,7 +248,7 @@ async function boot(){
   }
   for(let i=posts.length-1;i>=0;i--)if(!posts[i].alive)posts.splice(i,1);
   for(const s of sinks)if(s.update(dt,sparks)){
-   sfx.play.slam();shake=Math.max(shake,.3);
+   sfx.play.sink(s.at);shake=Math.max(shake,.3);
    if(Math.hypot(player.pos.x-s.at.x,player.pos.z-s.at.z)<Sink.RADIUS&&player.damage(25,s.at))sfx.play.hurt();
    for(const p of c.everyone())if(Math.hypot(p.pos.x-s.at.x,p.pos.z-s.at.z)<Sink.RADIUS)p.knock(s.at);
   }
@@ -255,10 +269,20 @@ async function boot(){
   cam.rotation.set(s.pitch+(Math.random()-.5)*shake*.05,s.yaw+(Math.random()-.5)*shake*.05,0,'YXZ');
   if(spectate){cam.position.copy(spectate.at);cam.lookAt(spectate.look);}
   else if(c.cam){cam.position.copy(c.cam.pos);cam.lookAt(c.cam.look);}
+  sfx.listen(cam);
   c.swing=Math.max(0,c.swing-1/60);
-  viewmodel.visible=(c.held||!!mode.heldAlways)&&!player.down&&!spectate&&!c.cam;
+  const eyes=!player.down&&!spectate&&!c.cam;
+  viewmodel.visible=!hands&&(c.held||!!mode.heldAlways)&&eyes;
   const k=c.swing>0?Math.sin((1-c.swing/.2)*Math.PI):0;
   viewmodel.position.set(.3-k*.42,-.27+k*.1,-.78-k*.08);viewmodel.rotation.set(1.15-k*.4,-.3+k*1.4,.1);
+  // the doc's hands, Doom-style: holding the disc, letting go, swatting (batting with the disc when you have
+  // it), open for the catch; the sleeve stays put
+  if(wasHeld&&!c.held)threwAt=c.t;wasHeld=c.held;
+  const cell=!hands||!eyes?-1:c.swing>0?(c.held||mode.heldAlways)&&hands[5]?5:3:mode.hand?.(c)??(c.held||mode.heldAlways?0:c.t-threwAt<.22?2:4);
+  if(cell!==handShown){
+   handShown=cell;handEl.hidden=cell<0;
+   if(cell>=0&&hands){const h=hands[cell],w=44*h.w/h.h;handEl.src=h.url;handEl.style.width=w+'vh';handEl.style.left=`calc(68vw - ${(h.root*w).toFixed(2)}vh)`;}
+  }
   stage.render();
  }
  requestAnimationFrame(frame);

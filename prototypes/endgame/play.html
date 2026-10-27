@@ -7,50 +7,54 @@
 <title>p(DOOM) endgame prototype</title>
 <style>
 :root{--line:#38f4ff;--core:#d8fdff;--bg:#02060a;--enemy:#ff3b1f;--enemy-core:#ffd2a0}
-html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:"Courier New",monospace;color:var(--core)}
+@font-face{font-family:DoomSmall;src:url('/local/ui/doom-small.ttf') format('truetype');font-display:block}
+/* Doom's own small font for every word, Tron or not (Jonathan, 2026-10-27), as in the game */
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:DoomSmall,monospace;font-synthesis:none;color:var(--core)}
 canvas{display:block;width:100vw;height:100vh;cursor:crosshair;outline:none}
 #hud{position:fixed;inset:0;pointer-events:none}
 #modes{position:fixed;top:10px;left:12px;font-size:12px;letter-spacing:.08em;pointer-events:auto}
 #modes a{color:#5f8f99;text-decoration:none;margin-right:12px}
 #modes a.on{color:var(--line);text-shadow:0 0 8px var(--line)}
-#keys{position:fixed;top:28px;left:12px;font-size:11px;color:#4d7480}
+#keys{position:fixed;top:28px;left:12px;max-width:min(330px,26vw);font-size:10px;line-height:1.5;color:#4d7480}
 #boss{position:fixed;top:14px;left:50%;transform:translateX(-50%);width:min(520px,60vw);text-align:center;font-size:12px;letter-spacing:.2em;color:var(--enemy-core)}
 #boss .track{height:8px;border:1px solid var(--enemy);margin-top:4px;box-shadow:0 0 10px var(--enemy)}
 #boss-fill{height:100%;width:100%;background:var(--enemy);box-shadow:0 0 12px var(--enemy)}
-#caption{position:fixed;top:58px;left:50%;transform:translateX(-50%);width:min(900px,86vw);text-align:center;font-size:22px;font-weight:900;color:var(--enemy-core);text-shadow:0 0 12px var(--enemy),0 0 2px #fff;letter-spacing:.06em}
+#caption{position:fixed;top:58px;left:50%;transform:translateX(-50%);width:min(900px,86vw);text-align:center;font-size:22px;line-height:1.35;color:var(--enemy-core);text-shadow:2px 2px #000;letter-spacing:.04em}
 #toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);width:max-content;max-width:min(720px,86vw);text-align:center;font-size:16px;line-height:1.35;background:rgba(2,8,12,.72);padding:8px 14px;border:1px solid rgba(56,244,255,.35)}
 #toast b{color:var(--line)}
-#hint{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);width:max-content;max-width:90vw;font-size:14px;color:#9fdcea;text-align:center;letter-spacing:.04em}
+#hint{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);width:max-content;max-width:min(760px,62vw);font-size:13px;line-height:1.45;color:#9fdcea;text-align:center;text-shadow:2px 2px #000}
 #reticle{position:fixed;left:50%;top:50%;width:18px;height:18px;margin:-10px 0 0 -10px;border:1px solid rgba(216,253,255,.6);border-radius:50%;box-shadow:0 0 6px var(--line);transition:transform .08s}
 #reticle.hot{border-color:#fff;box-shadow:0 0 14px #fff,0 0 4px var(--line);transform:scale(1.6)}
 #reticle::after{content:'';position:absolute;left:8px;top:8px;width:2px;height:2px;background:var(--core)}
-#pop{position:fixed;left:50%;top:calc(50% + 28px);transform:translateX(-50%);font-weight:900;font-size:18px;text-shadow:0 0 10px currentColor;white-space:nowrap}
+#pop{position:fixed;left:50%;top:calc(50% + 28px);transform:translateX(-50%);font-size:18px;text-shadow:2px 2px #000;white-space:nowrap}
 #pop.go{animation:pop .7s ease-out forwards}
 @keyframes pop{from{transform:translateX(-50%) scale(1.5);opacity:1}to{transform:translateX(-50%) translateY(-18px) scale(1);opacity:0}}
 #health{position:fixed;left:16px;bottom:18px;width:160px;font-size:11px;letter-spacing:.2em;color:var(--line)}
 #health .track{height:6px;border:1px solid var(--line);margin-top:4px}
 #health-fill{height:100%;width:100%;background:var(--line)}
 #vignette{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(255,40,20,.55));opacity:0}
-#down{position:fixed;top:40%;width:100%;text-align:center;font-size:26px;color:var(--line);text-shadow:0 0 12px var(--line)}
+#down{position:fixed;top:40%;width:100%;text-align:center;font-size:26px;color:var(--line);text-shadow:3px 3px #000}
 #start,#loading{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(2,6,10,.84);pointer-events:auto;cursor:pointer;text-align:center;padding:16px;box-sizing:border-box}
-#start h1{font-size:28px;color:var(--line);text-shadow:0 0 14px var(--line);margin:0 0 12px;letter-spacing:.12em}
+#start h1{font-size:28px;color:var(--line);text-shadow:3px 3px #000;margin:0 0 12px;letter-spacing:.12em}
 #start p{max-width:580px;color:#9fdcea;line-height:1.5;margin:4px 0}
 #start .go{margin-top:18px;color:var(--core);letter-spacing:.2em}
 #loading{cursor:default;color:var(--line);letter-spacing:.2em}
-#dialog{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,92vw);background:#c0c0c0;color:#000;font:13px/1.4 Tahoma,"MS Sans Serif",Arial,sans-serif;border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:1px 1px 0 #000;pointer-events:auto}
+#dialog{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,92vw);background:#c0c0c0;color:#000;font:15px/1.45 DoomSmall,monospace;border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:1px 1px 0 #000;pointer-events:auto}
 #dialog .bar{background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;padding:3px 6px}
 #dialog .body{display:flex;gap:14px;padding:16px 14px;align-items:flex-start}
 #dialog .x{width:32px;height:32px;border-radius:50%;background:#e00;color:#fff;font-weight:bold;display:flex;align-items:center;justify-content:center;flex:none;border:1px solid #800}
 #dialog .btns{display:flex;justify-content:flex-end;gap:8px;padding:0 14px 14px}
 #dialog button{min-width:86px;background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff;font:inherit;padding:3px 8px;cursor:pointer}
-#dialog-more{margin:0 14px 14px;padding:6px 8px;background:#fff;border:2px solid;border-color:#404040 #fff #fff #404040;font-family:"Courier New",monospace}
+#dialog-more{margin:0 14px 14px;padding:6px 8px;background:#fff;border:2px solid;border-color:#404040 #fff #fff #404040}
 #grok{position:fixed;top:150px;right:16px;width:min(330px,40vw);display:flex;gap:10px;align-items:flex-start;background:rgba(8,8,10,.88);border:1px solid #8a9496;border-radius:10px;padding:8px 10px;font-size:14px;line-height:1.35;color:#eef2f4}
 #grok .ava{flex:none;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4a4a4a,#000 70%);border:2px solid #ddd;position:relative}
 #grok .ava i{position:absolute;top:10px;width:5px;height:5px;background:#fff}#grok .ava i:first-child{left:7px}#grok .ava i+i{left:16px}
 #grok b{display:block;font-size:11px;letter-spacing:.2em;color:#fff}
-#ota{position:fixed;top:128px;left:50%;transform:translateX(-50%);width:min(440px,70vw);text-align:center;font-size:13px;letter-spacing:.12em;color:var(--enemy-core);text-shadow:0 0 8px var(--enemy)}
+#grok .ava.art{background:center/contain no-repeat;border:none;border-radius:0;width:34px;height:34px}#grok .ava.art i{display:none}
+#hands{position:fixed;bottom:0;height:44vh;pointer-events:none;image-rendering:pixelated}
+#ota{position:fixed;top:128px;left:50%;transform:translateX(-50%);width:min(440px,70vw);text-align:center;font-size:13px;letter-spacing:.08em;color:var(--enemy-core);text-shadow:2px 2px #000}
 #ota .track{height:10px;border:1px solid var(--enemy);margin-top:4px;box-shadow:0 0 10px var(--enemy)}#ota-fill{height:100%;width:0;background:var(--enemy);box-shadow:0 0 12px var(--enemy)}
-#countdown{position:fixed;top:128px;left:50%;transform:translateX(-50%);font-size:28px;font-weight:900;letter-spacing:.14em;color:var(--enemy-core);text-shadow:0 0 14px var(--enemy)}
+#countdown{position:fixed;top:128px;left:50%;transform:translateX(-50%);font-size:28px;letter-spacing:.1em;color:var(--enemy-core);text-shadow:3px 3px #000}
 #countdown.late{color:#fff;animation:blink .5s steps(2) infinite}@keyframes blink{50%{opacity:.35}}
 #static{position:fixed;inset:0;opacity:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.16) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(255,59,31,.14) 0 2px,transparent 2px 5px);animation:static .12s steps(2) infinite}
 @keyframes static{0%{background-position:0 0,0 0}50%{background-position:0 7px,11px 0}100%{background-position:0 3px,4px 0}}
@@ -59,7 +63,7 @@ canvas{display:block;width:100vw;height:100vh;cursor:crosshair;outline:none}
 #bars::before,#bars::after{content:'';position:fixed;left:0;right:0;height:11vh;background:#000;transition:transform .8s}
 #bars::before{top:0;transform:translateY(-100%)}#bars::after{bottom:0;transform:translateY(100%)}
 .cinema #bars::before,.cinema #bars::after{transform:none}
-.cinema #boss,.cinema #health,.cinema #hint,.cinema #reticle,.cinema #keys,.cinema #modes,.cinema #countdown,.cinema #chev,.cinema #pop,.cinema #vignette,.cinema #static,.cinema #down{display:none!important}
+.cinema #hands,.cinema #boss,.cinema #health,.cinema #hint,.cinema #reticle,.cinema #keys,.cinema #modes,.cinema #countdown,.cinema #chev,.cinema #pop,.cinema #vignette,.cinema #static,.cinema #down{display:none!important}
 .cinema #toast{bottom:calc(11vh + 16px)}.cinema #caption{top:calc(11vh + 14px)}.cinema #grok{top:calc(11vh + 70px)}
 #flash{position:fixed;inset:0;background:#fff;opacity:0}
 #crt{position:fixed;inset:0;background:#000;opacity:0}
@@ -76,6 +80,7 @@ canvas{display:block;width:100vw;height:100vh;cursor:crosshair;outline:none}
 <body>
 <canvas id="view" tabindex="0"></canvas>
 <div id="hud">
+ <img id="hands" alt="" hidden>
  <div id="flash"></div>
  <div id="bars"></div>
  <div id="modes"><a data-m="ricochet" href="?m=ricochet">A RICOCHET</a><a data-m="tennis" href="?m=tennis">B TENNIS</a><a data-m="volley" href="?m=volley">C VOLLEY</a><a data-m="boss" href="?m=boss">THE BOSS</a><a href="./">ABOUT</a></div>
@@ -92,7 +97,7 @@ canvas{display:block;width:100vw;height:100vh;cursor:crosshair;outline:none}
  <div id="chev"></div>
  <div id="ota" hidden><span id="ota-text"></span><div class="track"><div id="ota-fill"></div></div></div>
  <div id="countdown" hidden></div>
- <div id="grok" hidden><div class="ava"><i></i><i></i></div><div><b>GROK</b><span id="grok-text"></span></div></div>
+ <div id="grok" hidden><div class="ava" id="grok-ava"><i></i><i></i></div><div><b>GROK</b><span id="grok-text"></span></div></div>
  <div id="down" hidden>DEREZZED. REBUILDING…</div>
  <div id="start"><h1 id="mode-title"></h1><p id="mode-blurb"></p><p class="go">CLICK TO PLAY</p></div>
  <div id="dialog" hidden>

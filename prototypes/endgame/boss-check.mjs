@@ -3,18 +3,20 @@
 // through Elon's attacks. In part 3 it stands in three places to check the bank route follows it, then
 // lands the trick shot with ?autosteer=1, and watches the end through to black (it clicks Close on the
 // dialog to get to the wasteland). A second page throws a bad trick shot and checks the reset,
-// then runs the countdown out and checks the launch is only delayed. Screenshots go to
-// output/endgame-proto/boss/. Server up first (port 5228).
+// then runs the countdown out and checks the launch is only delayed. Where the doc's art and voice batch
+// is imported (scripts/import-endgame-assets.mjs) it checks the sheets loaded and the takes played;
+// without it, that's skipped. Screenshots go to output/endgame-proto/boss/. Server up first (port 5228).
 import {chromium} from 'playwright';
 import {mkdir} from 'node:fs/promises';
+import {existsSync} from 'node:fs';
 const port=Number(process.env.PDOOM_PORT)||5228,out='output/endgame-proto/boss';
 await mkdir(out,{recursive:true});
-const browser=await chromium.launch({channel:'chrome',args:['--mute-audio']});
+const browser=await chromium.launch({channel:'chrome',args:['--mute-audio','--autoplay-policy=no-user-gesture-required']});
 const wait=(ms)=>new Promise(r=>setTimeout(r,ms));
 const log={};let failed=[];
 async function open(q){
  const page=await browser.newPage({viewport:{width:1280,height:720}});const errors=[];
- page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+ page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error'&&!m.location().url.includes('/local/endgame/sfx/'))errors.push(m.text());});// recorded effects are optional (generate-endgame-sfx.py)
  await page.goto(`http://127.0.0.1:${port}/endgame-proto/play.html?m=boss&auto=1&mute=1${q}`);
  await page.waitForFunction(()=>window.__eg?.ready,null,{timeout:60000});
  const st=()=>page.evaluate(()=>window.__eg.state());
@@ -37,7 +39,7 @@ async function open(q){
   },16);
  });
  const swarm=await p.until(s=>s.mode_state.fleet==='swarm'&&s.recs.length>=7,120000);log.swarm=!!swarm;
- if(swarm){await wait(2500);await p.shot('1-swarm');}
+ if(swarm){log.portal=swarm.mode_state.portal;log.fightMusic=swarm.mode_state.music;await wait(2500);await p.shot('1-swarm');}
  const s1=await p.until(s=>s.mode_state.phase==='shieldDown',240000);log.ships=!!s1;
  const after1=(await p.st()).mode_state;log.shipsDown=after1.shipsDown;log.crowdReturns=after1.crowdReturns;
  if(!s1){log.shipsState=after1;await p.page.evaluate(()=>window.__eg.key('Digit2'));}
@@ -71,8 +73,9 @@ async function open(q){
  const dialog=await p.until(s=>s.mode_state.ending==='dialog',25000);if(dialog){await wait(300);await p.shot('8-dialog');await p.page.click('#dialog-close');}
  const waste=await p.until(s=>s.mode_state.phase==='waste'&&s.mode_state.pt>5,10000);if(waste)await p.shot('9-wasteland');
  const stare=await p.until(s=>s.mode_state.ending==='stare',15000);if(stare){await wait(1500);await p.shot('10-stare');}
- const black=await p.until(s=>s.mode_state.ending==='black',8000);if(black){await wait(3500);await p.shot('11-black');}
+ const black=await p.until(s=>s.mode_state.ending==='black',8000);if(black){await wait(3500);await p.shot('11-black');log.endMusic=(await p.st()).mode_state.music;}
  log.ending=!!(rud&&dialog&&waste&&stare&&black);
+ const ms=(await p.st()).mode_state;log.voice=ms.voice;log.art=ms.art;
  log.errors=p.errors;await p.page.close();
 }
 {
@@ -93,4 +96,9 @@ if(!(log.crowdReturns>0))failed.push('crowdReturns');
 if(['update','starlink','doge'].some(k=>!log.attacksSeen?.[k]))failed.push('attacks');
 if(!(log.grokWarnings>0))failed.push('grok');
 if(log.errors?.length||log.missErrors?.length)failed.push('errors');
+if(log.voice?.takes&&(log.voice.played<40||log.voice.failed))failed.push('voices');
+if(!log.portal)failed.push('portal');
+// Doom's tracks, where they've been rendered (scripts/prepare-doom-music.mjs)
+if(existsSync('doom-web/local/boss-e2m8-music.ogg')&&!(log.fightMusic?.includes('boss-e2m8')&&log.endMusic?.includes('epilogue-victor')))failed.push('music');
+if(log.voice?.takes&&!(log.art?.face&&log.art.poses>=21&&log.art.grok&&log.art.hands))failed.push('art');
 console.log(failed.length?`FAILED: ${failed.join(', ')}`:'ALL OK');process.exitCode=failed.length?1:0;

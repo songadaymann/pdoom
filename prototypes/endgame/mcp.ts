@@ -1,17 +1,32 @@
 import * as THREE from 'three';
 import {ARENA,PAL,TAU,wrap,glowSprite,type Sparks} from './kit';
+import {pixels} from './art';
 
 /* THE MUSK CONTROL PROGRAM, staged after spec 05 §4.1: a faceted steel column over a pit of light,
  * an X crown, four engine bells, a waist ring of 24 shield panels whose gap is missing panels,
- * and a face that always turns to look at you. The face here is a PLACEHOLDER pixel mosaic of
- * nobody in particular, drawn in code; the real one is a pixel-mosaic Musk caricature in the
- * HUD-mugshot style (an art task), never a photo. It "downloads" like a progressive JPEG. */
-const FW=24,FH=28;
-type Expr='idle'|'talk'|'hurt'|'rage'|'wind';
+ * and a face that always turns to look at you. The face is the doc's pixel-mosaic Musk caricature
+ * (art.ts: mcp-face, -mouths and -eyes, 48 x 56 in seven colours), never a photo, with a placeholder
+ * drawn in code until it loads. His mouth follows his voice take, shut when he's quiet, teeth on a hiss
+ * and open as wide as he's loud (it flaps when a line has no take),
+ * he blinks and glances about, and the face "downloads" like a progressive JPEG. */
+const FW=48,FH=56;
+export type Expr='idle'|'talk'|'laugh'|'concern'|'annoyed'|'rage'|'hurt'|'panic'|'defeat'|'wind';
+// the face sheet's cells: 0 smug, 1 laughing, 2 "concerning", 3 annoyed, 4 furious, 5 hurt, 6 panicked, 7 defeated
+const CELL:Record<Expr,number>={idle:0,talk:0,laugh:1,concern:2,annoyed:3,rage:4,hurt:5,panic:6,defeat:7,wind:3};
+// the mouth sheet's cells: 0 closed, 1 M/B/P, 2 A, 3 E, 4 O, 5 U, 6 F/V, 7 L/TH
+function shape(loud:number,hiss:number){
+ if(loud<.15)return 0;
+ if(hiss>.5)return loud<.5?6:3;
+ if(loud<.4)return hiss>.2?7:5;
+ if(loud<.7)return hiss>.15?3:4;
+ return hiss>.25?3:2;
+}
+type Placeholder='idle'|'talk'|'hurt'|'rage'|'wind';
+const placeholder=(e:Expr):Placeholder=>e==='hurt'||e==='defeat'||e==='panic'?'hurt':e==='rage'||e==='annoyed'?'rage':e==='wind'?'wind':e==='talk'||e==='laugh'?'talk':'idle';
 const COLOURS=['#000000','#2a0500','#7a1405','#d8340e','#ff6a2a','#ffa86a','#ffe2c0'];
 const hash=(x:number,y:number)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s);};
 
-function shade(x:number,y:number,expr:Expr,mouthOpen:boolean):number{
+function shade(x:number,y:number,expr:Placeholder,mouthOpen:boolean):number{
  const u=(x+.5-12)/11.5,v=(y+.5-14)/13.5,au=Math.abs(u);
  let hw=v<.35?.9*Math.sqrt(Math.max(0,1-((v-.35)/1.35)**2)):.9-(v-.35)*.75;
  if(v>-.18&&v<.2)hw+=.07;                                   // ears
@@ -47,7 +62,10 @@ export class MCP{
  faceCanvas=document.createElement('canvas');faceTex:THREE.CanvasTexture;faceMat:THREE.MeshBasicMaterial;face:THREE.Mesh;
  panels:THREE.Mesh[]=[];edges:THREE.LineBasicMaterial[]=[];panelMats:THREE.MeshStandardMaterial[]=[];
  static N=24;step=TAU/24;base=0;spin=0;missing=new Set<number>();
- integrity=1000;max=1000;awake=false;shieldY=0;reveal=0;expr:Expr='idle';exprUntil=0;talkUntil=0;t=0;flash=0;dead=false;deadT=0;lastCaption=-9;
+ integrity=1000;max=1000;awake=false;shieldY=0;reveal=0;expr:Expr='idle';exprUntil=0;hard=false;talkUntil=0;t=0;flash=0;dead=false;deadT=0;lastCaption=-9;
+ // the face sheets once loaded, the pixels the mouth and eye frames change, and his take at this moment (null: quiet)
+ sheets:{face:ImageData[];mouths:ImageData[];eyes:ImageData[];mouthAt:number[];eyesAt:number[]}|null=null;voiceMouth:(()=>{loud:number;hiss:number}|null)|null=null;
+ private mouth=0;mouthNext=0;eye=0;eyeUntil=0;blinkAt=3;glanceAt=6;
  facePos=new THREE.Vector3(0,ARENA.faceY,6);beam!:THREE.Mesh;private drawn='';private debris:{m:THREE.Mesh;v:THREE.Vector3;s:THREE.Vector3}[]=[];
  constructor(scene:THREE.Scene,private sparks:Sparks){
   scene.add(this.root);this.root.add(this.column);
@@ -76,6 +94,11 @@ export class MCP{
   this.faceMat=new THREE.MeshBasicMaterial({map:this.faceTex,transparent:true,alphaTest:.5});
   this.face=new THREE.Mesh(new THREE.PlaneGeometry(ARENA.faceH*FW/FH,ARENA.faceH),this.faceMat);this.root.add(this.face);
   this.drawFace();
+  Promise.all([pixels('mcp-face.png',4,2),pixels('mcp-mouths.png',4,2),pixels('mcp-eyes.png',3,2)]).then(([face,mouths,eyes])=>{
+   if(!face||!mouths||!eyes||face[0].width!==FW||face[0].height!==FH)return;
+   const changed=(frames:ImageData[])=>{const out:number[]=[],b=face[0].data;for(let i=0;i<FW*FH;i++)if(frames.some(f=>f.data[i*4]!==b[i*4]||f.data[i*4+1]!==b[i*4+1]||f.data[i*4+2]!==b[i*4+2]))out.push(i);return out;};
+   this.sheets={face,mouths,eyes,mouthAt:changed(mouths),eyesAt:changed(eyes)};this.drawn='';
+  });
  }
  // gaps: `count` gaps of `width` panels, evenly spaced
  setGap(width:number,count=1){this.missing.clear();for(let g=0;g<count;g++){const start=Math.round(g*MCP.N/count);for(let k=0;k<width;k++)this.missing.add((start+k)%MCP.N);}this.apply();}
@@ -91,26 +114,48 @@ export class MCP{
   return out;
  }
  say(sec:number){this.talkUntil=this.t+sec;}
- setExpr(e:Expr,sec:number){this.expr=e;this.exprUntil=this.t+sec;}
+ // a hard expression shows even while he talks (a flinch, the meltdown); a soft one waits till he's quiet
+ setExpr(e:Expr,sec:number,hard=false){this.expr=e;this.exprUntil=this.t+sec;this.hard=hard;}
  hurt(n:number,face:boolean){
   if(this.dead)return '';
-  this.integrity=Math.max(0,this.integrity-n);this.flash=face?1.4:.8;this.setExpr('hurt',.45);
+  this.integrity=Math.max(0,this.integrity-n);this.flash=face?1.4:.8;this.setExpr('hurt',.45,true);
   if(this.t-this.lastCaption>2.4){this.lastCaption=this.t;return ['CONCERNING.','INTERESTING.','!!'][Math.floor(Math.random()*3)];}
   return '';
  }
  die(){
-  this.dead=true;this.deadT=0;this.setExpr('hurt',99);
+  this.dead=true;this.deadT=0;this.setExpr('defeat',99,true);
   for(const [i,p] of this.panels.entries()){if(!p.visible)continue;const a=this.panelAngle(i);this.debris.push({m:p,v:new THREE.Vector3(Math.cos(a)*9,6+Math.random()*8,Math.sin(a)*9),s:new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).multiplyScalar(4)});}
  }
  private drawFace(){
-  const t=this.t,mouth=Math.floor(t/.14)%2===0,expr=this.dead?'hurt':this.t<this.exprUntil?this.expr:this.t<this.talkUntil?'talk':'idle';
-  const block=this.reveal<.3?6:this.reveal<.55?4:this.reveal<.8?2:1,dim=this.awake||this.reveal>0?1:.3;
-  const key=`${expr}${mouth&&expr==='talk'}${block}${dim}`;if(key===this.drawn)return;this.drawn=key;
+  const t=this.t,voice=this.voiceMouth?.()??null,talking=!!voice||t<this.talkUntil,held=t<this.exprUntil;
+  const expr:Expr=this.dead||held&&this.hard?this.expr:talking?'talk':held?this.expr:'idle';
+  // the mouth: from the take when there is one, else a flap; each shape held at least 60 ms (in real time,
+  // since bullet time slows his clock but not his voice)
+  const real=performance.now()/1000;
+  if(expr!=='talk')this.mouth=0;
+  else if(real>=this.mouthNext){
+   const m=voice?shape(voice.loud,voice.hiss):[2,3,4,0,5][Math.floor(Math.random()*5)];
+   if(m!==this.mouth){this.mouth=m;this.mouthNext=real+(voice?.06:.12);}
+  }
+  // the eyes: a blink every few seconds, now and then a glance aside or down
+  if(t>=this.blinkAt){this.eye=5;this.eyeUntil=t+.13;this.blinkAt=t+2.5+Math.random()*2.5;}
+  else if(t>=this.glanceAt){this.eye=[1,2,4][Math.floor(Math.random()*3)];this.eyeUntil=t+.7;this.glanceAt=t+4+Math.random()*4;}
+  if(t>=this.eyeUntil)this.eye=0;
+  const block=this.reveal<.3?12:this.reveal<.55?8:this.reveal<.8?4:1,dim=this.awake||this.reveal>0?1:.3,sh=this.sheets;
+  const key=sh?`${CELL[expr]} ${this.mouth} ${this.eye} ${block} ${dim}`:`${placeholder(expr)} ${this.mouth>1} ${block} ${dim}`;if(key===this.drawn)return;this.drawn=key;
   const g=this.faceCanvas.getContext('2d')!,img=g.createImageData(FW,FH);
+  let src:Uint8ClampedArray|null=null;
+  if(sh){
+   src=sh.face[CELL[expr]].data;
+   // the mouth and eye frames are the smug face with only those features changed, so they lay over it
+   if(CELL[expr]===0&&(this.mouth||this.eye)){src=new Uint8ClampedArray(src);for(const i of sh.mouthAt)src.set(sh.mouths[this.mouth].data.subarray(i*4,i*4+4),i*4);for(const i of sh.eyesAt)src.set(sh.eyes[this.eye].data.subarray(i*4,i*4+4),i*4);}
+  }
   for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
-   const bx=Math.min(FW-1,Math.floor(x/block)*block+Math.floor(block/2)),by=Math.min(FH-1,Math.floor(y/block)*block+Math.floor(block/2));
-   const k=shade(bx,by,expr as Expr,mouth),c=new THREE.Color(COLOURS[k]),o=(y*FW+x)*4;
-   img.data[o]=c.r*255*dim;img.data[o+1]=c.g*255*dim;img.data[o+2]=c.b*255*dim;img.data[o+3]=k?255:0;
+   const bx=Math.min(FW-1,Math.floor(x/block)*block+Math.floor(block/2)),by=Math.min(FH-1,Math.floor(y/block)*block+Math.floor(block/2)),o=(y*FW+x)*4;
+   let r:number,gr:number,b:number;
+   if(src){const i=(by*FW+bx)*4;r=src[i];gr=src[i+1];b=src[i+2];}
+   else{const c=new THREE.Color(COLOURS[shade(bx>>1,by>>1,placeholder(expr),this.mouth>1)]);r=c.r*255;gr=c.g*255;b=c.b*255;}
+   img.data[o]=r*dim;img.data[o+1]=gr*dim;img.data[o+2]=b*dim;img.data[o+3]=r+gr+b>0?255:0;
   }
   g.putImageData(img,0,0);this.faceTex.needsUpdate=true;
  }

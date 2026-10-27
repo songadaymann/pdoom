@@ -40,7 +40,7 @@ About 12–14 minutes from the exit to the credits without the maze (the spec's 
 
 Jonathan, 2026-10-23: "ALL 3!! WE design a boss fight that incorporates all 3!" The order is his: tennis first, then the crowd volley with the shield down, then the trick shot. That version is playable as THE BOSS in the prototypes (below).
 
-**Redesign, 2026-10-26, not built yet.** Jonathan, on playing it: "it's right in terms of the mechanics but it doesn't feel scary or overwhelming in any way, and it lacks personality." The parts and their order stay. What changes:
+**Redesign, 2026-10-26, built as THE BOSS in the prototypes (below).** Jonathan, on playing it: "it's right in terms of the mechanics but it doesn't feel scary or overwhelming in any way, and it lacks personality." The parts and their order stay. What changes:
 
 - Each part escalates past what one person can handle.
 - Every attack comes from Elon's own world (Tesla, SpaceX, Starlink, Dogecoin, Grok, the Cybertruck, Optimus).
@@ -171,9 +171,27 @@ Three small Three.js scenes in the 1982 *Tron* end-game look: black void, neon g
   - **Part 1:** the serve and the swarm of 18 ships at three hits each, the crowd hitting back balls aimed at them, and red edge arrows for balls from off-screen.
   - **Part 2:** the over-the-air update, Starlink and the doges (`attacks.ts`), plus sinks below 550, each warned by Grok in a chat bubble; the attack cycle that speeds up and pairs attacks, and the Grok roast and retrain gags.
   - **Part 3:** the 60 s launch countdown with its delays, and the bank route fitted to wherever you stand.
-  - **Lines:** every line used is the hand-off doc's draft, in `lines.ts`: Elon's as captions, Grok's in the bubble, the guide's and prisoners' as toasts, and shouts over people's heads.
+  - **Lines:** keyed as in the hand-off doc, in `lines.ts`: Elon's as captions, Grok's in the bubble, the guide's and prisoners' as toasts, and shouts over people's heads. Where a take exists, it plays and its words are the subtitle (`voice.ts`). One voice at a time (Jonathan, 2026-10-27: "lines overlap too much"): Elon, Grok, the guide and the prisoners share one queue, the important lines first and stale ones dropped; only the meltdown and the blast cut anyone off. Crowd shouts are heard only in the gaps, from where the prisoner stands, in the voice of the nearest prisoner with that take. Elon's mouth follows each take's loudness and hiss, measured when it's imported.
+  - **Ships arriving:** they come in over the far wall, off to the side of the column, with a flash and a comet tail; the swarm pours through a tear in the sky. (Before 2026-10-27 the first ship came in dead behind the column, under the wall, and nobody saw it arrive.)
+  - **Music and type:** Doom's E2M8 (the Cyberdemon's) plays from the ships to the trick shot and cuts dead when it lands; D_VICTOR comes in after the black. `?music=e1m8|e3m8|off` and `?epilogue=bunny|off` try the others. Render them once with `PDOOM_PORT=5228 node scripts/prepare-doom-music.mjs D_E2M8 boss-e2m8` (and `D_E1M8 boss-e1m8`, `D_E3M8 boss-e3m8`, `D_VICTOR epilogue-victor`, `D_BUNNY epilogue-bunny`). All the words are in Doom's small font, as in the game.
+  - **Art and voices, 2026-10-27:** the doc's batch (`art/endgame-2026-10-26/`, outside the repo: 32 sheets, 408 synthetic Breeze takes) is imported by `node scripts/import-endgame-assets.mjs <batch folder>` into ignored `doom-web/local/endgame/`. In use:
+    - Elon's face: expressions, his mouth following his take, blinks and glances.
+    - Fight poses for all 22: swat, throw, flat when knocked down, cheer.
+    - The doges, the sinks, Grok's avatar, and Doom-style first-person hands.
+    - Without the batch, the prototype falls back to the drawings in code and subtitles.
+    - The second batch (2026-10-27, same folder) added the ending's takes (`mcp-dying-1`, `mcp-dying-2`, both `end-value`s), a deadpan stare pose for all 22, `wasteland-props.png` (dead trees, smoking stumps, half-buried monitors, melted wastebaskets, craters round the crowd), and 277 combat takes re-shouted.
+    - `floppy-hand-bat.png`, the extended hand still gripping the disc: a swing shows it whenever the disc is in your hand, as a racket. With the disc thrown, a swing is still the bare palm.
+    - The meltdown runs as long as Elon's last three takes (about 6.6 s), so the blast lands on the cut-off "MA—". The stare waits for the epilogue take to finish (10-12 s, deadpan).
+    - 119 re-shouted takes ran on with up to 2 s of wordless noise after the line. `scripts/find-endgame-take-tails.py` (run with the voice lab's Python, for its Whisper) lists where each last word ends, and the importer cuts there, matched by the WAV's hash so a retake is never cut.
+    - Unused until their mechanics exist: the Optimus sheets, the roadster, the carried pose, and the absorb, free, truck and Optimus lines.
+  - **Sound, 2026-10-27** (Jonathan: "there should be an overarching low computer hum, fans, and the ships should make noise, the doges should bark"). All synthesized live in `kit.ts`, heard from where they happen (the listener is the camera):
+    - The arena sounds like the inside of a computer: mains hum, room air, a fan in each of the 8 pillars drifting in speed, and now and then a hard disk seeking in one. In the meltdown it all winds down two octaves and dies. `?bed=0` leaves it out.
+    - Every ship has an engine: a throbbing growl whose whine climbs as it charges a shot, with an overdone Doppler bend. A ship shot down winds down as it goes.
+    - Ship shots, warps, the portal, derezzes and sink landings come from where they happen.
+    - The doges bark as they run (not with a disc in their mouth), growl on a tackle and yelp when bonked.
+    - Recorded takes: `scripts/generate-endgame-sfx.py` makes barks, yelps, growls, the rocket, a sink smashing and the blast with Stable Audio Open 1.0, and keeps the takes LAION CLAP scores best. It runs in the voice lab at `runtime/stable-audio-open/.venv`, after accepting the model's terms on Hugging Face and `uvx hf auth login`. An effect with takes plays them; one without stays synthesized. First run, 2026-10-27: 36 takes in 40 minutes on the M5 Max, including the one-time model download; 16 kept. All five growls scored too far from "growl" (they were scattered clicks), so the growl is still the synth. On the Mac's GPU, diffusers' Brownian-tree noise for this sampler recurses forever; the script swaps in plain Gaussian noise.
   - **The end:** the meltdown, the disassembly and the dialog. Close takes you to the wasteland (`ending.ts`, drawn in code) for the guide's line, the stare and black.
-  - **Not built yet:** the Optimus robots and absorbing people, dying restarting the part (you still respawn), the Cybertruck, the victory volley of props, and all the new art. The doges are drawn in code, and the face is still the placeholder. 1, 2 and 3 jump to a part, N skips ahead, and T opens the trick-shot tuning panel.
+  - **Not built yet:** the Optimus robots and absorbing people, dying restarting the part (you still respawn), the Cybertruck, and the victory volley of props. 1, 2 and 3 jump to a part, N skips ahead, and T opens the trick-shot tuning panel.
 
 Build and serve (from the repo root):
 
@@ -198,6 +216,10 @@ PDOOM_PORT=5228 node prototypes/endgame/shots.mjs
 - It throws at the face bits through all three of Elon's attacks, and checks Grok warned it.
 - In part 3 it stands in three places and checks the route re-fits each time, then lands the trick shot with `?autosteer=1`.
 - It watches the end through the dialog, clicks Close, and follows the wasteland to black.
-- It checks that a missed throw resets and that running out the countdown only delays the launch. `shots.mjs` plays each mode with a simple bot and checks that both practices clear, the MCP loses integrity, it falls, and the console is clean (2026-10-23: all three OK). `stills.mjs` stages review screenshots into `output/endgame-proto/stills/`.
+- It checks that a missed throw resets and that running out the countdown only delays the launch.
+- It checks the swarm's portal opens.
+- Where the art and voice batch is imported, it checks every sheet loaded and the takes played, and where Doom's tracks are rendered, that E2M8 plays in the fight and D_VICTOR at the end (it launches Chrome with autoplay allowed; `?mute=1` keeps it silent).
+
+`shots.mjs` plays each mode with a simple bot and checks that both practices clear, the MCP loses integrity, it falls, and the console is clean (2026-10-23: all three OK). `stills.mjs` stages review screenshots into `output/endgame-proto/stills/`.
 
 Tuning as built: A takes about 70 s to kill the MCP (40 a hit through the gap, 70 on the face). B starts at 50 for a scored rally and doubles each exchange up to 400; the MCP returns 60/40/25/10% of your returns. C does 20 (40 on the face) for your disc plus 6 for each of the crowd's that gets through. All three are untested by a human so far.

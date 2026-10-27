@@ -145,28 +145,137 @@ export function makeHud(){
 }
 export type Hud=ReturnType<typeof makeHud>;
 
-// Original synth sounds only, quiet; M mutes. Nothing plays until the first click.
+// Original synth sounds, quiet, and Doom's own tracks for THE BOSS; M mutes. Nothing plays until the first click.
+// A sound given a place (`at`) is heard from there. Two kinds run all the time: the arena's own noise, the
+// inside of a computer (bed), and each ship's engine (engine).
+export type Engine={move(p:THREE.Vector3,charge:number,dt:number):void;stop(dying:boolean):void};
 export function makeSfx(){
  let ctx:AudioContext|null=null,master:GainNode|null=null,muted=new URLSearchParams(location.search).has('mute');
+ // the music has a bus of its own, which the cut to silence leaves alone and which dips while anyone talks
+ let songBus:GainNode|null=null,duckBus:GainNode|null=null,song:{src:AudioBufferSourceNode;gain:GainNode}|null=null,want:string|null=null;
+ // where tone() and noise() go: master, or the panner of a sound from somewhere
+ let out:AudioNode|null=null;
+ const ear=new THREE.Vector3(),look=new THREE.Vector3();
  function ensure(){
   if(!ctx){
    ctx=new AudioContext();master=ctx.createGain();master.gain.value=muted?0:.55;master.connect(ctx.destination);
-   const hum=ctx.createGain(),lp=ctx.createBiquadFilter();hum.gain.value=.035;lp.type='lowpass';lp.frequency.value=260;hum.connect(lp).connect(master);
-   for(const hz of [55,55.4,110.3]){const o=ctx.createOscillator();o.type='sawtooth';o.frequency.value=hz;o.connect(hum);o.start();}
+   songBus=ctx.createGain();songBus.gain.value=muted?0:1;duckBus=ctx.createGain();duckBus.connect(songBus).connect(ctx.destination);
+   bed();void loadClips();
   }
   if(ctx.state==='suspended')ctx.resume();
  }
  function tone(hz:number,dur:number,type:OscillatorType='sine',vol=.2,slide=0,delay=0){
   if(!ctx||!master)return;const t=ctx.currentTime+delay,o=ctx.createOscillator(),g=ctx.createGain();
   o.type=type;o.frequency.setValueAtTime(hz,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,hz+slide),t+dur);
-  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0008,t+dur);o.connect(g).connect(master);o.start(t);o.stop(t+dur+.02);
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0008,t+dur);o.connect(g).connect(out??master);o.start(t);o.stop(t+dur+.02);
  }
  function noise(dur:number,vol:number,hz:number,q=1,sweep=0,delay=0){
   if(!ctx||!master)return;const t=ctx.currentTime+delay,n=Math.floor(ctx.sampleRate*dur),b=ctx.createBuffer(1,n,ctx.sampleRate),d=b.getChannelData(0);
   for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
   const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();s.buffer=b;f.type='bandpass';f.Q.value=q;f.frequency.setValueAtTime(hz,t);
   if(sweep)f.frequency.exponentialRampToValueAtTime(Math.max(60,hz+sweep),t+dur);
-  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0008,t+dur);s.connect(f).connect(g).connect(master);s.start(t);
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0008,t+dur);s.connect(f).connect(g).connect(out??master);s.start(t);
+ }
+ // one dog's bark: a buzz bent up then down, through two mouth resonances, with breath on the front
+ function yap(f0:number,vol:number,delay=0){
+  if(!ctx||!master)return;const t=ctx.currentTime+delay,o=ctx.createOscillator(),g=ctx.createGain(),m1=ctx.createBiquadFilter(),m2=ctx.createBiquadFilter();
+  o.type='sawtooth';o.frequency.setValueAtTime(f0*.75,t);o.frequency.linearRampToValueAtTime(f0*1.2,t+.03);o.frequency.exponentialRampToValueAtTime(f0*.55,t+.15);
+  m1.type=m2.type='bandpass';m1.frequency.value=f0*1.9;m1.Q.value=3;m2.frequency.value=f0*4.1;m2.Q.value=4;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+.17);
+  o.connect(m1).connect(g);o.connect(m2).connect(g);g.connect(out??master);o.start(t);o.stop(t+.2);noise(.05,vol*.25,f0*3,1.2,0,delay);
+ }
+ // a panner at a place in the arena; `ref` is how far off it's heard at full strength
+ function panner(at:{x:number;y:number;z:number},ref:number,to:AudioNode){
+  const n=ctx!.createPanner();n.panningModel='HRTF';n.distanceModel='inverse';n.refDistance=ref;n.rolloffFactor=1;
+  n.positionX.value=at.x;n.positionY.value=at.y;n.positionZ.value=at.z;n.connect(to);return n;
+ }
+ // what f() plays, heard from `at` (or from everywhere, without one)
+ function from(at:THREE.Vector3|undefined,f:()=>void,ref=8){
+  if(!at||!ctx||!master)return f();const pan=panner(at,ref,master);out=pan;try{f();}finally{out=null;}setTimeout(()=>pan.disconnect(),6000);
+ }
+ // four seconds of white noise, looped by everything that hisses or roars, each from its own point in it
+ let hissBuf:AudioBuffer|null=null;
+ function hiss(){
+  const c=ctx!;if(!hissBuf){const n=c.sampleRate*4,d=(hissBuf=c.createBuffer(1,n,c.sampleRate)).getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;}
+  const s=c.createBufferSource();s.buffer=hissBuf;s.loop=true;s.start(0,rand(0,3.9));return s;
+ }
+ // a slow swing on a setting: `depth` either side of where it is, `hz` times a second
+ function wobble(p:AudioParam,hz:number,depth:number){const o=ctx!.createOscillator(),g=ctx!.createGain();o.frequency.value=hz;g.gain.value=depth;o.connect(g).connect(p);o.start();return o;}
+ // Recorded effects, where scripts/generate-endgame-sfx.py has made them (doom-web/local/endgame/sfx/):
+ // a few takes a name, one picked at random and its speed nudged. A name with none stays synthesized.
+ const clips=new Map<string,AudioBuffer[]>();
+ async function loadClips(){
+  try{
+   const r=await fetch('/local/endgame/sfx/manifest.json');if(!r.ok)return;const m=await r.json() as {clips:Record<string,string[]>};
+   for(const [name,files] of Object.entries(m.clips)){
+    const takes=await Promise.all(files.map(f=>fetch('/local/endgame/sfx/'+f).then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(b=>ctx!.decodeAudioData(b)).catch(()=>null)));
+    clips.set(name,takes.filter((b):b is AudioBuffer=>!!b));
+   }
+  }catch{/* none made: the synth */}
+ }
+ function clip(name:string,vol=1,delay=0){
+  const takes=clips.get(name);if(!takes?.length||!ctx||!master)return false;
+  const s=ctx.createBufferSource(),g=ctx.createGain();s.buffer=takes[Math.floor(Math.random()*takes.length)];s.playbackRate.value=rand(.94,1.06);g.gain.value=vol;
+  s.connect(g).connect(out??master);s.start(ctx.currentTime+delay);return true;
+ }
+
+ // The arena is the inside of a computer: mains hum, the roar of the room's air, a fan in each pillar,
+ // each drifting in speed, and now and then a hard disk seeking in one of them. ?bed=0 leaves it out.
+ let bedBus:GainNode|null=null,seekAt=0,seekBuf:AudioBuffer|null=null;const spin:OscillatorNode[]=[],fanBands:BiquadFilterNode[]=[],fanPans:PannerNode[]=[];
+ function bed(){
+  const c=ctx!;if(new URLSearchParams(location.search).get('bed')==='0')return;
+  bedBus=c.createGain();bedBus.connect(master!);
+  const hum=c.createGain();hum.connect(bedBus);wobble(hum.gain,.13,.15);
+  for(const [hz,v] of [[60,.012],[120,.03],[180,.01],[240,.008],[360,.004]]){const o=c.createOscillator(),g=c.createGain();o.frequency.value=hz;g.gain.value=v;o.connect(g).connect(hum);o.start();spin.push(o);}
+  const lp=c.createBiquadFilter(),air=c.createGain();lp.type='lowpass';lp.frequency.value=190;air.gain.value=.4;hiss().connect(lp).connect(air).connect(bedBus);fanBands.push(lp);
+  for(const p of PILLARS){
+   const k=rand(.85,1.2),pan=panner({x:p.x,y:ARENA.pillarH*.6,z:p.z},10,bedBus),bp=c.createBiquadFilter(),g=c.createGain(),blade=c.createOscillator(),bg=c.createGain();
+   bp.type='bandpass';bp.frequency.value=720*k;bp.Q.value=.8;g.gain.value=.25;hiss().connect(bp).connect(g).connect(pan);
+   blade.type='triangle';blade.frequency.value=185*k;bg.gain.value=.015;blade.connect(bg).connect(pan);blade.start();
+   wobble(blade.frequency,rand(.03,.08),7*k);wobble(bp.frequency,rand(.03,.08),80);wobble(g.gain,rand(4,7),.04);
+   spin.push(blade);fanBands.push(bp);fanPans.push(pan);
+  }
+  const n=Math.floor(c.sampleRate*.012),d=(seekBuf=c.createBuffer(1,n,c.sampleRate)).getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(n/6))+Math.sin(i/c.sampleRate*TAU*2900)*Math.exp(-i/(n/3))*.5;
+ }
+ // a hard disk seeking: a little run of clicks from one of the pillars
+ function seek(){
+  const c=ctx!;let t=c.currentTime;const pan=fanPans[Math.floor(Math.random()*fanPans.length)];
+  for(let i=0,n=3+Math.floor(rand(0,10));i<n;i++){t+=rand(.02,.09);const s=c.createBufferSource(),g=c.createGain();s.buffer=seekBuf;s.playbackRate.value=rand(.8,1.25);g.gain.value=rand(.05,.11);s.connect(g).connect(pan);s.start(t);}
+ }
+ // the power failing (the meltdown): fans and hum wind down two octaves over `sec`, then nothing
+ function powerDown(sec:number){
+  if(!ctx||!bedBus)return;const t=ctx.currentTime;
+  for(const o of spin)o.detune.setTargetAtTime(-2400,t,sec/3);for(const f of fanBands)f.frequency.setTargetAtTime(60,t,sec/3);
+  bedBus.gain.setTargetAtTime(0,t+sec*.35,sec/5);seekAt=Infinity;
+ }
+
+ // A ship's engine: detuned saws growling through a resonant filter that throbs, a rumble under it, and a
+ // whine that climbs as it charges a shot. It's heard from the ship, its pitch bent as it comes and goes.
+ function engine():Engine|null{
+  if(!ctx||!master)return null;const c=ctx,t=c.currentTime,base=rand(36,47);
+  const pan=panner({x:0,y:-50,z:0},12,master),g=c.createGain(),lp=c.createBiquadFilter();
+  lp.type='lowpass';lp.frequency.value=380;lp.Q.value=7;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+1.2);lp.connect(g).connect(pan);
+  const oscs=([['sawtooth',1,.5],['sawtooth',1.012,.5],['square',2.003,.16]] as [OscillatorType,number,number][]).map(([type,k,v])=>{const o=c.createOscillator(),og=c.createGain();o.type=type;o.frequency.value=base*k;og.gain.value=v;o.connect(og).connect(lp);o.start();return o;});
+  const throb=wobble(lp.frequency,rand(4.5,7),150),rumble=hiss(),rb=c.createBiquadFilter(),rg=c.createGain();rb.type='bandpass';rb.frequency.value=110;rb.Q.value=.7;rg.gain.value=3;rumble.connect(rb).connect(rg).connect(g);
+  const whine=c.createOscillator(),wg=c.createGain();whine.frequency.value=880;wg.gain.value=.01;whine.connect(wg).connect(g);whine.start();
+  let last=-1;
+  return {
+   move(p,charge,dt){
+    const now=c.currentTime,d=p.distanceTo(ear);
+    if(last<0){pan.positionX.value=p.x;pan.positionY.value=p.y;pan.positionZ.value=p.z;}
+    else{pan.positionX.setTargetAtTime(p.x,now,.03);pan.positionY.setTargetAtTime(p.y,now,.03);pan.positionZ.setTargetAtTime(p.z,now,.03);}
+    // Doppler, overdone: sound at 110 m/s, not 343
+    const bend=last<0||dt<=0?1:clamp(1/(1+(d-last)/dt/110),.7,1.4);last=d;
+    for(const o of oscs)o.detune.setTargetAtTime(1200*Math.log2(bend),now,.08);
+    whine.frequency.setTargetAtTime((880+charge*1800)*bend,now,.05);wg.gain.setTargetAtTime(.01+charge*.035,now,.05);lp.frequency.setTargetAtTime(380+charge*900,now,.05);
+   },
+   stop(dying){
+    const now=c.currentTime,end=now+(dying?1:.5);
+    for(const o of [...oscs,whine])o.detune.setTargetAtTime(dying?-2400:0,now,.25);g.gain.setTargetAtTime(0,now,dying?.25:.12);
+    for(const o of [...oscs,whine,throb,rumble])o.stop(end);setTimeout(()=>pan.disconnect(),(end-now+.3)*1000);
+   },
+  };
  }
  const play={
   throw(){noise(.28,.22,900,1.4,2200);tone(420,.16,'triangle',.06,380);},
@@ -175,26 +284,62 @@ export function makeSfx(){
   hit(){tone(150,.4,'sawtooth',.22,-100);noise(.25,.25,700,.8);},
   face(){tone(90,.6,'sawtooth',.28,-50);noise(.35,.3,500,.7);tone(620,.18,'square',.06,-400);},
   slam(){tone(62,.7,'sine',.5,-30);noise(.55,.35,240,.6);},
-  derez(){for(let i=0;i<6;i++)tone(1400-i*190,.09,'square',.05,0,i*.05);noise(.4,.12,3000,.8,-2400);},
+  // a sink landing: the slam, and porcelain smashing
+  sink(at?:THREE.Vector3){from(at,()=>{tone(62,.7,'sine',.5,-30);if(!clip('sink',.8))noise(.55,.35,240,.6);},14);},
+  derez(at?:THREE.Vector3){from(at,()=>{for(let i=0;i<6;i++)tone(1400-i*190,.09,'square',.05,0,i*.05);noise(.4,.12,3000,.8,-2400);},14);},
   pock(perfect:boolean){tone(perfect?1320:880,.08,'sine',.32);noise(.05,.3,perfect?5200:3200,1.2);if(perfect)tone(1980,.12,'triangle',.08,0,.02);},
   whiff(){noise(.16,.1,1400,1,-800);},
   charge(){tone(260,.75,'sawtooth',.05,700);},
-  serve(){tone(520,.28,'sawtooth',.09,260);noise(.2,.12,1800,1.2);},
+  serve(at?:THREE.Vector3){from(at,()=>{tone(520,.28,'sawtooth',.09,260);noise(.2,.12,1800,1.2);},16);},
   hurt(){tone(240,.3,'square',.13,-140);},
   shatter(){noise(.16,.2,5200,2);tone(1900,.09,'square',.04,-900);},
   whistle(){tone(2100,1.6,'sine',.05,-1500);},
-  boom(){tone(45,1.6,'sine',.6,-15);noise(1.4,.45,180,.5);for(let i=0;i<5;i++)noise(.3,.2,400+i*300,.8,0,.25*i);},
+  boom(){tone(45,1.6,'sine',.6,-15);if(clip('blast',.9))return;noise(1.4,.45,180,.5);for(let i=0;i<5;i++)noise(.3,.2,400+i*300,.8,0,.25*i);},
   spot(){tone(990,.08,'square',.05);tone(1320,.1,'square',.05,0,.09);},
-  bark(){tone(780,.07,'square',.08,-260);tone(640,.09,'square',.07,-200,.11);},
-  zap(){noise(.07,.1,4200,3);tone(2600+Math.random()*2200,.05,'sawtooth',.025,-1500);},
+  // a doge: "ruff ruff", or once, higher
+  bark(at?:THREE.Vector3,twice=true){from(at,()=>{if(clip('bark',.6))return;const f=rand(480,640);yap(f,.5);if(twice)yap(f*rand(.9,1),.42,rand(.16,.22));},6);},
+  // a doge on the tackle
+  growl(at?:THREE.Vector3){from(at,()=>{if(!clip('growl',.6))yap(rand(330,400),.45);},6);},
+  // a bonked doge, off to the moon: a yelp, and the rocket lighting under it
+  yelp(at?:THREE.Vector3){from(at,()=>{if(!clip('yelp',.6)){yap(rand(900,1100),.45);yap(rand(1100,1300),.35,.13);}if(!clip('rocket',.5,.2))noise(1.4,.2,400,.7,3000,.2);},6);},
+  zap(at?:THREE.Vector3){from(at,()=>{noise(.07,.1,4200,3);tone(2600+Math.random()*2200,.05,'sawtooth',.025,-1500);},10);},
   pulse(){tone(70,1.1,'sawtooth',.3,160);noise(.9,.3,500,.6,2600);},
   grok(){tone(660,.07,'sine',.07);tone(990,.09,'sine',.06,0,.08);},
   tick(){tone(1760,.05,'square',.04);},
   whine(){tone(180,4.4,'sawtooth',.07,1900);tone(183,4.4,'square',.03,1880);},
   alarm(){for(let i=0;i<8;i++){tone(i%2?620:880,.24,'square',.045,0,i*.26);}},
   wind(){noise(18,.16,260,.4,-80);noise(18,.07,900,.8,300,1);},
+  warp(at?:THREE.Vector3){from(at,()=>{noise(1.1,.22,3400,1,-3000);tone(1500,.9,'sawtooth',.05,-1300);},24);},
+  portal(at?:THREE.Vector3){from(at,()=>{tone(48,2.6,'sawtooth',.22,30);tone(97,2.6,'square',.06,60);noise(2.4,.25,260,.5,1400);},40);},
  };
- return {ensure,play,toggle(){muted=!muted;if(master)master.gain.value=muted?0:.55;return muted;},get muted(){return muted;},
+ // Doom's tracks (scripts/prepare-doom-music.mjs renders them into ignored doom-web/local/): one at a time,
+ // fading across; null fades out. A missing file is silence.
+ async function music(url:string|null,{vol=.4,fade=1.5}={}){
+  if(!ctx||!duckBus||want===url)return;want=url;
+  const t=ctx.currentTime,old=song;song=null;
+  if(old){old.gain.gain.cancelScheduledValues(t);old.gain.gain.setValueAtTime(old.gain.gain.value,t);old.gain.gain.linearRampToValueAtTime(0,t+fade);old.src.stop(t+fade+.05);}
+  if(!url)return;
+  try{
+   const r=await fetch(url);if(!r.ok)return;const buf=await ctx.decodeAudioData(await r.arrayBuffer());if(want!==url)return;// another track was asked for meanwhile
+   const src=ctx.createBufferSource(),gain=ctx.createGain(),now=ctx.currentTime;src.buffer=buf;src.loop=true;
+   gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime(vol,now+fade);src.connect(gain).connect(duckBus);src.start(now);song={src,gain};
+  }catch{/* no track: silence */}
+ }
+ return {ensure,play,music,engine,powerDown,
+  // every frame: hear from the camera, and let a disk seek now and then
+  listen(cam:THREE.Camera){
+   if(!ctx)return;const l=ctx.listener,t=ctx.currentTime;cam.getWorldPosition(ear);cam.getWorldDirection(look);
+   l.positionX.setTargetAtTime(ear.x,t,.02);l.positionY.setTargetAtTime(ear.y,t,.02);l.positionZ.setTargetAtTime(ear.z,t,.02);
+   l.forwardX.setTargetAtTime(look.x,t,.02);l.forwardY.setTargetAtTime(look.y,t,.02);l.forwardZ.setTargetAtTime(look.z,t,.02);
+   if(fanPans.length&&t>seekAt){if(seekAt)seek();seekAt=t+rand(2.5,8);}
+  },
+  toggle(){muted=!muted;if(master)master.gain.value=muted?0:.55;if(songBus)songBus.gain.value=muted?0:1;return muted;},get muted(){return muted;},
+  get track(){return want;},
+  // which effects have recorded takes loaded
+  get recorded(){return [...clips].filter(([,t])=>t.length).map(([n])=>n);},
+  duck(on:boolean){if(ctx&&duckBus)duckBus.gain.setTargetAtTime(on?.6:1,ctx.currentTime,.15);},
+  // for the voice takes (voice.ts), which share the mute and the cut to silence
+  audio(){return ctx&&master?{ctx,out:master as AudioNode}:null;},
   // a hard cut to silence (the ending's cut to black), and back
   hush(on:boolean){if(ctx&&master)master.gain.setTargetAtTime(on||muted?0:.55,ctx.currentTime,.015);}};
 }
@@ -244,8 +389,8 @@ export class Trail{
  dispose(){this.line.removeFromParent();this.line.geometry.dispose();}
 }
 
-export function textSprite(text:string,color:string,height=1,weight='900'){
- const c=document.createElement('canvas'),g=c.getContext('2d')!,font=`${weight} 64px "Courier New", monospace`;g.font=font;
+export function textSprite(text:string,color:string,height=1){
+ const c=document.createElement('canvas'),g=c.getContext('2d')!,font='64px DoomSmall, monospace';g.font=font;
  const w=Math.ceil(g.measureText(text).width)+28;c.width=w;c.height=92;g.font=font;g.textBaseline='middle';
  g.shadowColor=color;g.shadowBlur=16;g.fillStyle=color;g.fillText(text,14,48);g.shadowBlur=0;g.fillStyle='rgba(255,255,255,.55)';g.fillText(text,14,48);
  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;
@@ -259,7 +404,7 @@ export function makeFloppy(color:string){
  const shutterGeo=new THREE.BoxGeometry(.27,.058,.21).translate(.02,0,-.185);
  g.add(new THREE.Mesh(shutterGeo,new THREE.MeshBasicMaterial({color:0x33434b})),lines(shutterGeo,PAL.core,.7));
  const c=document.createElement('canvas');c.width=128;c.height=64;const x=c.getContext('2d')!;
- x.fillStyle='#0b1d26';x.fillRect(0,0,128,64);x.strokeStyle=color;x.lineWidth=3;x.strokeRect(4,4,120,56);x.fillStyle=color;x.font='bold 22px "Courier New", monospace';x.fillText('1.44 MB',18,40);
+ x.fillStyle='#0b1d26';x.fillRect(0,0,128,64);x.strokeStyle=color;x.lineWidth=3;x.strokeRect(4,4,120,56);x.fillStyle=color;x.font='22px DoomSmall, monospace';x.fillText('1.44 MB',18,40);
  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;
  const label=new THREE.Mesh(new THREE.PlaneGeometry(.42,.21).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:tex}));label.position.set(0,.027,.13);g.add(label);
  const halo=new THREE.Mesh(new THREE.RingGeometry(.4,.47,40).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
