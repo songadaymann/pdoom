@@ -1,7 +1,8 @@
 // Plays THE BOSS (the 2026-10-26 redesign) headless and muted. A bot hits back the balls aimed at it
 // through the serve and the swarm, then in part 2 swats what's on it and throws at the glowing bits
 // through Elon's attacks. In part 3 it stands in three places to check the bank route follows it, then
-// lands the trick shot with ?autosteer=1. A second page throws a bad trick shot and checks the reset,
+// lands the trick shot with ?autosteer=1, and watches the end through to black (it clicks Close on the
+// dialog to get to the wasteland). A second page throws a bad trick shot and checks the reset,
 // then runs the countdown out and checks the launch is only delayed. Screenshots go to
 // output/endgame-proto/boss/. Server up first (port 5228).
 import {chromium} from 'playwright';
@@ -64,7 +65,15 @@ async function open(q){
  const slow=await p.until(s=>s.mode_state.trick&&s.mode_state.timeScale<.45&&s.mode_state.trick.idx>=1,20000);await p.shot('4-trick-bullet-time');log.bulletTime=!!slow;
  const last=await p.until(s=>s.mode_state.trick&&s.mode_state.trick.idx>=marks.length,30000);if(last){await wait(500);await p.shot('5-trick-window');}
  const won=await p.until(s=>s.phase==='down',30000);log.trickWin=!!won;log.trickBest=(await p.st()).mode_state.best;
- await wait(5000);await p.shot('6-end');log.errors=p.errors;await p.page.close();
+ // the end: the meltdown, the disassembly, the dialog, then Close into the wasteland, the stare, and black
+ await wait(2400);await p.shot('6-meltdown');
+ const rud=await p.until(s=>s.mode_state.ending==='rud',8000);if(rud){await wait(900);await p.shot('7-disassembly');}
+ const dialog=await p.until(s=>s.mode_state.ending==='dialog',25000);if(dialog){await wait(300);await p.shot('8-dialog');await p.page.click('#dialog-close');}
+ const waste=await p.until(s=>s.mode_state.phase==='waste'&&s.mode_state.pt>5,10000);if(waste)await p.shot('9-wasteland');
+ const stare=await p.until(s=>s.mode_state.ending==='stare',15000);if(stare){await wait(1500);await p.shot('10-stare');}
+ const black=await p.until(s=>s.mode_state.ending==='black',8000);if(black){await wait(3500);await p.shot('11-black');}
+ log.ending=!!(rud&&dialog&&waste&&stare&&black);
+ log.errors=p.errors;await p.page.close();
 }
 {
  const p=await open('&part=3');
@@ -79,7 +88,7 @@ await browser.close();
 console.log(JSON.stringify(log));
 const fits=log.paths.filter(q=>q.key&&q.marks>=3);
 log.pathFollows=fits.length===3&&new Set(fits.map(q=>q.key)).size>=2;
-failed=['swarm','ships','shieldDown','pathFollows','bulletTime','trickWin','missResets','launchDelayed'].filter(k=>!log[k]);
+failed=['swarm','ships','shieldDown','pathFollows','bulletTime','trickWin','ending','missResets','launchDelayed'].filter(k=>!log[k]);
 if(!(log.crowdReturns>0))failed.push('crowdReturns');
 if(['update','starlink','doge'].some(k=>!log.attacksSeen?.[k]))failed.push('attacks');
 if(!(log.grokWarnings>0))failed.push('grok');

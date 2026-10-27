@@ -30,9 +30,9 @@ About 12–14 minutes from the exit to the credits without the maze (the spec's 
 | E5 | **The tower door** | ~15 s | The base of the column opens. "This is the last stand. The real one, this time." Everyone walks in. (If Q2 keeps the maze, it is here: the tower's ground floor.) |
 | E6 | **Arena intro** | ~25 s | The spec's intro, shortened: everyone rezzes in at the I/O tower, the column lights, the shield ring spins up. `GREETINGS, PROGRAMS. EVERYTHING HERE IS CALLED X NOW.` A new opener addresses both founders, since both are here. |
 | E7 | **The fight** | ~6–8 min | Three parts ([below](#the-fight-three-parts-that-escalate)): the Fleet, the Face, the Last Throw (LAUNCH). The other founder fights at your right shoulder and can't be killed, the same rule as the Last Stand. A downed human can be carried off and absorbed, and a hit on the face beside them frees them. You can die, which restarts the part. |
-| E8 | **The victory volley** | ~20 s | The shield shatters and every survivor throws their own signature prop at the falling column, with a name tag (spec §4.5's beat). Then the `MCP.EXE` illegal-operation dialog, Details: `p(DOOM): 0%.` The walk into the beam is dropped (Q10). |
-| E9 | **Dawn** | ~1.5 min | Spec §8.4: the Bliss crest at dawn, people step out one at a time with a "Copying…" chime, the world p(DOOM) rolls to 0% for the first time. The thank-yous from camp night move here (Q4). Each CEO's habit beat (Sam drafts a post, Dario opens a 212-page Notepad file). Last shot: both founders on the crest, an awkward nod. |
-| E10 | **Credits** | 2–3 min | Spec §4.7, the Windows 95 credits homage over the clouds. |
+| E8 | **The disassembly** | ~17 s | Jonathan, 2026-10-26: "the destroying of elon needs to be hella dramatic." The camera cuts to a wide, low shot and pulls back. For 4.4 s the column melts down: cracks of light run up it, the shield panels blow off one by one, his face glitches and un-downloads back into big blocks, and he tries to launch anyway (`ROLLING BACK…`, `I'M GOING TO MARS. I'M GOING TO MA—`). Then `RAPID UNSCHEDULED DISASSEMBLY.`: a white-out, the blast, a shockwave that knocks everyone flat, and the X crown spinning off into the sky. His last words come from the rubble, Grok asks for a job, and the `MCP.EXE` illegal-operation dialog pops up (Details: `p(DOOM): 0%.`). The prop volley (spec §4.5) could fold into the blast. The walk into the beam is dropped (Q10). |
+| E9 | **The wasteland** | ~16 s | Jonathan, 2026-10-26: Close the dialog, and everyone is teleported to an apocalyptic wasteland. The Windows hill is burnt brown, ash is falling, and the column's stump smokes behind them. The founder you didn't pick tells you: "…we did bring about the apocalypse and the near extinction of humankind. But we also drove a ton of great value to the shareholders" (`end-value`). Everyone turns and looks into the camera, and it cuts to black. This replaces the spec's dawn on the crest (Q15). |
+| E10 | **Credits** | 2–3 min | After the black: spec §4.7, the Windows 95 credits homage. |
 
 **Who owns what.** The hub lane (session `safe-mode-progression`) owns the hill's "after 4" look, the tower as scenery from the meadow, the face's download steps, and where rescued people stand. This lane owns E0–E10: the guide scene, the discs, the march, the walk past the edge (the Grid floor beyond the boundary is part of the walk, built as its own module and agreed with the hub lane), the tower and the fight. Code goes in new `src/doom-endgame-*.ts` modules with one narrow hook into `src/doom-outside.ts`, agreed with the hub lane first.
 
@@ -120,6 +120,7 @@ His attacks come on a cycle, and Grok's chat bubble warns you about 2 s before e
 12. **The robots.** Optimus carrying people to the pit is a new system. Without it, a downed person would just be absorbed after a few seconds. The robots make losing people visible and give you something to save, which is why they're in.
 13. **Grok as a character.** It's a real product, voiced by a designed voice and kept on the same parody footing as the MCP. Its warnings are what make the busier fight readable.
 14. **Fillers.** The Cybertruck and the sinks both arrive below 550. Keep both, or pick one?
+15. **The dawn.** The wasteland replaces E9's dawn on the crest (p(DOOM) rolling to 0%, the thank-yous moved there from camp night, the founders' nod). Keep the thank-yous somewhere, maybe over the credits, or cut them?
 
 ## Draft lines
 
@@ -171,6 +172,7 @@ Three small Three.js scenes in the 1982 *Tron* end-game look: black void, neon g
   - **Part 2:** the over-the-air update, Starlink and the doges (`attacks.ts`), plus sinks below 550, each warned by Grok in a chat bubble; the attack cycle that speeds up and pairs attacks, and the Grok roast and retrain gags.
   - **Part 3:** the 60 s launch countdown with its delays, and the bank route fitted to wherever you stand.
   - **Lines:** every line used is the hand-off doc's draft, in `lines.ts`: Elon's as captions, Grok's in the bubble, the guide's and prisoners' as toasts, and shouts over people's heads.
+  - **The end:** the meltdown, the disassembly and the dialog. Close takes you to the wasteland (`ending.ts`, drawn in code) for the guide's line, the stare and black.
   - **Not built yet:** the Optimus robots and absorbing people, dying restarting the part (you still respawn), the Cybertruck, the victory volley of props, and all the new art. The doges are drawn in code, and the face is still the placeholder. 1, 2 and 3 jump to a part, N skips ahead, and T opens the trick-shot tuning panel.
 
 Build and serve (from the repo root):
@@ -195,6 +197,7 @@ PDOOM_PORT=5228 node prototypes/endgame/shots.mjs
 - It returns the balls through the serve and the swarm, and checks the crowd hits some back.
 - It throws at the face bits through all three of Elon's attacks, and checks Grok warned it.
 - In part 3 it stands in three places and checks the route re-fits each time, then lands the trick shot with `?autosteer=1`.
+- It watches the end through the dialog, clicks Close, and follows the wasteland to black.
 - It checks that a missed throw resets and that running out the countdown only delays the launch. `shots.mjs` plays each mode with a simple bot and checks that both practices clear, the MCP loses integrity, it falls, and the console is clean (2026-10-23: all three OK). `stills.mjs` stages review screenshots into `output/endgame-proto/stills/`.
 
 Tuning as built: A takes about 70 s to kill the MCP (40 a hit through the gap, 70 on the face). B starts at 50 for a scored rally and doubles each exchange up to 400; the MCP returns 60/40/25/10% of your returns. C does 20 (40 on the face) for your disc plus 6 for each of the crowd's that gets through. All three are untested by a human so far.

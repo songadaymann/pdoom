@@ -190,8 +190,13 @@ export function makeSfx(){
   pulse(){tone(70,1.1,'sawtooth',.3,160);noise(.9,.3,500,.6,2600);},
   grok(){tone(660,.07,'sine',.07);tone(990,.09,'sine',.06,0,.08);},
   tick(){tone(1760,.05,'square',.04);},
+  whine(){tone(180,4.4,'sawtooth',.07,1900);tone(183,4.4,'square',.03,1880);},
+  alarm(){for(let i=0;i<8;i++){tone(i%2?620:880,.24,'square',.045,0,i*.26);}},
+  wind(){noise(18,.16,260,.4,-80);noise(18,.07,900,.8,300,1);},
  };
- return {ensure,play,toggle(){muted=!muted;if(master)master.gain.value=muted?0:.55;return muted;},get muted(){return muted;}};
+ return {ensure,play,toggle(){muted=!muted;if(master)master.gain.value=muted?0:.55;return muted;},get muted(){return muted;},
+  // a hard cut to silence (the ending's cut to black), and back
+  hush(on:boolean){if(ctx&&master)master.gain.setTargetAtTime(on||muted?0:.55,ctx.currentTime,.015);}};
 }
 export type Sfx=ReturnType<typeof makeSfx>;
 

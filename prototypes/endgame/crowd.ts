@@ -11,11 +11,18 @@ export const CAST=[['liron','Liron Shapira'],['stuart','Stuart Russell'],['eliez
 
 const loader=new THREE.TextureLoader();
 async function tex(url:string){try{const t=await loader.loadAsync(url);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=t.minFilter=THREE.NearestFilter;return t;}catch{return null;}}
+// a founder's meadow sprites: two walk rows and the idle row, 8 directions each
+export async function loadFounder(id:'mario'|'samwise'){
+ const [walk,idle]=await Promise.all([
+  Promise.all(Array.from({length:16},(_,n)=>tex(`/outside-assets/guide-${id}-${Math.floor(n/8)}-${n%8}.png`))),
+  Promise.all(Array.from({length:8},(_,n)=>tex(`/outside-assets/guide-${id}-idle-${n}.png`))),
+ ]);
+ return {walk,idle};
+}
 export async function loadCast(guide:'mario'|'samwise'){
- const [people,walk,idle]=await Promise.all([
+ const [people,{walk,idle}]=await Promise.all([
   Promise.all(CAST.map(([id])=>Promise.all(Array.from({length:32},(_,n)=>tex(`/outside-assets/figure-${id}-${Math.floor(n/8)}-${n%8}.png`))))),
-  Promise.all(Array.from({length:16},(_,n)=>tex(`/outside-assets/guide-${guide}-${Math.floor(n/8)}-${n%8}.png`))),
-  Promise.all(Array.from({length:8},(_,n)=>tex(`/outside-assets/guide-${guide}-idle-${n}.png`))),
+  loadFounder(guide),
  ]);
  return {people,walk,idle};
 }
@@ -24,6 +31,7 @@ export class Person{
  sprite:THREE.Sprite;ring:THREE.Mesh;pos=new THREE.Vector3();target=new THREE.Vector3();dodge=new THREE.Vector3();dodgeUntil=0;dodgeAt=-1;pendingDodge=new THREE.Vector3();
  facing=Math.PI;moving=false;down=0;hasDisc=true;nextThrow=rand(3,9);reaction=rand(.3,.9);hop=0;isPlayer=false;
  override:THREE.Vector3|null=null;overrideUntil=0;// somewhere to be instead of the formation (cover from the update)
+ faceTo:THREE.Vector3|null=null;// something to look at instead of the MCP (the ending)
  constructor(scene:THREE.Scene,public index:number,public id:string,public name:string,private frames:(THREE.Texture|null)[],public guide=false,private idle:(THREE.Texture|null)[]=[]){
   this.sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:frames[0],color:guide?0xd8e4e8:0xa9cbd4,transparent:true,alphaTest:.5}));
   this.sprite.center.set(.5,0);this.sprite.scale.set(1.8,1.8,1);scene.add(this.sprite);
@@ -49,7 +57,7 @@ export class Person{
   const goal=this.override&&t<this.overrideUntil?this.override.clone():this.target.clone().add(this.dodge),to=goal.sub(this.pos);to.y=0;const dist=to.length();
   this.moving=false;
   if(this.down<=0&&dist>.25){const speed=(this.guide?8.5:5.5)*(dist>6?1.4:1);this.pos.addScaledVector(to.normalize(),Math.min(dist,speed*dt));this.facing=Math.atan2(to.x,to.z);this.moving=true;}
-  else if(this.down<=0)this.facing=Math.atan2(look.x-this.pos.x,look.z-this.pos.z);
+  else if(this.down<=0){const at=this.faceTo??look;this.facing=Math.atan2(at.x-this.pos.x,at.z-this.pos.z);}
   resolve(this.pos,.4);
   const m=this.sprite.material,angle=((Math.atan2(cam.x-this.pos.x,cam.z-this.pos.z)-this.facing)*180/Math.PI+720)%360,rot=Math.round(angle/45)%8;
   const frame=this.guide?(this.moving?this.frames[(Math.floor(t*5)%2)*8+rot]:this.idle[rot]||this.frames[rot]):this.frames[(this.moving?Math.floor(t*6+this.index)%4:0)*8+rot];

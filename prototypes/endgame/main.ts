@@ -22,6 +22,8 @@ export interface Mode{
  highlight?(c:Ctx):number|null;heldAlways?:boolean;
  // a mode with run() drives its own phases instead of practice → wake → fight
  run?(c:Ctx,dt:number):void;key?(c:Ctx,code:string):void;crowdRecDamage?:number;
+ // the MCP.EXE dialog's Close (default: restart)
+ dialogClose?(c:Ctx):void;
 }
 export interface Ctx{
  stage:Stage;input:Input;player:Player;hud:Hud;sfx:Sfx;sparks:Sparks;mcp:MCP;discs:Discs;mode:Mode;
@@ -156,7 +158,7 @@ async function boot(){
   if(started)mode.key?.(c,code);
  }
  input.onKey(onKey);
- document.getElementById('dialog-close')!.onclick=restart;
+ document.getElementById('dialog-close')!.onclick=()=>{if(mode.dialogClose)mode.dialogClose(c);else restart();};
  document.getElementById('dialog-details')!.onclick=()=>{(document.getElementById('dialog-more') as HTMLElement).hidden=false;};
  const overlay=document.getElementById('start') as HTMLElement;
  document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement===canvas){started=true;overlay.hidden=true;sfx.ensure();}else if(c.phase!=='down')overlay.hidden=false;});

@@ -27,6 +27,8 @@ export const GUIDE:Record<'mario'|'samwise',Record<string,string>>={
   'miss-2':'Again. The lights moved with you. Follow them.',
   delay:'He delayed it. Of course he delayed it. Go again.',
   win:"That's it. That's the one.",
+  // the wasteland, Jonathan's line (2026-10-26), lightly punched up
+  value:'Well. Yes. I suppose we did bring about the apocalypse, and the near extinction of humankind. But we also drove a great deal of value for our shareholders.',
  },
  samwise:{
   ships:"Ships! When they shoot, swing. Hit it back three times and it goes down. It's basically tennis. I've played tennis.",
@@ -52,6 +54,7 @@ export const GUIDE:Record<'mario'|'samwise',Record<string,string>>={
   'miss-2':'Again! Follow the lights!',
   delay:'He delayed it? Ha. Go again, go again!',
   win:"Yes! That's the one.",
+  value:'Well, yeah. I guess we did bring about the apocalypse. And the near extinction of humankind. But we also drove a ton of great value to the shareholders.',
  },
 };
 
@@ -91,6 +94,7 @@ export const ELON={
  close:'WAIT. WAIT, WAIT, WAIT.',
  miss:["MISSED. I'D FIRE YOU, BUT YOU DON'T WORK FOR ME. YET.","THAT WAS PATHETIC. I'M POSTING IT."],
  delay:['LAUNCH DELAYED. NEW DATE: NEXT YEAR.','SLIGHT DELAY. TWO WEEKS. MAYBE.'],
+ dying:['ROLLING BACK THE UPDATE. ROLLING BACK. ROLLBACK FAILED.',"I'M GOING TO MARS. I'M GOING TO MA—"],
  last:'EXCESSIVE AUTOMATION WAS A MISTAKE. HUMANS ARE UNDERRATED.',
  chat:["IN 2014 I SAID AI WAS SUMMONING THE DEMON. GOOD NEWS: I'M THE DEMON.","YOUR DISCS HAVE BEEN COMMUNITY NOTED. READERS ADDED CONTEXT: YOU'RE LOSING.",'FULL SELF-DEFEATING MODE SHIPS NEXT YEAR. DEFINITELY NEXT YEAR.',
   'TWENTY HUMANS? I WAS PLANNING ON A MILLION. ON MARS.','THROWING IS FREE. HITTING ME REQUIRES A SUBSCRIPTION.',"I'M NOT THE VILLAIN. I'M THE MAIN CHARACTER. COMMON MISTAKE.",

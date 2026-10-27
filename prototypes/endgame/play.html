@@ -55,12 +55,29 @@ canvas{display:block;width:100vw;height:100vh;cursor:crosshair;outline:none}
 #static{position:fixed;inset:0;opacity:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.16) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(255,59,31,.14) 0 2px,transparent 2px 5px);animation:static .12s steps(2) infinite}
 @keyframes static{0%{background-position:0 0,0 0}50%{background-position:0 7px,11px 0}100%{background-position:0 3px,4px 0}}
 #chev i{position:fixed;width:0;height:0;margin:-10px 0 0 -11px;border-left:11px solid transparent;border-right:11px solid transparent;border-bottom:20px solid var(--enemy);filter:drop-shadow(0 0 6px var(--enemy))}
+/* the end: letterbox bars and no HUD, the blast's white flash, the CRT blink into the wasteland, and black */
+#bars::before,#bars::after{content:'';position:fixed;left:0;right:0;height:11vh;background:#000;transition:transform .8s}
+#bars::before{top:0;transform:translateY(-100%)}#bars::after{bottom:0;transform:translateY(100%)}
+.cinema #bars::before,.cinema #bars::after{transform:none}
+.cinema #boss,.cinema #health,.cinema #hint,.cinema #reticle,.cinema #keys,.cinema #modes,.cinema #countdown,.cinema #chev,.cinema #pop,.cinema #vignette,.cinema #static,.cinema #down{display:none!important}
+.cinema #toast{bottom:calc(11vh + 16px)}.cinema #caption{top:calc(11vh + 14px)}.cinema #grok{top:calc(11vh + 70px)}
+#flash{position:fixed;inset:0;background:#fff;opacity:0}
+#crt{position:fixed;inset:0;background:#000;opacity:0}
+#crt.go{animation:crtbg 1.5s forwards}#crt.go::after{content:'';position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1px;background:#fff;box-shadow:0 0 30px 6px #fff;animation:crtline 1.5s forwards}
+@keyframes crtbg{0%{opacity:0}10%{opacity:1}55%{opacity:1}100%{opacity:0}}
+@keyframes crtline{0%{transform:scale(1,40);opacity:0}10%{transform:scale(1,1);opacity:1}28%{transform:scale(.02,1);opacity:1}42%{transform:scale(0,0);opacity:0}100%{opacity:0}}
+#black{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:30}
+#black .t{opacity:0;transition:opacity 1.6s;font-size:44px;letter-spacing:.2em;color:var(--core);text-shadow:0 0 18px var(--line)}
+#black small{opacity:0;transition:opacity 1.6s 1.4s;margin-top:16px;font-size:13px;letter-spacing:.2em;color:#5f8f99}
+#black.title .t,#black.title small{opacity:1}
 [hidden]{display:none!important}
 </style>
 </head>
 <body>
 <canvas id="view" tabindex="0"></canvas>
 <div id="hud">
+ <div id="flash"></div>
+ <div id="bars"></div>
  <div id="modes"><a data-m="ricochet" href="?m=ricochet">A RICOCHET</a><a data-m="tennis" href="?m=tennis">B TENNIS</a><a data-m="volley" href="?m=volley">C VOLLEY</a><a data-m="boss" href="?m=boss">THE BOSS</a><a href="./">ABOUT</a></div>
  <div id="keys">WASD move · Shift run · click throw · N skip ahead · R restart · M mute · THE BOSS: 1 2 3 jump to a part, T tunes the trick shot</div>
  <div id="boss" hidden>MCP — MUSK CONTROL PROGRAM<div class="track"><div id="boss-fill"></div></div></div>
@@ -84,6 +101,8 @@ canvas{display:block;width:100vw;height:100vh;cursor:crosshair;outline:none}
   <div id="dialog-more" hidden>p(DOOM): 0%.</div>
   <div class="btns"><button id="dialog-close" type="button">Close</button><button id="dialog-details" type="button">Details &gt;&gt;</button></div>
  </div>
+ <div id="crt" hidden></div>
+ <div id="black" hidden><div class="t">p(DOOM)</div><small>R PLAYS AGAIN</small></div>
  <div id="loading">LOADING THE GRID…</div>
 </div>
 <script type="module" src="./proto.js"></script>

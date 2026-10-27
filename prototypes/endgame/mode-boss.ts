@@ -1,11 +1,12 @@
 import * as THREE from 'three';
-import {ARENA,PAL,PILLARS,rand,clamp,wrap,glowSprite,textSprite,makeFloppy,Trail} from './kit';
+import {ARENA,PAL,PILLARS,TAU,rand,clamp,wrap,glowSprite,textSprite,makeFloppy,Trail} from './kit';
 import type {Mode,Ctx} from './main';
 import type {Recognizer} from './recognizer';
-import type {Person} from './crowd';
+import {Person,loadFounder} from './crowd';
 import {Sink} from './threats';
 import {Update,Starlink,Doges,type Attack,type Env,type Hitter,type Source} from './attacks';
 import {GUIDE,ELON,GROK,SHOUT,OWN} from './lines';
+import {Wasteland,CAM_FROM,CAM_TO,CAM_LOOK} from './ending';
 
 /* THE BOSS, as redesigned on 2026-10-26 (docs/ENDGAME.md, "The fight: three parts that escalate").
  * 1 THE FLEET (tennis): one ship, then two; click as a shot flashes white in front of you to send it
@@ -19,6 +20,9 @@ import {GUIDE,ELON,GROK,SHOUT,OWN} from './lines';
  * 3 THE LAST THROW (LAUNCH): a 60 s countdown to Mars, the ring closed but for one gap. The 2026-10-23
  *   bank route is fitted to wherever you stand (rotated and mirrored by the arena's symmetry) and
  *   re-fitted as you move. Throw at 1, ride the disc, steer it in. Running out of time only delays it.
+ * THE END: the column melts down on a wide shot (cracks, panels blowing off, the face un-downloading),
+ *   tries to launch, and disassembles; the MCP.EXE dialog; Close, and you're all in a wasteland (ending.ts)
+ *   for the guide's last line, a stare into the camera, and black.
  * Keys 1, 2, 3 jump to each part; N skips to the next; T opens the trick-shot tuning panel.
  * ?autosteer=1 steers the trick shot for smokes. */
 const DEG=Math.PI/180,UP=new THREE.Vector3(0,1,0);
@@ -45,7 +49,7 @@ const TUNE_INFO:[keyof Tune,string,number,number,number][]=[
 const ROUTE:{kind:'wall'|'pillar';off:number;y:number}[]=[{kind:'wall',off:-45,y:2.4},{kind:'pillar',off:-67.5,y:3},{kind:'wall',off:-100,y:3.6},{kind:'pillar',off:-157.5,y:3.4},{kind:'wall',off:-190,y:5}];
 const autosteer=new URLSearchParams(location.search).has('autosteer');
 
-type Phase='intro'|'ships'|'shieldDown'|'trick'|'down';
+type Phase='intro'|'ships'|'shieldDown'|'trick'|'down'|'waste';
 type Kind='update'|'starlink'|'doge'|'sink';
 const WARN:Record<Kind,string[]>={update:GROK.update,starlink:GROK.starlink,doge:GROK.doge,sink:GROK.sink};
 
@@ -90,6 +94,11 @@ let marks:Mark[]=[],route:THREE.Group|null=null,aimLine:THREE.Line|null=null,win
 let pathKey:string|null=null,solvedAt=new THREE.Vector3(1e9,0,0),solveCd=0,solves=0,launchT=COUNTDOWN,delays=0,lastThrowAt=0;
 let chatAt=0,chatN=0,captionFree=0,grokUntil=0,staticAt=-9,behindSaid=-99,downSaid=-99;
 let queue:{who:string;text:string;sec:number;at:number}[]=[],toastFree=0,shouts:{s:THREE.Sprite;p:Person;t:number}[]=[],shoutFree=0;
+// the end: the meltdown, the disassembly, and the wasteland
+const RUD=4.4;
+let ending:'meltdown'|'rud'|'dialog'|'waste'|'stare'|'black'|null=null,waste:Wasteland|null=null,you:Person|null=null,founder:ReturnType<typeof loadFounder>|null=null;
+let cracks:THREE.LineSegments|null=null,crackN=0,crackAt=0,popAt=0,flames:THREE.Sprite[]=[],blast:THREE.Mesh|null=null,blastR=0,quake=0,flashAt=-9;
+const camFrom=new THREE.Vector3(),camTo=new THREE.Vector3(),crownV=new THREE.Vector3();
 const said=new Set<string>(),shoutedAt=new WeakMap<Person,number>(),tmp=new THREE.Vector3();
 const $=(id:string)=>document.getElementById(id) as HTMLElement;
 
@@ -477,10 +486,42 @@ function go(c:Ctx,to:Phase,instant=false){
   c.later(instant?2.4:6.4,()=>grok(c,GROK.launch,4.6));c.later(instant?5:10,()=>own(c,'kokotajlo'));lastThrowAt=c.t+(instant?3:7);
  }
  if(to==='down'){
-  c.phase='down';mcp.die();c.hud.caption('RAPID UNSCHEDULED DISASSEMBLY.',4);c.sfx.play.boom();c.shake(1);c.discs.clear();c.hud.hint('');$('countdown').hidden=true;
-  c.later(.8,()=>guide(c,'win',3));c.later(1.2,()=>{for(const p of c.people)if(Math.random()<.4)shout(c,p,'yes');});
-  c.later(4.2,()=>elon(c,ELON.last,3.4));c.later(7.8,()=>grok(c,GROK.end,4.2));
+  c.phase='down';ending='meltdown';c.player.frozen=true;$('countdown').hidden=true;c.hud.hint('');c.hud.reticle(false);c.discs.clear();$('hud').classList.add('cinema');
+  founder=loadFounder(c.guide.id==='mario'?'samwise':'mario');
+  // a wide, low shot of the column from behind where you stood, pulling back
+  const away=new THREE.Vector3(c.player.pos.x,0,c.player.pos.z).normalize();camFrom.copy(away).multiplyScalar(30).setY(2.6);camTo.copy(away).multiplyScalar(41).setY(1.1);
+  c.cam={pos:camFrom.clone(),look:new THREE.Vector3(0,15,0)};
+  cracks=new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(new Float32Array(70*12*3),3)),new THREE.LineBasicMaterial({color:PAL.white,transparent:true,blending:THREE.AdditiveBlending}));
+  cracks.geometry.setDrawRange(0,0);cracks.frustumCulled=false;mcp.root.add(cracks);crackN=0;
+  flames=[0,1,2,3].map(i=>{const a=i*Math.PI/2+Math.PI/4,f=glowSprite(PAL.enemyCore,1,.95);f.position.set(Math.cos(a)*7.6,-1,Math.sin(a)*7.6);f.scale.setScalar(.01);mcp.root.add(f);return f;});
+  c.sfx.play.alarm();c.sfx.play.whine();
  }
+}
+// a crack of light running up the column
+function addCrack(){
+ if(!cracks||crackN>=70)return;const g=cracks.geometry.attributes.position as THREE.BufferAttribute;let a=rand(0,TAU),y=rand(1,36);
+ for(let s=0;s<6;s++){const y2=Math.min(41.5,y+rand(1.2,3)),a2=a+rand(-.12,.12),r0=5.47-y/42,r1=5.47-y2/42,v=(crackN*6+s)*2;g.setXYZ(v,Math.cos(a)*r0,y,Math.sin(a)*r0);g.setXYZ(v+1,Math.cos(a2)*r1,y2,Math.sin(a2)*r1);y=y2;a=a2;}
+ crackN++;g.needsUpdate=true;cracks.geometry.setDrawRange(0,crackN*12);
+}
+// RAPID UNSCHEDULED DISASSEMBLY: the flash, the blast, a shockwave that knocks everyone flat, the crown off into the sky
+function disassemble(c:Ctx){
+ const mcp=c.mcp,at=new THREE.Vector3(0,12+mcp.root.position.y,0);ending='rud';
+ mcp.die();flashAt=c.t;c.stage.pitLight.intensity=3200;c.sfx.play.boom();c.later(.3,()=>c.sfx.play.boom());c.later(.75,()=>c.sfx.play.slam());
+ for(const [col,n,sp] of [[PAL.white,500,26],[PAL.enemyCore,450,20],[PAL.enemy,450,15],[PAL.line,200,11]] as [string,number,number][])c.sparks.burst(at,col,n,sp,{gravity:-5,life:2.4,spread:6});
+ elon(c,'RAPID UNSCHEDULED DISASSEMBLY.',4.2);
+ blast=new THREE.Mesh(new THREE.CylinderGeometry(1,1,3,128,1,true).translate(0,1.5,0),new THREE.MeshBasicMaterial({color:PAL.enemyCore,transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+ blastR=ARENA.block;c.stage.scene.add(blast);crownV.set(-.1,1,-.2).normalize().multiplyScalar(34);cracks?.removeFromParent();
+}
+// Close on the dialog: a CRT blink, and you're somewhere else
+async function startWaste(c:Ctx){
+ if(ending!=='dialog'||!founder)return;ending='waste';c.hud.dialog(false);
+ const crt=$('crt'),f=await founder;crt.hidden=false;crt.classList.remove('go');void crt.offsetWidth;crt.classList.add('go');
+ c.later(.4,()=>{
+  waste=new Wasteland();you=new Person(waste.scene,21,c.guide.id==='mario'?'samwise':'mario','YOU',f.walk,true,f.idle);
+  waste.stand(c.people,c.guide,you);waste.show(c.stage);c.cam={pos:CAM_FROM.clone(),look:CAM_LOOK.clone()};
+  phase='waste';pt=0;$('caption').hidden=true;$('grok').hidden=true;c.sfx.play.wind();
+ });
+ c.later(1.5,()=>{crt.hidden=true;});
 }
 function jump(c:Ctx,to:Phase){
  if(c.mcp.dead)return;// R restarts after the end
@@ -578,7 +619,48 @@ export const boss:Mode={
     if(Math.ceil(launchT)!==Math.ceil(launchT+dt)&&launchT<10)c.sfx.play.tick();
     c.shake(launchT<10?.2:.08);
     break;}
-   case 'down':if(pt>9&&pt-dt<=9){c.hud.dialog(true);if(document.pointerLockElement)document.exitPointerLock();}break;
+   case 'down':{
+    const root=mcp.root;
+    if(pt<RUD){
+     // the meltdown: the face glitches and un-downloads, cracks run up the column, the shield panels blow off
+     mcp.setExpr((['hurt','rage','wind','talk'] as const)[Math.floor(pt*9)%4],.15);mcp.reveal=pt<1.3?1:pt<2.3?.7:pt<3.3?.5:.2;mcp.flash=Math.random()*.8;
+     if(c.t>crackAt){crackAt=c.t+.07;addCrack();}
+     if(c.t>popAt){popAt=c.t+.16;const live=mcp.panels.filter(p=>p.visible);if(live.length){const p=live[Math.floor(Math.random()*live.length)];p.visible=false;c.sparks.burst(p.getWorldPosition(tmp),Math.random()<.5?PAL.enemy:PAL.white,40,8);c.sfx.play.shatter();}}
+     c.stage.pitLight.intensity=200+Math.random()*900;quake=.12+pt/RUD*.55;
+     // and it tries to launch anyway
+     if(pt>2.8){const lift=pt-2.8;root.position.y=lift*lift*2.6;for(const f of flames)f.scale.setScalar((3+lift*9)*(.8+Math.random()*.4));if(Math.random()<c.realDt*20)c.sparks.burst(new THREE.Vector3(rand(-7,7),root.position.y,rand(-7,7)),PAL.enemyCore,12,6,{gravity:-2});}
+     if(pt>.3&&pt-dt<=.3)elon(c,'CONCERNING.',.9);
+     if(pt>1.1&&pt-dt<=1.1)elon(c,ELON.dying[0],1.7);
+     if(pt>2.9&&pt-dt<=2.9)elon(c,ELON.dying[1],1.5);
+    }
+    if(pt>=RUD&&pt-dt<RUD)disassemble(c);
+    if(pt>RUD){
+     quake=Math.max(0,1.4-(pt-RUD)*.45);for(const f of flames)f.scale.multiplyScalar(Math.exp(-c.realDt*6));
+     if(blast){const prev=blastR;blastR+=c.realDt*30;blast.scale.set(blastR,1,blastR);(blast.material as THREE.MeshBasicMaterial).opacity=Math.max(0,.7-blastR/ARENA.radius*.7);
+      for(const p of c.everyone()){const r=Math.hypot(p.pos.x,p.pos.z);if(prev<r&&r<=blastR)p.knock(new THREE.Vector3());}
+      if(blastR>ARENA.radius+4){blast.removeFromParent();blast=null;}}
+     crownV.y-=c.realDt*3;mcp.crown.position.addScaledVector(crownV,c.realDt);mcp.crown.rotation.z+=c.realDt*7;mcp.crown.rotation.x+=c.realDt*3;
+     if(Math.random()<c.realDt*8)c.sparks.burst(new THREE.Vector3(rand(-8,8),rand(0,4),rand(-8,8)),Math.random()<.5?PAL.enemy:PAL.enemyCore,10,4,{gravity:-3,up:3,life:1.6});
+    }
+    $('flash').style.opacity=String(clamp(1-(c.t-flashAt)/1.6,0,1));
+    // the camera pulls back and down through the meltdown, then holds on the wreck, shaking
+    const e=clamp(pt/RUD,0,1),cam=c.cam!;cam.pos.lerpVectors(camFrom,camTo,e*e*(3-2*e));
+    cam.look.set((Math.random()-.5)*quake*.9,13+root.position.y*.5+(Math.random()-.5)*quake*.9,0);
+    for(const p of c.everyone())p.sprite.visible=p.sprite.position.distanceTo(cam.pos)>3.2;// nobody's face in the lens
+    if(pt>7.4&&pt-dt<=7.4){guide(c,'win',3);for(const p of c.people)if(Math.random()<.5)shout(c,p,'yes');}
+    if(pt>9&&pt-dt<=9)elon(c,ELON.last,3.6);
+    if(pt>12.8&&pt-dt<=12.8)grok(c,GROK.end,4.2);
+    if(pt>16.6&&pt-dt<=16.6){ending='dialog';c.hud.dialog(true);if(document.pointerLockElement)document.exitPointerLock();}
+    break;}
+   case 'waste':{
+    // the wasteland: the line, the stare, black
+    if(!waste)break;waste.update(c.realDt);you?.update(dt,c.stage.camera.position,c.t,new THREE.Vector3());
+    const k=clamp(pt/15,0,1),e=k*k*(3-2*k);c.cam!.pos.lerpVectors(CAM_FROM,CAM_TO,e);c.cam!.look.copy(CAM_LOOK);
+    if(pt>2.6&&pt-dt<=2.6)guide(c,'value',7.8);
+    if(pt>11.2&&pt-dt<=11.2){ending='stare';waste.stare(c.stage.camera.position,c.later);}
+    if(pt>14&&pt-dt<=14){ending='black';$('black').hidden=false;c.sfx.hush(true);}
+    if(pt>16&&pt-dt<=16)$('black').classList.add('title');
+    break;}
   }
   updateArrows(c);
  },
@@ -602,15 +684,16 @@ export const boss:Mode={
   if(fleet==='swarm'){const atMe=shots.filter(s=>s.alive&&s.enemy&&s.target.kind==='player').length,live=c.people.filter(p=>p.down<=0);if((atMe>=3||Math.random()<.62)&&live.length)target={kind:'person',p:live[Math.floor(Math.random()*live.length)]};}
   shots.push(new Shot(c.stage.scene,from,target,11,chest(c,target),shipSrc(c,rec)));c.sfx.play.serve();
  },
+ dialogClose(c){if(ending==='dialog')startWaste(c);else location.reload();},
  key(c,code){
   if(code==='KeyT')toggleTune();
   if(code==='Digit1')jump(c,'ships');if(code==='Digit2')jump(c,'shieldDown');if(code==='Digit3')jump(c,'trick');
-  if(code==='KeyN'){const next:Record<Phase,Phase>={intro:'ships',ships:'shieldDown',shieldDown:'trick',trick:'trick',down:'down'};if(phase!=='trick'&&phase!=='down')jump(c,next[phase]);}
+  if(code==='KeyN'){const next:Record<Phase,Phase>={intro:'ships',ships:'shieldDown',shieldDown:'trick',trick:'trick',down:'down',waste:'waste'};if(phase!=='trick'&&phase!=='down')jump(c,next[phase]);}
  },
  highlight:()=>phase==='trick'?windowBearing:null,
  state:(c)=>{
   const eye=c.player.eyePos(),mine=shots.filter(s=>s.alive&&s.enemy&&s.target.kind==='player').sort((a,b)=>a.pos.distanceTo(eye)-b.pos.distanceTo(eye))[0];
-  return {phase,pt:+pt.toFixed(2),fleet,wave,shipsDown,ships:SHIPS,crowdReturns,spots:spots.length,spotsAt:spots.map(s=>s.world().toArray().map(v=>+v.toFixed(2))),shots:shots.length,hot:shots.some(s=>s.hot),
+  return {phase,pt:+pt.toFixed(2),ending,fleet,wave,shipsDown,ships:SHIPS,crowdReturns,spots:spots.length,spotsAt:spots.map(s=>s.world().toArray().map(v=>+v.toFixed(2))),shots:shots.length,hot:shots.some(s=>s.hot),
    incoming:mine&&mine.pos.distanceTo(eye)<8?mine.pos.toArray().map(v=>+v.toFixed(2)):null,
    attacks:attacks.map(a=>a.kind),started:Object.fromEntries(started),warnings,doges:attacks.filter((a):a is Doges=>a instanceof Doges).reduce((n,a)=>n+a.running,0),
    attempts,best,timeScale:+c.timeScale.toFixed(2),launchT:+launchT.toFixed(1),delays,pathKey,solves,
