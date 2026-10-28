@@ -48,8 +48,9 @@ try{
  const lines=new Set(['greet']);const until=Date.now()+150000;
  const voiced=new Set();while(Date.now()<until){const g=(await q.read()).outside.guide;if(g.speaking){lines.add(g.speaking);if(g.voiced)voiced.add(g.speaking);}if(g.ready)break;
   await p.evaluate(({x,z})=>{const o=window.__DOOM_DEBUG__.outside,st=o.getState();const dx=x-st.x,dz=z-st.z,d=Math.hypot(dx,dz);if(d>4){const k=(d-3.5)/d;o.debug.setView(st.x+dx*k,st.z+dz*k,Math.atan2(-dx,-dz),0);}},{x:g.x,z:g.z});await p.waitForTimeout(400);}
- // Every beat this founder has. The shouts (call, call2, call3) only play while we have not walked over.
- const guideKeys=JSON.parse(await fs.readFile('src/doom-bliss-guide-lines.json','utf8'))[s.outside.guide.character].lines.map(l=>l.key).filter(k=>!/^call\d*$/.test(k));
+ // Every beat this founder has on this walk. The shouts (call, call2, call3) only play while we have not walked
+ // over, and the end- lines are the endgame's meeting at the door (ENDGAME.md, In the game).
+ const guideKeys=JSON.parse(await fs.readFile('src/doom-bliss-guide-lines.json','utf8'))[s.outside.guide.character].lines.map(l=>l.key).filter(k=>!/^call\d*$|^end-/.test(k));
  assert.deepEqual(guideKeys.filter(k=>!lines.has(k)),[],'Every line plays on the walk');
  // Lines with an imported recording must play it; the rest run on subtitles.
  const recorded=JSON.parse(await fs.readFile('doom-web/outside-assets/voice/guide-voices.json','utf8'))[s.outside.guide.character]||{};

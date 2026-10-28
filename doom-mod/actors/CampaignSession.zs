@@ -82,6 +82,9 @@ class PDCampaignSession : StaticEventHandler
     }
     void Enter(bool hal,bool asReplay=false)
     {
+        // Load first, as EnterFactory/EnterAgentic do: on a fresh New Game the first Load() would otherwise run on
+        // the new map and reset GuideGift from the boot cvars, so the guide's wrench never reached your hands.
+        Load();
         let battle=PDLastStand.Get();
         bool fromOpening=!hal&&(OpeningEntry||battle&&battle.Active&&battle.Bliss);
         HubEntry=!fromOpening;Replay=asReplay;OpeningEntry=false;FactoryEntry=false;AgenticEntry=false;
