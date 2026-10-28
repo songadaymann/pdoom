@@ -35,7 +35,7 @@ export function glowSprite(color:string,size:number,opacity=1){
  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:glow(),color,transparent:true,opacity,blending:THREE.AdditiveBlending,depthWrite:false}));s.scale.setScalar(size);return s;
 }
 
-export function makeStage(canvas:HTMLCanvasElement){
+export function makeStage(canvas:HTMLCanvasElement,{door=false}={}){
  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
  const scene=new THREE.Scene();scene.background=new THREE.Color(PAL.floor);scene.fog=new THREE.FogExp2(PAL.floor,.003);
@@ -64,9 +64,11 @@ export function makeStage(canvas:HTMLCanvasElement){
  const ring=(r:number,y:number,color:string,n=128)=>{const pts=Array.from({length:n+1},(_,i)=>new THREE.Vector3(Math.cos(i/n*TAU)*r,y,Math.sin(i/n*TAU)*r));return new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color}));};
  // The arena wall: dark, ruled with cyan, one bright band at hip height.
  const R=ARENA.radius,H=ARENA.wallH;
- scene.add(new THREE.Mesh(new THREE.CylinderGeometry(R,R,H,128,1,true).translate(0,H/2,0),new THREE.MeshBasicMaterial({color:0x03090e,side:THREE.BackSide})));
+ // with a door (the finale's walk in), a gap at +z, and the wall is seen from outside too
+ const gap=door?DOOR_HALF*2/R:0,around=(r:number,h:number,y:number)=>new THREE.CylinderGeometry(r,r,h,128,1,true,gap/2,TAU-gap).translate(0,y,0);
+ scene.add(new THREE.Mesh(around(R,H,H/2),new THREE.MeshBasicMaterial({color:0x03090e,side:door?THREE.DoubleSide:THREE.BackSide})));
  for(const y of [.03,H*.55,H])scene.add(ring(R-.02,y,PAL.line));
- scene.add(new THREE.Mesh(new THREE.CylinderGeometry(R-.05,R-.05,.12,128,1,true).translate(0,1.3,0),new THREE.MeshBasicMaterial({color:PAL.line,side:THREE.BackSide})));
+ scene.add(new THREE.Mesh(around(R-.05,.12,1.3),new THREE.MeshBasicMaterial({color:PAL.line,side:door?THREE.DoubleSide:THREE.BackSide})));
  const ribs:THREE.Vector3[]=[];for(let i=0;i<72;i++){const a=i/72*TAU;ribs.push(new THREE.Vector3(Math.cos(a)*(R-.03),0,Math.sin(a)*(R-.03)),new THREE.Vector3(Math.cos(a)*(R-.03),H,Math.sin(a)*(R-.03)));}
  scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ribs),new THREE.LineBasicMaterial({color:PAL.line,transparent:true,opacity:.18})));
  // Eight data pillars (cover), the dais round the pit, and Mars: a red dot high in the void.
@@ -75,7 +77,14 @@ export function makeStage(canvas:HTMLCanvasElement){
  scene.add(ring(ARENA.block-.5,.52,PAL.enemy),ring(ARENA.block,.02,PAL.enemy));
  const mars=glowSprite(PAL.enemy,26);mars.position.set(-60,320,-620);scene.add(mars);
  const marsCore=new THREE.Mesh(new THREE.SphereGeometry(3.2,16,12),new THREE.MeshBasicMaterial({color:'#ff6a3a',fog:false}));marsCore.position.copy(mars.position);scene.add(marsCore);
- return {renderer,scene,camera,composer,pitLight,floor,render:()=>composer.render()};
+ // the door: a slab in the gap that slides up into the wall (open(0..1)), cyan jambs either side
+ let doorSlab:THREE.Object3D|null=null;
+ if(door){
+  doorSlab=edged(new THREE.BoxGeometry(DOOR_HALF*2,H,.4).translate(0,H/2,0),0x03090e,PAL.core,.9);doorSlab.position.set(0,0,R);scene.add(doorSlab);
+  for(const x of [-DOOR_HALF,DOOR_HALF]){const jamb=new THREE.Mesh(new THREE.BoxGeometry(.3,H,.6),new THREE.MeshBasicMaterial({color:PAL.line}));jamb.position.set(x,H/2,Math.sqrt(R*R-x*x));scene.add(jamb);}
+ }
+ return {renderer,scene,camera,composer,pitLight,floor,render:()=>composer.render(),
+  openDoor(k:number){if(doorSlab)doorSlab.position.y=THREE.MathUtils.clamp(k,0,1)*(H-.4);}};
 }
 export type Stage=ReturnType<typeof makeStage>;
 
@@ -93,8 +102,20 @@ export function makeInput(canvas:HTMLCanvasElement){
 export type Input=ReturnType<typeof makeInput>;
 
 // Keeps a walker on the arena floor: inside the wall, outside the dais, out of the pillars.
+// The walk in (?m=finale, docs/ENDGAME.md E4-E5): outside the wall there's a corridor running north from the
+// door, which sits on the wall at +z (DOOR_HALF either side of x 0); the wall is solid until the door opens.
+export const WALK={on:false,door:false,far:290};
+export const DOOR_HALF=3.4;
 export function resolve(p:THREE.Vector3,rad:number){
  const r=Math.hypot(p.x,p.z),max=ARENA.radius-.6-rad,min=ARENA.block+rad;
+ if(WALK.on){
+  const doorway=WALK.door&&p.z>0&&Math.abs(p.x)<DOOR_HALF-rad;
+  if(r>ARENA.radius||doorway){
+   p.x=THREE.MathUtils.clamp(p.x,-18,18);p.z=Math.min(p.z,WALK.far+6);
+   const out=ARENA.radius+.6+rad,r2=Math.hypot(p.x,p.z);if(!doorway&&r2<out){p.x*=out/r2;p.z*=out/r2;}
+   return;
+  }
+ }
  if(r>max){p.x*=max/r;p.z*=max/r;}else if(r<min&&r>1e-6){p.x*=min/r;p.z*=min/r;}
  for(const q of PILLARS){const dx=p.x-q.x,dz=p.z-q.z,d=Math.hypot(dx,dz),m=ARENA.pillarSize+rad;if(d<m&&d>1e-6){p.x=q.x+dx/d*m;p.z=q.z+dz/d*m;}}
 }

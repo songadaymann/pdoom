@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {ARENA,PAL,PILLARS,makeFloppy,Trail,type Sparks,type Sfx} from './kit';
+import {ARENA,PAL,PILLARS,makeFloppy,Trail,type Sparks,type Sfx,WALK} from './kit';
 import type {MCP} from './mcp';
 import type {Recognizer} from './recognizer';
 import type {Post} from './threats';
@@ -51,7 +51,7 @@ export class Discs{
     if(this.probe(d)){d.home();continue;}
     const r=Math.hypot(d.pos.x,d.pos.z),pr=Math.hypot(prev.x,prev.z);
     if(d.pos.y<.2&&d.vel.y<0){d.pos.y=.2;this.bounce(d,n.set(0,1,0),'floor');}
-    if(r>ARENA.radius-.4){d.pos.multiplyScalar((ARENA.radius-.45)/r);this.bounce(d,n.set(-d.pos.x,0,-d.pos.z).normalize(),'wall');}
+    if(r>ARENA.radius-.4&&!WALK.on){d.pos.multiplyScalar((ARENA.radius-.45)/r);this.bounce(d,n.set(-d.pos.x,0,-d.pos.z).normalize(),'wall');}
     if(d.pos.y<ARENA.pillarH)for(const q of PILLARS){const dx=d.pos.x-q.x,dz=d.pos.z-q.z,dist=Math.hypot(dx,dz);if(dist<ARENA.pillarSize+.3){d.pos.x=q.x+dx/dist*(ARENA.pillarSize+.32);d.pos.z=q.z+dz/dist*(ARENA.pillarSize+.32);this.bounce(d,n.set(dx/dist,0,dz/dist),'pillar');}}
     // the shield: inward through a gap only; from inside, out through a gap only
     if(d.pos.y>.5&&d.pos.y<ARENA.shieldTop&&!this.mcp.dead){

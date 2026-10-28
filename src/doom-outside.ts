@@ -13,7 +13,7 @@ import {SUN_DIR} from './bliss';
 import {meadowHumanIdle} from './doom-human-idle';
 import {createBlissAudio} from './doom-bliss-audio';
 import {meadowCampLayout,HILL_ZONES,HILL_RADIUS,DOOR_WANDER,clearOfDoor} from './doom-camp-layout';
-import {makeBlissGuide,INTRO_START} from './doom-bliss-guide';
+import {makeBlissGuide,INTRO_START,endgameScene} from './doom-bliss-guide';
 import {makeFutureHub,FUTURE_DOORS,FINAL,type FutureId} from './doom-hub-future';
 import {makeDesktopIcons} from './doom-desktop-icons';
 import {makeHubCorruption} from './doom-hub-corruption';
@@ -31,7 +31,7 @@ const LEVEL_OFFSET:Record<string,number>={'five-prisons':0,'hal-station':5,'meg3
 type Person={id:number;name:string;alive:number;controlled:number};
 type World={alive:number;people:Person[]};
 type LabelRect={name:string;depth:number;left:number;right:number;bottom:number;top:number};
-type Options={prompt?:(text:string)=>string;labels?:(rects:LabelRect[],surface:HTMLCanvasElement,active:boolean)=>void;source:HTMLCanvasElement;stage:HTMLElement;audio:AudioContext;read:()=>{world:World;escape:EscapeState;levelId?:string};campaign?:()=>{saved:number;lost:number;worldPdoom:number;roster:{id:number;name:string;state:string}[]};enter?:(id:string,replay?:boolean)=>void;readThis?:()=>void;agenticDoor?:boolean};
+type Options={prompt?:(text:string)=>string;labels?:(rects:LabelRect[],surface:HTMLCanvasElement,active:boolean)=>void;source:HTMLCanvasElement;stage:HTMLElement;audio:AudioContext;read:()=>{world:World;escape:EscapeState;levelId?:string};campaign?:()=>{saved:number;lost:number;worldPdoom:number;roster:{id:number;name:string;state:string}[]};enter?:(id:string,replay?:boolean)=>void;onGate?:()=>void;readThis?:()=>void;agenticDoor?:boolean};
 
 /** The bunker's foundation slab: weathered poured concrete, drawn procedurally once.
  * Cast in ~3 m bays (sawn joints), speckled aggregate, soft water stains and darker
@@ -145,7 +145,7 @@ export async function createOutside(options:Options){
  const sunAway=new THREE.Vector2(-SUN_DIR.x,-SUN_DIR.z).normalize();
  let active=true,currentLevel='five-prisons';
  const hubUi=document.createElement('div');hubUi.id='hub-ui';options.stage.append(hubUi);
- hubUi.innerHTML='<p class="hub-heading">SAFE MODE</p><p id="hub-count"></p><button id="hub-enter" hidden></button><button id="hub-replay" hidden>Replay lost survivors</button>';
+ hubUi.innerHTML='<p class="hub-heading">SAFE MODE</p><p id="hub-count"></p><p id="hub-got" hidden></p><button id="hub-enter" hidden></button><button id="hub-replay" hidden>Replay lost survivors</button>';
  const enterButton=hubUi.querySelector<HTMLButtonElement>('#hub-enter')!,replayButton=hubUi.querySelector<HTMLButtonElement>('#hub-replay')!;
  /* A locked structure's install dialog, or the final door's Display Properties: a Win95 window drawn
   * in HTML (no OS artwork). Space presses its default button, R its READ THIS!; walking away, pausing
@@ -157,6 +157,17 @@ export async function createOutside(options:Options){
  let dialogFor:FutureId|null=null,dialogAt=0,refusedUntil=0,nearestFuture:FutureId|null=null;
  let guide:Awaited<ReturnType<typeof makeBlissGuide>>|null=null;
  let intro=false;
+ // The endgame (docs/ENDGAME.md E1-E3): once all 20 are resolved the guide meets you at the door, hands you a
+ // floppy, everyone falls in behind you, and the meadow's south edge opens at GATE, where the hub's buses land
+ // on the Grid's x 80 line. Stepping through hands over to the endgame page (options.onGate). After it, the
+ // column is gone (fallen).
+ const GATE={x:80,z:180};
+ let endgame:'off'|'door'|'gone'|'fallen'='off',gateOpen=false,following=false,gotUntil=0;
+ const trail:THREE.Vector3[]=[],rank=new Map<number,number>();
+ const gateFrame=new THREE.Group();gateFrame.visible=false;scene.add(gateFrame);
+ {const glow=new THREE.MeshBasicMaterial({color:0x5ef2ff});
+  for(const dx of [-5,5]){const post=new THREE.Mesh(new THREE.BoxGeometry(.35,7,.35),glow);post.position.set(GATE.x+dx,3.5,GATE.z);gateFrame.add(post);}
+  const lintel=new THREE.Mesh(new THREE.BoxGeometry(10.35,.35,.35),glow);lintel.position.set(GATE.x,7,GATE.z);gateFrame.add(lintel);}
  let nearestDoor:typeof HUB_DOORS[number]|null=null;
  // MEG3N.AVI is a real door (2026-10-20): Space walks into the factory. AGENTIC.BAT (level 4, 2026-10-21)
  // walks into the pod farm only in local development (options.agenticDoor); elsewhere it still installs.
@@ -189,7 +200,9 @@ export async function createOutside(options:Options){
   const camp=options.campaign?.(),unresolved=Math.max(0,20-(camp?.saved??0)-(camp?.lost??0)),people=(n:number)=>`${n} ${n===1?'person':'people'}`;
   if(dialogFor==='final'){
    put(dialogParts.title,FINAL.label);put(dialogParts.text,`Screen saver: 3D Maze. Wait: ${people(unresolved)}.`);dialogParts.bar.style.width=`${Math.round(100*(20-unresolved)/20)}%`;
-   put(dialogParts.status,time<refusedUntil?`Preview is not available. ${people(unresolved)} still out there.`:'Free everyone to preview the screen saver.');put(dialogParts.a,'Preview');put(dialogParts.b,'OK');
+   // At 20/20 the screen saver is the walk south (the arrow above says so); once he's down there's nothing to wait for.
+   const status=endgame==='fallen'?'Screen saver: none. Nothing left to wait for.':unresolved===0?'Everyone is out. The preview is south of here, at the column.':time<refusedUntil?`Preview is not available. ${people(unresolved)} still out there.`:'Free everyone to preview the screen saver.';
+   put(dialogParts.status,status);put(dialogParts.a,'Preview');put(dialogParts.b,'OK');
    return;
   }
   const door=FUTURE_DOORS.find(d=>d.id===dialogFor)!,t=time-dialogAt;
@@ -203,6 +216,8 @@ export async function createOutside(options:Options){
  function key(code:string,down:boolean){if(!active)return;
   if(dialogFor&&down&&(code==='Space'||code==='KeyE')){dialogAction('b');return;}
   if(dialogFor&&down&&code==='KeyR'&&dialogFor!=='final'){dialogAction('a');return;}
+  // the endgame's meeting at the door: Space skips him (not back into the level you just left)
+  if(endgame==='door'&&code==='Space'&&down&&!paused&&guide?.active&&!guide.ready){guide.skip();return;}
   if((code==='Space'||code==='KeyE')&&down&&nearestDoor){options.enter?.(nearestDoor.id);return;}
   if((code==='Space'||code==='KeyE')&&down&&factoryDoor()&&!paused){options.enter?.('meg3n-factory');return;}
   if((code==='Space'||code==='KeyE')&&down&&agenticDoor()&&!paused){options.enter?.('agentic-pods');return;}
@@ -239,6 +254,20 @@ export async function createOutside(options:Options){
   options.stage.classList.add('bliss-intro');
   portalContext.fillStyle='#111';portalContext.fillRect(0,0,320,200);portalTexture.needsUpdate=true;
  }
+ async function startEndgame(ceo:string,anyLost:boolean){
+  guide??=await makeBlissGuide(scene,options.stage,options.audio);endgame='door';gateOpen=following=false;trail.length=0;
+  guide.onCue=key=>{
+   // the floppies reach camp and everyone falls in; then the edge opens
+   if(key==='end-everyone'&&!following){following=true;trail.length=0;rank.clear();[...people.keys()].sort((a,b)=>a-b).forEach((id,k)=>rank.set(id,k));}
+   if(key==='end-go'){gateOpen=true;gateFrame.visible=true;}
+  };
+  guide.onHandoff=()=>{const got=hubUi.querySelector<HTMLElement>('#hub-got')!;got.textContent='YOU GOT A FLOPPY DISK! 1.44 MEGABYTES OF PAYBACK.';got.hidden=false;gotUntil=time+4;};
+  // a skip lands you both at the gate, everyone with you, as the walk would have
+  guide.onSkip=()=>{yaw=Math.PI;pitch=0;pos.set(GATE.x+1.5,groundY(GATE.x+1.5,GATE.z-9)+eye,GATE.z-9);};
+  guide.start(ceo,endgameScene({x:pos.x,z:pos.z,yaw},GATE,anyLost));
+ }
+ // After the endgame: the column is gone, and the meadow is just the meadow.
+ function endgameDone(){endgame='fallen';guide?.stop();gateOpen=following=false;gateFrame.visible=false;future.setFallen(true);}
  // The long-distance pace unlocks only after both facilities are resolved,
  // including losses. The wake-up walk and the first return keep their pacing.
  function travel(){
@@ -248,7 +277,7 @@ export async function createOutside(options:Options){
   }).length,boosted=!intro&&levels===2;
   return {camp,levels,boosted,walk:boosted?6:3.6,run:boosted?10:6};
  }
- function getState(){const {walk,run,boosted}=travel();return {movement:{walk,run,boosted},intro,guide:guide?.getState()||null,scene:'meadow',active,currentLevel,nearestDoor:nearestDoor?.id||null,coordinate_system:'metres; x east, z south, y up',x:+pos.x.toFixed(2),y:+pos.y.toFixed(2),z:+pos.z.toFixed(2),yaw:+yaw.toFixed(3),pitch:+pitch.toFixed(3),paused,won,saved_visual:people.size,settled:[...people.values()].filter(p=>p.settled).length,people:[...people.entries()].map(([id,p])=>({id,character:MEADOW_IDS[id],out:time>=p.emergeAt,x:+p.sprite.position.x.toFixed(3),z:+p.sprite.position.z.toFixed(3),height:+p.sprite.scale.y.toFixed(4),arrived:p.settled,home:p.home,walking:!p.arrived})),portal_frames:portalFrames,hal:hubDoors.getState(),screensavers:screensavers.getState(),future:future.getState(),corruption:corruption.getState(),dressing:dressing.getState(),icons:icons.getState(),nearest_future:nearestFuture,dialog:dialogFor?{id:dialogFor,title:dialogParts.title.textContent,status:dialogParts.status.textContent,bar:dialogParts.bar.style.width}:null,portal_visible:visiblePortal,render_width:canvas.width,render_height:canvas.height,audio:blissAudio.getState()};}
+ function getState(){const {walk,run,boosted}=travel();return {movement:{walk,run,boosted},intro,endgame:{state:endgame,gateOpen,following,gate:GATE},guide:guide?.getState()||null,scene:'meadow',active,currentLevel,nearestDoor:nearestDoor?.id||null,coordinate_system:'metres; x east, z south, y up',x:+pos.x.toFixed(2),y:+pos.y.toFixed(2),z:+pos.z.toFixed(2),yaw:+yaw.toFixed(3),pitch:+pitch.toFixed(3),paused,won,saved_visual:people.size,settled:[...people.values()].filter(p=>p.settled).length,people:[...people.entries()].map(([id,p])=>({id,character:MEADOW_IDS[id],out:time>=p.emergeAt,x:+p.sprite.position.x.toFixed(3),z:+p.sprite.position.z.toFixed(3),height:+p.sprite.scale.y.toFixed(4),arrived:p.settled,home:p.home,walking:!p.arrived})),portal_frames:portalFrames,hal:hubDoors.getState(),screensavers:screensavers.getState(),future:future.getState(),corruption:corruption.getState(),dressing:dressing.getState(),icons:icons.getState(),nearest_future:nearestFuture,dialog:dialogFor?{id:dialogFor,title:dialogParts.title.textContent,status:dialogParts.status.textContent,bar:dialogParts.bar.style.width}:null,portal_visible:visiblePortal,render_width:canvas.width,render_height:canvas.height,audio:blissAudio.getState()};}
  let frameId=0;
  function frame(now:number){frameId=requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.05);last=now;if(document.hidden||!active)return;
   const state=options.read();if(!state.world||(!state.escape&&!intro))return;
@@ -267,7 +296,9 @@ export async function createOutside(options:Options){
    const fromX=pos.x,fromZ=pos.z;
    if(!blocked(pos.x+dx,pos.z))pos.x+=dx;if(!blocked(pos.x,pos.z+dz))pos.z+=dz;
    velocity.set((pos.x-fromX)/Math.max(dt,1e-4),0,(pos.z-fromZ)/Math.max(dt,1e-4));
-   pos.x=THREE.MathUtils.clamp(pos.x,-180,200);pos.z=THREE.MathUtils.clamp(pos.z,-220,180);pos.y=groundY(pos.x,pos.z)+eye;
+   const throughGate=gateOpen&&Math.abs(pos.x-GATE.x)<4.6;
+   pos.x=THREE.MathUtils.clamp(pos.x,-180,200);pos.z=THREE.MathUtils.clamp(pos.z,-220,throughGate?GATE.z+12:GATE.z);pos.y=groundY(pos.x,pos.z)+eye;
+   if(throughGate&&pos.z>GATE.z+6&&endgame==='door'){endgame='gone';options.onGate?.();}
   }
   camera.position.copy(pos);camera.rotation.set(pitch,yaw,0,'YXZ');
   meadow.uTime.value=time;meadow.uCam.value.copy(pos);sky.position.copy(pos);if(!paused)screensavers.update(dt,pos,camera);
@@ -296,25 +327,31 @@ export async function createOutside(options:Options){
     const start=localArrival?layout.origin:person.anchor;sprite.position.set(start.x,groundY(start.x,start.z),start.z);
    }
   }
+  if(following&&(!trail.length||trail[0].distanceTo(pos)>1))trail.unshift(new THREE.Vector3(pos.x,0,pos.z)),trail.length=Math.min(trail.length,160);
   for(const [i,p]of people){
    const before=p.sprite.position.clone();
    // Still inside, waiting for the one ahead to clear the door.
    const out=time>=p.emergeAt;p.sprite.visible=p.shadow.visible=out;
    // A later group came out: this one moves up the hill, at once if you're far off, otherwise on foot.
    const home=homeOf(i);
-   if(home!==p.home&&out){
+   if(following&&out){
+    // in single file behind you (and the guide), two paces apart
+    const back=4+1.6*(rank.get(i)??0),at=trail[Math.min(trail.length-1,Math.round(back))]??pos;
+    p.target.set(at.x,0,at.z);p.arrived=false;p.settled=false;p.home='door';
+   }
+   else if(home!==p.home&&out){
     p.home=home;const spot=wanderSpot(i,p,home);p.target.set(spot.x,0,spot.z);
     if(Math.hypot(pos.x-p.sprite.position.x,pos.z-p.sprite.position.z)>45){p.anchor.copy(p.target);p.sprite.position.set(spot.x,0,spot.z);p.arrived=true;p.arrivedAt=time;}
     else p.arrived=false;
    }
    // Wandering: rest a few seconds, then stroll to another free spot at home.
-   if(p.arrived&&p.settled&&!paused&&!reduced&&time>=p.restUntil){const spot=wanderSpot(i,p,p.home);p.target.set(spot.x,0,spot.z);p.arrived=false;}
+   if(!following&&p.arrived&&p.settled&&!paused&&!reduced&&time>=p.restUntil){const spot=wanderSpot(i,p,p.home);p.target.set(spot.x,0,spot.z);p.arrived=false;}
    if(!p.arrived&&!paused&&out){
-    const delta=p.target.clone().sub(p.sprite.position);delta.y=0;const left=delta.length(),pace=p.settled?p.speed*(left>30?1.4:1):1.8;
+    const delta=p.target.clone().sub(p.sprite.position);delta.y=0;const left=delta.length(),pace=following?(left>10?9:Math.min(6.5,left*2)):p.settled?p.speed*(left>30?1.4:1):1.8;
     const step=delta.normalize().multiplyScalar(Math.min(dt*pace,left));
     // a wanderer never walks into you (waits until you step aside); someone coming out of a door walks on past
     if(left>.08&&(!p.settled||Math.hypot(pos.x-(p.sprite.position.x+step.x*8),pos.z-(p.sprite.position.z+step.z*8))>.9))p.sprite.position.add(step);
-    else if(left<=.08){p.arrived=p.settled=true;p.arrivedAt=time;p.anchor.copy(p.target);p.restUntil=time+3+rand(p)*6;}
+    else if(left<=.08){p.arrived=true;p.settled=!following;p.arrivedAt=time;p.anchor.copy(p.target);p.restUntil=time+3+rand(p)*6;}
    }
    const idle=meadowHumanIdle(i,time,time-p.arrivedAt);
    if(p.arrived){p.sprite.position.x=p.anchor.x+idle.x;p.sprite.position.z=p.anchor.z+idle.z;}
@@ -350,6 +387,7 @@ export async function createOutside(options:Options){
    icons.update(paused?0:dt,time,pos,velocity,paused);}
   const matching=camp?.roster.filter(p=>p.id>=((nearestDoor?.id==='hal-station')?5:0)&&p.id<((nearestDoor?.id==='hal-station')?10:5))||[];
   replayButton.hidden=!nearestDoor||!matching.some(p=>p.state==='lost');
+  if(gotUntil&&time>gotUntil){gotUntil=0;hubUi.querySelector<HTMLElement>('#hub-got')!.hidden=true;}
   hubUi.querySelector('#hub-count')!.textContent=camp?`FREED ${camp.saved}/20 · LOST ${camp.lost} · WORLD p(DOOM) ${camp.worldPdoom}%`:'';
   el('people').textContent=won?'You made it out':'Fresh air';
   // Nobody came out with you this visit (a Load Game, or back out empty-handed): the last level's escape line would
@@ -384,7 +422,7 @@ export async function createOutside(options:Options){
   setFuture(value:boolean){future.setVisible(value);icons.setVisible(value);},icons:icons.debug,
   // dev mock-ups of the hub's buildings (docs/SAFE-MODE-PROGRESSION.md) add scenery through these
   scene,THREE,groundY};
- return {key,release,showWin,setActive,startIntro,getState,debug,
+ return {key,release,showWin,setActive,startIntro,startEndgame,endgameDone,getState,debug,
   dispose(){active=false;cancelAnimationFrame(frameId);icons.dispose();future.dispose();renderer.dispose();canvas.remove();hubUi.remove();dialog.remove();window.removeEventListener('resize',resize);}
  };
 }

@@ -39,6 +39,43 @@
     "key": "inside",
     "text": "OK, here we are. Five of the last 20 people alive are in here, and you have to go in and save them. Take this. It's dangerous to go alone. I'll be right behind you. In principle, if not in practice.",
     "handoff": 8.94
+   },
+   {
+    "key": "end-call",
+    "text": "Hey! Hey! Over here!"
+   },
+   {
+    "key": "end-saved",
+    "text": "You did it. That's all twenty. Everyone who's left is out. I always said this was achievable. With appropriate uncertainty, but I said it."
+   },
+   {
+    "key": "end-saved-some",
+    "text": "That's everyone we could get. Not all twenty. I'm not going to put a number on how I feel about that."
+   },
+   {
+    "key": "end-boss",
+    "text": "OK. Bad news. You know the column on the horizon, with the face? It finished downloading. It's Elon. And he's very upset."
+   },
+   {
+    "key": "end-why",
+    "text": "As far as I can tell, he thinks the last people alive belong to him now. He has a nickname for my company. I've chosen not to engage with it."
+   },
+   {
+    "key": "end-discs",
+    "text": "So we're going to fight him. Take this. Still dangerous to go alone. You throw it, and it comes back. In principle.",
+    "handoff": 2.3
+   },
+   {
+    "key": "end-everyone",
+    "text": "Everyone gets one. I made twenty-two. I was optimistic about the headcount, which I still think was the right call."
+   },
+   {
+    "key": "end-go",
+    "text": "And we need to go now. Straight south, to the tower. Everybody with us. He knows we're coming."
+   },
+   {
+    "key": "end-edge",
+    "text": "This is the edge of the desktop. I didn't know you could go past it. I don't think we're supposed to."
    }
   ]
  },
@@ -81,7 +118,45 @@
     "key": "inside",
     "text": "All right, here we are. There are five of the last 20 people alive in there. You have to go in and save them. Take this. It's dangerous to go alone. I'd go in myself, but to be honest, I never played Doom.",
     "handoff": 8.52
+   },
+   {
+    "key": "end-call",
+    "text": "Hey! Hello! Over here!"
+   },
+   {
+    "key": "end-saved",
+    "text": "You did it. All twenty. Everyone's out. Honestly, incredible. I think this is the best thing either of us has ever shipped."
+   },
+   {
+    "key": "end-saved-some",
+    "text": "That's everybody we could get. Not all twenty. But a lot of them. Most of them."
+   },
+   {
+    "key": "end-boss",
+    "text": "OK, so, bad news. That tower on the horizon, with the face? It finished loading. It's Elon. And he is really, really mad."
+   },
+   {
+    "key": "end-why",
+    "text": "As far as I can tell, he thinks the last humans belong to him now. We've had this argument before. Mostly in court."
+   },
+   {
+    "key": "end-discs",
+    "text": "So we're going to fight him. Take this. Still dangerous to go alone. You throw it and it comes back. I haven't tested that part.",
+    "handoff": 2.3
+   },
+   {
+    "key": "end-everyone",
+    "text": "There's one for everybody. I ordered extra. You can never have too much compute. Disks. Too many disks."
+   },
+   {
+    "key": "end-go",
+    "text": "And we have to go, like, now. Straight south, to the tower. Everybody comes. He knows we're coming."
+   },
+   {
+    "key": "end-edge",
+    "text": "So this is where the wallpaper ends. Huh. I always assumed it just kept going."
    }
   ]
- }
+ },
+ "_endgame_note": "The endgame's door scene (2026-10-28), from docs/ENDGAME.md's draft walk lines: met at the door once all 20 are resolved; end-saved-some replaces end-saved if anyone was lost. Unrecorded so far (subtitles); a take drops in as outside-assets/voice/guide-<mario|samwise>-end-<key>.mp3, and end-discs' handoff is then seconds into it."
 }

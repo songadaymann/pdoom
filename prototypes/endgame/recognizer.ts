@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {ARENA,PAL,glowSprite,type Sparks} from './kit';
+import {ARENA,PAL,WALK,glowSprite,type Sparks} from './kit';
 
 /* A Recognizer: the flying lower-case "n" gantry from Tron. Original geometry: a crossbar on two
  * legs with a head under the middle of the bar and a glowing core beneath it (the weak spot).
@@ -69,9 +69,10 @@ export class Recognizer{
    // Keep orbitR off (18 m), drift round you, face you, charge and fire; stay clear of the column and inside the wall.
    const away=new THREE.Vector2(p.x-player.x,p.z-player.z);if(away.lengthSq()<.01)away.set(0,1);away.normalize();
    this.orbit+=dt*.14;const a=Math.atan2(away.y,away.x)+dt*.14*this.orbitDir;let tx=player.x+Math.cos(a)*this.orbitR,tz=player.z+Math.sin(a)*this.orbitR;
-   const tr=Math.hypot(tx,tz),fit=tr<15?15/tr:tr>42?42/tr:1;tx*=fit;tz*=fit;
+   // (on the walk in, outside the wall, it just keeps its distance)
+   const tr=Math.hypot(tx,tz),fit=WALK.on?1:tr<15?15/tr:tr>42?42/tr:1;tx*=fit;tz*=fit;
    // coming in, it stays over the wall till it's inside, so you see it arrive (2026-10-27)
-   const outside=this.state==='enter'&&Math.hypot(p.x,p.z)>ARENA.radius-3,speed=this.state==='enter'?16:5;
+   const outside=!WALK.on&&this.state==='enter'&&Math.hypot(p.x,p.z)>ARENA.radius-3,speed=this.state==='enter'?16:5;
    flyTo(tx,outside?Math.max(this.orbitY,ARENA.wallH+7):this.orbitY,tz,speed);this.face(player.x-p.x,player.z-p.z,dt,5);
    if(this.state==='enter'&&Math.hypot(p.x-tx,p.z-tz)<3){this.state='hover';this.t=0;}
    if(this.state==='hover'){this.fireCd-=dt;if(this.fireCd<=0){this.state='charge';this.t=0;}}

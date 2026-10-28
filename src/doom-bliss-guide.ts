@@ -3,7 +3,8 @@ import {loadTexture} from './doom-texture-load';
 import {meadowGroundY as groundY} from './doom-meadow-ground';
 import LINES from './doom-bliss-guide-lines.json';
 
-// Owns only the first wake-up walk. No rescued roster or save mutation.
+// The other founder in the meadow: the first wake-up walk, and the endgame's meeting at the door
+// (docs/ENDGAME.md E1-E3). No rescued roster or save mutation; the meadow reacts to his cues.
 //
 // The player wakes low on the far side of the big dome, facing away. The other
 // founder stands on the slope above, in plain view; CONTROL.EXE is hidden behind
@@ -13,27 +14,47 @@ import LINES from './doom-bliss-guide-lines.json';
 // on the route, and nothing advances while the player is out of earshot. He keeps
 // walking the whole way, a little slower while talking.
 export const INTRO_START={x:-45,z:-150,yaw:0};
-const POST={x:-45,z:-120};                          // where the founder waits
-const ROUTE=[[-45,-120],[-36,-104],[-6,-52],[13.5,-7]] as const; // over the crest, down to the door's side
 const DOOR={x:17,z:.1};
-// Once he has walked us over he potters about in front of the bunker (never into it:
-// its walls run x 7.6..26.4 from z -.4) instead of standing like a statue.
-const HOME={x:13.5,z:-7},WANDER={radius:4.5,speed:1.15,minX:6,maxX:25,maxZ:-3};
-const SPEED=3.1,TALK_SPEED=2.5,GREET_RANGE=7,EARSHOT=12,FALL_BEHIND=10;
+const GREET_RANGE=7,EARSHOT=12,FALL_BEHIND=10;
 
 type Line={key:string;text:string;handoff?:number};   // handoff: seconds into the take of "Take this"
 type Guide={name:string;lines:Line[]};
 type Voice={file:string;duration?:number};
 type Cue={key:string;after?:number;gap:number;progress?:number};
 // progress = metres walked along ROUTE before the line may start (the crest reveal is at ~18 m)
-const CUES:Cue[]=[
- {key:'greet',gap:0},{key:'follow',gap:.5},
- {key:'recap',gap:1.2,progress:2},
- {key:'fault',gap:.8},
- {key:'situation',gap:1.5,progress:36},            // after the crest, once the bunker is in view
- {key:'mirror',gap:.6},
-];
-const ROUTE_LENGTH=ROUTE.slice(1).reduce((sum,p,i)=>sum+Math.hypot(p[0]-ROUTE[i][0],p[1]-ROUTE[i][1]),0);
+// A walk with him: where he waits, the route he leads you along (the first point is where he waits), his
+// calls until you come over, his lines in order (he sets off once `leadAfter` of them have started), the
+// line he says on arrival, what he hands you ("Take this"), and how he spends the time after.
+type Scene={id:'intro'|'endgame';route:[number,number][];calls:string[];cues:Cue[];leadAfter:number;arrived:string;
+ speed:number;talkSpeed:number;item:'wrench'|'floppy';skipLabel:string;faceFrom:{x:number;z:number};
+ wander:{home:{x:number;z:number};radius:number;speed:number;minX:number;maxX:number;maxZ:number}|null};
+const INTRO:Scene={id:'intro',
+ route:[[-45,-120],[-36,-104],[-6,-52],[13.5,-7]],  // over the crest, down to the door's side
+ calls:['call','call2','call3'],
+ cues:[
+  {key:'greet',gap:0},{key:'follow',gap:.5},
+  {key:'recap',gap:1.2,progress:2},
+  {key:'fault',gap:.8},
+  {key:'situation',gap:1.5,progress:36},            // after the crest, once the bunker is in view
+  {key:'mirror',gap:.6},
+ ],leadAfter:2,arrived:'inside',speed:3.1,talkSpeed:2.5,item:'wrench',skipLabel:'SPACE — SKIP WALK',
+ // facing the view from the crest, back to the player: they have to look around to find him
+ faceFrom:{x:17,z:0},
+ // Once he has walked us over he potters about in front of the bunker (never into it:
+ // its walls run x 7.6..26.4 from z -.4) instead of standing like a statue.
+ wander:{home:{x:13.5,z:-7},radius:4.5,speed:1.15,minX:6,maxX:25,maxZ:-3}};
+// The endgame (all 20 resolved): he runs up to whichever door you came out of, says what happened, hands you
+// a floppy, and once everyone is with you leads south to the gate in the meadow's edge, where he waits. With
+// anyone lost, end-saved-some replaces end-saved.
+export function endgameScene(at:{x:number;z:number;yaw:number},gate:{x:number;z:number},anyLost:boolean):Scene{
+ // far enough ahead that he calls you over (calls start past GREET_RANGE+6)
+ const post={x:at.x-Math.sin(at.yaw)*18,z:at.z-Math.cos(at.yaw)*18};
+ return {id:'endgame',route:[[post.x,post.z],[gate.x,gate.z-14],[gate.x,gate.z-2]],calls:['end-call'],
+  cues:[{key:anyLost?'end-saved-some':'end-saved',gap:0},{key:'end-boss',gap:.6},{key:'end-why',gap:.6},
+   {key:'end-discs',gap:.8},{key:'end-everyone',gap:.8},{key:'end-go',gap:.6}],
+  leadAfter:6,arrived:'end-edge',speed:4.6,talkSpeed:4,item:'floppy',skipLabel:'SPACE — SKIP',faceFrom:{x:at.x,z:at.z},wander:null};
+}
+const routeLength=(route:[number,number][])=>route.slice(1).reduce((sum,p,i)=>sum+Math.hypot(p[0]-route[i][0],p[1]-route[i][1]),0);
 
 export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:AudioContext){
  const loader=new THREE.TextureLoader();
@@ -64,7 +85,7 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
  const ui=document.createElement('section');ui.id='bliss-guide';ui.hidden=true;ui.setAttribute('aria-label','Your guide');
  const speaker=document.createElement('p'),line=document.createElement('p'),skip=document.createElement('button');
  speaker.className='guide-speaker';line.className='guide-line';line.setAttribute('aria-live','polite');
- skip.textContent='SPACE — SKIP WALK';skip.type='button';skip.className='guide-skip';ui.append(speaker,line,skip);stage.append(ui);
+ skip.type='button';skip.className='guide-skip';ui.append(speaker,line,skip);stage.append(ui);
  // He is placed in 3D (HRTF): a shout from behind sounds behind. Far away he is quieter,
  // duller (air) and wetter (a light outdoor reverb off the hills); close, he is dry.
  const out=audio.createGain(),air=audio.createBiquadFilter(),panner=audio.createPanner(),wet=audio.createGain(),hills=audio.createConvolver();
@@ -74,16 +95,24 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
   for(let c=0;c<2;c++){const d=b.getChannelData(c);let s=911+c*331,low=0;for(let i=0;i<n;i++){s=(s*1664525+1013904223)>>>0;low+=((s/2147483648-1)-low)*.35;d[i]=low*Math.pow(1-i/n,4)*(i<rate*.06?.2:1);}}return b;})();
  out.connect(air).connect(panner).connect(audio.destination);panner.connect(wet).connect(hills).connect(audio.destination);
 
- let active=false,ready=false,who:'mario'|'samwise'='mario',guide:Guide=LINES.mario as Guide;
+ let active=false,ready=false,who:'mario'|'samwise'='mario',guide:Guide=LINES.mario as Guide,walkScene:Scene=INTRO,ROUTE=INTRO.route,ROUTE_LENGTH=routeLength(ROUTE),CUES=INTRO.cues;
  let phase:'waiting'|'leading'|'arrived'='waiting',walked=0,moving=false,facing=0,time=0,clock=0;
  let cue=0,lastEnd=-99,called=0,greeted=false,arrivedLine=false;
  let roam:{x:number,z:number}|null=null,rest=0;
+ // the meadow listens: each line as it starts (and, on a skip, every line it skipped), and the handoff landing
+ let onCue:((key:string)=>void)|null=null,onHandoff:(()=>void)|null=null;
  // "Take this. It's dangerous to go alone." The wrench flies from his hand to us. With
  // handoff frames (outside-assets/guide-<who>-handoff-<0..3>.png, see
  // art/bliss-guide-v1/HANDOFF.md) he also acts it out; without them the wrench alone does.
  let handoffAt=-1,handoffStart=-1,handedOver=false;
  const wrench=new THREE.Sprite(new THREE.SpriteMaterial({map:await (async()=>{const t=await loadTexture(loader,'wrench.png');t.colorSpace=THREE.SRGBColorSpace;t.magFilter=t.minFilter=THREE.NearestFilter;return t;})(),transparent:true,alphaTest:.5,depthTest:false}));
  wrench.center.set(.5,.5);wrench.scale.set(.22,.33,1);wrench.visible=false;wrench.renderOrder=10;scene.add(wrench);
+ const wrenchTexture=wrench.material.map,floppyTexture=(()=>{
+  // a glowing cyan 3.5" floppy, shutter and label, drawn once
+  const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d')!;
+  g.fillStyle='#19d3e6';g.fillRect(1,1,14,14);g.fillStyle='#0a6f7a';g.fillRect(1,14,14,1);g.fillRect(14,1,1,14);
+  g.fillStyle='#b9c2c8';g.fillRect(4,1,8,5);g.fillStyle='#38424a';g.fillRect(9,2,2,3);g.fillStyle='#f2f2ea';g.fillRect(3,8,10,6);
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=t.minFilter=THREE.NearestFilter;return t;})();
  const handoffFrames:Record<string,THREE.Texture[]>={};
  for(const id of ['mario','samwise']){
   const got:THREE.Texture[]=[];
@@ -107,6 +136,7 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
   speaking={key,text:words,until:clock+seconds+.35,source:null,started:clock,offset:0,buffer:b};
   if(b)play(speaking,0);
   const at=guide.lines.find(l=>l.key===key)?.handoff;
+  onCue?.(key);
   if(at!==undefined&&!handedOver){
    // Subtitles only: place it by the words' position in the line.
    const words=text(key).split(/\s+/),i=words.findIndex(w=>/^take$/i.test(w));
@@ -141,20 +171,23 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
  function finish(){
   // Skip lands both founders at the door, so the entrance still has to be found and used.
   if(!active||ready)return;silence();
+  for(let i=cue;i<CUES.length;i++)onCue?.(CUES[i].key);
   walked=ROUTE_LENGTH;phase='arrived';ready=true;cue=CUES.length;greeted=true;arrivedLine=true;
   if(!handedOver&&handoffStart<0)handoffAt=clock;   // skipping still hands it over
   const end=routePoint(walked);sprite.position.set(end.x,groundY(end.x,end.z),end.z);
   onSkip?.();updateUi();
  }
  skip.onclick=finish;
- function start(ceo:string){
+ function start(ceo:string,walk:Scene=INTRO){
   who=ceo==='amodei'?'samwise':'mario';guide=LINES[who] as Guide;
-  // Only recorded takes: extra shouts (call2, call3) are used once Jonathan records them.
- for(const l of guide.lines)if(voices[who]?.[l.key]||!/^call\d/.test(l.key))buffer(fileFor(l.key));
+  walkScene=walk;ROUTE=walk.route;ROUTE_LENGTH=routeLength(ROUTE);CUES=walk.cues;skip.textContent=walk.skipLabel;
+  wrench.material.map=walk.item==='floppy'?floppyTexture:wrenchTexture;wrench.scale.set(walk.item==='floppy'?.3:.22,walk.item==='floppy'?.3:.33,1);
+  // Only recorded takes: extra shouts (call2, call3) and the endgame's lines are used once Jonathan
+  // records them and lists them in guide-voices.json.
+  for(const l of guide.lines)if(voices[who]?.[l.key]||!/^call\d|^end-/.test(l.key)&&walk.id==='intro')buffer(fileFor(l.key));
   active=true;ready=false;phase='waiting';walked=0;moving=false;time=0;clock=0;cue=0;lastEnd=-99;called=0;greeted=false;arrivedLine=false;roam=null;rest=0;silence();
   handoffAt=-1;handoffStart=-1;handedOver=false;wrench.visible=false;
-  // Facing the view from the crest, back to the player: they have to look around to find him.
-  facing=Math.atan2(17-POST.x,0-POST.z);sprite.visible=true;sprite.position.set(POST.x,groundY(POST.x,POST.z),POST.z);updateUi();
+  const [px,pz]=ROUTE[0];facing=Math.atan2(walk.faceFrom.x-px,walk.faceFrom.z-pz);sprite.visible=true;sprite.position.set(px,groundY(px,pz),pz);updateUi();
  }
  function stop(){active=false;sprite.visible=false;ui.hidden=true;silence();}
  function tick(dt:number,pos:THREE.Vector3,paused:boolean,yaw:number){
@@ -179,22 +212,23 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
    // He shouts almost as soon as we wake, and keeps calling until we come over,
    // rotating through the shouts that have been recorded.
    if(!greeted&&distance>GREET_RANGE+6&&!talking&&called<8&&time>2.5+called*7){
-    const shouts=['call','call2','call3'].filter(k=>k==='call'||voices[who]?.[k]);called++;say(shouts[(called-1)%shouts.length]);
+    const shouts=walkScene.calls.filter((k,i)=>i===0||voices[who]?.[k]);called++;say(shouts[(called-1)%shouts.length]);
    }
    if(distance<GREET_RANGE&&!greeted&&!talking){greeted=true;cue=0;}
-   if(greeted){facing=toPlayer;if(cue>=2&&!talking)phase='leading';}
+   if(greeted){facing=toPlayer;if(cue>=walkScene.leadAfter&&!talking)phase='leading';}
    else if(distance<EARSHOT)facing=toPlayer;
   }
   if(phase==='leading'){
    if(distance>FALL_BEHIND){facing=toPlayer;}
    else{
-    walked=Math.min(ROUTE_LENGTH,walked+(talking?TALK_SPEED:SPEED)*dt*(distance<4?1.12:1));const p=routePoint(walked);
+    walked=Math.min(ROUTE_LENGTH,walked+(talking?walkScene.talkSpeed:walkScene.speed)*dt*(distance<4?1.12:1));const p=routePoint(walked);
     sprite.position.x=p.x;sprite.position.z=p.z;facing=p.heading;moving=true;
     if(walked>=ROUTE_LENGTH)phase='arrived';
    }
   }
   if(phase==='arrived'){
-   if(!ready||talking||distance<3.2){facing=toPlayer;roam=null;}
+   const WANDER=walkScene.wander;
+   if(!ready||talking||distance<3.2||!WANDER){facing=toPlayer;roam=null;}
    else if(roam){
     const rx=roam.x-sprite.position.x,rz=roam.z-sprite.position.z,left=Math.hypot(rx,rz),step=WANDER.speed*dt;
     if(left<=step){sprite.position.x=roam.x;sprite.position.z=roam.z;roam=null;rest=time+1.5+Math.random()*3;if(Math.random()<.5)facing=toPlayer;}
@@ -202,9 +236,9 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
    }
    else if(time>=rest){
     const a=Math.random()*Math.PI*2,r=1.5+Math.random()*(WANDER.radius-1.5);
-    roam={x:THREE.MathUtils.clamp(HOME.x+Math.cos(a)*r,WANDER.minX,WANDER.maxX),z:Math.min(WANDER.maxZ,HOME.z+Math.sin(a)*r)};
+    roam={x:THREE.MathUtils.clamp(WANDER.home.x+Math.cos(a)*r,WANDER.minX,WANDER.maxX),z:Math.min(WANDER.maxZ,WANDER.home.z+Math.sin(a)*r)};
    }
-   if(!arrivedLine&&cue>=CUES.length&&!talking&&distance<9&&clock-lastEnd>1){arrivedLine=true;say('inside');}
+   if(!arrivedLine&&cue>=CUES.length&&!talking&&distance<9&&clock-lastEnd>1){arrivedLine=true;say(walkScene.arrived);}
    if(arrivedLine&&!talking&&!ready)ready=true;
   }
   // Ordered lines: previous finished, minimum gap, far enough along, player in earshot.
@@ -228,12 +262,13 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
    if(k<.35)wrench.position.copy(hand);
    else{const f=Math.min(1,(k-.35)/.65),e=f*f*(3-2*f);wrench.position.lerpVectors(hand,dest,e);wrench.position.y+=Math.sin(e*Math.PI)*.35;}
    const acting=handoffFrames[who];if(acting)(sprite.material as THREE.SpriteMaterial).map=acting[Math.min(3,Math.floor(k*4))];
-   if(k>=1){wrench.visible=false;handedOver=true;clank();}
+   if(k>=1){wrench.visible=false;handedOver=true;clank();onHandoff?.();}
   }
   updateUi();
  }
- return{start,stop,tick,skip:finish,set onSkip(f:(()=>void)|null){onSkip=f;},door:DOOR,
+ return{start,stop,tick,skip:finish,set onSkip(f:(()=>void)|null){onSkip=f;},set onCue(f:((key:string)=>void)|null){onCue=f;},set onHandoff(f:(()=>void)|null){onHandoff=f;},door:DOOR,
+  get scene(){return walkScene.id;},get end(){const [x,z]=ROUTE[ROUTE.length-1];return {x,z};},
   get active(){return active;},get ready(){return ready;},
-  getState:()=>active?{name:guide.name,character:who,phase,ready,clock:+clock.toFixed(2),walked:+walked.toFixed(1),route:+ROUTE_LENGTH.toFixed(1),moving,cue,called,
+  getState:()=>active?{name:guide.name,character:who,scene:walkScene.id,phase,ready,clock:+clock.toFixed(2),walked:+walked.toFixed(1),route:+ROUTE_LENGTH.toFixed(1),moving,cue,called,
    speaking:speaking?.key||null,text:line.textContent,voiced:!!speaking?.buffer,handoff:handedOver?'done':handoffStart>=0?'flying':handoffAt>=0?'due':'none',actedOut:!!handoffFrames[who],x:+sprite.position.x.toFixed(2),z:+sprite.position.z.toFixed(2)}:null};
 }

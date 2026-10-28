@@ -8,7 +8,7 @@ import {isGameControl} from './game-controls.js';
 import {nativePersonRects,createPersonLabel} from './person-label.js';
 import {createStoryBeats} from './story-beats.js';
 import {configureHalAnswers,updateHalHud} from './hal-hud.js';
-import {Campaign,CAMPAIGN_KEY,OPENING_COMPLETE_KEY,campaignResumePoint,readCampaign} from './campaign.js';
+import {Campaign,CAMPAIGN_KEY,OPENING_COMPLETE_KEY,ENDGAME_GATE,ENDGAME_DONE,campaignResumePoint,readCampaign} from './campaign.js';
 import {updateLevelPolish} from './level-polish.js';
 import {DoomAudio} from './audio.js';
 import {createVoiceOver} from './voice-over.js';
@@ -269,6 +269,22 @@ function onMessage(m){
   if(/Script error|Execution could not continue|Unknown identifier|Unknown flag|VM execution aborted|virtual override not allowed/i.test(m.msg))fail(m.msg);
 }
 
+// The endgame (docs/ENDGAME.md): once all 20 are resolved, at whichever door that happens, the guide meets you
+// outside it, and the meadow's south gate leads to the endgame page (doom-web/endgame-proto/, built from
+// prototypes/endgame/ by scripts/build-endgame-protos.mjs). That page marks the save ENDGAME_DONE and comes back
+// (?play=1&load=1) to a meadow without the column.
+function syncEndgame(){
+ const camp=campaign.getState();
+ if(camp.endgame===ENDGAME_DONE){outside.endgameDone();return;}
+ if(!camp.hub||camp.saved+camp.lost<20)return;
+ campaign.setEndgame(ENDGAME_GATE);void outside.startEndgame(runningCeo,camp.lost>0);
+}
+// Through the gate: fade to black, then the endgame page, which reads this save for who's alive and who you are.
+function goEndgame(){
+ const black=document.createElement('div');black.id='endgame-fade';black.style.cssText='position:fixed;inset:0;background:#000;opacity:0;transition:opacity .9s;z-index:99';document.body.append(black);
+ requestAnimationFrame(()=>{black.style.opacity='1';});audio.pauseMusic();
+ setTimeout(()=>{location.href=new URL(`endgame-proto/play.html?m=finale&ceo=${runningCeo}`,location.href).href;},1000);
+}
 async function enterOutside({intro=false,melt=false}={}){
   if(outside||outsideLoading)return;
   // Leaving a level (2026-10-14): the last frame holds over the window while the meadow gets
@@ -284,9 +300,10 @@ async function enterOutside({intro=false,melt=false}={}){
   try{
     if(hub){outside=hub;outside.setActive(true,LEVEL.id);}
     else{const {createOutside}=await import('./outside/outside.js');
-      outside=hub=await createOutside({source:canvas,agenticDoor:await localDevelopmentEnabled(),stage:document.querySelector('#stage'),audio:audio.context,read:()=>state,campaign:()=>campaign.getState(),enter:enterLevel,prompt:text=>preferences.prompt(text),readThis:()=>gamePause?.openRead?.(),labels:(rects,surface,active)=>personLabel.update(rects,surface,active&&!uiBlocked)});}
+      outside=hub=await createOutside({source:canvas,agenticDoor:await localDevelopmentEnabled(),stage:document.querySelector('#stage'),audio:audio.context,read:()=>state,campaign:()=>campaign.getState(),enter:enterLevel,onGate:goEndgame,prompt:text=>preferences.prompt(text),readThis:()=>gamePause?.openRead?.(),labels:(rects,surface,active)=>personLabel.update(rects,surface,active&&!uiBlocked)});}
     outside.setActive(true,LEVEL.id);
     if(intro){await outside.startIntro(runningCeo);campaign.saveOpening('xp-intro');prologue.reset();document.querySelector('#reticle').hidden=true;}
+    else syncEndgame();
     window.__DOOM_DEBUG__.outside=outside;document.querySelector('#hal-thaw').hidden=true;
     outsideLoading=false;document.querySelector('#threat-warning').hidden=true;document.querySelector('#status-line')?.setAttribute('hidden','');
     canvas.hidden=true;document.querySelector('#stage').classList.add('outside');checkpointStatusBar()?.setPaused(true);

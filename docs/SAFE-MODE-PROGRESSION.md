@@ -129,7 +129,7 @@ The hub's part, after 4:
 
 The endgame lane's part: the guide's congratulations, handing out the discs, the walk south through the gate, Recognizers, the followers' march, and the arena behind the column's door.
 
-Open hook between lanes: when the endgame sequence starts, the hill groups could walk down to the gate and fall in behind you. That needs a small hub call (for example `outside.gather(point)`), which I'll add if the endgame lane wants it.
+Built 2026-10-28 ([ENDGAME.md, In the game](ENDGAME.md#in-the-game)): with all 20 resolved, `outside.startEndgame()` runs the guide's meeting at the door. The hill groups fall in behind you in single file, and the gate opens at (80, 180). After the endgame, `outside.endgameDone()` takes the column off the horizon.
 
 ## 8. Previewing and testing
 

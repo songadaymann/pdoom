@@ -337,6 +337,7 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
 
  /* The MCP column (spec 2.6): 900 m south, behind you as you leave the bunker. A faceted
   * stainless column under an X crown, rocket bells at its foot, and the face band. */
+ let fallen=false;
  const mcp=new THREE.Group();mcp.position.set(MCP.x,groundY(MCP.x,MCP.z),MCP.z);mcp.rotation.y=Math.atan2(17-MCP.x,0-MCP.z);root.add(mcp);
  const steel=hazed(null,.42);
  mcp.add(new THREE.Mesh(mergeGeometries([
@@ -376,6 +377,8 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
    {x:FINAL.x,y:finalGroup.position.y+5,z:FINAL.z,hx:7,hy:5,hz:.3,yaw:toBunker},
   ],
   setVisible(value:boolean){visible=value;root.visible=value;phoneAudio.setActive(audioEnabled&&visible);},
+  /** After the endgame the column is gone from the horizon, and the summit stops pointing at it. */
+  setFallen(value:boolean){fallen=value;mcp.visible=!value;},
   /** MEG3N.AVI's doorway shows the live engine view only while the factory is the loaded level, AGENTIC.BAT's while the pod farm is. */
   setLevel(id:string){const live=id==='meg3n-factory';megDoor.faceMaterial.map=live?portal:bigdoor;megDoor.faceMaterial.color.setHex(live?0xffffff:0xb8b8b8);
    const agLive=id==='agentic-pods';agDoor.faceMaterial.map=agLive?portal:bigdoor;agDoor.faceMaterial.color.setHex(agLive?0xffffff:0xb8b8b8);},
@@ -408,7 +411,7 @@ export async function makeFutureHub(scene:THREE.Scene,loader:THREE.TextureLoader
    for(const o of [spinner,todo])o.rotation.y=Math.atan2(player.x-o.position.x,player.z-o.position.z);
    hourglass.rotation.y=Math.atan2(player.x-hourglass.position.x,player.z-hourglass.position.z);
    const flip=reduced?0:Math.min(1,((time%3.2)-2.8)/.4);hourglass.rotation.z=flip>0?Math.PI*flip*flip*(3-2*flip):0;
-   const pointing=progress.unresolved===0;hourglass.visible=!pointing;arrowPivot.visible=pointing;
+   const pointing=progress.unresolved===0&&!fallen;hourglass.visible=!pointing&&!fallen;arrowPivot.visible=pointing;
    if(pointing){
     // face you, and in that plane point at the column, biased downhill so it always says "go back down"
     arrowPivot.rotation.y=hourglass.rotation.y;

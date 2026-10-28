@@ -1,8 +1,44 @@
 # The endgame: from the Level 4 exit to the credits
 
-**Draft, 2026-10-23.** Written from Jonathan's brief of the same day (below) against the finale spec ([GAME-SPEC §8](GAME-SPEC.md#8-the-finale), [05](spec/05-maze-and-mcp-finale.md), [06 §7–8](spec/06-names-and-antagonists.md)). Nothing here is built into the game yet. Three playable feel prototypes are in [`prototypes/endgame/`](../prototypes/endgame/) (how to run them is at the end). Every line is a draft for Jonathan to edit and record. He records the audio himself; no voice is generated or cloned. The MCP is a pixel-mosaic caricature of Elon Musk, never a photo.
+**Draft, 2026-10-23.** Written from Jonathan's brief of the same day (below) against the finale spec ([GAME-SPEC §8](GAME-SPEC.md#8-the-finale), [05](spec/05-maze-and-mcp-finale.md), [06 §7–8](spec/06-names-and-antagonists.md)). Since 2026-10-28 it's hooked into the game (see [In the game](#in-the-game) below); the fight itself is still the Three.js page in [`prototypes/endgame/`](../prototypes/endgame/) (how to run it is at the end). Every line is a draft for Jonathan to edit and record. He records the audio himself; no voice is generated or cloned. The MCP is a pixel-mosaic caricature of Elon Musk, never a photo.
 
 > Jonathan, 2026-10-23: "we come out of 4, dario/sam comes and says amazing you saved all the people … ok but the big boss man is pissed … by the time we've done 4, things are really crazy and we can feel the urgency to go to that final tall building. We take that walk the whole way. Maybe it's dario/sam that gives us the discs, and maybe on the walk over we practice doing it with some other tron related enemies … maybe dario vs sam reappears and there's a 'real last stand' … I want it to really look like that end game of Tron. It may feel more like tennis or something."
+
+## In the game
+
+Built 2026-10-28 on `claude/endgame-hookup` (the hub-progression and endgame branches merged), from Jonathan's picks that day:
+- **Trigger:** all 20 resolved, freed or lost, at whichever door that happens. Normally that's the level 4 exit.
+- **Survivors:** only the people you saved come with you.
+- **The door scene:** in the meadow.
+- **The rest:** one page.
+- **After the black:** back to the meadow.
+
+What happens:
+- **E0-E3, in the meadow** (`src/doom-outside.ts`, `src/doom-bliss-guide.ts`):
+  - Arriving in SAFE MODE with all 20 resolved, the guide waits 18 m ahead of the door you came out of and calls you over (`end-call`).
+  - Then he says `end-saved` (`end-saved-some` if anyone was lost), `end-boss`, `end-why`, and `end-discs` with the floppy flying into your hands (`YOU GOT A FLOPPY DISK! 1.44 MEGABYTES OF PAYBACK.`).
+  - At `end-everyone` everyone in camp falls in behind you in single file.
+  - At `end-go` a cyan frame opens in the meadow's south edge at (80, 180), where the hub's traces land.
+  - He leads you there and says `end-edge`. Space skips him, as it skips the wake-up walk.
+  - The lines are subtitles until they're recorded (`guide-<mario|samwise>-end-<key>.mp3`, listed in `guide-voices.json`).
+- **The handoff:** walking through the gate fades to black and opens `endgame-proto/play.html?m=finale`.
+  - That page reads the save (`pdoom.campaign.v1`, same origin) for your hero and who's alive.
+  - The save's new `endgame` field records progress: 1 once the guide has met you, 2 when it's over.
+- **E4-E5, the walk in** (`prototypes/endgame/mode-boss.ts`, `?m=finale`):
+  - You start 290 m north of the arena on the Grid, with the guide at your shoulder and everyone in file behind.
+  - P1 is one Recognizer that drops on a shadow (`end-recognizer`, `end-hit`).
+  - P2 is one that shoots, to learn the swing the Fleet needs (`end-rule`, then `end-sky`).
+  - P3 is a squadron of three (`end-fault`).
+  - Elon's walk lines are captions (`mcp-resolve`, `mcp-recognize`, `mcp-walk`).
+  - A stomp hurts but nobody dies out here.
+  - Near the wall, a door in it opens once the Recognizers are down (`end-tower`).
+  - Inside, everyone takes their places and THE BOSS's intro begins. N skips the walk.
+- **E6-E9:** THE BOSS as before.
+- **After the black:** the save is marked done, and a click returns through the game's own handoff (`?play=1&load=1`) to the meadow.
+  - There the column is gone and the summit stops pointing south. The dialog reads "Screen saver: none. Nothing left to wait for."
+- **Credits (E10):** not built. Jonathan chose the meadow after the black.
+- **Smoke:** `scripts/endgame-hookup-smoke.mjs` covers all of this.
+- **Not in the game's release build yet:** the page is built by `node scripts/build-endgame-protos.mjs` into ignored `doom-web/endgame-proto/`, and level 4 itself is still local-only.
 
 ## Where this differs from the spec
 

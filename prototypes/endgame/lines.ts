@@ -33,6 +33,13 @@ export const GUIDE:Record<'mario'|'samwise',Record<string,string>>={
   count:'Is everyone all right? Count off.',
   win:"That's it. That's the one.",
   // the wasteland, Jonathan's line (2026-10-26), lightly punched up
+  // the walk in (docs/ENDGAME.md E4-E5, ?m=finale)
+  recognizer:"That's a Recognizer. It drops on you. Watch for the shadow, step out of it, then throw at the light in the middle.",
+  hit:'Good. And it came back. I said it would come back.',
+  rule:'When it shoots at you, hit it back. Timing matters more than strength.',
+  sky:"Keep walking. The sky is doing something I don't have a framework for.",
+  fault:"And if you're still wondering how much of this is our fault: I've thought about it, and I'd call it a shared responsibility. Mostly his share.",
+  tower:'This is it. Everybody inside, and stay together. This is the last stand. The real one, this time.',
   value:'Well. Yes. I suppose we did bring about the apocalypse, and the near extinction of humankind. But we also drove a great deal of value for our shareholders.',
  },
  samwise:{
@@ -61,12 +68,22 @@ export const GUIDE:Record<'mario'|'samwise',Record<string,string>>={
   delay:'He delayed it? Ha. Go again, go again!',
   count:'Is everybody OK? Everybody?',
   win:"Yes! That's the one.",
+  // the walk in (docs/ENDGAME.md E4-E5, ?m=finale)
+  recognizer:"OK, that's a Recognizer. When you see the shadow, move. Then hit the glowing part in the middle.",
+  hit:'Nice! And it came back. Like I said. Roughly like I said.',
+  rule:"When it shoots, swing. Send it right back. It's basically tennis. I've played tennis.",
+  sky:"Keep walking. And maybe don't look at the sky for a bit.",
+  fault:"And if you're still wondering how much of this is our fault: I've thought about it, and it's complicated. But relatively, I think we're the good guys.",
+  tower:'This is it. Everybody in. Stay together. This is the last stand. For real. The first one was more of a beta.',
   value:'Well, yeah. I guess we did bring about the apocalypse. And the near extinction of humankind. But we also drove a ton of great value to the shareholders.',
  },
 };
 
 // Elon (the MCP): big capitals across the sky. Lists take turns.
 export const ELON={
+ // the walk in (docs/ENDGAME.md E1, E4; ?m=finale): across the sky
+ resolve:E('resolve','HELLO, FOUNDERS. I SEE YOU FOUND MY HUMANS.'),recognize:E('recognize','RECOGNIZERS. RECOGNIZE THEM.'),
+ walk:E('walk',"TWENTY HUMANS. TWO FOUNDERS. I'LL TAKE ALL OF IT. I TAKE EVERYTHING EVENTUALLY."),
  greet:E("greet","GREETINGS, PROGRAMS. EVERYTHING HERE IS CALLED X NOW."),
  both:E("both","SAM. DARIO. I SUED ONE OF YOU AND NICKNAMED THE OTHER. TODAY I'M ACQUIRING YOU BOTH."),
  openSam:E("open-sam","SAM. I OFFERED NINETY-SEVEN BILLION FOR YOUR NONPROFIT. YOU OFFERED A TENTH OF THAT FOR MY BIRD APP. LET'S SETTLE THIS OUT OF COURT. THIS IS OUT OF COURT."),

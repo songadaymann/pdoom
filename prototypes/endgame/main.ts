@@ -19,7 +19,7 @@ import {boss} from './mode-boss';
  * R restarts, M mutes. ?auto=1 runs without pointer lock (smokes and screenshots). */
 export type Phase='practice1'|'practice2'|'wake'|'fight'|'down';
 export interface Mode{
- id:string;title:string;hints:Record<Phase,string>;recStyle:'slam'|'bolt';formation:'arc'|'audience'|'behind';
+ id:string;title:string;hints:Record<Phase,string>;recStyle:'slam'|'bolt';formation:'arc'|'audience'|'behind'|'none';// none: the mode places them itself
  wake(c:Ctx):void;press(c:Ctx,button:number):void;update(c:Ctx,dt:number):void;
  recFire?(c:Ctx,rec:Recognizer,from:THREE.Vector3):void;state?(c:Ctx):object;
  highlight?(c:Ctx):number|null;heldAlways?:boolean;
@@ -39,7 +39,7 @@ export interface Ctx{
  pickTarget():()=>THREE.Vector3;gapPoint(from:THREE.Vector3,speed:number):THREE.Vector3;hitRec(rec:Recognizer):void;
  // timeScale slows the world (bullet time); realDt is the frame's unscaled time; cam overrides the eye
  timeScale:number;realDt:number;cam:{pos:THREE.Vector3;look:THREE.Vector3}|null;
- spawnRec(fromAngle:number,hp?:number,style?:'slam'|'bolt'):Recognizer;shake(amount:number):void;
+ spawnRec(fromAngle:number,hp?:number,style?:'slam'|'bolt',from?:THREE.Vector3):Recognizer;shake(amount:number):void;
 }
 export type Aim={kind:'mcp'|'rec'|'point';rec?:Recognizer;point:THREE.Vector3};
 
@@ -54,7 +54,7 @@ const LINES:Record<'mario'|'samwise',{name:string}&Record<'recognizer'|'hit'|'do
 const TENNIS_RECOGNIZER={mario:"That's a Recognizer. It shoots. When the shot reaches you, hit it back.",samwise:"OK, that's a Recognizer. It's going to shoot at you. Hit it back."};
 const TAUNTS=['IN 2014 I SAID AI WAS SUMMONING THE DEMON. GOOD NEWS: I\'M THE DEMON.','THROWING IS FREE. HITTING ME REQUIRES A SUBSCRIPTION.','I\'M NOT THE VILLAIN. I\'M THE MAIN CHARACTER. COMMON MISTAKE.','FULL SELF-DEFEATING MODE SHIPS NEXT YEAR. DEFINITELY NEXT YEAR.','YOUR DISCS HAVE BEEN COMMUNITY NOTED. READERS ADDED CONTEXT: YOU\'RE LOSING.'];
 
-const MODES:Record<string,Mode>={ricochet,tennis,volley,boss};
+const MODES:Record<string,Mode>={ricochet,tennis,volley,boss,finale:boss};
 const BLURBS:Record<string,string>={
  ricochet:'One disc, yours. It bounces off pillars, the wall and the shield, then flies back to your hand. No second throw until you catch it.',
  tennis:'The MCP can only shoot through its own gap. Click as the shot reaches you to hit it back. Rallies speed up and hit harder.',
@@ -63,7 +63,12 @@ const BLURBS:Record<string,string>={
 };
 const params=new URLSearchParams(location.search);
 const mode=MODES[params.get('m')||'ricochet']||ricochet;
-const who:'mario'|'samwise'=params.get('ceo')==='amodei'?'samwise':'mario';
+// The finale (?m=finale, through the meadow's south gate): THE BOSS after a walk in, with this browser's save
+// (doom-web/campaign.js, same origin) saying who you are and who's alive. Without a save, everyone is.
+const finale=params.get('m')==='finale';
+const save=(()=>{try{const v=JSON.parse(localStorage.getItem('pdoom.campaign.v1')||'null');return finale&&v?.version===1?v as Record<string,number|string>:null;}catch{return null;}})();
+const alive=(i:number)=>!save||!!(Number(save['saved'+Math.floor(i/5)]??0)>>(i%5)&1);
+const who:'mario'|'samwise'=(params.get('ceo')??save?.ceo)==='amodei'?'samwise':'mario';
 const auto=params.has('auto');
 
 async function boot(){
@@ -71,12 +76,14 @@ async function boot(){
  document.title=`p(DOOM) endgame · ${mode.title}`;
  (document.getElementById('mode-title') as HTMLElement).textContent=mode.title;
  (document.getElementById('mode-blurb') as HTMLElement).textContent=BLURBS[mode.id];
+ // come from the game: no prototype tabs or dev keys, just the walk
+ if(finale){document.title='p(DOOM)';(document.getElementById('mode-title') as HTMLElement).textContent='THE TOWER';(document.getElementById('mode-blurb') as HTMLElement).textContent='Everyone who made it out is behind you. Walk south to the tower. WASD to move, Shift to run, click to throw.';for(const id of ['modes','keys'])(document.getElementById(id) as HTMLElement).hidden=true;}
  for(const a of document.querySelectorAll<HTMLAnchorElement>('#modes a'))a.classList.toggle('on',a.dataset.m===mode.id);
- const stage=makeStage(canvas),input=makeInput(canvas),hud=makeHud(),sfx=makeSfx(),voices=new Voices(()=>sfx.audio()),sparks=new Sparks(stage.scene);
+ const stage=makeStage(canvas,{door:finale}),input=makeInput(canvas),hud=makeHud(),sfx=makeSfx(),voices=new Voices(()=>sfx.audio()),sparks=new Sparks(stage.scene);
  const player=new Player(input),mcp=new MCP(stage.scene,sparks);
  // the words drawn on canvases need Doom's font in first
  const [art]=await Promise.all([loadCast(who),document.fonts.load('64px DoomSmall').catch(()=>null)]);
- const people=CAST.map(([id,name],i)=>new Person(stage.scene,i,id,name,art.people[i]));
+ const people=CAST.flatMap(([id,name],i)=>alive(i)?[new Person(stage.scene,i,id,name,art.people[i])]:[]);
  const guide=new Person(stage.scene,20,who,LINES[who].name,art.walk,true,art.idle);
  // the doc's art batch (art.ts), where it's been imported: fight poses, doges, sinks, the first-person hands
  void loadPoses([...people,guide]);void loadDoges();void loadSinks();
@@ -94,7 +101,7 @@ async function boot(){
   later:(sec,f)=>timers.push({at:c.t+sec,f}),
   hitRec:(rec)=>hitRec(rec),
   timeScale:1,realDt:0,cam:null,
-  spawnRec:(a,hp,style)=>spawnRec(a,hp,style),
+  spawnRec:(a,hp,style,from)=>spawnRec(a,hp,style,from),
   shake:(n)=>{shake=Math.max(shake,n);},
   everyone:()=>[...people,guide],
   say:(key)=>{const l=LINES[who];hud.toast(l.name,key==='rule'?l.rule[mode.id]:key==='recognizer'&&mode.recStyle==='bolt'?TENNIS_RECOGNIZER[who]:l[key],key==='down'?1.8:4.2);},
@@ -152,8 +159,8 @@ async function boot(){
   fire:(rec:Recognizer,from:THREE.Vector3)=>mode.recFire?.(c,rec,from),
   pick:()=>c.pickTarget(),
  };
- function spawnRec(fromAngle:number,hp?:number,style:'slam'|'bolt'=mode.recStyle){
-  const from=new THREE.Vector3(Math.cos(fromAngle)*70,24,Math.sin(fromAngle)*70);
+ function spawnRec(fromAngle:number,hp?:number,style:'slam'|'bolt'=mode.recStyle,at?:THREE.Vector3){
+  const from=at?.clone()??new THREE.Vector3(Math.cos(fromAngle)*70,24,Math.sin(fromAngle)*70);
   const rec=new Recognizer(stage.scene,style,from,c.pickTarget(),hp??(style==='bolt'?2:3));
   if(mode.formation==='arc')rec.telegraphFor=2;recs.push(rec);return rec;
  }
@@ -180,6 +187,7 @@ async function boot(){
 
  const tmp=new THREE.Vector3();
  function formation(dt:number){
+  if(mode.formation==='none')return;
   const b=bearingOf(player.pos),pr=Math.hypot(player.pos.x,player.pos.z);
   people.forEach((p,i)=>{
    let a:number,r:number;

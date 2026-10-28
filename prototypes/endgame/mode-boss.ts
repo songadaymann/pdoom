@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {ARENA,PAL,PILLARS,TAU,rand,clamp,wrap,bearingOf,glowSprite,textSprite,makeFloppy,Trail} from './kit';
+import {ARENA,PAL,PILLARS,TAU,WALK,rand,clamp,wrap,bearingOf,glowSprite,textSprite,makeFloppy,Trail} from './kit';
 import type {Mode,Ctx} from './main';
 import type {Recognizer} from './recognizer';
 import {Person,loadFounder,loadPoses} from './crowd';
@@ -54,8 +54,10 @@ const TUNE_INFO:[keyof Tune,string,number,number,number][]=[
 // mirror, so the route can turn in 45° steps and flip and stay good; only your own leg to it needs checking.
 const ROUTE:{kind:'wall'|'pillar';off:number;y:number}[]=[{kind:'wall',off:-45,y:2.4},{kind:'pillar',off:-67.5,y:3},{kind:'wall',off:-100,y:3.6},{kind:'pillar',off:-157.5,y:3.4},{kind:'wall',off:-190,y:5}];
 const autosteer=QUERY.has('autosteer');
+// the finale (?m=finale, through the meadow's south gate): the walk in first, and back to the meadow after
+const FINALE=QUERY.get('m')==='finale';
 
-type Phase='intro'|'ships'|'shieldDown'|'trick'|'down'|'waste';
+type Phase='walk'|'intro'|'ships'|'shieldDown'|'trick'|'down'|'waste';
 type Kind='update'|'starlink'|'doge'|'sink';
 const WARN:Record<Kind,Line[]>={update:GROK.update,starlink:GROK.starlink,doge:GROK.doge,sink:GROK.sink};
 
@@ -562,6 +564,63 @@ function clearAll(c:Ctx){
  if(trick)endTrick(c);removeRoute();c.discs.clear();shield=null;c.hud.reticle(false);
  for(const id of ['grok','ota','countdown'])$(id).hidden=true;updateArrows(c);
 }
+// The walk in (?m=finale; docs/ENDGAME.md E4-E5): from the end of the meadow, north of the arena, straight to the
+// door in its wall, the guide at your shoulder and everyone alive in single file behind you. Practice on the
+// way: one Recognizer that drops on a shadow (P1), one that shoots, to learn the swing part 1 needs (P2), and a
+// squadron of three (P3). Nobody dies out here. Once the way is clear the door opens; inside, THE BOSS begins.
+let walkRecs:{rec:Recognizer;beat:number}[]=[],beat=0,doorK=0,inside=0;const walkTrail:THREE.Vector3[]=[],slots=new Map<Person,THREE.Vector3>();
+function walkStart(c:Ctx){
+ phase='walk';pt=0;WALK.on=true;WALK.door=false;c.stage.openDoor(0);
+ for(const p of c.everyone())slots.set(p,p.pos.clone());// their places in the arena, for when they're in
+ c.player.pos.set(0,0,WALK.far);c.input.state.yaw=0;c.input.state.pitch=0;
+ walkTrail.length=0;for(let k=0;k<90;k++)walkTrail.push(new THREE.Vector3(0,0,WALK.far+k));// the file starts already formed behind you
+ c.people.forEach((p,k)=>{p.pos.set(k%2?.7:-.7,0,WALK.far+4+k*1.6);p.target.copy(p.pos);});
+ c.guide.pos.set(-2.2,0,WALK.far-3);c.guide.target.copy(c.guide.pos);
+ (c.stage.floor.material as THREE.ShaderMaterial).uniforms.uR.value=1e4;// the Grid all the way out
+ c.hud.hint('South, to the tower. Click throws your floppy (it comes back); click a ball that\'s on you to hit it back.');
+}
+function walk(c:Ctx,dt:number){
+ const p=c.player.pos,z=p.z,live=(b:number)=>walkRecs.some(w=>w.beat===b&&w.rec.alive),spawn=(b:number,style:'slam'|'bolt',at:THREE.Vector3,hp:number)=>walkRecs.push({rec:c.spawnRec(0,hp,style,at),beat:b});
+ c.player.health=Math.max(c.player.health,40);// a stomp hurts, but nobody dies on the walk
+ if(!walkTrail.length||walkTrail[0].distanceTo(p)>1){walkTrail.unshift(p.clone());walkTrail.length=Math.min(walkTrail.length,240);}
+ if(WALK.door&&Math.hypot(p.x,p.z)<ARENA.radius-2){
+  // in: everyone to their places, then the door shuts behind them and he wakes
+  for(const q of c.everyone())q.target.copy(slots.get(q)??q.pos);
+  inside+=dt;if(c.everyone().every(q=>Math.hypot(q.pos.x,q.pos.z)<ARENA.radius-1)||inside>9)walkEnd(c,false);
+  return;
+ }
+ c.people.forEach((q,k)=>{if(q.down>0)return;const at=walkTrail[Math.min(walkTrail.length-1,4+Math.round(k*1.6))]??p;q.target.set(at.x+(k%2?.7:-.7),0,at.z);});
+ c.guide.target.set(p.x-2.2,0,Math.max(WALK.door?-40:ARENA.radius+3,z-3));
+ if(pt>2&&once('walk-resolve'))elon(c,ELON.resolve,3.6);
+ if(beat===0&&z<WALK.far-45){beat=1;spawn(1,'slam',new THREE.Vector3(26,24,z-60),2);guide(c,'recognizer',6);c.later(2.5,()=>elon(c,ELON.recognize,2.6));}
+ if(beat>=1&&walkRecs.length&&!live(1)&&once('walk-hit'))guide(c,'hit',3);
+ if(beat===1&&z<WALK.far-115){beat=2;spawn(2,'bolt',new THREE.Vector3(-22,10,z-55),2);guide(c,'rule',5);c.later(14,()=>{if(once('walk-sky'))guide(c,'sky',4);});}
+ if(beat===2&&z<WALK.far-175){beat=3;for(let k=0;k<3;k++)spawn(3,'slam',new THREE.Vector3(-70,24,z-28-k*9),1);c.later(5,()=>guide(c,'fault',6));}
+ if(beat===3&&z<ARENA.radius+50&&once('walk-mcp'))elon(c,ELON.walk,4.4);
+ // the door: once nothing's left out here
+ if(!WALK.door&&z<ARENA.radius+18){
+  if(walkRecs.some(w=>w.rec.alive)){if(once('walk-clear'))c.hud.hint('Clear the Recognizers, and the door opens.');}
+  else{WALK.door=true;guide(c,'tower',5.5);c.sfx.play.charge();c.hud.hint('In you go.');}
+ }
+ if(WALK.door&&doorK<1){doorK=Math.min(1,doorK+dt/1.8);c.stage.openDoor(doorK);}
+}
+// in (or skipped): the walk's over and THE BOSS begins; `instant` puts everyone in place at once
+function walkEnd(c:Ctx,instant:boolean){
+ if(!WALK.on)return;WALK.on=false;WALK.door=false;doorK=0;c.stage.openDoor(0);
+ for(const w of walkRecs)if(w.rec.alive){w.rec.alive=false;w.rec.derez(c.sparks);}
+ for(const q of c.everyone()){const at=slots.get(q);if(instant&&at){q.pos.copy(at);q.target.copy(at);}}
+ if(instant)c.player.pos.set(0,0,36);
+ (c.stage.floor.material as THREE.ShaderMaterial).uniforms.uR.value=ARENA.radius;c.hud.hint('');
+ go(c,'intro');
+}
+// the end of the finale: this save's endgame is done (doom-web/campaign.js ENDGAME_DONE), and a click goes home
+function markDone(){try{const v=JSON.parse(localStorage.getItem('pdoom.campaign.v1')||'null');if(v?.version===1){v.endgame=2;localStorage.setItem('pdoom.campaign.v1',JSON.stringify(v));}}catch{/* nothing saved: nothing to mark */}}
+function offerMeadow(){
+ const small=$('black').querySelector('small');if(small)small.textContent='CLICK TO GO BACK TO THE MEADOW';
+ // the game's own handoff (onboarding.js ?play=1&load=1) loads this save straight into the meadow
+ const home=()=>{location.href=new URL('../?play=1&load=1',location.href).href;};
+ setTimeout(()=>{addEventListener('pointerdown',home,{once:true});addEventListener('keydown',e=>{if(e.code!=='KeyR')home();},{once:true});},1500);
+}
 function go(c:Ctx,to:Phase,instant=false){
  phase=to;pt=0;const mcp=c.mcp;
  if(to==='ships'||to==='shieldDown'||to==='trick')fightMusic(c);
@@ -627,13 +686,14 @@ async function startWaste(c:Ctx){
 }
 function jump(c:Ctx,to:Phase){
  if(c.mcp.dead)return;// R restarts after the end
+ if(phase==='walk')walkEnd(c,true);
  clearAll(c);c.phase='fight';c.mcp.integrity=to==='trick'?SHIELD_DOWN_TO:1000;c.mcp.awake=true;c.mcp.reveal=1;
  go(c,to,true);
 }
 
 export const boss:Mode={
  id:'boss',title:'THE BOSS · ALL THREE',recStyle:'slam',
- get formation(){return phase==='trick'?'behind' as const:'arc' as const;},
+ get formation(){return phase==='walk'?'none' as const:phase==='trick'?'behind' as const:'arc' as const;},
  hints:{practice1:'',practice2:'',wake:'',fight:'',down:''},
  wake(){},
  run(c,dt){
@@ -659,12 +719,13 @@ export const boss:Mode={
    void grokFaces().then(f=>{grokArt=f;if(f)$('grok-ava').classList.add('art');});
    (window as any).__boss={countdown:(n:number)=>{launchT=n;}};// for boss-check.mjs
    const start=QUERY.get('part');
-   if(start==='2')jump(c,'shieldDown');else if(start==='3')jump(c,'trick');
+   if(start==='2')jump(c,'shieldDown');else if(start==='3')jump(c,'trick');else if(FINALE)walkStart(c);
   }
   pt+=dt;swingCd=Math.max(0,swingCd-dt);const mcp=c.mcp;
   if(shield){shield.t+=dt;const k=Math.min(1,shield.t/shield.dur);mcp.shieldY=shield.from+(shield.to-shield.from)*k*k*(3-2*k);if(k>=1){const then=shield.then;shield=null;then?.();}}
   tickVoices(c);updateArrivals(c,dt);c.sfx.duck(c.voices.talking());
   switch(phase){
+   case 'walk':walk(c,dt);updateShots(c,dt);break;
    case 'intro':
     mcp.reveal=1;
     // his opening, line after line; the ships come after the second, and the one for the CEO you play runs over them
@@ -768,14 +829,16 @@ export const boss:Mode={
     // the stare comes once the line is done (the takes are 10-12 s, deadpan), black 2.8 s later, the title 2 s after
     if(pt>2.6&&pt-dt<=2.6)guide(c,'value',7.8,{prio:2,ttl:20,then:()=>{stareAt=pt+.7;}});
     if(ending==='waste'&&(pt>=stareAt||pt>32)){stareAt=pt;ending='stare';waste.stare(c.stage.camera.position,c.later);}
-    if(ending==='stare'&&pt>=stareAt+2.8){ending='black';$('black').hidden=false;c.sfx.hush(true);}
-    if(ending==='black'&&pt>=stareAt+4.8&&!$('black').classList.contains('title')){$('black').classList.add('title');if(END_MUSIC!=='off')void c.sfx.music(`/local/epilogue-${END_MUSIC}-music.ogg`,{vol:.6,fade:3});}
+    if(ending==='stare'&&pt>=stareAt+2.8){ending='black';$('black').hidden=false;c.sfx.hush(true);if(FINALE)markDone();}
+    if(ending==='black'&&pt>=stareAt+4.8&&!$('black').classList.contains('title')){$('black').classList.add('title');if(FINALE)offerMeadow();if(END_MUSIC!=='off')void c.sfx.music(`/local/epilogue-${END_MUSIC}-music.ogg`,{vol:.6,fade:3});}
     break;}
   }
   updateArrows(c);
  },
  press(c,b){
   if(b!==0||c.player.down)return;
+  // on the walk: swing at a ball that's on you, otherwise throw
+  if(phase==='walk'){const eye=c.player.eyePos();if(shots.some(s=>s.alive&&s.enemy&&s.pos.distanceTo(eye)<4.6))swing(c);else if(c.held)c.throwPlayer(MINE);return;}
   if(phase==='ships'){swing(c);return;}
   if(phase==='shieldDown'){
    if(swing(c)||!c.held)return;
@@ -798,14 +861,15 @@ export const boss:Mode={
  key(c,code){
   if(code==='KeyT')toggleTune();
   if(code==='Digit1')jump(c,'ships');if(code==='Digit2')jump(c,'shieldDown');if(code==='Digit3')jump(c,'trick');
-  if(code==='KeyN'){const next:Record<Phase,Phase>={intro:'ships',ships:'shieldDown',shieldDown:'trick',trick:'trick',down:'down',waste:'waste'};if(phase!=='trick'&&phase!=='down')jump(c,next[phase]);}
+  if(code==='KeyN'&&phase==='walk'){walkEnd(c,true);return;}
+  if(code==='KeyN'){const next:Record<Phase,Phase>={walk:'intro',intro:'ships',ships:'shieldDown',shieldDown:'trick',trick:'trick',down:'down',waste:'waste'};if(phase!=='trick'&&phase!=='down')jump(c,next[phase]);}
  },
  highlight:()=>phase==='trick'?windowBearing:null,
  // the arm wound back while you line up the trick shot
  hand:(c)=>phase==='trick'&&!trick&&c.held?1:null,
  state:(c)=>{
   const eye=c.player.eyePos(),mine=shots.filter(s=>s.alive&&s.enemy&&s.target.kind==='player').sort((a,b)=>a.pos.distanceTo(eye)-b.pos.distanceTo(eye))[0];
-  return {phase,pt:+pt.toFixed(2),ending,fleet,wave,shipsDown,ships:SHIPS,crowdReturns,spots:spots.length,spotsAt:spots.map(s=>s.world().toArray().map(v=>+v.toFixed(2))),shots:shots.length,hot:shots.some(s=>s.hot),
+  return {phase,pt:+pt.toFixed(2),ending,walk:FINALE?{on:WALK.on,beat,door:WALK.door,live:walkRecs.filter(w=>w.rec.alive).length}:null,fleet,wave,shipsDown,ships:SHIPS,crowdReturns,spots:spots.length,spotsAt:spots.map(s=>s.world().toArray().map(v=>+v.toFixed(2))),shots:shots.length,hot:shots.some(s=>s.hot),
    incoming:mine&&mine.pos.distanceTo(eye)<8?mine.pos.toArray().map(v=>+v.toFixed(2)):null,
    attacks:attacks.map(a=>a.kind),started:Object.fromEntries(started),warnings,doges:attacks.filter((a):a is Doges=>a instanceof Doges).reduce((n,a)=>n+a.running,0),
    attempts,best,timeScale:+c.timeScale.toFixed(2),launchT:+launchT.toFixed(1),delays,pathKey,solves,
