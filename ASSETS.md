@@ -45,7 +45,10 @@ license above. This includes `local/ui/textscreen-e2.png` (2026-10-19), Doom's o
 SFLR6_1 flat, extracted by `scripts/build-doom-ui.py` for level 3's exit text screen, and
 `local/ui/textscreen-e1.png` (2026-10-20), Doom's FLOOR4_8 flat, for levels 1-2's. The
 factory's `local/factory-music.ogg` (2026-10-20) is Doom's D_E2M7 track, rendered by
-`scripts/prepare-doom-music.mjs D_E2M7 factory` like the other levels' tracks. Level 3's intro
+`scripts/prepare-doom-music.mjs D_E2M7 factory` like the other levels' tracks. The endgame
+prototype's boss and ending tracks (2026-10-27, ignored `local/boss-e1m8-music.ogg`, `-e2m8`, `-e3m8`,
+`local/epilogue-victor-music.ogg`, `epilogue-bunny-music.ogg`) are Doom's D_E1M8, D_E2M8, D_E3M8,
+D_VICTOR and D_BUNNY, rendered the same way. Level 3's intro
 film (2026-10-20, ignored `local/intro/levels/e2m7-intro*.mp4`) is captured from the engine and
 composited like levels 1-2's (`scripts/build-level-intros.py`): Doom's WIMAP2 and D_E2M7, the
 factory and its cast, and no voice takes (MEG3N's lines are captions only). Existing film/character/likeness media is also outside that grant.
@@ -244,3 +247,21 @@ Original generic agent costume, machinery, signs, props and HUD art are Jonathan
 project media under CC BY 4.0. Real-person likenesses and any third-party reference
 or character rights remain separate from that grant. All images, native import-check
 output and previews remain ignored by Git.
+
+### Endgame prototype sound, 2026-10-27
+
+THE BOSS's arena noise (mains hum, room air, a fan in each pillar, hard-disk seeks), the ships'
+engines and the synthesized doge barks are made live by `prototypes/endgame/kit.ts`. Like the
+other synthesized sounds, they are Jonathan Mann's original project media under CC BY 4.0.
+
+`scripts/generate-endgame-sfx.py` can add recorded-sounding effects in their place:
+- What: the doges' barks, yelps and growls, the rocket a bonked doge rides, a sink smashing, and
+  the blast.
+- How: generated on this Mac with Stability AI's Stable Audio Open 1.0. Its Stability AI Community
+  License allows commercial use under $1M annual revenue and leaves outputs with the user.
+- Training data: CC0, CC BY and CC Sampling+ recordings.
+- Takes: originals, seeds and LAION CLAP scores stay in ignored `art/endgame-sfx-2026-10-27/`. The
+  encoded takes go to ignored `doom-web/local/endgame/sfx/`.
+- Status, 2026-10-27: 36 takes made and 16 kept (6 barks, 3 yelps, 2 rockets, 3 sinks, 2 blasts).
+  None of the growls matched their description, so the tackle's growl stays synthesized. Any effect
+  without takes plays the synth.
