@@ -64,9 +64,10 @@ const BLURBS:Record<string,string>={
 const params=new URLSearchParams(location.search);
 const mode=MODES[params.get('m')||'ricochet']||ricochet;
 // The finale (?m=finale, through the meadow's south gate): THE BOSS after a walk in, with this browser's save
-// (doom-web/campaign.js, same origin) saying who you are and who's alive. Without a save, everyone is.
+// (doom-web/campaign.js, same origin) saying who you are and who's alive. Without a save, everyone is. From the
+// meadow's SAFE MODE fixture (&safemode=1, doom-web/main.js) the save comes in the URL (&saved=, a mask per level).
 const finale=params.get('m')==='finale';
-const save=(()=>{try{const v=JSON.parse(localStorage.getItem('pdoom.campaign.v1')||'null');return finale&&v?.version===1?v as Record<string,number|string>:null;}catch{return null;}})();
+const save=(()=>{if(finale&&params.get('safemode')==='1')return Object.fromEntries((params.get('saved')??'31,31,31,31').split(',').map((m,i)=>['saved'+i,Number(m)|0]));try{const v=JSON.parse(localStorage.getItem('pdoom.campaign.v1')||'null');return finale&&v?.version===1?v as Record<string,number|string>:null;}catch{return null;}})();
 const alive=(i:number)=>!save||!!(Number(save['saved'+Math.floor(i/5)]??0)>>(i%5)&1);
 const who:'mario'|'samwise'=(params.get('ceo')??save?.ceo)==='amodei'?'samwise':'mario';
 const auto=params.has('auto');

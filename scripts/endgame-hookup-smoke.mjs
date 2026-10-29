@@ -1,13 +1,17 @@
 // The endgame hookup (docs/ENDGAME.md E0-E5, 2026-10-28), headless and muted:
-// 1. The meadow after level 4 (?safemode=1&after=4: all 20 out) starts the guide's meeting at the door; he calls,
-//    walking over starts his lines, and Space skips to the gate with the floppy handed over, everyone following
-//    and the south edge open. Walking south through the gate opens the endgame page (?m=finale).
+// 1. The meadow after level 4 (?safemode=1&after=4: all 20 out, out of AGENTIC.BAT's door as level 4 leaves you)
+//    starts the guide's meeting at the door; he calls, walking over starts his lines, and Space skips to the gate
+//    with the floppy handed over, everyone following and the south edge open. Walking south through the gate
+//    opens the endgame page (?m=finale), with the fixture's save in the URL.
 // 2. That page (reloaded with &auto=1, as a click would start it): the walk in, its three Recognizer beats (shot
 //    down by QA), the door opening once they're gone, and THE BOSS's intro once you're inside.
 // 3. A save marked done (endgame 2) loads (?play=1&load=1, the game's own handoff) into a meadow without the
 //    column, and doesn't start the meeting again.
+// 4. The fixture's finale, from its last part (&part=3, the trick shot steered by &autosteer=1) to black: a click
+//    goes back to the fixture's meadow after the boss (&after=5, the column gone), and this browser's real save
+//    is left as it was.
 // PDOOM_ORIGIN (e.g. http://127.0.0.1:5238) points it at another server. Needs doom-web/endgame-proto/
-// (node scripts/build-endgame-protos.mjs). Screenshots and report.json in output/endgame-hookup/.
+// (node scripts/build-endgame-protos.mjs). Screenshots and report.json in output/endgame-hookup/. Takes about 4 minutes.
 import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -26,6 +30,7 @@ try{
  await page.goto(`${origin}?safemode=1&after=4`);
  let s=await until(async()=>{const h=await hub();return h?.endgame?.state==='door'&&h.guide?.scene==='endgame'&&h;},'the guide meets you at the door',120000);
  assert.equal(s.guide.phase,'waiting');assert.equal(s.endgame.gateOpen,false);assert.equal(s.endgame.following,false);
+ assert.equal(s.currentLevel,'agentic-pods');assert.ok(Math.hypot(s.x-143.5,s.z-86.7)<5,`out of AGENTIC.BAT's door (at ${s.x}, ${s.z})`);
  s=await until(async()=>{const h=await hub();return /over here/i.test(h.guide.text)&&h;},'he calls you over');
  await view(s.guide.x,s.guide.z+4,Math.PI*0,0);// beside him, facing him
  s=await until(async()=>{const h=await hub();return /twenty/i.test(h.guide.text)&&h.guide.speaking==='end-saved'&&h;},'walking over starts his lines: all twenty');
@@ -42,7 +47,7 @@ try{
  // through it, on foot
  await view(s.endgame.gate.x+1.5,s.endgame.gate.z-4,Math.PI,0);
  await page.keyboard.down('KeyW');
- await page.waitForURL(/endgame-proto\/play\.html\?m=finale&ceo=(altman|amodei)/,{timeout:15000});
+ await page.waitForURL(/endgame-proto\/play\.html\?m=finale&ceo=(altman|amodei)&safemode=1&saved=31,31,31,31$/,{timeout:15000});
  await page.keyboard.up('KeyW');
  report.cases.push(`Walking south through the gate opens ${new URL(page.url()).pathname}${new URL(page.url()).search}`);
 
@@ -59,16 +64,16 @@ try{
  const shoot=()=>page.evaluate(()=>{const c=window.__eg.ctx;for(const r of c.recs)while(r.alive)c.hitRec(r);});
  for(const [z,beat] of [[230,1],[160,2],[100,3]]){
   await page.evaluate(z=>window.__eg.place(0,z),z);
-  s=await until(async()=>{const e=await eg();return e.mode_state.walk.beat>=beat&&e.recs.length>0&&e;},`practice beat ${beat}`);
+  s=await until(async()=>{const e=await eg();return e.mode_state.walk.beat>=beat&&e.recs.length>0&&e;},`practice beat ${beat}`,45000);// each waits for the last one's lines
   if(beat===1){await sleep(2500);await page.screenshot({path:`${out}/4-recognizer.png`});}
   await shoot();
  }
  await page.evaluate(()=>window.__eg.place(0,58));
- s=await until(async()=>{const e=await eg();return e.mode_state.walk.door&&e;},'the door opens once the way is clear');
+ s=await until(async()=>{const e=await eg();return e.mode_state.walk.door&&e;},'the door opens once the way is clear and everyone has had their say',60000);
  await page.evaluate(()=>window.__eg.lookAt(0,4,0));await sleep(1800);await page.screenshot({path:`${out}/5-door.png`});
  await page.evaluate(()=>window.__eg.place(0,40));
  s=await until(async()=>{const e=await eg();return e.mode_state.phase==='intro'&&e;},'inside: THE BOSS wakes',20000);
- assert.equal(s.mode_state.walk.on,false);assert.equal(s.people,20,'no save in this browser: everyone came');
+ assert.equal(s.mode_state.walk.on,false);assert.equal(s.people,20,"the fixture's save: everyone came");
  report.cases.push('Finale page: the walk in, three Recognizer beats, the door opens once they are down, THE BOSS intro inside');
 
  // 3. back to the meadow after it
@@ -78,6 +83,25 @@ try{
  assert.equal(s.guide,null,'he does not meet you again');
  await view(80,170,Math.PI,.02);await sleep(500);await page.screenshot({path:`${out}/6-after.png`});
  report.cases.push('A finished save (endgame 2) loads into the meadow with the column gone and no meeting');
+
+ // 4. the fixture's finale to black, and back to its meadow after the boss
+ const real=JSON.stringify({version:1,ceo:'altman',hub:true,saved0:31,saved1:0,saved2:0,saved3:0,lost0:0,lost1:0,lost2:0,lost3:0,following0:0,following1:0,following2:0,following3:0,ending3:0,endgame:0});
+ await page.evaluate(v=>localStorage.setItem('pdoom.campaign.v1',v),real);
+ await page.goto(`${origin}endgame-proto/play.html?m=finale&ceo=altman&safemode=1&saved=31,31,31,31&auto=1&autosteer=1&part=3`);
+ s=await until(async()=>{const e=await page.evaluate(()=>window.__eg?.ready&&window.__eg.state());return e?.mode_state?.phase==='trick'&&e.mode_state.marks?.length&&e;},'part 3',60000);
+ await sleep(2600);const marks=(await eg()).mode_state.marks;
+ await page.evaluate(m=>{window.__eg.lookAt(...m[0]);window.__eg.press(0);},marks);
+ await until(async()=>(await eg()).phase==='down','the trick shot lands',60000);
+ await until(async()=>(await eg()).mode_state.ending==='dialog','the MCP.EXE dialog',40000);await page.click('#dialog-close');
+ await until(async()=>(await eg()).mode_state.ending==='black','black',40000);
+ await until(()=>page.evaluate(()=>/MEADOW/.test(document.querySelector('#black small')?.textContent??'')),'the way back is offered',10000);
+ await sleep(1700);await page.mouse.click(640,400);
+ await page.waitForURL(/\?safemode=1&after=5&ceo=altman/,{timeout:15000});
+ s=await until(async()=>{const h=await hub();return h?.endgame?.state==='fallen'&&h;},"the fixture's meadow after the boss, the column gone",120000);
+ assert.equal(s.guide,null);
+ assert.equal(await page.evaluate(()=>localStorage.getItem('pdoom.campaign.v1')),real,'the real save is untouched');
+ await page.screenshot({path:`${out}/7-fixture-after.png`});
+ report.cases.push("The fixture's finale ends back in its own meadow after the boss (&after=5), the real save untouched");
  assert.deepEqual(errors,[]);
  report.passed=true;
 }catch(e){report.failure=String(e?.stack||e);}

@@ -72,6 +72,78 @@
    "source": [
     "guide-mario-call3 take.wav"
    ]
+  },
+  "end-call": {
+   "file": "outside-assets/voice/guide-mario-end-call.mp3",
+   "duration": 2.715,
+   "source": [
+    "endgame-2026-10-26/voices/guide-mario-end-call.wav"
+   ],
+   "gain_db": 0.1
+  },
+  "end-saved": {
+   "file": "outside-assets/voice/guide-mario-end-saved.mp3",
+   "duration": 8.374,
+   "source": [
+    "endgame-2026-10-26/voices/guide-mario-end-saved.wav"
+   ],
+   "gain_db": 0.0
+  },
+  "end-saved-some": {
+   "file": "outside-assets/voice/guide-mario-end-saved-some.mp3",
+   "duration": 5.31,
+   "source": [
+    "endgame-2026-10-26/voices/guide-mario-end-saved-some.wav"
+   ],
+   "gain_db": 0.6
+  },
+  "end-boss": {
+   "file": "outside-assets/voice/guide-mario-end-boss.mp3",
+   "duration": 8.053,
+   "source": [
+    "endgame-2026-10-26/voices/guide-mario-end-boss.wav"
+   ],
+   "gain_db": 1.8
+  },
+  "end-why": {
+   "file": "outside-assets/voice/guide-mario-end-why.mp3",
+   "duration": 7.871,
+   "source": [
+    "endgame-2026-10-26/voices/guide-mario-end-why.wav"
+   ],
+   "gain_db": 1.8
+  },
+  "end-discs": {
+   "file": "outside-assets/voice/guide-mario-end-discs.mp3",
+   "duration": 7.154,
+   "source": [
+    "endgame-2026-10-26/voices/guide-mario-end-discs.wav"
+   ],
+   "gain_db": 3.5
+  },
+  "end-everyone": {
+   "file": "outside-assets/voice/guide-mario-end-everyone.mp3",
+   "duration": 6.834,
+   "source": [
+    "endgame-2026-10-26/voices/guide-mario-end-everyone.wav"
+   ],
+   "gain_db": 1.6
+  },
+  "end-go": {
+   "file": "outside-assets/voice/guide-mario-end-go.mp3",
+   "duration": 7.55,
+   "source": [
+    "endgame-2026-10-26/voices/guide-mario-end-go.wav"
+   ],
+   "gain_db": -1.5
+  },
+  "end-edge": {
+   "file": "outside-assets/voice/guide-mario-end-edge.mp3",
+   "duration": 7.528,
+   "source": [
+    "endgame-2026-10-26/voices/guide-mario-end-edge.wav"
+   ],
+   "gain_db": 1.4
   }
  },
  "samwise": {
@@ -147,6 +219,78 @@
    "source": [
     "guide-samwise-call3 take.wav"
    ]
+  },
+  "end-call": {
+   "file": "outside-assets/voice/guide-samwise-end-call.mp3",
+   "duration": 4.08,
+   "source": [
+    "endgame-2026-10-26/voices/guide-samwise-end-call.wav"
+   ],
+   "gain_db": -2.5
+  },
+  "end-saved": {
+   "file": "outside-assets/voice/guide-samwise-end-saved.mp3",
+   "duration": 8.0,
+   "source": [
+    "endgame-2026-10-26/voices/guide-samwise-end-saved.wav"
+   ],
+   "gain_db": -1.5
+  },
+  "end-saved-some": {
+   "file": "outside-assets/voice/guide-samwise-end-saved-some.mp3",
+   "duration": 5.76,
+   "source": [
+    "endgame-2026-10-26/voices/guide-samwise-end-saved-some.wav"
+   ],
+   "gain_db": -1.5
+  },
+  "end-boss": {
+   "file": "outside-assets/voice/guide-samwise-end-boss.mp3",
+   "duration": 9.52,
+   "source": [
+    "endgame-2026-10-26/voices/guide-samwise-end-boss.wav"
+   ],
+   "gain_db": -1.3
+  },
+  "end-why": {
+   "file": "outside-assets/voice/guide-samwise-end-why.mp3",
+   "duration": 5.84,
+   "source": [
+    "endgame-2026-10-26/voices/guide-samwise-end-why.wav"
+   ],
+   "gain_db": -1.2
+  },
+  "end-discs": {
+   "file": "outside-assets/voice/guide-samwise-end-discs.mp3",
+   "duration": 7.76,
+   "source": [
+    "endgame-2026-10-26/voices/guide-samwise-end-discs.wav"
+   ],
+   "gain_db": -1.5
+  },
+  "end-everyone": {
+   "file": "outside-assets/voice/guide-samwise-end-everyone.mp3",
+   "duration": 7.52,
+   "source": [
+    "endgame-2026-10-26/voices/guide-samwise-end-everyone.wav"
+   ],
+   "gain_db": 1.1
+  },
+  "end-go": {
+   "file": "outside-assets/voice/guide-samwise-end-go.mp3",
+   "duration": 5.76,
+   "source": [
+    "endgame-2026-10-26/voices/guide-samwise-end-go.wav"
+   ],
+   "gain_db": -1.5
+  },
+  "end-edge": {
+   "file": "outside-assets/voice/guide-samwise-end-edge.mp3",
+   "duration": 5.2,
+   "source": [
+    "endgame-2026-10-26/voices/guide-samwise-end-edge.wav"
+   ],
+   "gain_db": -1.5
   }
  }
 }

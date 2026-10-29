@@ -265,3 +265,12 @@ other synthesized sounds, they are Jonathan Mann's original project media under 
 - Status, 2026-10-27: 36 takes made and 16 kept (6 barks, 3 yelps, 2 rockets, 3 sinks, 2 blasts).
   None of the growls matched their description, so the tackle's growl stays synthesized. Any effect
   without takes plays the synth.
+
+### Endgame walk voices, 2026-10-28
+
+The 33 lines between level 4 and the fight (the guide meeting you in the meadow, the walk to the tower,
+and Elon across the sky) came in the same batch folder as the fight's takes,
+`art/endgame-2026-10-26/voices/` (`walk-manifest-2026-10-28.json`, made by another session with the
+same synthetic voices; all 33 matched their words on its final check). The meadow lines are imported
+into `doom-web/outside-assets/voice/` by `scripts/import-guide-voices.py --endgame`, and the walk and
+Elon lines into ignored `doom-web/local/endgame/voice/` by `scripts/import-endgame-assets.mjs`.

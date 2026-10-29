@@ -133,7 +133,7 @@ Built 2026-10-28 ([ENDGAME.md, In the game](ENDGAME.md#in-the-game)): with all 2
 
 ## 8. Previewing and testing
 
-- **Preview a stage:** `?safemode=1&after=N` (N 1–4). It works only on loopback with dev-config on, like the existing `?safemode=1` fixture, and plays from an in-memory save so a real save is untouched. After 2 comes out of HAL's door; the others come out of the bunker's.
+- **Preview a stage:** `?safemode=1&after=N` (N 1–5). It works only on loopback with dev-config on, like the existing `?safemode=1` fixture, and plays from an in-memory save so a real save is untouched. You come out of the door you'd leave level N by: the bunker's, HAL's, MEG3N.AVI's, AGENTIC.BAT's. After 4 the guide meets you there and the endgame begins (docs/ENDGAME.md, "In the game"). 5 is the meadow after the boss, out of the bunker's door.
 - **Smoke:** `PDOOM_ORIGIN=http://127.0.0.1:5218 node scripts/safe-mode-stages-smoke.mjs`. It is muted and boots each stage through the flag. It checks:
   - the newest group is near its exit and clear of the door, every earlier group is in its hilltop zone, and people wander;
   - the corruption stage, the toy count, every cleared building's state and the column's glow;

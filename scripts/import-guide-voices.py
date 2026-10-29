@@ -15,12 +15,21 @@ a longer take instead, list them in TAKES. The v1 recordings (the first script)
 are archived in art/audio/bliss-guide-v1-recordings/.
 
     python3 scripts/import-guide-voices.py
+
+The endgame's meadow lines (end-*, docs/ENDGAME.md) come from the boss-fight batch instead, as
+<batch>/voices/guide-<who>-end-<key>.wav. --endgame trims and levels just those, cut after their last
+word where doom-web/local/endgame/take-tails.json says (scripts/find-endgame-take-tails.py), and adds
+them to guide-voices.json, leaving every other line's file alone:
+
+    python3 scripts/import-guide-voices.py --endgame art/endgame-2026-10-26
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -30,6 +39,10 @@ OUT = ROOT / 'doom-web' / 'outside-assets' / 'voice'
 LINES = ROOT / 'src' / 'doom-bliss-guide-lines.json'
 FOLDERS = {'mario': 'dario-prologue-vo-v2', 'samwise': 'sam-prologue-vo-v2'}
 EXTS = ('.mp3', '.wav', '.m4a', '.aif', '.aiff')
+TAILS = ROOT / 'doom-web' / 'local' / 'endgame' / 'take-tails.json'
+# The batch's takes start and end on a little silence (as scripts/import-endgame-assets.mjs trims).
+QUIET_ENDS = ('silenceremove=start_periods=1:start_threshold=-48dB:start_silence=0.05,areverse,'
+              'silenceremove=start_periods=1:start_threshold=-48dB:start_silence=0.12,areverse,')
 TARGET_LUFS = -16.0
 PEAK_DB = -1.5
 
@@ -93,14 +106,14 @@ def loudness(path):
     return lufs, peak
 
 
-def build(who, key, pieces, tmp):
+def build(who, key, pieces, tmp, before=''):
     parts = []
     gaps = GAP.get((who, key), [0.3] * (len(pieces) - 1))
     for i, (name, start, end) in enumerate(pieces):
         piece = tmp / f'{who}-{key}-{i}.wav'
         trim = ['-ss', str(start)] + (['-to', str(end)] if end is not None else [])
         # 8 ms fades at every cut so joins never click.
-        run('ffmpeg', '-v', 'error', '-y', '-i', str(SRC / name), *trim, '-af', 'afade=t=in:d=0.008,areverse,afade=t=in:d=0.008,areverse',
+        run('ffmpeg', '-v', 'error', '-y', '-i', str(SRC / name), *trim, '-af', before + 'afade=t=in:d=0.008,areverse,afade=t=in:d=0.008,areverse',
             '-ar', '44100', '-ac', '1', str(piece))
         parts.append(piece)
         if i < len(pieces) - 1 and gaps[i] > 0:
@@ -120,7 +133,37 @@ def build(who, key, pieces, tmp):
             'gain_db': round(gain, 2)}
 
 
+def endgame(batch):
+    lines = json.loads(LINES.read_text())
+    tails = json.loads(TAILS.read_text()) if TAILS.exists() else {}
+    manifest = json.loads((OUT / 'guide-voices.json').read_text())
+    missing = []
+    with tempfile.TemporaryDirectory() as t:
+        tmp = Path(t)
+        for who in FOLDERS:
+            for line in lines[who]['lines']:
+                key = line['key']
+                take = batch / 'voices' / f'guide-{who}-{key}.wav'
+                if not key.startswith('end-'):
+                    continue
+                if not take.exists():
+                    missing.append(take.name)
+                    continue
+                # where it runs on, if this is the same WAV the tails were found in
+                tail = tails.get(take.stem)
+                end = tail and tail['sha256'] == hashlib.sha256(take.read_bytes()).hexdigest() and tail['end'] + .35
+                entry = build(who, key, [(take, 0, None)], tmp, (f'atrim=end={end},' if end else '') + QUIET_ENDS)
+                entry['source'] = [f'{batch.name}/voices/{take.name}']
+                manifest.setdefault(who, {})[key] = entry
+                print('%-8s %-14s %5.2fs  %+5.1f dB%s' % (who, key, entry['duration'], entry['gain_db'], '  cut' if end else ''))
+    (OUT / 'guide-voices.json').write_text(json.dumps(manifest, indent=1) + '\n')
+    if missing:
+        print('No take yet (subtitles only):', ', '.join(missing))
+
+
 def main():
+    if '--endgame' in sys.argv:
+        return endgame(Path(sys.argv[sys.argv.index('--endgame') + 1]).resolve())
     OUT.mkdir(parents=True, exist_ok=True)
     takes, missing = discover()
     manifest = {}

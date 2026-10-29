@@ -63,7 +63,7 @@
    {
     "key": "end-discs",
     "text": "So we're going to fight him. Take this. Still dangerous to go alone. You throw it, and it comes back. In principle.",
-    "handoff": 2.3
+    "handoff": 1.4
    },
    {
     "key": "end-everyone",
@@ -142,7 +142,7 @@
    {
     "key": "end-discs",
     "text": "So we're going to fight him. Take this. Still dangerous to go alone. You throw it and it comes back. I haven't tested that part.",
-    "handoff": 2.3
+    "handoff": 1.8
    },
    {
     "key": "end-everyone",
@@ -158,5 +158,5 @@
    }
   ]
  },
- "_endgame_note": "The endgame's door scene (2026-10-28), from docs/ENDGAME.md's draft walk lines: met at the door once all 20 are resolved; end-saved-some replaces end-saved if anyone was lost. Unrecorded so far (subtitles); a take drops in as outside-assets/voice/guide-<mario|samwise>-end-<key>.mp3, and end-discs' handoff is then seconds into it."
+ "_endgame_note": "The endgame's door scene (2026-10-28), from docs/ENDGAME.md's draft walk lines: met at the door once all 20 are resolved; end-saved-some replaces end-saved if anyone was lost. Voiced from the boss-fight batch (2026-10-28, scripts/import-guide-voices.py --endgame); end-discs' handoff is where Whisper hears \"Take\" in each take."
 }

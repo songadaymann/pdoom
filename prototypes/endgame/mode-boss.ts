@@ -56,6 +56,8 @@ const ROUTE:{kind:'wall'|'pillar';off:number;y:number}[]=[{kind:'wall',off:-45,y
 const autosteer=QUERY.has('autosteer');
 // the finale (?m=finale, through the meadow's south gate): the walk in first, and back to the meadow after
 const FINALE=QUERY.get('m')==='finale';
+// played from the meadow's SAFE MODE fixture (doom-web/main.js): this browser's real save is left alone
+const FIXTURE=FINALE&&QUERY.get('safemode')==='1';
 
 type Phase='walk'|'intro'|'ships'|'shieldDown'|'trick'|'down'|'waste';
 type Kind='update'|'starlink'|'doge'|'sink';
@@ -580,6 +582,11 @@ function walkStart(c:Ctx){
  c.hud.hint('South, to the tower. Click throws your floppy (it comes back); click a ball that\'s on you to hit it back.');
 }
 function walk(c:Ctx,dt:number){
+ // Voiced (2026-10-28), the walk's lines take about 45 s: each beat waits for the last one's lines (hush), and
+ // the door for all of them, so none is dropped or lands late. The guide's reaction to your first hit, and his
+ // line at the door, go before Elon's (and his intro's).
+ const wait={ttl:30},first={prio:2,ttl:8},hush=()=>!says.length&&clock()>=voiceFree&&c.t>=toastFree&&c.t>=captionFree;
+ const ahead=(dz:number)=>Math.max(ARENA.radius+40,z-dz);// a late beat still spawns out on the Grid, not in the tower
  const p=c.player.pos,z=p.z,live=(b:number)=>walkRecs.some(w=>w.beat===b&&w.rec.alive),spawn=(b:number,style:'slam'|'bolt',at:THREE.Vector3,hp:number)=>walkRecs.push({rec:c.spawnRec(0,hp,style,at),beat:b});
  c.player.health=Math.max(c.player.health,40);// a stomp hurts, but nobody dies on the walk
  if(!walkTrail.length||walkTrail[0].distanceTo(p)>1){walkTrail.unshift(p.clone());walkTrail.length=Math.min(walkTrail.length,240);}
@@ -591,16 +598,17 @@ function walk(c:Ctx,dt:number){
  }
  c.people.forEach((q,k)=>{if(q.down>0)return;const at=walkTrail[Math.min(walkTrail.length-1,4+Math.round(k*1.6))]??p;q.target.set(at.x+(k%2?.7:-.7),0,at.z);});
  c.guide.target.set(p.x-2.2,0,Math.max(WALK.door?-40:ARENA.radius+3,z-3));
- if(pt>2&&once('walk-resolve'))elon(c,ELON.resolve,3.6);
- if(beat===0&&z<WALK.far-45){beat=1;spawn(1,'slam',new THREE.Vector3(26,24,z-60),2);guide(c,'recognizer',6);c.later(2.5,()=>elon(c,ELON.recognize,2.6));}
- if(beat>=1&&walkRecs.length&&!live(1)&&once('walk-hit'))guide(c,'hit',3);
- if(beat===1&&z<WALK.far-115){beat=2;spawn(2,'bolt',new THREE.Vector3(-22,10,z-55),2);guide(c,'rule',5);c.later(14,()=>{if(once('walk-sky'))guide(c,'sky',4);});}
- if(beat===2&&z<WALK.far-175){beat=3;for(let k=0;k<3;k++)spawn(3,'slam',new THREE.Vector3(-70,24,z-28-k*9),1);c.later(5,()=>guide(c,'fault',6));}
- if(beat===3&&z<ARENA.radius+50&&once('walk-mcp'))elon(c,ELON.walk,4.4);
+ if(pt>2&&once('walk-resolve'))elon(c,ELON.resolve,3.6,wait);
+ if(beat===0&&z<WALK.far-45&&hush()){beat=1;spawn(1,'slam',new THREE.Vector3(26,24,z-60),2);guide(c,'recognizer',6,wait);c.later(2.5,()=>elon(c,ELON.recognize,2.6,wait));}
+ if(beat>=1&&walkRecs.length&&!live(1)&&once('walk-hit'))guide(c,'hit',3,first);
+ if(beat===1&&z<WALK.far-150&&hush()){beat=2;spawn(2,'bolt',new THREE.Vector3(-22,10,ahead(55)),2);guide(c,'rule',5,wait);}
+ if(beat===2&&z<WALK.far-205&&hush()&&once('walk-sky'))guide(c,'sky',4,wait);
+ if(beat===2&&said.has('walk-sky')&&z<WALK.far-260&&hush()){beat=3;for(let k=0;k<3;k++)spawn(3,'slam',new THREE.Vector3(-70,24,ahead(28)-k*9),1);c.later(2,()=>guide(c,'fault',6,wait));}
+ if(beat===3&&z<ARENA.radius+50&&hush()&&once('walk-mcp'))elon(c,ELON.walk,4.4,wait);
  // the door: once nothing's left out here
  if(!WALK.door&&z<ARENA.radius+18){
   if(walkRecs.some(w=>w.rec.alive)){if(once('walk-clear'))c.hud.hint('Clear the Recognizers, and the door opens.');}
-  else{WALK.door=true;guide(c,'tower',5.5);c.sfx.play.charge();c.hud.hint('In you go.');}
+  else if(said.has('walk-mcp')&&hush()){WALK.door=true;guide(c,'tower',5.5,{...wait,prio:2});c.sfx.play.charge();c.hud.hint('In you go.');}
  }
  if(WALK.door&&doorK<1){doorK=Math.min(1,doorK+dt/1.8);c.stage.openDoor(doorK);}
 }
@@ -614,11 +622,13 @@ function walkEnd(c:Ctx,instant:boolean){
  go(c,'intro');
 }
 // the end of the finale: this save's endgame is done (doom-web/campaign.js ENDGAME_DONE), and a click goes home
-function markDone(){try{const v=JSON.parse(localStorage.getItem('pdoom.campaign.v1')||'null');if(v?.version===1){v.endgame=2;localStorage.setItem('pdoom.campaign.v1',JSON.stringify(v));}}catch{/* nothing saved: nothing to mark */}}
+function markDone(){if(FIXTURE)return;try{const v=JSON.parse(localStorage.getItem('pdoom.campaign.v1')||'null');if(v?.version===1){v.endgame=2;localStorage.setItem('pdoom.campaign.v1',JSON.stringify(v));}}catch{/* nothing saved: nothing to mark */}}
 function offerMeadow(){
  const small=$('black').querySelector('small');if(small)small.textContent='CLICK TO GO BACK TO THE MEADOW';
- // the game's own handoff (onboarding.js ?play=1&load=1) loads this save straight into the meadow
- const home=()=>{location.href=new URL('../?play=1&load=1',location.href).href;};
+ // the game's own handoff (onboarding.js ?play=1&load=1) loads this save straight into the meadow; the fixture's
+ // own meadow after the boss is &after=5
+ const back=FIXTURE?`../?safemode=1&after=5&ceo=${QUERY.get('ceo')??'altman'}`:'../?play=1&load=1';
+ const home=()=>{location.href=new URL(back,location.href).href;};
  setTimeout(()=>{addEventListener('pointerdown',home,{once:true});addEventListener('keydown',e=>{if(e.code!=='KeyR')home();},{once:true});},1500);
 }
 function go(c:Ctx,to:Phase,instant=false){

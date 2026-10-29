@@ -46,13 +46,16 @@ const realStorage=browserStorage(),CEO_CHOICE=resolveCeo({search:location.search
 // Loopback development fixture only: pretend levels 1 and 2 were cleared (ten saved),
 // out of HAL's door (add &level=five-prisons to come out of the bunker instead). It plays from an
 // in-memory save, so a real save in this browser is left alone; the menu's own Load Game hand-off launches it.
-// &after=N (1-4) previews SAFE MODE after N levels instead (docs/SAFE-MODE-PROGRESSION.md); after 2 comes out of
-// HAL's door, the others out of the bunker's.
+// &after=N (1-4) previews SAFE MODE after N levels instead (docs/SAFE-MODE-PROGRESSION.md), out of the door
+// you'd leave level N by: the bunker's, HAL's, MEG3N.AVI's, AGENTIC.BAT's. After 4 the guide meets you there and
+// the walk to the endgame begins (docs/ENDGAME.md); the endgame page plays this save too and comes back to
+// &after=5, the meadow after the boss (the column gone), out of the bunker's door.
 const SAFE_MODE=CHECKPOINT&&new URLSearchParams(location.search).get('safemode')==='1'&&await localDevelopmentEnabled();
-const SAFE_MODE_AFTER=Math.min(4,Math.max(1,Number(new URLSearchParams(location.search).get('after'))||2));
+const SAFE_MODE_AFTER=Math.min(5,Math.max(1,Number(new URLSearchParams(location.search).get('after'))||2));
+let fixtureDoor=SAFE_MODE?{3:'meg3n-factory',4:'agentic-pods'}[SAFE_MODE_AFTER]??null:null;
 function campaignSandbox(storage,ceo){
  const groups=Object.fromEntries([0,1,2,3].flatMap(i=>[['saved'+i,i<SAFE_MODE_AFTER?31:0],['lost'+i,0],['following'+i,0]]));
- let save=JSON.stringify({version:1,ceo:['altman','amodei'].includes(ceo)?ceo:'altman',hub:true,...groups}),openingComplete='1';
+ let save=JSON.stringify({version:1,ceo:['altman','amodei'].includes(ceo)?ceo:'altman',hub:true,...groups,endgame:SAFE_MODE_AFTER>4?ENDGAME_DONE:0}),openingComplete='1';
  return {getItem:k=>k===CAMPAIGN_KEY?save:k===OPENING_COMPLETE_KEY?openingComplete:storage?.getItem(k)??null,setItem:(k,v)=>{if(k===CAMPAIGN_KEY)save=String(v);else if(k===OPENING_COMPLETE_KEY)openingComplete=String(v);else storage?.setItem(k,v);},removeItem:k=>{if(k===CAMPAIGN_KEY)save=null;else if(k===OPENING_COMPLETE_KEY)openingComplete=null;else storage?.removeItem(k);}};
 }
 const ceoStorage=SAFE_MODE?campaignSandbox(realStorage,CEO_CHOICE.id):realStorage;
@@ -280,10 +283,13 @@ function syncEndgame(){
  campaign.setEndgame(ENDGAME_GATE);void outside.startEndgame(runningCeo,camp.lost>0);
 }
 // Through the gate: fade to black, then the endgame page, which reads this save for who's alive and who you are.
+// From the SAFE MODE fixture it gets the fixture's save instead (&safemode=1&saved=, a mask per level) and leaves
+// this browser's real one alone.
 function goEndgame(){
+ const fixture=SAFE_MODE?`&safemode=1&saved=${[0,1,2,3].map(i=>campaign.data['saved'+i]|0).join(',')}`:'';
  const black=document.createElement('div');black.id='endgame-fade';black.style.cssText='position:fixed;inset:0;background:#000;opacity:0;transition:opacity .9s;z-index:99';document.body.append(black);
  requestAnimationFrame(()=>{black.style.opacity='1';});audio.pauseMusic();
- setTimeout(()=>{location.href=new URL(`endgame-proto/play.html?m=finale&ceo=${runningCeo}`,location.href).href;},1000);
+ setTimeout(()=>{location.href=new URL(`endgame-proto/play.html?m=finale&ceo=${runningCeo}${fixture}`,location.href).href;},1000);
 }
 async function enterOutside({intro=false,melt=false}={}){
   if(outside||outsideLoading)return;
@@ -297,11 +303,13 @@ async function enterOutside({intro=false,melt=false}={}){
   personLabel.hide();outsideLoading=true;state.mode='outside';releaseKeys();audio.pauseMusic();
   for(const source of audio.sources.values()){try{source.stop();}catch{}}
   if(document.pointerLockElement)document.exitPointerLock();
+  // the SAFE MODE fixture's first exit is from the door of the level it pretends you just left
+  const exitFrom=fixtureDoor??LEVEL.id;fixtureDoor=null;
   try{
-    if(hub){outside=hub;outside.setActive(true,LEVEL.id);}
+    if(hub){outside=hub;outside.setActive(true,exitFrom);}
     else{const {createOutside}=await import('./outside/outside.js');
       outside=hub=await createOutside({source:canvas,agenticDoor:await localDevelopmentEnabled(),stage:document.querySelector('#stage'),audio:audio.context,read:()=>state,campaign:()=>campaign.getState(),enter:enterLevel,onGate:goEndgame,prompt:text=>preferences.prompt(text),readThis:()=>gamePause?.openRead?.(),labels:(rects,surface,active)=>personLabel.update(rects,surface,active&&!uiBlocked)});}
-    outside.setActive(true,LEVEL.id);
+    outside.setActive(true,exitFrom);
     if(intro){await outside.startIntro(runningCeo);campaign.saveOpening('xp-intro');prologue.reset();document.querySelector('#reticle').hidden=true;}
     else syncEndgame();
     window.__DOOM_DEBUG__.outside=outside;document.querySelector('#hal-thaw').hidden=true;

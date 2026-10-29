@@ -20,16 +20,17 @@ What happens:
   - At `end-everyone` everyone in camp falls in behind you in single file.
   - At `end-go` a cyan frame opens in the meadow's south edge at (80, 180), where the hub's traces land.
   - He leads you there and says `end-edge`. Space skips him, as it skips the wake-up walk.
-  - The lines are subtitles until they're recorded (`guide-<mario|samwise>-end-<key>.mp3`, listed in `guide-voices.json`).
+  - Voiced since 2026-10-28 from the boss-fight batch (`python3 scripts/import-guide-voices.py --endgame art/endgame-2026-10-26` writes `guide-<mario|samwise>-end-<key>.mp3` and lists them in `guide-voices.json`). The floppy lands on "Take" in `end-discs` (its `handoff`, timed with Whisper).
 - **The handoff:** walking through the gate fades to black and opens `endgame-proto/play.html?m=finale`.
   - That page reads the save (`pdoom.campaign.v1`, same origin) for your hero and who's alive.
   - The save's new `endgame` field records progress: 1 once the guide has met you, 2 when it's over.
 - **E4-E5, the walk in** (`prototypes/endgame/mode-boss.ts`, `?m=finale`):
-  - You start 290 m north of the arena on the Grid, with the guide at your shoulder and everyone in file behind.
+  - You start 420 m north of the arena on the Grid, with the guide at your shoulder and everyone in file behind.
   - P1 is one Recognizer that drops on a shadow (`end-recognizer`, `end-hit`).
   - P2 is one that shoots, to learn the swing the Fleet needs (`end-rule`, then `end-sky`).
   - P3 is a squadron of three (`end-fault`).
-  - Elon's walk lines are captions (`mcp-resolve`, `mcp-recognize`, `mcp-walk`).
+  - Elon's walk lines are captions across the sky (`mcp-resolve`, `mcp-recognize`, `mcp-walk`).
+  - All of the walk's lines are voiced since 2026-10-28 (`node scripts/import-endgame-assets.mjs <batch>`), about 45 s of them. They queue one at a time; each beat waits for the last one's lines, and the door for all of them, so nothing is dropped or said late. The walk grew from 290 m to 420 m to fit them.
   - A stomp hurts but nobody dies out here.
   - Near the wall, a door in it opens once the Recognizers are down (`end-tower`).
   - Inside, everyone takes their places and THE BOSS's intro begins. N skips the walk.
@@ -37,6 +38,10 @@ What happens:
 - **After the black:** the save is marked done, and a click returns through the game's own handoff (`?play=1&load=1`) to the meadow.
   - There the column is gone and the summit stops pointing south. The dialog reads "Screen saver: none. Nothing left to wait for."
 - **Credits (E10):** not built. Jonathan chose the meadow after the black.
+- **To start right after level 4:** `?safemode=1&after=4` on loopback (dev-config on). You come out of AGENTIC.BAT's door with all 20 saved and the guide waiting.
+  - It plays from an in-memory save, and so does the endgame page it leads to (`&safemode=1&saved=`, a mask per level), so a real save in the browser is left alone.
+  - After the black it comes back to `?safemode=1&after=5`, the meadow after the boss with the column gone.
+  - `&ceo=amodei` plays Dario (Sam guides you).
 - **Smoke:** `scripts/endgame-hookup-smoke.mjs` covers all of this.
 - **Not in the game's release build yet:** the page is built by `node scripts/build-endgame-protos.mjs` into ignored `doom-web/endgame-proto/`, and level 4 itself is still local-only.
 

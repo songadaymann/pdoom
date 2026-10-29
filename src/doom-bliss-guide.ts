@@ -182,9 +182,9 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
   who=ceo==='amodei'?'samwise':'mario';guide=LINES[who] as Guide;
   walkScene=walk;ROUTE=walk.route;ROUTE_LENGTH=routeLength(ROUTE);CUES=walk.cues;skip.textContent=walk.skipLabel;
   wrench.material.map=walk.item==='floppy'?floppyTexture:wrenchTexture;wrench.scale.set(walk.item==='floppy'?.3:.22,walk.item==='floppy'?.3:.33,1);
-  // Only recorded takes: extra shouts (call2, call3) and the endgame's lines are used once Jonathan
-  // records them and lists them in guide-voices.json.
-  for(const l of guide.lines)if(voices[who]?.[l.key]||!/^call\d|^end-/.test(l.key)&&walk.id==='intro')buffer(fileFor(l.key));
+  // This walk's own lines (the endgame's are end-*, voiced 2026-10-28). Extra shouts (call2, call3) and the
+  // endgame's lines are used only once they're recorded and listed in guide-voices.json.
+  for(const l of guide.lines)if(/^end-/.test(l.key)===(walk.id!=='intro')&&(voices[who]?.[l.key]||!/^call\d|^end-/.test(l.key)))buffer(fileFor(l.key));
   active=true;ready=false;phase='waiting';walked=0;moving=false;time=0;clock=0;cue=0;lastEnd=-99;called=0;greeted=false;arrivedLine=false;roam=null;rest=0;silence();
   handoffAt=-1;handoffStart=-1;handedOver=false;wrench.visible=false;
   const [px,pz]=ROUTE[0];facing=Math.atan2(walk.faceFrom.x-px,walk.faceFrom.z-pz);sprite.visible=true;sprite.position.set(px,groundY(px,pz),pz);updateUi();

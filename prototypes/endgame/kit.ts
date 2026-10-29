@@ -104,7 +104,7 @@ export type Input=ReturnType<typeof makeInput>;
 // Keeps a walker on the arena floor: inside the wall, outside the dais, out of the pillars.
 // The walk in (?m=finale, docs/ENDGAME.md E4-E5): outside the wall there's a corridor running north from the
 // door, which sits on the wall at +z (DOOR_HALF either side of x 0); the wall is solid until the door opens.
-export const WALK={on:false,door:false,far:290};
+export const WALK={on:false,door:false,far:420};
 export const DOOR_HALF=3.4;
 export function resolve(p:THREE.Vector3,rad:number){
  const r=Math.hypot(p.x,p.z),max=ARENA.radius-.6-rad,min=ARENA.block+rad;
