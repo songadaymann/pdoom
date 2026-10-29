@@ -1,8 +1,8 @@
 # Level 4 generated art
 
-Generated locally on 2026-10-18 with OpenAI's built-in image generator, following [the current art brief](LEVEL-04-ART.md).
+Generated locally on 2026-10-18 with OpenAI's built-in image generator; Smith was redone on 2026-10-23 to match [the revised art brief](LEVEL-04-ART.md).
 
-The selected pack is in ignored `art/level-04-v1/`: **20 required images plus both optional images**, using the brief's exact filenames. There are 219 frames/panels, 22.79 MB total; no individual selected PNG exceeds 2.35 MB. Open the pack's `index.html` through a local HTTP server for a gallery, individual cells, and links to each original sheet.
+The selected pack is in ignored `art/level-04-v1/`: **20 required images plus both optional images**, using the brief's exact filenames. There are 219 frames/panels, 23.24 MB total; no individual selected PNG exceeds 2.35 MB. Open the pack's `index.html` through a local HTTP server for a gallery, individual cells, and links to each original sheet.
 
 The brief changed during generation. The current pack includes the cable drum, jack-in chair, survey kit, sockets, SMITH's survey-writing pose, and the grey jailer arm's lever/telephone/alarm/crystal-ball states. Earlier waiting-room art, cable box, and superseded poses remain under `superseded-brief/`; they are not part of the current 22-image selection.
 
@@ -45,12 +45,18 @@ Downloaded on 2026-10-18 from the person's own or organisation's site. The photo
 | Katja Grace | [AI Impacts](https://aiimpacts.org/about/) | [Portrait](https://aiimpacts.org/wp-content/uploads/2014/12/KatjaGrace-25-July-14.jpg) |
 | Yoshua Bengio | [Official home page](https://yoshuabengio.org/) | [Portrait](https://yoshuabengio.org/sites/default/files/styles/focal_crop_1250x1250/public/frontpage/yb2025rlm1481v3-website-4_1.jpg?h=755ef5dd&itok=lC-G_VMz) |
 
-Style references were `art/factory-cast-v1/cast-lineup.png` and `art/factory-props-v1/puzzle-lineup.png`. They were used for pixel technique and proportions; their existing cast members were not requested as new subjects. Original geometric layout guides were also used during generation. SMITH's extra poses and the jailer arm use the selected original SMITH design as a reference.
+Style references were `art/factory-cast-v1/cast-lineup.png` and `art/factory-props-v1/puzzle-lineup.png`. They were used for pixel technique and proportions; their existing cast members were not requested as new subjects. Original geometric layout guides were also used during generation. SMITH's extra poses now match the human-agent redo; the jailer arm retains the earlier mannequin-head design.
 
 ## Verification and import
 
 The pack records exact prompts, all attempts, source locations, and SHA-256 hashes. Every selected PNG is byte-identical to its generated source. All 19 sprite sheets have real alpha transparency; the three texture/poster sheets are fully opaque. Each of the 219 cells contains artwork. Complete props and figures fit their cells; the cable drum's trailing cable deliberately meets the right edge, as requested by the brief. Candidates with insufficient margins were regenerated through the image tool.
 
-Use the grids and rounded frame bounds in the pack's `quality-report.json`. Image dimensions and within-cell padding vary. Normalize character scale and shoe baseline from alpha bounds during native import, as in the factory cast pipeline. The selected sources have not been manually cut, rearranged, recoloured, or repainted. Level 4 runtime integration remains a separate build step.
+Use the grids and rounded frame bounds in the pack's `quality-report.json`. Image dimensions and within-cell padding vary. Normalize character scale and shoe baseline from alpha bounds during native import, as in the factory cast pipeline. The selected sources have not been manually cut, rearranged, recoloured, or repainted. The level-4 checkout already imports the 20 unchanged sheets. The new Smith source sheets are installed for the next import/build; all 44 frames passed an isolated run of that checkout's existing importer.
+
+## Smith redo and additions, 2026-10-23
+
+Ignored `art/level-04-redo-2026-10-23/` contains the two replacement Smith sheets and 11 new optional visual assets: 13 PNGs / 61 frames, 9.47 MB. Its README maps the badge-free survey, booth jack states, dormant camera, camera behind glass, lit/off SIGN panels, wall notes, empty jailer arm, blue/yellow floor cables, larger clipboard, Katja throw and held-badge HUD to their intended uses. Exact prompts, source hashes, alpha/cell checks, native Smith checks and an animated browser gallery remain in that folder.
+
+Both checkouts share the primary `art/` directory. The two expected Smith filenames in `art/level-04-v1/` now use the black suit, slicked-back dark hair, rectangular sunglasses and earpiece. The mannequin sheets and previous metadata remain in `art/level-04-v1/history/2026-10-23-before-smith-redo/`. All other 20 original sources were checked unchanged against their saved hashes and native import manifest. The 11 optional additions still need importer/state/HUD integration; their generation does not rebuild the running level. The level-4 needs list records this distinction.
 
 Original SMITH, machinery, props, chair, textures, posters, courier, and retained generic waiting-room designs are Jonathan Mann project media under CC BY 4.0. Third-party photograph, likeness, and reference rights remain separate. See [ASSETS.md](../ASSETS.md). Images, local reference photos, previews, and generated output remain ignored by Git.
