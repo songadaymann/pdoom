@@ -57,6 +57,8 @@ try{
  await page.goto(page.url()+'&auto=1');
  const eg=()=>page.evaluate(()=>window.__eg.state());
  s=await until(async()=>{const e=await page.evaluate(()=>window.__eg?.ready&&window.__eg.state());return e?.mode_state?.phase==='walk'&&e;},'the walk begins',60000);
+ // every voice take the walk starts (a line with no take stays a subtitle)
+ await page.evaluate(()=>{const v=window.__eg.ctx.voices,play=v.play.bind(v);window.__takes=[];v.play=(k,o)=>{window.__takes.push(k);return play(k,o);};});
  assert.ok(s.player.z>400,'you start far out on the Grid');assert.equal(s.mode_state.walk.door,false);
  assert.ok(s.dc.sign&&s.dc.turbines===10&&s.dc.leds>800,`the data center is dressed (${JSON.stringify(s.dc)})`);
  // every toast and hint the walk shows, to check nobody teaches tennis out here
@@ -87,8 +89,13 @@ try{
  assert.equal(s.mode_state.walk.on,false);assert.equal(s.people,20,"the fixture's save: everyone came");assert.equal(s.dc.sign,false,'the sign is outside only');
  const shown=await page.evaluate(()=>window.__said);
  assert.ok(shown.some(t=>/data center/i.test(t)),'the hum line is said');
+ // 2026-10-30's walk takes are voiced (the guide here is Dario: the fixture plays Sam)
+ const takes=await page.evaluate(()=>window.__takes);
+ for(const k of ['guide-mario-end-keep','guide-mario-end-hum'])assert.ok(takes.includes(k),`${k} plays as a voice take (${takes.join(', ')})`);
+ assert.ok(!takes.some(k=>k.endsWith('-end-rule')),'the old tennis take never plays');
+ assert.equal(await page.evaluate(()=>window.__eg.ctx.voices.failed),0,'no take failed to load');
  const tennis=shown.filter(t=>/tennis|hit it back|swing|send it/i.test(t));assert.deepEqual(tennis,[],'nothing on the walk teaches tennis');
- report.cases.push('Finale page: the walk in past the data center (sign, turbines, the hum line), three Recognizer beats with no tennis, the door opens once they are down, THE BOSS intro inside');
+ report.cases.push('Finale page: the walk in past the data center (sign, turbines, the hum line), three Recognizer beats with no tennis, the door opens once they are down, THE BOSS intro inside; the keep and hum lines voiced');
 
  // 3. back to the meadow after it
  await page.evaluate(()=>localStorage.setItem('pdoom.campaign.v1',JSON.stringify({version:1,ceo:'altman',hub:true,saved0:31,saved1:31,saved2:31,saved3:31,lost0:0,lost1:0,lost2:0,lost3:0,following0:0,following1:0,following2:0,following3:0,ending3:0,endgame:2})));
