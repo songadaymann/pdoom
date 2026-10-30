@@ -239,3 +239,13 @@ Exact supplied wording, delivery instructions and the October 28 source brief ar
 preserved beside the batch. The two meadow calls are shouted; the other guide
 lines use urgent spoken delivery. Wording/PCM verification and a separate subset
 manifest accompany the WAVs. Game wiring and the Take cue remain for the caller.
+
+### Prisoner reference cutouts, 2026-10-30
+
+Twenty-one photographs of the twenty roster prisoners were downloaded for likeness
+reference and cut out to transparent PNGs with macOS Vision subject masking. Holly
+Elmore has two. Twelve come from Wikimedia Commons under CC0, public domain, CC BY
+or CC BY-SA. Nine come from official organisation, company or channel pages with no
+stated licence. Sources, cutouts, per-image page and image URLs, licences, authors,
+crops and checksums remain in ignored `private-assets/prisoner-photos/`. They are not
+packaged, and no rights to the photographs or likenesses are asserted.
