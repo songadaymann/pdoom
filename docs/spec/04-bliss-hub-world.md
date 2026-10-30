@@ -789,7 +789,7 @@ The campaign coordinator listens to the existing `pdoom:level-complete` event. P
 
 ### 6.2 Going in and out (persistence)
 
-- **Retreat is always allowed.** The guardian seals the front door behind you on entry, but every seal is a manual crank (hold E 1.5 s). Walking back out before the level is done emits `outcome: retreat`.
+- **Retreat is always allowed**, except level 3 (2026-10-30, Jonathan): the factory's exit switch waits until everyone still inside is with you, and LOAD GAME or a reload is the way out. The guardian seals the front door behind you on entry, but every seal is a manual crank (hold E 1.5 s). Walking back out before the level is done emits `outcome: retreat`.
   - **Freed followers who leave with you** are safe for the campaign and go to camp.
   - **Per-person state is authoritative.** Each person's state (imprisoned / following / camp / lost) in the campaign save is applied at every map load, whether or not the hub snapshot below works: a saved person's cell spawns open and empty, and a lost person's cell spawns sealed with a memorial plate. Nobody is ever duplicated.
   - **The level's native state** must survive until you return. Recommended: keep it in the running GZDoom session by putting all modded maps in one MAPINFO `cluster` with the **`hub`** flag, so GZDoom snapshots and restores map state on re-entry (Hexen-style hubs).

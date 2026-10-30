@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {meadowGroundY} from './doom-meadow-ground';
 import {meadowUniforms,MEADOW_COMMON_GLSL,OUT_GLSL} from './doom-meadow-shared';
+import {TRON_DUSK_GLSL} from './doom-hub-traces';
 
 /* The meadow's blades live in world-anchored square tiles (so they never slide
  * with the camera) at three tile sizes. Every tile of a level draws a prefix of
@@ -68,7 +69,7 @@ uniform highp sampler2D uTable;
 uniform vec4 uToys[9]; // world x/z, footprint radius, ground contact
 uniform int uCount;
 uniform float uTile,uRhoHi,uRhoLo,uFadeStart,uFadeEnd,uWidth,uRhoMax,uD0,uK;
-varying vec3 vBase,vN,vGlow,vAdd,vK;
+varying vec3 vBase,vN,vGlow,vAdd,vK,vTron;
 varying vec4 vNG;
 varying float vSd;
 vec2 symm(vec2 p,float h){ // one of the 8 symmetries of the unit square, per tile
@@ -77,7 +78,7 @@ vec2 symm(vec2 p,float h){ // one of the 8 symmetries of the unit square, per ti
   if(fract(h*4.)>.5)p.y=1.-p.y;
   return p;
 }
-void hide(){gl_Position=vec4(0.,0.,2.,1.);vBase=vN=vGlow=vAdd=vK=vec3(0.);vNG=vec4(0.);vSd=0.;}
+void hide(){gl_Position=vec4(0.,0.,2.,1.);vBase=vN=vGlow=vAdd=vK=vTron=vec3(0.);vNG=vec4(0.);vSd=0.;}
 // Tufts: blades gather toward world tuft centres ~0.46 m apart (jittered centres on a
 // grid turned off the world axes) and fan out from them a little, so neighbours never
 // lean quite the same way while the field still reads as one combed sweep.
@@ -119,9 +120,11 @@ void main(){
   float edge=max(fq.x,fq.y);
   if(edge<1.2)vis*=smoothstep(0.,.8,edge+(nzL(base*1.3).r-.5)*.6-.1);
   if(vis<=0.){hide();return;}
-  // no grass where the wallpaper has cracked or peeled away (doom-hub-traces.ts)
-  Tron tf=tronField(base,max(0.,log2(d*.0018/.25)));
-  if(tf.peel>.5||tf.crack>.5){hide();return;}
+  // no grass where the wallpaper has peeled away, nor over a trace's or crack's core and the dark groove round it
+  // (doom-hub-traces.ts): the light is in the ground, so the blades must not stand on it (2026-10-30)
+  float fp=d*.0018;
+  Tron tf=tronField(base,vec2(fp,0.),vec2(0.,fp),.02+fp*.85);
+  if(tf.peel>.5||tf.tr>.45||tf.cr>.5){hide();return;}
 
   float r=B.w;
   float r2=hash11(r*713.1+1.3),r3=hash11(r*291.7+4.1),r4=hash11(r*937.3+7.7),r5=hash11(r*113.9+2.9),r6=hash11(r*57.3+9.1);
@@ -163,6 +166,8 @@ void main(){
    pressed=max(pressed,(1.-smoothstep(.50,1.,dot(delta,delta)))*uToys[toy].w);
   }
   L*=mix(1.,.12,pressed);
+  // ...and mown short in a trace's halo, so the blades beside it don't lean over the line
+  L*=1.-.7*smoothstep(.04,.45,max(tf.tr,tf.cr));
   float comp=clamp(pow(uRhoMax/max(rho,.01),.42),1.,2.5+3.5*sil);
   float w=uWidth*(.72+.56*r3)*comp*vis;
 
@@ -241,9 +246,9 @@ void main(){
   float hz=atmosHaze(d);
   vGlow=(G_TIP*.26+vec3(.09,.06,0.))*back*t*cs; // sun behind the blades: glowing tips
   vAdd=(sw*conv+atmosLift(d))*(1.-hz)+HAZE*hz;
-  // blades on a trace light up along it, those beside it catch its light at the root; tiles about to fall out flicker
-  float tg=tf.line*tf.glow*(.7+.5*t)+tf.glow*(1.-tf.line)*(1.-t)*.35+tf.loose*.3*tronFlicker(base);
-  vBase*=1.-.75*tf.line;vGlow+=TRON_LINE*tg;vAdd+=TRON_LINE*tf.glow*.5*conv*(1.-hz);
+  // blades beside a trace catch its light only low on the leaf (never dyed root to tip); far off, where a blade stands
+  // for the ground under it, it carries that ground's light
+  vTron=(tronEmit(tf)*mix(.45*(1.-t)*(1.-t),1.,conv)+TRON_LINE*tf.loose*tronFlicker(base)*.12*(1.-t))*(1.-.6*hz); // tiles about to go flicker
   vK=vec3((1.-conv)*(1.-hz),.53+.40*diffG,(.12+.88*back)*t*own);
   // leaves are lit more and more like the sward they melt into
   vNG=vec4(nG,smoothstep(8.,28.,d));
@@ -252,7 +257,7 @@ void main(){
 
 const BLADE_FRAGMENT=/* glsl */`
 uniform vec3 uSun;
-varying vec3 vBase,vN,vGlow,vAdd,vK;
+varying vec3 vBase,vN,vGlow,vAdd,vK,vTron;
 varying vec4 vNG;
 varying float vSd;
 void main(){
@@ -264,7 +269,8 @@ void main(){
   float trans=clamp(-ndl,0.,1.)*vK.z;
   // (with distance a leaf is lit exactly like the sward it melts into)
   vec3 lit=vBase*mix(vK.y+.36*diff+vec3(.42,.50,.12)*trans,vec3(.48+.56*diff),vNG.w)*(1.-.18*vSd*vSd)+vGlow;
-  gl_FragColor=meadowOut(lit*vK.x+vAdd);
+  // (the Tron light as on the terrain: soft-clipped, the dusk tint undone)
+  gl_FragColor=meadowOut(lit*vK.x+vAdd+(1.-exp(-vTron*1.6))*1.15/mix(vec3(1.),TRON_DUSK,uDusk));
   #include <colorspace_fragment>
 }`;
 
@@ -315,7 +321,7 @@ export function makeMeadowGrass(coarse:boolean):MeadowGrass {
       uniforms:{...U,uTable:{value:bladeTable(count,lv.tile,7331+li*101)},uCount:{value:count},uTile:{value:lv.tile},uRhoHi:{value:hi},uRhoLo:{value:lo},
         uFadeStart:{value:lv.fadeStart},uFadeEnd:{value:lv.fadeEnd},uWidth:{value:lv.width},uRhoMax:{value:density.rhoMax},uD0:{value:density.d0},uK:{value:density.k}},
       vertexShader:MEADOW_COMMON_GLSL+BLADE_VERTEX,
-      fragmentShader:OUT_GLSL+BLADE_FRAGMENT});
+      fragmentShader:OUT_GLSL+TRON_DUSK_GLSL+BLADE_FRAGMENT});
     const mesh=new THREE.Mesh(g,mat);mesh.name=`meadow-grass-${'ABC'[li]}`;mesh.frustumCulled=false;mesh.renderOrder=li;mesh.visible=false;
     group.add(mesh);meshes.push(mesh);drawn.push(0);drawnBlades.push(0);
     const order:number[]=[],near=new Float32Array(side*side),cnt=new Int32Array(side*side);

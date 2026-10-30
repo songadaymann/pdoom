@@ -61,6 +61,15 @@ The traces come from each structure's own door, so any clearing order shows corr
 | **Junk to kick** | The 9 desktop icons | 45 pieces: old computers and disks | 80: games and gadgets | 142: error pop-ups, copies of copies, giants |
 | **People** | At the bunker door, wandering | L1 on the hilltop, L2 at HAL's door | L1–2 on the hilltop, L3 at its door | L1–3 on the hilltop, L4 at its door |
 
+**How the lines are drawn (reworked 2026-10-30).** Jonathan felt the first build's lines didn't look finished. From above they read as jagged teal rivers with no bright core. At eye height they read as a ragged band of grass dyed cyan. The rework (`src/doom-hub-traces.ts`, the meadow terrain and grass shaders):
+- The masks hold a baked distance-like profile, not a painted stroke. The shader cuts a crisp, antialiased core from it with gradient sampling, so the line stays a line at a grazing angle. Each core is about 0.36 m wide, the narrowest that doesn't bead on 45° runs at the masks' 0.25 m texels.
+- Each line is light *in* the ground. It has a white-hot middle, a cyan edge, a soft halo and a dark Grid groove round it.
+- Grass is mown short along the traces and cracks, and none grows on a core. Blades beside a line only catch its light low down; none is dyed root to tip. There is no bloom: the glow is soft-clipped in the shader, and the dusk tint after 4 is not applied to it.
+- Lanes run abreast round the bends. Side lanes and chip pins show only from after 3, at any range; after 2 there is just the middle lane. Where two buses run side by side (CONTROL with HAL and MEG3N on the way to the gate), their middle lanes stay at least 8 m apart, so no lanes merge. Each texel's arc length comes from the bus that lights it most, so one bus's rez-in and packets never leak onto its neighbour.
+- When a level clears, its bus draws itself out of the door to the gate over about 4 s, with a bright head. After 4, packets run along each bus toward the gate.
+- Cracks are drawn the same way. Loose tiles dim and their 4 m edge flickers; they are no longer flat cyan squares.
+- The building outlines are unchanged. They are still box edges round the physics boxes.
+
 ![Bunker exit by stage](img/safe-mode-progression/built-01-bunker-exit.jpg)
 ![Looking back south by stage](img/safe-mode-progression/built-02-look-back-south.jpg)
 ![AGENTIC.BAT by stage](img/safe-mode-progression/built-09-agentic.jpg)

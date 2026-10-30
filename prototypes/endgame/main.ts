@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {ARENA,PAL,rand,wrap,bearingOf,makeStage,makeInput,makeHud,makeSfx,makeFloppy,Player,Sparks,type Stage,type Input,type Hud,type Sfx,type Engine} from './kit';
+import {ARENA,PAL,rand,wrap,bearingOf,makeStage,makeInput,lock,makeHud,makeSfx,makeFloppy,Player,Sparks,type Stage,type Input,type Hud,type Sfx,type Engine} from './kit';
 import {MCP} from './mcp';
 import {Recognizer} from './recognizer';
 import {Post,Sink,loadSinks} from './threats';
@@ -8,6 +8,7 @@ import {CAST,Person,loadCast,loadPoses} from './crowd';
 import {loadDoges} from './attacks';
 import {Voices} from './voice';
 import {hands as loadHands,POSE,type Hand} from './art';
+import {makeDatacenter,type Datacenter} from './datacenter';
 import {ricochet} from './mode-ricochet';
 import {tennis} from './mode-tennis';
 import {volley} from './mode-volley';
@@ -31,7 +32,7 @@ export interface Mode{
  hand?(c:Ctx):number|null;
 }
 export interface Ctx{
- stage:Stage;input:Input;player:Player;hud:Hud;sfx:Sfx;voices:Voices;sparks:Sparks;mcp:MCP;discs:Discs;mode:Mode;
+ stage:Stage;input:Input;player:Player;hud:Hud;sfx:Sfx;voices:Voices;sparks:Sparks;mcp:MCP;discs:Discs;mode:Mode;dc:Datacenter;
  people:Person[];guide:Person;recs:Recognizer[];posts:Post[];sinks:Sink[];
  t:number;phase:Phase;phaseT:number;held:boolean;viewmodel:THREE.Group;swing:number;
  later(sec:number,f:()=>void):void;everyone():Person[];say(key:LineKey):void;
@@ -86,6 +87,8 @@ async function boot(){
  const [art]=await Promise.all([loadCast(who),document.fonts.load('64px DoomSmall').catch(()=>null)]);
  const people=CAST.flatMap(([id,name],i)=>alive(i)?[new Person(stage.scene,i,id,name,art.people[i])]:[]);
  const guide=new Person(stage.scene,20,who,LINES[who].name,art.walk,true,art.idle);
+ // the data center's racks, lights and fans, and in the finale its sign and turbines (their words want the font too)
+ const dc=makeDatacenter(stage.scene,{outside:finale,pillars:stage.pillars});
  // the doc's art batch (art.ts), where it's been imported: fight poses, doges, sinks, the first-person hands
  void loadPoses([...people,guide]);void loadDoges();void loadSinks();
  const engines=new Map<Recognizer,Engine>();
@@ -98,7 +101,7 @@ async function boot(){
  const timers:{at:number;f:()=>void}[]=[];
  const playerThrower:Thrower={hand:(o)=>player.hand(o),caught:()=>{c.held=true;},isPlayer:true,name:'you'};
  const discs=new Discs(stage.scene,mcp,()=>recs,()=>posts,sparks,sfx);
- const c:Ctx={stage,input,player,hud,sfx,voices,sparks,mcp,discs,mode,people,guide,recs,posts,sinks,t:0,phase:'practice1',phaseT:0,held:true,viewmodel,swing:0,
+ const c:Ctx={stage,input,player,hud,sfx,voices,sparks,mcp,discs,mode,dc,people,guide,recs,posts,sinks,t:0,phase:'practice1',phaseT:0,held:true,viewmodel,swing:0,
   later:(sec,f)=>timers.push({at:c.t+sec,f}),
   hitRec:(rec)=>hitRec(rec),
   timeScale:1,realDt:0,cam:null,
@@ -181,7 +184,7 @@ async function boot(){
  document.getElementById('dialog-details')!.onclick=()=>{(document.getElementById('dialog-more') as HTMLElement).hidden=false;};
  const overlay=document.getElementById('start') as HTMLElement;
  document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement===canvas){started=true;overlay.hidden=true;sfx.ensure();}else if(c.phase!=='down')overlay.hidden=false;});
- overlay.onclick=()=>canvas.requestPointerLock?.();
+ overlay.onclick=()=>lock(canvas);
  if(auto){overlay.hidden=true;sfx.ensure();}
  (document.getElementById('loading') as HTMLElement).hidden=true;
  go('practice1');
@@ -265,7 +268,7 @@ async function boot(){
   discs.update(dt);
   formation(dt);
   for(const p of c.everyone())p.update(dt,stage.camera.position,c.t,new THREE.Vector3(0,0,0));
-  mcp.update(dt,stage.camera.position,mode.highlight?.(c)??null);
+  mcp.update(dt,stage.camera.position,mode.highlight?.(c)??null);dc.tick(c.t,dt);
   sparks.update(dt);
   hud.bar(c.phase==='fight'||c.phase==='down'?mcp.integrity/mcp.max:null);
   hud.health(player.health,player.hurt,player.down);
@@ -299,7 +302,7 @@ async function boot(){
   get ready(){return true;},
   state:()=>({mode:mode.id,phase:c.phase,phaseT:+c.phaseT.toFixed(2),t:+c.t.toFixed(2),held:c.held,player:{x:+player.pos.x.toFixed(2),z:+player.pos.z.toFixed(2),health:player.health,down:player.down,yaw:+s().yaw.toFixed(3),pitch:+s().pitch.toFixed(3)},
    mcp:{integrity:mcp.integrity,awake:mcp.awake,dead:mcp.dead,gaps:mcp.gapCenters().map(g=>+g.toFixed(3)),spin:+mcp.spin.toFixed(3)},recs:recs.map(r=>({state:r.state,hp:r.hp,x:+r.pos.x.toFixed(1),y:+r.pos.y.toFixed(1),z:+r.pos.z.toFixed(1)})),
-   discs:discs.list.length,posts:posts.length,sinks:sinks.length,people:people.filter(p=>p.down<=0).length,peopleWithDiscs:people.filter(p=>p.hasDisc).length,mode_state:mode.state?.(c)||null}),
+   discs:discs.list.length,posts:posts.length,sinks:sinks.length,people:people.filter(p=>p.down<=0).length,peopleWithDiscs:people.filter(p=>p.hasDisc).length,dc:dc.state,mode_state:mode.state?.(c)||null}),
   look:(yaw:number,pitch=0)=>{s().yaw=yaw;s().pitch=pitch;},
   lookAt:(x:number,y:number,z:number)=>{const e=player.eyePos(),d=new THREE.Vector3(x,y,z).sub(e);s().yaw=Math.atan2(-d.x,-d.z);s().pitch=Math.atan2(d.y,Math.hypot(d.x,d.z));},
   place:(x:number,z:number)=>{player.pos.set(x,0,z);},

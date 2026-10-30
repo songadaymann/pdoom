@@ -36,8 +36,11 @@ export const GUIDE:Record<'mario'|'samwise',Record<string,string>>={
   // the walk in (docs/ENDGAME.md E4-E5, ?m=finale)
   recognizer:"That's a Recognizer. It drops on you. Watch for the shadow, step out of it, then throw at the light in the middle.",
   hit:'Good. And it came back. I said it would come back.',
-  rule:'When it shoots at you, hit it back. Timing matters more than strength.',
+  // P2 hangs back and never shoots (2026-10-30: no tennis on the walk); a new key, so the old `rule` take can't play
+  keep:"This one keeps its distance. It won't come to you, so throw from where you are.",
   sky:"Keep walking. The sky is doing something I don't have a framework for.",
+  // the data center's hum, as you start to hear it (2026-10-30)
+  hum:"Hear that hum? Those are fans. It's not a tower, it's a data center. The world's biggest, the sign says. He wrote the sign.",
   fault:"And if you're still wondering how much of this is our fault: I've thought about it, and I'd call it a shared responsibility. Mostly his share.",
   tower:'This is it. Everybody inside, and stay together. This is the last stand. The real one, this time.',
   value:'Well. Yes. I suppose we did bring about the apocalypse, and the near extinction of humankind. But we also drove a great deal of value for our shareholders.',
@@ -71,8 +74,9 @@ export const GUIDE:Record<'mario'|'samwise',Record<string,string>>={
   // the walk in (docs/ENDGAME.md E4-E5, ?m=finale)
   recognizer:"OK, that's a Recognizer. When you see the shadow, move. Then hit the glowing part in the middle.",
   hit:'Nice! And it came back. Like I said. Roughly like I said.',
-  rule:"When it shoots, swing. Send it right back. It's basically tennis. I've played tennis.",
+  keep:"This one's hanging back. Just throw from here. Long throws are fine.",
   sky:"Keep walking. And maybe don't look at the sky for a bit.",
+  hum:"Hear that? Fans. It's a data center. You can never have too much compute. I want to be clear that this is too much.",
   fault:"And if you're still wondering how much of this is our fault: I've thought about it, and it's complicated. But relatively, I think we're the good guys.",
   tower:'This is it. Everybody in. Stay together. This is the last stand. For real. The first one was more of a beta.',
   value:'Well, yeah. I guess we did bring about the apocalypse. And the near extinction of humankind. But we also drove a ton of great value to the shareholders.',

@@ -25,17 +25,19 @@ assert.ok(s.hal.exit_lights>50,'Floor chevrons laid to the exit');report.cases.p
 await page.waitForTimeout(600);await shot(null,'blackout-faraday-room');
 await warp(208,200,270);await command('centerview');await page.waitForTimeout(300);await shot(null,'floor-lights-a');await page.waitForTimeout(100);await shot(null,'floor-lights-b');
 await warp(1200,-2262,0);await command('centerview');await page.waitForTimeout(300);await shot(null,'floor-lights-east');
-// Out of the Faraday Room first (they open its door themselves), then wait at the
-// original exit: the group walks the whole dark route to you through the pod bay.
+// Out of the Faraday Room first (they open its door themselves). Since 2026-10-30 (Jonathan) freed people
+// keep up on levels 1-2 as on 3-4: left over 1024 units behind and out of sight, they appear just behind you.
 await warp(208,80,270);await wait(s=>following(s).every(p=>p.y<340),'Everyone leaves the Faraday Room',20000);report.leftRoomSeconds=Math.round((Date.now()-pulledAt)/100)/10;
-await warp(1200,-2256,0);await shot(null,'route-pod-bay');await warp(1808,-2304,180);
-// The exit room's original red switch ends the level (2026-10-14), and only once everyone is in.
-await warp(1900,-2304,0);await command('centerview');s=await read();assert.equal(s.hal.exit_all_in,0,'The group is still on its way');
+await warp(1200,-2256,0);s=await wait(s=>following(s).every(p=>Math.hypot(p.x-s.world.x,p.y-s.world.y)<400),'The group catches up through the dark station',15000);await shot(null,'route-pod-bay');
+report.cases.push('Run ahead through the blackout: all five catch up to you in the pod bay');
+// The exit room's original red switch ends the level (2026-10-14), and only once everyone is in. 700 units on
+// (under the catch-up distance) they walk the rest, so the switch is pressed before they arrive.
+await warp(1900,-2304,0);s=await read();assert.equal(s.hal.exit_all_in,0,'The group is still on its way');
 await press('Space');await page.waitForTimeout(300);s=await read();assert.equal(s.hal.exit_button,0,'The switch does nothing before everyone is in');assert.match(s.world.message,/Not everyone/);
 report.cases.push("Exit switch pressed early: nothing, \"Not everyone's here yet.\"");
 s=await wait(s=>s.hal.exit_all_in===1,'Everyone in the exit room',120000);
 report.escortSeconds=Math.round((Date.now()-pulledAt)/100)/10;report.rebootLeftSeconds=Math.round(s.hal.reboot_remaining/35);
-assert.ok(s.hal.reboot_remaining>0,'Reached the exit before HAL rebooted');report.cases.push(`Five companions followed through the dark station to the original exit in ${report.escortSeconds}s (${report.rebootLeftSeconds}s of reboot left)`);
+assert.ok(s.hal.reboot_remaining>0,'Reached the exit before HAL rebooted');report.cases.push(`Five companions followed to the original exit in ${report.escortSeconds}s (${report.rebootLeftSeconds}s of reboot left)`);
 await page.waitForTimeout(1500);s=await read();assert.equal(s.hal.exit_reached,0,'Reaching the exit room alone no longer ends the level');
 await wait(s=>/press the button/.test(s.world.prompt),'Exit switch prompt once everyone is in');await shot(null,'exit-switch-ready');
 await press('Space');await wait(s=>s.hal.exit_button===1,'Exit switch pressed');await wait(s=>s.hal.exit_reached===1,'Level ends after the switch');

@@ -15,10 +15,11 @@ class PDFactory : EventHandler
     // broadcasts MEG3N.AVI, she runs off to watch herself and everyone follows the arrows out.
     bool AllSafe,Evacuating,ExitDone,GuardSaid;int BroadcastAt,BroadcastUntil,ViralStage;
     // Walked in from SAFE MODE (2026-10-20, PDCampaignSession.FactoryEntry): people already at
-    // camp (Camped) are gone, and the exit switch always lets you back out with whoever is with you.
+    // camp (Camped) are gone. Since 2026-10-30 (Jonathan) there is no retreat: the exit switch waits
+    // for everyone still inside, so only a finished factory (all camped) lets you straight back out.
     // Commits: the campaign page (pdoom_factory_commit), walked in or started from the episode menu,
     // where the exit commits the clear to the save natively.
-    bool HubEntry,Commits;int Camped;
+    bool HubEntry,Commits;int Camped,ExitNagAt;
     // MEG3N's live feeds (2026-10-20): 20 wall screens to find and smash (PDFactoryScreen).
     // A dark feed brings her to look (ScreenAlarm), unless she is guarding the exit.
     Array<PDFactoryScreen> Screens;int ScreensBroken,ScreenAlarmUntil,ScreenQuipAt,ScreenQuips;Vector2 ScreenAlarmAt;bool ScreenNoticed;
@@ -338,10 +339,8 @@ class PDFactory : EventHandler
         if(!Released[3]&&FacingLine(viewer,PDFactoryMap.PaulSwitch()))return "SPACE - lower Paul's platform";
         if(!ExitDone&&FacingLine(viewer,PDFactoryMap.ExitSwitch()))
         {
-            if(AllSafe&&EveryoneAtExit())return "SPACE - leave the factory";
-            // From SAFE MODE the switch is also the retreat (GAME-SPEC 5.1): whoever is with you comes out.
-            if(HubEntry)return "SPACE - retreat to the meadow";
-            if(AllSafe)return "SPACE - leave the factory";
+            // No retreat from SAFE MODE (2026-10-30): the switch offers itself once everyone left is with you.
+            if(AllSafe||HubEntry&&EveryoneAtExit())return "SPACE - leave the factory";
         }
         if(!p)return "";
         int k=p.Kind;
@@ -663,20 +662,28 @@ class PDFactory : EventHandler
     {
         if(RunFinished||!Commits)return;
         RunFinished=true;SnapshotCover();
-        int figures=0;for(int i=0;i<5;i++)if(leaving&(1<<i))figures++;
+        int figures=0,camp=0;for(int i=0;i<5;i++){if(leaving&(1<<i))figures++;if(Camped&(1<<i))camp++;}
         Console.Printf("PDOOM_RESULT {\"outcome\":\"escaped\",\"saved\":%d,\"total\":6,\"level_id\":\"meg3n-factory\",\"level_version\":\"%s\",\"score_version\":\"rescue-v2\",\"active_tics\":%d,\"p_doom_cover\":%d,\"cameras_broken\":%d,\"cameras_total\":%d,\"practice\":%d,\"routes\":[\"music\",\"fabric\",\"pause\",\"%s\",\"helper\"],\"saved_figures\":%d,\"ceo_state\":\"conscious\",\"skill\":3,\"entry\":\"%s\",\"retreat\":%d}",
-            figures+1,RunVersion(),RunTics,CoverDoom,ScreensBroken,Screens.Size(),RunPractice,Sycophant?"overpraise":"trained",figures,HubEntry?"hub":"cold",figures<5);
+            figures+1,RunVersion(),RunTics,CoverDoom,ScreensBroken,Screens.Size(),RunPractice,Sycophant?"overpraise":"trained",figures,HubEntry?"hub":"cold",figures+camp<5);
     }
     void UseExit(Actor user)
     {
         if(ExitDone)return;
-        if((!AllSafe||!EveryoneAtExit())&&!HubEntry)
+        // Walked in from SAFE MODE, people already at camp count as done; since 2026-10-30 (Jonathan)
+        // the switch never lets you out without the rest: save them or reload (LOAD GAME).
+        if(HubEntry?!EveryoneAtExit():(!AllSafe||!EveryoneAtExit()))
         {
             if(user)user.A_StartSound("*usefail",CHAN_VOICE);
-            Say(!AllSafe?"Find all five first.":"Not everyone's here yet.");return;
+            if(!HubEntry){Say(!AllSafe?"Find all five first.":"Not everyone's here yet.");return;}
+            int inside=0,away=0;for(int i=0;i<5;i++)if(!(Camped&(1<<i))){if(!Released[i])inside++;else if(!AtExit(People[i].Pos.XY))away++;}
+            String why=inside>0?String.Format("%d still inside",inside):"";if(away>0)why=why..(inside>0?", ":"")..String.Format("%d not with you",away);
+            Say("Nobody gets left in here: "..why..".");
+            if(Quiet()&&level.time>=ExitNagAt){ExitNagAt=level.time+700;MeganSays(MeganChat(0),"chat-1");}
+            return;
         }
-        // Who comes out: everyone freed and with you in the exit area. Anyone freed but left
-        // behind goes back to the break room for next time (following).
+        // Who comes out: everyone freed and with you in the exit area. Anyone freed but left behind
+        // goes back to the break room for next time (following); since the 2026-10-30 lock-in only
+        // a save from before it can leave anyone behind.
         int leaving=0,behind=0;
         for(int i=0;i<5;i++)
         {
@@ -1000,7 +1007,7 @@ class PDFactory : EventHandler
     // Walked in from SAFE MODE through MEG3N.AVI's door: you come in at the front door, E2M7's
     // exit room, looking up the corridor, wrench in hand (the showroom wrench stays as a spare).
     // People already at camp are gone and their cells stand open; anyone freed last time but left
-    // behind is waiting in the break room. The exit switch behind you is the way back out.
+    // behind is waiting in the break room. The exit switch behind you waits for everyone left (2026-10-30).
     void ApplyHubEntry()
     {
         let pawn=players[0].mo,session=PDCampaignSession.Get();

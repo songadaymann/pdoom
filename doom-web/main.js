@@ -325,9 +325,9 @@ async function enterOutside({intro=false,melt=false}={}){
 // MEG3N.AVI's door into the meadow, as levels 1-2's outside-reveal does. The first exit of a
 // playthrough melts straight into the meadow; a later one (this save has reached SAFE MODE
 // before) types the exit text over a Doom flat first (spec 06 section 8.3).
-// Walked in from SAFE MODE (2026-10-20, event.hub), the switch is also the retreat: event.saved
-// says who came out with you, the native exit has already committed the save (PDOOM_CAMPAIGN), and
-// anyone freed but left behind waits in the break room next time. A cold run from the episode menu
+// Walked in from SAFE MODE (2026-10-20, event.hub): event.saved says who came out with you and the
+// native exit has already committed the save (PDOOM_CAMPAIGN). Since 2026-10-30 the switch only
+// works once everyone still inside is with you, so nobody is left behind (no retreat). A cold run from the episode menu
 // commits natively too (event.committed); the ?level=meg3n-factory page records its clear here
 // instead. The text screen shows only when this exit finishes the factory, on a save that had
 // already reached SAFE MODE before this exit committed to it (levelExit()'s rule).

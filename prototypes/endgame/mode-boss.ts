@@ -568,18 +568,20 @@ function clearAll(c:Ctx){
 }
 // The walk in (?m=finale; docs/ENDGAME.md E4-E5): from the end of the meadow, north of the arena, straight to the
 // door in its wall, the guide at your shoulder and everyone alive in single file behind you. Practice on the
-// way: one Recognizer that drops on a shadow (P1), one that shoots, to learn the swing part 1 needs (P2), and a
-// squadron of three (P3). Nobody dies out here. Once the way is clear the door opens; inside, THE BOSS begins.
+// way: one Recognizer that drops on a shadow (P1), one that keeps its distance and never shoots, for a long throw
+// (P2; 2026-10-30, Jonathan: no tennis on the walk), and a squadron of three (P3). The tower is a data center
+// (datacenter.ts): its hum swells as you near it, and the guide remarks on it. Nobody dies out here. Once the
+// way is clear the door opens; inside, THE BOSS begins.
 let walkRecs:{rec:Recognizer;beat:number}[]=[],beat=0,doorK=0,inside=0;const walkTrail:THREE.Vector3[]=[],slots=new Map<Person,THREE.Vector3>();
 function walkStart(c:Ctx){
- phase='walk';pt=0;WALK.on=true;WALK.door=false;c.stage.openDoor(0);
+ phase='walk';pt=0;WALK.on=true;WALK.door=false;c.stage.openDoor(0);c.dc.inside(false);
  for(const p of c.everyone())slots.set(p,p.pos.clone());// their places in the arena, for when they're in
  c.player.pos.set(0,0,WALK.far);c.input.state.yaw=0;c.input.state.pitch=0;
  walkTrail.length=0;for(let k=0;k<90;k++)walkTrail.push(new THREE.Vector3(0,0,WALK.far+k));// the file starts already formed behind you
  c.people.forEach((p,k)=>{p.pos.set(k%2?.7:-.7,0,WALK.far+4+k*1.6);p.target.copy(p.pos);});
  c.guide.pos.set(-2.2,0,WALK.far-3);c.guide.target.copy(c.guide.pos);
  (c.stage.floor.material as THREE.ShaderMaterial).uniforms.uR.value=1e4;// the Grid all the way out
- c.hud.hint('South, to the tower. Click throws your floppy (it comes back); click a ball that\'s on you to hit it back.');
+ c.hud.hint('South, to the data center. Click throws your floppy (it comes back). Watch for shadows.');
 }
 function walk(c:Ctx,dt:number){
  // Voiced (2026-10-28), the walk's lines take about 45 s: each beat waits for the last one's lines (hush), and
@@ -587,9 +589,11 @@ function walk(c:Ctx,dt:number){
  // line at the door, go before Elon's (and his intro's).
  const wait={ttl:30},first={prio:2,ttl:8},hush=()=>!says.length&&clock()>=voiceFree&&c.t>=toastFree&&c.t>=captionFree;
  const ahead=(dz:number)=>Math.max(ARENA.radius+40,z-dz);// a late beat still spawns out on the Grid, not in the tower
- const p=c.player.pos,z=p.z,live=(b:number)=>walkRecs.some(w=>w.beat===b&&w.rec.alive),spawn=(b:number,style:'slam'|'bolt',at:THREE.Vector3,hp:number)=>walkRecs.push({rec:c.spawnRec(0,hp,style,at),beat:b});
+ const p=c.player.pos,z=p.z,live=(b:number)=>walkRecs.some(w=>w.beat===b&&w.rec.alive),spawn=(b:number,style:'slam'|'bolt',at:THREE.Vector3,hp:number)=>{const rec=c.spawnRec(0,hp,style,at);if(style==='bolt')rec.fireCd=Infinity;walkRecs.push({rec,beat:b});};// a bolt out here just circles: it never charges
  c.player.health=Math.max(c.player.health,40);// a stomp hurts, but nobody dies on the walk
  if(!walkTrail.length||walkTrail[0].distanceTo(p)>1){walkTrail.unshift(p.clone());walkTrail.length=Math.min(walkTrail.length,240);}
+ // the data center's noise: faint far out, louder as you near the wall, all of it once the door opens
+ c.sfx.near(WALK.door?1:.35+.45*clamp(1-(Math.hypot(p.x,p.z)-ARENA.radius)/260,0,1));
  if(WALK.door&&Math.hypot(p.x,p.z)<ARENA.radius-2){
   // in: everyone to their places, then the door shuts behind them and he wakes
   for(const q of c.everyone())q.target.copy(slots.get(q)??q.pos);
@@ -601,20 +605,22 @@ function walk(c:Ctx,dt:number){
  if(pt>2&&once('walk-resolve'))elon(c,ELON.resolve,3.6,wait);
  if(beat===0&&z<WALK.far-45&&hush()){beat=1;spawn(1,'slam',new THREE.Vector3(26,24,z-60),2);guide(c,'recognizer',6,wait);c.later(2.5,()=>elon(c,ELON.recognize,2.6,wait));}
  if(beat>=1&&walkRecs.length&&!live(1)&&once('walk-hit'))guide(c,'hit',3,first);
- if(beat===1&&z<WALK.far-150&&hush()){beat=2;spawn(2,'bolt',new THREE.Vector3(-22,10,ahead(55)),2);guide(c,'rule',5,wait);}
+ if(beat===1&&z<WALK.far-150&&hush()){beat=2;spawn(2,'bolt',new THREE.Vector3(-22,10,ahead(55)),2);guide(c,'keep',5,wait);}
  if(beat===2&&z<WALK.far-205&&hush()&&once('walk-sky'))guide(c,'sky',4,wait);
- if(beat===2&&said.has('walk-sky')&&z<WALK.far-260&&hush()){beat=3;for(let k=0;k<3;k++)spawn(3,'slam',new THREE.Vector3(-70,24,ahead(28)-k*9),1);c.later(2,()=>guide(c,'fault',6,wait));}
+ // in the gap after the sky, the hum (the sign reads by now)
+ if(beat===2&&said.has('walk-sky')&&z<WALK.far-235&&hush()&&once('walk-hum'))guide(c,'hum',5.5,wait);
+ if(beat===2&&said.has('walk-hum')&&z<WALK.far-260&&hush()){beat=3;for(let k=0;k<3;k++)spawn(3,'slam',new THREE.Vector3(-70,24,ahead(28)-k*9),1);c.later(2,()=>guide(c,'fault',6,wait));}
  if(beat===3&&z<ARENA.radius+50&&hush()&&once('walk-mcp'))elon(c,ELON.walk,4.4,wait);
  // the door: once nothing's left out here
  if(!WALK.door&&z<ARENA.radius+18){
   if(walkRecs.some(w=>w.rec.alive)){if(once('walk-clear'))c.hud.hint('Clear the Recognizers, and the door opens.');}
-  else if(said.has('walk-mcp')&&hush()){WALK.door=true;guide(c,'tower',5.5,{...wait,prio:2});c.sfx.play.charge();c.hud.hint('In you go.');}
+  else if(said.has('walk-mcp')&&hush()){WALK.door=true;c.sfx.near(1);guide(c,'tower',5.5,{...wait,prio:2});c.sfx.play.charge();c.hud.hint('In you go.');}
  }
  if(WALK.door&&doorK<1){doorK=Math.min(1,doorK+dt/1.8);c.stage.openDoor(doorK);}
 }
 // in (or skipped): the walk's over and THE BOSS begins; `instant` puts everyone in place at once
 function walkEnd(c:Ctx,instant:boolean){
- if(!WALK.on)return;WALK.on=false;WALK.door=false;doorK=0;c.stage.openDoor(0);
+ if(!WALK.on)return;WALK.on=false;WALK.door=false;doorK=0;c.stage.openDoor(0);c.sfx.near(1);c.dc.inside(true);
  for(const w of walkRecs)if(w.rec.alive){w.rec.alive=false;w.rec.derez(c.sparks);}
  for(const q of c.everyone()){const at=slots.get(q);if(instant&&at){q.pos.copy(at);q.target.copy(at);}}
  if(instant)c.player.pos.set(0,0,36);
@@ -629,7 +635,7 @@ function offerMeadow(){
  // own meadow after the boss is &after=5
  const back=FIXTURE?`../?safemode=1&after=5&ceo=${QUERY.get('ceo')??'altman'}`:'../?play=1&load=1';
  const home=()=>{location.href=new URL(back,location.href).href;};
- setTimeout(()=>{addEventListener('pointerdown',home,{once:true});addEventListener('keydown',e=>{if(e.code!=='KeyR')home();},{once:true});},1500);
+ setTimeout(()=>{addEventListener('pointerdown',e=>{e.preventDefault();home();},{once:true});addEventListener('keydown',e=>{if(e.code!=='KeyR')home();},{once:true});},1500);
 }
 function go(c:Ctx,to:Phase,instant=false){
  phase=to;pt=0;const mcp=c.mcp;
@@ -665,7 +671,7 @@ function go(c:Ctx,to:Phase,instant=false){
   cracks=new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(new Float32Array(70*12*3),3)),new THREE.LineBasicMaterial({color:PAL.white,transparent:true,blending:THREE.AdditiveBlending}));
   cracks.geometry.setDrawRange(0,0);cracks.frustumCulled=false;mcp.root.add(cracks);crackN=0;
   flames=[0,1,2,3].map(i=>{const a=i*Math.PI/2+Math.PI/4,f=glowSprite(PAL.enemyCore,1,.95);f.position.set(Math.cos(a)*7.6,-1,Math.sin(a)*7.6);f.scale.setScalar(.01);mcp.root.add(f);return f;});
-  c.sfx.play.alarm();c.sfx.play.whine();c.sfx.powerDown(melt.rud);
+  c.sfx.play.alarm();c.sfx.play.whine();c.sfx.powerDown(melt.rud);c.dc.powerDown(melt.rud);
  }
 }
 // a crack of light running up the column
@@ -733,7 +739,7 @@ export const boss:Mode={
   }
   pt+=dt;swingCd=Math.max(0,swingCd-dt);const mcp=c.mcp;
   if(shield){shield.t+=dt;const k=Math.min(1,shield.t/shield.dur);mcp.shieldY=shield.from+(shield.to-shield.from)*k*k*(3-2*k);if(k>=1){const then=shield.then;shield=null;then?.();}}
-  tickVoices(c);updateArrivals(c,dt);c.sfx.duck(c.voices.talking());
+  tickVoices(c);updateArrivals(c,dt);c.sfx.duck(c.voices.talking());c.dc.quiet(phase==='trick');
   switch(phase){
    case 'walk':walk(c,dt);updateShots(c,dt);break;
    case 'intro':
@@ -847,8 +853,8 @@ export const boss:Mode={
  },
  press(c,b){
   if(b!==0||c.player.down)return;
-  // on the walk: swing at a ball that's on you, otherwise throw
-  if(phase==='walk'){const eye=c.player.eyePos();if(shots.some(s=>s.alive&&s.enemy&&s.pos.distanceTo(eye)<4.6))swing(c);else if(c.held)c.throwPlayer(MINE);return;}
+  // on the walk nothing shoots, so a click throws
+  if(phase==='walk'){if(c.held)c.throwPlayer(MINE);return;}
   if(phase==='ships'){swing(c);return;}
   if(phase==='shieldDown'){
    if(swing(c)||!c.held)return;
@@ -879,7 +885,7 @@ export const boss:Mode={
  hand:(c)=>phase==='trick'&&!trick&&c.held?1:null,
  state:(c)=>{
   const eye=c.player.eyePos(),mine=shots.filter(s=>s.alive&&s.enemy&&s.target.kind==='player').sort((a,b)=>a.pos.distanceTo(eye)-b.pos.distanceTo(eye))[0];
-  return {phase,pt:+pt.toFixed(2),ending,walk:FINALE?{on:WALK.on,beat,door:WALK.door,live:walkRecs.filter(w=>w.rec.alive).length}:null,fleet,wave,shipsDown,ships:SHIPS,crowdReturns,spots:spots.length,spotsAt:spots.map(s=>s.world().toArray().map(v=>+v.toFixed(2))),shots:shots.length,hot:shots.some(s=>s.hot),
+  return {phase,pt:+pt.toFixed(2),ending,walk:FINALE?{on:WALK.on,beat,door:WALK.door,live:walkRecs.filter(w=>w.rec.alive).length,heard:[...said].filter(k=>k.startsWith('walk-')),near:+c.sfx.nearness.toFixed(2)}:null,fleet,wave,shipsDown,ships:SHIPS,crowdReturns,spots:spots.length,spotsAt:spots.map(s=>s.world().toArray().map(v=>+v.toFixed(2))),shots:shots.length,hot:shots.some(s=>s.hot),
    incoming:mine&&mine.pos.distanceTo(eye)<8?mine.pos.toArray().map(v=>+v.toFixed(2)):null,
    attacks:attacks.map(a=>a.kind),started:Object.fromEntries(started),warnings,doges:attacks.filter((a):a is Doges=>a instanceof Doges).reduce((n,a)=>n+a.running,0),
    attempts,best,timeScale:+c.timeScale.toFixed(2),launchT:+launchT.toFixed(1),delays,pathKey,solves,

@@ -86,8 +86,10 @@ const possessions=()=>page.evaluate(()=>window.__PT__?.poss||0);
 async function startPhase(name){const s=await read();phase={name,t0:Date.now(),tick0:s.world.ticks,detail:{},before:{...stats,poss:await possessions()}};console.log(`-- ${name} (tick ${s.world.ticks})`);return phase.detail;}
 async function endPhase(){const s=await read(),b=phase.before;const p={name:phase.name,seconds:+((Date.now()-phase.t0)/1000).toFixed(1),tics:s.world.ticks-phase.tick0,stuns:stats.stuns-b.stuns,unpossessed:stats.unpossessed-b.unpossessed,possessions:await possessions()-b.poss,...phase.detail};report.phases.push(p);console.log(`   done in ${p.seconds} s (${p.tics} tics)`);phase=null;return p;}
 async function warp(x,y,angle){
- const s=await read();const following=[0,1,2,3,4].filter(i=>person(s,i).released&&!person(s,i).sheltered&&!person(s,i).camped);
+ let s=await read();const following=[0,1,2,3,4].filter(i=>person(s,i).released&&!person(s,i).sheltered&&!person(s,i).camped);
  assert.deepEqual(following,[],`warp only while nobody follows (following: ${following.map(i=>NAMES[i])})`);
+ // GZDoom's warp keeps your momentum: a run that just ended glides on at the far end. Stand still first.
+ for(let t=s.world.ticks,p=here(s),end=Date.now()+4000;Date.now()<end;){await sleep(100);s=await read();if(s.world.ticks<t+3)continue;if(dist(here(s),p)<0.5)break;t=s.world.ticks;p=here(s);}
  stats.warps.push([phase?.name,x,y]);await qa.warp(x,y,angle);
 }
 async function swing(){await qa.hold('ControlLeft',120);}

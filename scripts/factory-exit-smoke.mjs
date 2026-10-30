@@ -21,7 +21,7 @@ async function playthrough(name,save){
  page.on('pageerror',e=>report.errors.push(`${name}: ${e}`));
  await page.addInitScript(save=>{
   const W=window.Worker;window.Worker=class extends W{constructor(...a){super(...a);window.__QA_WORKER__=this;}};
-  if(save&&!sessionStorage.getItem('qa-seeded')){sessionStorage.setItem('qa-seeded','1');localStorage.setItem('pdoom.campaign.v1',JSON.stringify(save));}
+  if(save&&!sessionStorage.getItem('qa-seeded')){sessionStorage.setItem('qa-seeded','1');localStorage.setItem('pdoom.level-intros.v1',JSON.stringify(['five-prisons','hal-station','meg3n-factory']));localStorage.setItem('pdoom.campaign.v1',JSON.stringify(save));}
  },save);
  const {read,wait}=nativeQA(page);const shot=n=>page.screenshot({path:`${out}/${name}-${n}.png`});
  await page.goto('http://127.0.0.1:5198/?level=meg3n-factory&puzzle=exit');await startGame(page,{console:false});

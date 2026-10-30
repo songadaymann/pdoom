@@ -46,7 +46,8 @@ export function makeHubCorruption(scene:THREE.Scene,structures:IconObstacle[][])
   update(dt:number,time:number,cam:THREE.Vector3,done:boolean[],instant:boolean,reduced:boolean){
    const target=Math.max(0,done.filter(Boolean).length-1);
    if(instant||corrupt<0)corrupt=target;else corrupt+=THREE.MathUtils.clamp(target-corrupt,-dt*.5,dt*.35);
-   done.forEach((d,i)=>{cleared[i]=instant?+d:THREE.MathUtils.clamp(cleared[i]+(d?dt:-dt)*.5,0,1);});
+   // (about 4 s: uCleared is also the front of each bus drawing itself out of its door to the gate, doom-hub-traces.ts)
+   done.forEach((d,i)=>{cleared[i]=instant?+d:THREE.MathUtils.clamp(cleared[i]+(d?dt:-dt)*.25,0,1);});
    U.uCorrupt.value=corrupt;U.uCleared.value.set(cleared[0],cleared[1],cleared[2],cleared[3]);U.uDusk.value=THREE.MathUtils.clamp(corrupt-2,0,1)*.8;U.uTronMotion.value=reduced?0:1;
    const c1=THREE.MathUtils.clamp(corrupt,0,1),c2=THREE.MathUtils.clamp(corrupt-1,0,1),c3=THREE.MathUtils.clamp(corrupt-2,0,1);
    edges.forEach((e,i)=>{const o=cleared[i]*c1*(.35+.3*c2+.35*c3)*(reduced?1:.85+.15*Math.sin(time*2.1+i));e.mesh.visible=o>.002;e.material.opacity=o;});

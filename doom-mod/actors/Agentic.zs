@@ -63,7 +63,7 @@ class PDAgentic : EventHandler
     // InConstruct: a puzzle holds the player (HoldsPlayer). CableHeld: set by the Tallinn rescue while
     // you carry the hardline (PDOOM_STATE cable: the browser draws hardline.png instead of the wrench).
     bool InConstruct,CableHeld,IntroDone,SmithMet,CameraSaid,PhoneRinging,AtDoorstep;
-    int OldButtons,MessageUntil,Shots,Tool,Swings,Guide,Camped,SafeMask,DevSite,StartAt,IntroAt,IntroUntil,LineLater;
+    int OldButtons,MessageUntil,Shots,Tool,Swings,Guide,Camped,SafeMask,Homing,DevSite,StartAt,IntroAt,IntroUntil,LineLater;
     String Message;
     // Character lines take the speaker box one at a time, like levels 1-3 (Factory.zs Speak/Show).
     String DialogueSpeaker,DialogueText,DialogueVoice;int DialogueUntil,DialogueSerial;Actor DialogueFrom;
@@ -84,7 +84,8 @@ class PDAgentic : EventHandler
     int RingFrom,DoorPossessAt,GuideCameraAt;
     // People. Called: hint callouts done (a rescue sets Called[Site] in Setup to speak its own).
     PDAgenticPerson People[5];PDAgenticNav Routes[5];
-    bool Released[5],LeftCell[5],Called[5];int ReleasedAt[5];
+    // Homing: brought nearly home (NearRefuge), they walk on in whatever you do; HomingAt is when.
+    bool Released[5],LeftCell[5],Called[5];int ReleasedAt[5],HomingAt[5];
     PDAgenticPuzzle Puzzles[5];
     Array<PDAgenticProp> Props;
     Array<int> Links,MachineLinks,Doors,BridgeSectors,BridgeNodes,BridgeLinks;
@@ -100,6 +101,10 @@ class PDAgentic : EventHandler
     static String PersonKey(int site){return site==0?"jaan":site==1?"nick":site==2?"daniel":site==3?"katja":"yoshua";}
     // Where SMITH waits outside the refuge: nook 7, just east of door 11 (InRefuge is x < -168).
     static Vector2 Doorstep(){return (-148,-96);}
+    // Nearly home (2026-10-30, Jonathan: they should stay once you get pretty close): the refuge, nook 7 and the raised
+    // bridge, the 64 u passage east of door 11 (x -168..-32; room 3's mouth starts at -32). Like level 1's RefugeArrival
+    // (RescueRefuge.NearEntrance). A box, not a radius: 128 u round the doorstep reaches through the wall south of room 9.
+    static bool NearRefuge(Vector2 p){return PDAgenticMap.InRefuge(p)||p.X>=-168&&p.X<-32&&p.Y>-128&&p.Y<-64;}
 
     // Say: short world feedback (status line). Speak: a character's line (speaker box, queued).
     void Say(String text,int ticks=175){Message=text;MessageUntil=level.time+ticks;}
@@ -486,7 +491,7 @@ class PDAgentic : EventHandler
         for(int i=0;i<5;i++)
         {
             let who=People[i];
-            if(!who||!Released[i]||Possessed[i]||Camped&(1<<i)||SafeMask&(1<<i)||who.bInvisible)continue;
+            if(!who||!Released[i]||Possessed[i]||Camped&(1<<i)||(SafeMask|Homing)&(1<<i)||who.bInvisible)continue;
             // A freed person first steps out and says their line: never taken in their cell or in their first 5 s.
             if(!LeftCell[i]||level.time<ReleasedAt[i]+175)continue;
             // Nearly home: nobody on the refuge doorstep is taken (stepping out to fetch someone used to loop).
@@ -721,7 +726,7 @@ class PDAgentic : EventHandler
     {
         if(!Released[i]||Camped&(1<<i)||Possessed[i]||!LeftCell[i]&&!(SafeMask&(1<<i))||InConstruct)return false;
         if(i==Guide&&!Introduced&&!(SafeMask&(1<<i)))return false;
-        return !(SafeMask&(1<<i))&&!PDAgenticMap.InRefuge(players[0].mo.Pos.XY);
+        return !((SafeMask|Homing)&(1<<i))&&!PDAgenticMap.InRefuge(players[0].mo.Pos.XY);
     }
     // The only teleport an escort ever makes: one left far behind (over 1024 u, out of your sight)
     // reappears just behind you where you cannot see it happen. Never into the Construct.
@@ -768,7 +773,11 @@ class PDAgentic : EventHandler
                     continue;
                 }
             }
-            if(!InConstruct&&!(SafeMask&(1<<i))&&level.time>=ReleasedAt[i]+140&&who.Distance2D(you)>1024&&!you.CheckSight(who))CatchUp(i);
+            // Brought nearly home, they go on in even if you turn back (not the guide before they lead you there). If one
+            // is ever stuck short of the door for 10 s out of your sight, they are put in their slot (CatchUp skips them).
+            if(!((SafeMask|Homing)&(1<<i))&&!(i==Guide&&!Introduced)&&NearRefuge(who.Pos.XY)){Homing|=1<<i;HomingAt[i]=level.time;}
+            if(Homing&(1<<i)&&!(SafeMask&(1<<i))&&level.time>HomingAt[i]+350&&!you.CheckSight(who)){Place(who,slot,0);SafeMask|=1<<i;}
+            if(!InConstruct&&!((SafeMask|Homing)&(1<<i))&&level.time>=ReleasedAt[i]+140&&who.Distance2D(you)>1024&&!you.CheckSight(who))CatchUp(i);
             if(i==Guide&&!Introduced&&!(SafeMask&(1<<i)))
             {
                 // The guide speaks first, then leads; it waits whenever you fall behind.
@@ -788,7 +797,8 @@ class PDAgentic : EventHandler
                 if(who.Distance2D(ahead)<(ahead==you?64:40))continue;
                 Walk(who,ahead.Pos.XY,speed,Routes[i]);
             }
-            else if(!InConstruct||SafeMask&(1<<i))Walk(who,slot,2.5,Routes[i]);
+            // Safe people amble to their slot; homing ones keep your pace, so they never visibly lag on the way in.
+            else if(!InConstruct||(SafeMask|Homing)&(1<<i))Walk(who,slot,SafeMask&(1<<i)?2.5:max(speed,3.5),Routes[i]);
             if(PDAgenticMap.InRefuge(who.Pos.XY))SafeMask|=1<<i;
         }
         // People pass through each other (one species): anyone standing inside someone else eases apart.
@@ -830,7 +840,7 @@ class PDAgentic : EventHandler
         if(Guide>=0&&!Introduced||InConstruct||CableHeld)return;
         // While someone follows you home, nobody calls through a wall: the escort's barks keep the box.
         bool escort=false;
-        for(int j=0;j<5;j++)if(Released[j]&&!(SafeMask&(1<<j))&&!(Camped&(1<<j)))escort=true;
+        for(int j=0;j<5;j++)if(Released[j]&&!((SafeMask|Homing)&(1<<j))&&!(Camped&(1<<j)))escort=true;
         for(int i=0;i<5;i++)
         {
             if(Called[i]||Released[i])continue;
@@ -1144,8 +1154,8 @@ class PDAgentic : EventHandler
         peopleJson=peopleJson.."]";
         String extra="";for(int i=0;i<5;i++)if(Puzzles[i])extra=extra..Puzzles[i].Json();
         bool smithSeen=Smith&&!InConstruct&&Smith.Alpha>.5&&you.CheckSight(Smith);
-        Console.Printf("PDOOM_AGENTIC {\"guide\":%d,\"introduced\":%d,\"all_safe\":%d,\"freed\":%d,\"safe\":%d,\"camped\":%d,\"possessed\":%d,\"pill\":%d,\"smith_x\":%.1f,\"smith_y\":%.1f,\"smith_z\":%.1f,\"smith_mode\":%d,\"smith_visible\":%d,\"smith_pace\":%.3f,\"smith_busy\":%d,\"todo\":\"%s\",\"in_construct\":%d,\"ending\":\"%s\",\"bridge_up\":%d,\"phone_ringing\":%d,\"door_camera\":%d,\"cameras_broken\":%d,\"cameras_total\":%d,\"alarm_count\":%d,\"spot_camera\":%d,\"hub_entry\":%d,\"site\":%d,\"exit_done\":%d%s}",
-            Guide,Introduced,AllSafe,FreedMask(),SafeMask,Camped,PossessedMask(),HasPill,Smith?Smith.Pos.X:0.,Smith?Smith.Pos.Y:0.,Smith?Smith.Pos.Z:0.,SmithMode,smithSeen,Pace(),Busy(),Clean(Todo),InConstruct,Ending(),
+        Console.Printf("PDOOM_AGENTIC {\"guide\":%d,\"introduced\":%d,\"all_safe\":%d,\"freed\":%d,\"safe\":%d,\"homing\":%d,\"camped\":%d,\"possessed\":%d,\"pill\":%d,\"smith_x\":%.1f,\"smith_y\":%.1f,\"smith_z\":%.1f,\"smith_mode\":%d,\"smith_visible\":%d,\"smith_pace\":%.3f,\"smith_busy\":%d,\"todo\":\"%s\",\"in_construct\":%d,\"ending\":\"%s\",\"bridge_up\":%d,\"phone_ringing\":%d,\"door_camera\":%d,\"cameras_broken\":%d,\"cameras_total\":%d,\"alarm_count\":%d,\"spot_camera\":%d,\"hub_entry\":%d,\"site\":%d,\"exit_done\":%d%s}",
+            Guide,Introduced,AllSafe,FreedMask(),SafeMask,Homing,Camped,PossessedMask(),HasPill,Smith?Smith.Pos.X:0.,Smith?Smith.Pos.Y:0.,Smith?Smith.Pos.Z:0.,SmithMode,smithSeen,Pace(),Busy(),Clean(Todo),InConstruct,Ending(),
             BridgeUp,PhoneRinging,DoorCameraState(),CamerasBroken,CamerasTotal(),AlarmCount,SpotCamera,HubEntry,DevSite,ExitDone,extra);
         let source=DialogueFrom;
         Console.Printf("PDOOM_DIALOGUE {\"speaker\":\"%s\",\"text\":\"%s\",\"remaining\":%d,\"serial\":%d,\"voice\":\"%s\",\"from\":%d,\"sx\":%.1f,\"sy\":%.1f,\"sz\":%.1f,\"seen\":%d}",

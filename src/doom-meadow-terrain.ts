@@ -66,13 +66,21 @@ export function makeMeadowTerrain():THREE.Mesh {
         // (the gaps only show between near leaves: by ~24 m the ground is the sward the
         // blades there converge on, so blades and ground share one value)
         vec3 col=mix(under,sward,smoothstep(3.,24.,d));
-        // SAFE MODE coming apart (doom-hub-traces.ts): cracks, and peeled patches showing the Grid underneath
+        // SAFE MODE coming apart (doom-hub-traces.ts): traces and cracks glowing in the ground, peeled patches showing the Grid
         float fw=max(max(fwidth(p.x),fwidth(p.y)),1e-4);
-        Tron tf=tronField(p,max(0.,log2(fw/.25)));
+        Tron tf=tronField(p,dFdx(p),dFdy(p),.02);
+        tronEdges(tf,fwidth(tf.tr)*.7+.004,fwidth(tf.cr)*.7+.004);
         col=mix(col,tronFloor(p,fw*1.5),tf.peel);
-        col=mix(col,TRON_FLOOR,max(tf.crack,tf.line)*.9);
+        // the Grid's dark floor shows in a groove a little wider than each core, and the wallpaper dims beside it, so the light has contrast
+        col=mix(col,TRON_FLOOR,max(smoothstep(.38,.62,tf.tr),smoothstep(.38,.62,tf.cr))*(1.-.7*tf.far)*.94);
+        col*=1.-.3*smoothstep(0.,.4,max(tf.tr,tf.cr));
+        // a tile about to go dims, its 4 m cell edge flickering (not a flat wash: that read as a debug square)
+        vec2 lq=abs(fract(p/4.)-.5)*4.;
+        float lEdge=tf.loose*tronFlicker(p)*(1.-smoothstep(.06,.06+fw*1.5,2.-max(lq.x,lq.y)));
+        col*=1.-.25*tf.loose;
         col=atmosphere(col,d);
-        col+=min(vec3(1.3),TRON_LINE*(tf.glow+tf.crack*.55+tf.loose*.25*tronFlicker(p))+TRON_CORE*tf.line*tf.glow*.4)*(1.-.6*atmosHaze(d));
+        // (OUT_GLSL's dusk tint is undone on the light: the Grid's glow stays bright as the wallpaper's drains)
+        col+=tronLight(tronEmit(tf)+TRON_LINE*lEdge*.8)*(1.-.6*atmosHaze(d))/mix(vec3(1.),TRON_DUSK,uDusk);
         gl_FragColor=meadowOut(col);
         #include <colorspace_fragment>
       }`});

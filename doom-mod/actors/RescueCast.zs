@@ -131,10 +131,47 @@ class PDRescueCast : Object play
         return true;
     }
 
+    // Freed people keep up (2026-10-19, Jonathan; levels 3-4 first, Factory.zs CatchUp): one left over 1024 units
+    // behind and out of your sight appears just behind you where you cannot see it happen. The only escort teleport,
+    // and only onto the human graph, out of crawls and away from an awake hunter.
+    bool CatchUp(PDCheckpoint game, PDRescuePerson p, Actor pawn)
+    {
+        let who=p.Body;Vector3 from=who.Pos;
+        for(int n=0;n<15;n++)
+        {
+            double a=pawn.Angle+180+(n%3-1)*35,reach=64+(n/3)*32;
+            Vector2 spot=pawn.Pos.XY+(cos(a),sin(a))*reach;int node=game.NodeAt(spot,true);
+            if(node<0||(PDCheckpointMap.Center(node)-spot).Length()>PDCheckpointMap.Step()||p.Nav.MaintenanceBlocked(game,node)||PDRescueRefuge.Inside(spot))continue;
+            if(game.Hunter&&game.Awake&&(game.Hunter.Pos.XY-spot).Length()<256||!who.CheckPosition(spot))continue;
+            let sec=level.PointInSector(spot);double z=sec.floorplane.ZatPoint(spot);
+            if(sec.ceilingplane.ZatPoint(spot)-z<who.Height)continue;
+            bool crowded=false;
+            for(int j=0;j<People.Size();j++)if(People[j]!=p&&People[j].Alive&&People[j].Body&&(People[j].Body.Pos.XY-spot).Length()<24)crowded=true;
+            if(crowded)continue;
+            who.SetOrigin((spot,z),false);
+            // Same room as you, nothing between: otherwise try the next spot.
+            if(who.CheckSight(pawn)&&abs(who.Pos.Z-pawn.Pos.Z)<=24){who.ClearInterpolation();p.Nav.Ready=false;p.Nav.HasWaypoint=false;return true;}
+            who.SetOrigin(from,false);
+        }
+        return false;
+    }
+
+    // Their own route search to your cell, under today's doors, bridge and locks, reached them: a warp
+    // only shortens a walk they could already make (never past Holly's bridge or a locked cell).
+    // Refreshed here, since Next only rebuilds it after a waypoint, and a snagged follower may never finish one.
+    bool Linked(PDCheckpoint game, PDRescuePerson p, Actor pawn)
+    {
+        int you=game.NodeAt(pawn.Pos.XY,true),at=game.NodeAt(p.Body.Pos.XY,true);
+        if(you<0||at<0)return false;
+        p.Nav.Build(game,pawn.Pos.XY,at);
+        return p.Nav.Goal==you&&!p.Nav.Stranded&&p.Nav.CostAt(at)>=0;
+    }
+
     void Tick(PDCheckpoint game)
     {
         if (game.Escape.Opened) return;
         let pawn = players[0].mo;
+        double pace=clamp(pawn.Vel.XY.Length()+.5,4.2,18); // Your pace up to running speed (2026-10-19), never under the old 4.2 walk.
         for (int i = 0; i < People.Size(); i++)
         {
             let p = People[i];
@@ -149,6 +186,9 @@ class PDRescueCast : Object play
                 Console.Printf("PDOOM_EVENT {\"type\":\"prisoner-clear\",\"id\":%d}", i + 1);
             }
             if (p.Avoid.Tick(game,p)) continue;
+            // Every 7 tics, cheap tests first, the route search last. Not the guide, who waits where you left it, nor while HAL holds a door shut.
+            if((level.time+i)%7==0&&p.Complete&&!p.Holding&&!p.Sheltered&&!p.RefugeArrival&&!game.Refuge.Guiding(i)&&level.time>=p.ReleasedAt+140&&p.Body.Distance2D(pawn)>1024&&
+                !PDRescueRefuge.Inside(pawn.Pos.XY)&&!(PDCampaignSession.Hal()&&game.Hal.Doors.LockIndex>=0&&level.time<game.Hal.Doors.LockExpires)&&!pawn.CheckSight(p.Body)&&Linked(game,p,pawn))CatchUp(game,p,pawn);
             if (p.Holding && (p.Body.Pos.XY - p.HoldGoal).Length() <= (p.PadDuty ? 6 : 32))
             {
                 PDRescueIdle.Tick(game, p);
@@ -181,13 +221,17 @@ class PDRescueCast : Object play
                 if (node >= 0)
                 {
                     Vector2 center = PDCheckpointMap.Center(node);
-                    if ((center - formation).Length() < 48) goal = center;
+                    // Only a slot with no wall between you (2026-10-30): one behind a wall routes them away, and at
+                    // 200 units they flip between that route and you and never arrive.
+                    Vector2 toSlot = center - pawn.Pos.XY;FLineTraceData wall;
+                    if ((center - formation).Length() < 48 && !pawn.LineTrace(atan2(toSlot.Y, toSlot.X), toSlot.Length(), 0, TRF_THRUACTORS, 28, data: wall)) goal = center;
                 }
             }
             bool moving = (goal - p.Body.Pos.XY).Length() > (p.PadDuty ? 6 : p.Sheltered ? 8 : 48);
             if (moving != p.Walking)
             { if (moving) p.Body.SetStateLabel('Walk'); else p.Body.SetStateLabel('Spawn'); p.Walking = moving; }
-            if (moving) game.MoveBody(p.Body, goal, 4.2, p.Nav, false, p.PadDuty ? 6 : p.Sheltered ? 8 : 40);
+            // Followers and the guide move at your pace; leaving a cell, refuge arrival and holding stay at 4.2.
+            if (moving) game.MoveBody(p.Body, goal, p.Complete && !p.Holding && !p.RefugeArrival ? pace : 4.2, p.Nav, false, p.PadDuty ? 6 : p.Sheltered ? 8 : 40);
             else PDRescueIdle.InPlace(p);
             if (!p.Holding)
             {

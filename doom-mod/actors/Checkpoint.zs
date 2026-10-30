@@ -410,7 +410,7 @@ class PDCheckpoint : EventHandler
             if (currentNode >= 0)
             {
                 Vector2 center = PDCheckpointMap.Center(currentNode) - body.Pos.XY;
-                if (center.Length() > 4) body.TryMove(body.Pos.XY + center / center.Length() * speed, 1);
+                if (center.Length() > 4) body.TryMove(body.Pos.XY + center / center.Length() * min(speed, center.Length()), 1); // No overshoot at running pace.
             }
         }
     }

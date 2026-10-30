@@ -4,7 +4,9 @@
 //    with the floppy handed over, everyone following and the south edge open. Walking south through the gate
 //    opens the endgame page (?m=finale), with the fixture's save in the URL.
 // 2. That page (reloaded with &auto=1, as a click would start it): the walk in, its three Recognizer beats (shot
-//    down by QA), the door opening once they're gone, and THE BOSS's intro once you're inside.
+//    down by QA), the door opening once they're gone, and THE BOSS's intro once you're inside. The tower is a data
+//    center (2026-10-30): its sign and turbines are up, its hum swells as you near it and the guide remarks on it,
+//    the far Recognizer never shoots, and nothing on the walk talks about tennis.
 // 3. A save marked done (endgame 2) loads (?play=1&load=1, the game's own handoff) into a meadow without the
 //    column, and doesn't start the meeting again.
 // 4. The fixture's finale, from its last part (&part=3, the trick shot steered by &autosteer=1) to black: a click
@@ -55,8 +57,12 @@ try{
  await page.goto(page.url()+'&auto=1');
  const eg=()=>page.evaluate(()=>window.__eg.state());
  s=await until(async()=>{const e=await page.evaluate(()=>window.__eg?.ready&&window.__eg.state());return e?.mode_state?.phase==='walk'&&e;},'the walk begins',60000);
- assert.ok(s.player.z>250,'you start far out on the Grid');assert.equal(s.mode_state.walk.door,false);
+ assert.ok(s.player.z>400,'you start far out on the Grid');assert.equal(s.mode_state.walk.door,false);
+ assert.ok(s.dc.sign&&s.dc.turbines===10&&s.dc.leds>800,`the data center is dressed (${JSON.stringify(s.dc)})`);
+ // every toast and hint the walk shows, to check nobody teaches tennis out here
+ await page.evaluate(()=>{window.__said=[];const keep=id=>{const e=document.getElementById(id);new MutationObserver(()=>window.__said.push(e.textContent)).observe(e,{childList:true,subtree:true,characterData:true});window.__said.push(e.textContent);};keep('toast');keep('hint');});
  await sleep(1500);await page.screenshot({path:`${out}/3-walk.png`});
+ assert.ok((await eg()).mode_state.walk.near<.4,'the hum is faint far out');
  // everyone in single file behind you
  const behind=await page.evaluate(()=>{const c=window.__eg.ctx,p=c.player.pos;return c.people.filter(q=>q.pos.z>p.z+2&&Math.abs(q.pos.x-p.x)<4).length;});
  assert.equal(behind,s.people,`the crowd follows behind you (${behind} of ${s.people})`);
@@ -66,15 +72,23 @@ try{
   await page.evaluate(z=>window.__eg.place(0,z),z);
   s=await until(async()=>{const e=await eg();return e.mode_state.walk.beat>=beat&&e.recs.length>0&&e;},`practice beat ${beat}`,45000);// each waits for the last one's lines
   if(beat===1){await sleep(2500);await page.screenshot({path:`${out}/4-recognizer.png`});}
+  // the far one only circles: it can never charge a shot
+  if(beat===2)assert.ok(await page.evaluate(()=>window.__eg.ctx.recs.filter(r=>r.alive&&r.style==='bolt').every(r=>r.fireCd===Infinity&&r.state!=='charge')),'the far one never charges');
   await shoot();
  }
+ s=await eg();assert.ok(s.mode_state.walk.heard.includes('walk-hum'),'the guide hears the data center on the way in');assert.equal(s.mode_state.shots,0,'nothing shoots on the walk');
+ await page.evaluate(()=>{window.__eg.place(0,200);window.__eg.lookAt(0,21,47);});await sleep(600);await page.screenshot({path:`${out}/3-sign.png`});
  await page.evaluate(()=>window.__eg.place(0,58));
  s=await until(async()=>{const e=await eg();return e.mode_state.walk.door&&e;},'the door opens once the way is clear and everyone has had their say',60000);
+ assert.ok(s.mode_state.walk.near>.95,'the noise pours out of the open door');
  await page.evaluate(()=>window.__eg.lookAt(0,4,0));await sleep(1800);await page.screenshot({path:`${out}/5-door.png`});
  await page.evaluate(()=>window.__eg.place(0,40));
  s=await until(async()=>{const e=await eg();return e.mode_state.phase==='intro'&&e;},'inside: THE BOSS wakes',20000);
- assert.equal(s.mode_state.walk.on,false);assert.equal(s.people,20,"the fixture's save: everyone came");
- report.cases.push('Finale page: the walk in, three Recognizer beats, the door opens once they are down, THE BOSS intro inside');
+ assert.equal(s.mode_state.walk.on,false);assert.equal(s.people,20,"the fixture's save: everyone came");assert.equal(s.dc.sign,false,'the sign is outside only');
+ const shown=await page.evaluate(()=>window.__said);
+ assert.ok(shown.some(t=>/data center/i.test(t)),'the hum line is said');
+ const tennis=shown.filter(t=>/tennis|hit it back|swing|send it/i.test(t));assert.deepEqual(tennis,[],'nothing on the walk teaches tennis');
+ report.cases.push('Finale page: the walk in past the data center (sign, turbines, the hum line), three Recognizer beats with no tennis, the door opens once they are down, THE BOSS intro inside');
 
  // 3. back to the meadow after it
  await page.evaluate(()=>localStorage.setItem('pdoom.campaign.v1',JSON.stringify({version:1,ceo:'altman',hub:true,saved0:31,saved1:31,saved2:31,saved3:31,lost0:0,lost1:0,lost2:0,lost3:0,following0:0,following1:0,following2:0,following3:0,ending3:0,endgame:2})));

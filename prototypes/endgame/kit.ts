@@ -17,6 +17,8 @@ export const rand=(a:number,b:number)=>a+Math.random()*(b-a);
 export const clamp=THREE.MathUtils.clamp;
 export const bearingOf=(p:{x:number;z:number})=>Math.atan2(p.z,p.x);
 export const PILLARS=Array.from({length:8},(_,i)=>{const a=(i*45+22.5)*Math.PI/180;return {x:Math.cos(a)*ARENA.pillarR,z:Math.sin(a)*ARENA.pillarR};});
+// the data center's gas turbines (datacenter.ts), two rows either side of the walk's approach, outside its |x| 18
+export const TURBINES=Array.from({length:10},(_,i)=>({x:(i%2?1:-1)*(26+((i>>1)%2)*3),z:54+(i>>1)*12}));
 
 function lines(geo:THREE.BufferGeometry,color:string,opacity=1){
  return new THREE.LineSegments(new THREE.EdgesGeometry(geo,20),new THREE.LineBasicMaterial({color,transparent:opacity<1,opacity}));
@@ -48,7 +50,8 @@ export function makeStage(canvas:HTMLCanvasElement,{door=false}={}){
  const pitLight=new THREE.PointLight(PAL.enemy,260,70,1.5);pitLight.position.set(0,4,0);scene.add(pitLight);
 
  // The floor: black with a cyan grid, 4 m minor and 16 m major lines on world x/z (the hub's traces land on them).
- const floor=new THREE.Mesh(new THREE.PlaneGeometry(600,600).rotateX(-Math.PI/2),new THREE.ShaderMaterial({
+ // 1200 m across, so the walk in (WALK.far) starts on it
+ const floor=new THREE.Mesh(new THREE.PlaneGeometry(1200,1200).rotateX(-Math.PI/2),new THREE.ShaderMaterial({
   uniforms:{uLine:{value:new THREE.Color(PAL.line)},uBase:{value:new THREE.Color(PAL.floor)},uPit:{value:new THREE.Color(PAL.enemy)},uR:{value:ARENA.radius},uPitGlow:{value:1}},
   vertexShader:'varying vec3 vW;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
   fragmentShader:`uniform vec3 uLine,uBase,uPit;uniform float uR,uPitGlow;varying vec3 vW;
@@ -71,8 +74,9 @@ export function makeStage(canvas:HTMLCanvasElement,{door=false}={}){
  scene.add(new THREE.Mesh(around(R-.05,.12,1.3),new THREE.MeshBasicMaterial({color:PAL.line,side:door?THREE.DoubleSide:THREE.BackSide})));
  const ribs:THREE.Vector3[]=[];for(let i=0;i<72;i++){const a=i/72*TAU;ribs.push(new THREE.Vector3(Math.cos(a)*(R-.03),0,Math.sin(a)*(R-.03)),new THREE.Vector3(Math.cos(a)*(R-.03),H,Math.sin(a)*(R-.03)));}
  scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ribs),new THREE.LineBasicMaterial({color:PAL.line,transparent:true,opacity:.18})));
- // Eight data pillars (cover), the dais round the pit, and Mars: a red dot high in the void.
- for(const p of PILLARS){const s=ARENA.pillarSize*1.45,pillar=edged(new THREE.BoxGeometry(s,ARENA.pillarH,s).translate(0,ARENA.pillarH/2,0),0x050c12,PAL.line,.55);pillar.position.set(p.x,0,p.z);pillar.rotation.y=-Math.atan2(p.z,p.x);scene.add(pillar);}
+ // Eight data pillars (cover; server racks, datacenter.ts), the dais round the pit, and Mars: a red dot high in the void.
+ const pillars:THREE.Group[]=[];
+ for(const p of PILLARS){const s=ARENA.pillarSize*1.45,pillar=edged(new THREE.BoxGeometry(s,ARENA.pillarH,s).translate(0,ARENA.pillarH/2,0),0x050c12,PAL.line,.55);pillar.position.set(p.x,0,p.z);pillar.rotation.y=-Math.atan2(p.z,p.x);scene.add(pillar);pillars.push(pillar);}
  const dais=new THREE.Mesh(new THREE.CylinderGeometry(ARENA.block-.5,ARENA.block,.5,96).translate(0,.25,0),new THREE.MeshBasicMaterial({color:0x07040a}));scene.add(dais);
  scene.add(ring(ARENA.block-.5,.52,PAL.enemy),ring(ARENA.block,.02,PAL.enemy));
  const mars=glowSprite(PAL.enemy,26);mars.position.set(-60,320,-620);scene.add(mars);
@@ -83,15 +87,17 @@ export function makeStage(canvas:HTMLCanvasElement,{door=false}={}){
   doorSlab=edged(new THREE.BoxGeometry(DOOR_HALF*2,H,.4).translate(0,H/2,0),0x03090e,PAL.core,.9);doorSlab.position.set(0,0,R);scene.add(doorSlab);
   for(const x of [-DOOR_HALF,DOOR_HALF]){const jamb=new THREE.Mesh(new THREE.BoxGeometry(.3,H,.6),new THREE.MeshBasicMaterial({color:PAL.line}));jamb.position.set(x,H/2,Math.sqrt(R*R-x*x));scene.add(jamb);}
  }
- return {renderer,scene,camera,composer,pitLight,floor,render:()=>composer.render(),
+ return {renderer,scene,camera,composer,pitLight,floor,pillars,render:()=>composer.render(),
   openDoor(k:number){if(doorSlab)doorSlab.position.y=THREE.MathUtils.clamp(k,0,1)*(H-.4);}};
 }
 export type Stage=ReturnType<typeof makeStage>;
 
+// requestPointerLock can reject (the page is navigating away, the user pressed Esc): nothing to do, the next click retries.
+export function lock(canvas:HTMLCanvasElement){try{(canvas.requestPointerLock?.() as unknown as Promise<void>|undefined)?.catch?.(()=>{});}catch{/* no pointer lock here */}}
 export function makeInput(canvas:HTMLCanvasElement){
  const keys=new Set<string>(),state={yaw:0,pitch:0,locked:false};
  const press:((b:number)=>void)[]=[],key:((c:string)=>void)[]=[];
- canvas.addEventListener('mousedown',e=>{if(!state.locked){canvas.requestPointerLock?.();return;}press.forEach(f=>f(e.button));});
+ canvas.addEventListener('mousedown',e=>{if(!state.locked){lock(canvas);return;}press.forEach(f=>f(e.button));});
  canvas.addEventListener('contextmenu',e=>e.preventDefault());
  document.addEventListener('pointerlockchange',()=>{state.locked=document.pointerLockElement===canvas;});
  document.addEventListener('mousemove',e=>{if(!state.locked)return;state.yaw-=e.movementX*.0022;state.pitch=clamp(state.pitch-e.movementY*.0022,-1.25,1.25);});
@@ -104,7 +110,7 @@ export type Input=ReturnType<typeof makeInput>;
 // Keeps a walker on the arena floor: inside the wall, outside the dais, out of the pillars.
 // The walk in (?m=finale, docs/ENDGAME.md E4-E5): outside the wall there's a corridor running north from the
 // door, which sits on the wall at +z (DOOR_HALF either side of x 0); the wall is solid until the door opens.
-export const WALK={on:false,door:false,far:420};
+export const WALK={on:false,door:false,far:450};// 450 since 2026-10-30, to fit the hum line
 export const DOOR_HALF=3.4;
 export function resolve(p:THREE.Vector3,rad:number){
  const r=Math.hypot(p.x,p.z),max=ARENA.radius-.6-rad,min=ARENA.block+rad;
@@ -168,7 +174,7 @@ export type Hud=ReturnType<typeof makeHud>;
 
 // Original synth sounds, quiet, and Doom's own tracks for THE BOSS; M mutes. Nothing plays until the first click.
 // A sound given a place (`at`) is heard from there. Two kinds run all the time: the arena's own noise, the
-// inside of a computer (bed), and each ship's engine (engine).
+// inside of a data center (bed), and each ship's engine (engine).
 export type Engine={move(p:THREE.Vector3,charge:number,dt:number):void;stop(dying:boolean):void};
 export function makeSfx(){
  let ctx:AudioContext|null=null,master:GainNode|null=null,muted=new URLSearchParams(location.search).has('mute');
@@ -206,8 +212,8 @@ export function makeSfx(){
   o.connect(m1).connect(g);o.connect(m2).connect(g);g.connect(out??master);o.start(t);o.stop(t+.2);noise(.05,vol*.25,f0*3,1.2,0,delay);
  }
  // a panner at a place in the arena; `ref` is how far off it's heard at full strength
- function panner(at:{x:number;y:number;z:number},ref:number,to:AudioNode){
-  const n=ctx!.createPanner();n.panningModel='HRTF';n.distanceModel='inverse';n.refDistance=ref;n.rolloffFactor=1;
+ function panner(at:{x:number;y:number;z:number},ref:number,to:AudioNode,model:PanningModelType='HRTF'){
+  const n=ctx!.createPanner();n.panningModel=model;n.distanceModel='inverse';n.refDistance=ref;n.rolloffFactor=1;
   n.positionX.value=at.x;n.positionY.value=at.y;n.positionZ.value=at.z;n.connect(to);return n;
  }
  // what f() plays, heard from `at` (or from everywhere, without one)
@@ -240,12 +246,13 @@ export function makeSfx(){
   s.connect(g).connect(out??master);s.start(ctx.currentTime+delay);return true;
  }
 
- // The arena is the inside of a computer: mains hum, the roar of the room's air, a fan in each pillar,
+ // The arena is the inside of a data center: mains hum, the roar of the room's air, a fan in each pillar,
  // each drifting in speed, and now and then a hard disk seeking in one of them. ?bed=0 leaves it out.
- let bedBus:GainNode|null=null,seekAt=0,seekBuf:AudioBuffer|null=null;const spin:OscillatorNode[]=[],fanBands:BiquadFilterNode[]=[],fanPans:PannerNode[]=[];
+ // On the walk in it swells as you get nearer (near()), and pours out when the door opens (2026-10-30).
+ let bedBus:GainNode|null=null,turbBus:GainNode|null=null,nearK=1,seekAt=0,seekBuf:AudioBuffer|null=null;const spin:OscillatorNode[]=[],fanBands:BiquadFilterNode[]=[],fanPans:PannerNode[]=[];
  function bed(){
-  const c=ctx!;if(new URLSearchParams(location.search).get('bed')==='0')return;
-  bedBus=c.createGain();bedBus.connect(master!);
+  const c=ctx!,q=new URLSearchParams(location.search);if(q.get('bed')==='0')return;
+  bedBus=c.createGain();bedBus.gain.value=nearK;bedBus.connect(master!);
   const hum=c.createGain();hum.connect(bedBus);wobble(hum.gain,.13,.15);
   for(const [hz,v] of [[60,.012],[120,.03],[180,.01],[240,.008],[360,.004]]){const o=c.createOscillator(),g=c.createGain();o.frequency.value=hz;g.gain.value=v;o.connect(g).connect(hum);o.start();spin.push(o);}
   const lp=c.createBiquadFilter(),air=c.createGain();lp.type='lowpass';lp.frequency.value=190;air.gain.value=.4;hiss().connect(lp).connect(air).connect(bedBus);fanBands.push(lp);
@@ -258,6 +265,15 @@ export function makeSfx(){
   }
   const n=Math.floor(c.sampleRate*.012),d=(seekBuf=c.createBuffer(1,n,c.sampleRate)).getChannelData(0);
   for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(n/6))+Math.sin(i/c.sampleRate*TAU*2900)*Math.exp(-i/(n/3))*.5;
+  // the finale's gas turbines outside (TURBINES): a roar and a whine from each row, on a bus of their own that near() leaves alone
+  if(q.get('m')!=='finale')return;
+  turbBus=c.createGain();turbBus.connect(master!);
+  for(const side of [-1,1]){
+   const pan=panner({x:side*27.5,y:2.1,z:78},18,turbBus,'equalpower'),lp=c.createBiquadFilter(),rg=c.createGain(),bp=c.createBiquadFilter(),wg=c.createGain();
+   lp.type='lowpass';lp.frequency.value=160;rg.gain.value=.3;hiss().connect(lp).connect(rg).connect(pan);
+   bp.type='bandpass';bp.frequency.value=3200;bp.Q.value=6;wg.gain.value=.04;hiss().connect(bp).connect(wg).connect(pan);wobble(bp.frequency,rand(.05,.1),90);
+   fanBands.push(lp,bp);
+  }
  }
  // a hard disk seeking: a little run of clicks from one of the pillars
  function seek(){
@@ -268,7 +284,7 @@ export function makeSfx(){
  function powerDown(sec:number){
   if(!ctx||!bedBus)return;const t=ctx.currentTime;
   for(const o of spin)o.detune.setTargetAtTime(-2400,t,sec/3);for(const f of fanBands)f.frequency.setTargetAtTime(60,t,sec/3);
-  bedBus.gain.setTargetAtTime(0,t+sec*.35,sec/5);seekAt=Infinity;
+  bedBus.gain.setTargetAtTime(0,t+sec*.35,sec/5);turbBus?.gain.setTargetAtTime(0,t+sec*.35,sec/5);seekAt=Infinity;
  }
 
  // A ship's engine: detuned saws growling through a resonant filter that throbs, a rumble under it, and a
@@ -356,6 +372,8 @@ export function makeSfx(){
   },
   toggle(){muted=!muted;if(master)master.gain.value=muted?0:.55;if(songBus)songBus.gain.value=muted?0:1;return muted;},get muted(){return muted;},
   get track(){return want;},
+  // how much of the bed you hear, 0..1 (the walk in turns it up as you near the door)
+  near(k:number){nearK=k;if(ctx&&bedBus)bedBus.gain.setTargetAtTime(k,ctx.currentTime,.4);},get nearness(){return nearK;},
   // which effects have recorded takes loaded
   get recorded(){return [...clips].filter(([,t])=>t.length).map(([n])=>n);},
   duck(on:boolean){if(ctx&&duckBus)duckBus.gain.setTargetAtTime(on?.6:1,ctx.currentTime,.15);},

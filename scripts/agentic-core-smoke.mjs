@@ -215,9 +215,11 @@ try{
  await session('hub',async({page,read,wait,command,shot,detail})=>{
   const before=(await read()).world.ticks;
   await command('netevent pdoom_enter_agentic');
-  // An open console can swallow main.js's F4 hold release on the map change; send it again once closed.
-  await page.waitForTimeout(1500);await page.evaluate(()=>{for(const evType of ['keydown','keyup'])window.__QA_WORKER__.postMessage({type:'input',target:'window',evType,init:{code:'F4',key:'F4',keyCode:115,which:115,bubbles:true,cancelable:true}});});
-  const s=await wait(s=>s.agentic?.hub_entry===1&&s.world.ticks<before+400&&dist(here(s),map.hub)<24,'Walked in from AGENTIC.BAT',20000);
+  // An open console can swallow main.js's F4 hold release on the map change, and a slow load can outlast one resend:
+  // keep releasing (F4 = netevent pdoom_ready, harmless once released) until the new map has applied its hub entry.
+  const f4=()=>page.evaluate(()=>{for(const evType of ['keydown','keyup'])window.__QA_WORKER__.postMessage({type:'input',target:'window',evType,init:{code:'F4',key:'F4',keyCode:115,which:115,bubbles:true,cancelable:true}});});
+  for(const end=Date.now()+30000;Date.now()<end;){const t=await read();if(t.agentic?.hub_entry===1&&t.world.wrench===1)break;if(t.agentic?.hub_entry===1)await f4();await page.waitForTimeout(500);}
+  const s=await wait(s=>s.agentic?.hub_entry===1&&s.world.wrench===1&&s.world.ticks<1400&&dist(here(s),map.hub)<24,'Walked in from AGENTIC.BAT',20000);
   assert.equal(s.world.wrench,1);assert.equal(s.agentic.bridge_up,1);assert.equal(s.world.gun,0);
   detail.hub={at:here(s),angle:s.world.angle,smith_mode:s.agentic.smith_mode};await shot('hub-entry');
  });

@@ -157,6 +157,14 @@ they hold their refuge slot and wander locally. The approach trigger never
 captures people through surrounding walls. The ending cannot seal the refuge
 until the player is inside too.
 
+Freed people keep up here too (2026-10-30, shared with level 1 in
+`PDRescueCast`): they move at your pace, and one left over 1024 units behind and
+out of sight catches up behind you. Not while HAL holds a corridor door shut,
+and only if their route to you is open (see LEVEL-01.md). During the reboot
+blackout the doors fail open, so a group you run ahead of catches up on the way
+to the exit (`scripts/hal-exit-smoke.mjs`).
+`node scripts/escort-keepup-smoke.mjs` checks both maps.
+
 The opening story is remembered per browser and skipped on subsequent visits,
 including switching CEOs. Existing saved SAFE MODE campaigns also skip it.
 
