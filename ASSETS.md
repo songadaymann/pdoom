@@ -274,3 +274,61 @@ and Elon across the sky) came in the same batch folder as the fight's takes,
 same synthetic voices; all 33 matched their words on its final check). The meadow lines are imported
 into `doom-web/outside-assets/voice/` by `scripts/import-guide-voices.py --endgame`, and the walk and
 Elon lines into ignored `doom-web/local/endgame/voice/` by `scripts/import-endgame-assets.mjs`.
+
+### MCP boss asset batch, 2026-10-26
+
+The local, ignored `art/endgame-2026-10-26/` batch contains generated boss sprite
+sheets and synthetic Breeze voice takes, with source brief, prompts, recovered
+voice IDs, wording changes and QA records. It has not been imported or published.
+The MCP portrait used [Elon Musk Royal Society (crop1)](https://commons.wikimedia.org/wiki/File:Elon_Musk_Royal_Society_(crop1).jpg),
+credited to The Royal Society under CC BY-SA 3.0 on its source page, as a likeness
+reference. The generated portrait is a pixel caricature. Existing project mugshots
+and cast/prop atlases supplied style references. Photograph, likeness and model/output
+rights remain separate from the project's original-media grant.
+
+Jonathan explicitly requested deterministic finishing of the three MCP face sheets.
+The selected PNGs use the seven specified colors and 48×56 cells; mouth/eye frames
+retain the common base face outside fixed feature masks. Original generator output
+is preserved under the batch's `originals/`, with hashes, processing details and
+palette/pixel-invariance verification beside it. No game import was performed.
+
+
+### MCP ending additions and combat delivery, 2026-10-27
+
+The same local batch now contains 55 sprite sheets and 412 WAV takes. The 22 separate
+front-facing stare poses match existing cast atlases, and `wasteland-props.png` follows
+the supplied five-cell prompt using the factory prop lineup as a style reference.
+Prompts, generator provenance and cell-boundary checks remain in the batch.
+277 guide/prisoner combat takes were regenerated with projected shouted delivery;
+old takes are archived. Both founders have all 30 guide beats. The four ending takes
+include the exact quiet shareholder lines and processed accelerating/cutoff meltdown
+lines, with wording and PCM checks. The batch was imported into the local endgame
+prototype checkout; stares and wasteland props are provided for later wiring.
+
+The additional `floppy-hand-bat.png` single-frame sprite was generated with the built-in
+image tool from the existing floppy-hands atlas, retaining the cyan disk in the
+extended hand for batting energy balls. Prompt and source provenance are in the batch.
+
+### Level 4 exit and tower walk voice additions, 2026-10-28
+
+The existing local endgame batch includes 33 additional synthetic Breeze takes
+using its saved Dario, Sam and Elon profiles: fifteen per guide and three MCP lines.
+Exact supplied wording, delivery instructions and the October 28 source brief are
+preserved beside the batch. The two meadow calls are shouted; the other guide
+lines use urgent spoken delivery. Wording/PCM verification and a separate subset
+manifest accompany the WAVs. Game wiring and the Take cue remain for the caller.
+
+### Prisoner reference cutouts, 2026-10-30
+
+Twenty-one photographs of the twenty roster prisoners were downloaded for likeness
+reference and cut out to transparent PNGs with macOS Vision subject masking. Holly
+Elmore has two. Twelve come from Wikimedia Commons under CC0, public domain, CC BY
+or CC BY-SA. Nine come from official organisation, company or channel pages with no
+stated licence. Sources, cutouts, per-image page and image URLs, licences, authors,
+crops and checksums remain in ignored `private-assets/prisoner-photos/`. They are not
+packaged, and no rights to the photographs or likenesses are asserted.
+
+October 30 walk additions: `guide-mario-end-keep`, `guide-samwise-end-keep`,
+`guide-mario-end-hum`, and `guide-samwise-end-hum` use the same saved Breeze
+profiles and exact supplied text. All four passed transcription and PCM checks.
+Source brief and subset manifest are in the existing endgame batch.
