@@ -37,3 +37,10 @@ normal progression and Load Game. The fixture is available only on loopback with
 `dev-config.enabled: true`.
 
 Local verification reports are ignored under `output/playtest/canonical/` and `output/playtest/canonical-shell/`.
+
+## Level 4 and the endgame released 2026-11-03
+
+- Game `mann-cool-pdoom` version `b14ef678-9892-4a81-9fca-7dbd6facaceb` from `main` (`02baae3`, the `claude/endgame-hookup` work merged with main and the one-row leaderboard tabs fix). AGENTIC.BAT's door opens for everyone: level 4, AGENTIC SMITH's Pod Farm (E2M2), unscored, with its voice takes, music, HUD images and the five captives' meadow figures. SAFE MODE changes after each level. When all twenty are resolved, the meadow's gate leads to the endgame page (`endgame-proto/play.html?m=finale`: the walk, the MCP fight, the wasteland) and back to the meadow. The live pk3 is byte-identical to the local build.
+- No central Worker change: level 4 has no board yet, so the shell keeps three level tabs. The episode menu's fourth entry still reads COMING SOON; level 4 is reached through SAFE MODE.
+- Before deploy (local): hub-future (now checking the open door), endgame-hookup, safe-mode-stages, factory-hub, campaign, onboarding, agentic core and playthrough, and the Tallinn, Bostrom, Kokotajlo and Bengio rescues passed. Grace passed 11 of 12; its `guide` case (the `katja-hint` take is heard after the guide is introduced) passed 1 of 3 reruns. Her line triggers every time; the voice take sometimes isn't heard in the test's window.
+- Live checks: canonical host smoke, canonical shell smoke (desktop, phone, tablet), the hub smoke against mann.cool (AGENTIC.BAT enters, its phone rings), a Load Game into SAFE MODE with three levels cleared that walks into AGENTIC.BAT and boots E2M2, and the endgame page under `/pdoom/` with no failed requests. No score submissions, guestbook posts or email requests were made.

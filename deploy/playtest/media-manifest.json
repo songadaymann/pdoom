@@ -1,5 +1,2330 @@
 [
   {
+    "file": "local/endgame/sfx/bark-1000-0.mp3",
+    "bytes": 4746,
+    "sha256": "bd03ecd31694ef99aadd214570699a0459e155a60a99ca8849011e33ad725790"
+  },
+  {
+    "file": "local/endgame/sfx/bark-1000-3.mp3",
+    "bytes": 10075,
+    "sha256": "c49d8efa4d80b6340a963991523b5b05aaa68c4680a73b40449e64afe7da33b4"
+  },
+  {
+    "file": "local/endgame/sfx/bark-1005-0.mp3",
+    "bytes": 14777,
+    "sha256": "8acdd4f43b1abca89917cbaa7fe460bd6626fe9c35c5113b8916194a6f896fc9"
+  },
+  {
+    "file": "local/endgame/sfx/bark-1005-2.mp3",
+    "bytes": 13523,
+    "sha256": "e864e62e8607521dc70b9bafc26ad496563b5dbd67d0c7cd624ede4d7a707905"
+  },
+  {
+    "file": "local/endgame/sfx/bark-1005-3.mp3",
+    "bytes": 10702,
+    "sha256": "1f18d9b80a9aacb389fd26e36291d4facf2ffdea4b8d7b84ee6607392d5bd249"
+  },
+  {
+    "file": "local/endgame/sfx/bark-1005-4.mp3",
+    "bytes": 9448,
+    "sha256": "5329505a77f54ac3ea37031c4da28598e6d913fcbd2f30e570cfebf4af59f150"
+  },
+  {
+    "file": "local/endgame/sfx/blast-1000-1.mp3",
+    "bytes": 84680,
+    "sha256": "e4119697e9158d746d09a0a9e3dcff069229297691bbc25fc3086d85f04c966b"
+  },
+  {
+    "file": "local/endgame/sfx/blast-1000-2.mp3",
+    "bytes": 84680,
+    "sha256": "a4276369920cd12b461e6bf06310e2303285693c927edee039bf9d7497f84588"
+  },
+  {
+    "file": "local/endgame/sfx/rocket-1000-1.mp3",
+    "bytes": 36719,
+    "sha256": "a79cd6c3e3f7a857b9a2ba14a6140baa2de97c618f0cdbcd8bf2ca8f34bf7c62"
+  },
+  {
+    "file": "local/endgame/sfx/rocket-1000-2.mp3",
+    "bytes": 36719,
+    "sha256": "e7aacdf86e691e1c3190ab2b400a7e76cf1c0143c0f79ce525c7a173bcbcb035"
+  },
+  {
+    "file": "local/endgame/sfx/sink-1000-0.mp3",
+    "bytes": 25748,
+    "sha256": "a3387561fdd94d491c9ae53cb3253b6f2dbeb177a0b07ae9cea066a6b3a6ab24"
+  },
+  {
+    "file": "local/endgame/sfx/sink-1000-1.mp3",
+    "bytes": 16030,
+    "sha256": "2418d281be45a4a95c6796f6f442901bc56642b12f9655206adc6fd5766c3cc4"
+  },
+  {
+    "file": "local/endgame/sfx/sink-1005-0.mp3",
+    "bytes": 12896,
+    "sha256": "193c1567bd6b4a2fd7c423c2bfbd24cbf00ee70974ee036840bd6518bf43d757"
+  },
+  {
+    "file": "local/endgame/sfx/yelp-1000-0.mp3",
+    "bytes": 5373,
+    "sha256": "8e6608b17cb8498643742dacd431dc19106a2391010e862d75b05d1693acb032"
+  },
+  {
+    "file": "local/endgame/sfx/yelp-1000-1.mp3",
+    "bytes": 5059,
+    "sha256": "7a7b4464c7be60b893cda25978c568dce836d8bcb4efaffd3c828bf2a2e7bb9e"
+  },
+  {
+    "file": "local/endgame/sfx/yelp-1000-4.mp3",
+    "bytes": 9448,
+    "sha256": "a66a80aa1d026b4a9ebf79a0f4c73e3d1605d7f791af91b95cf7796c79ad4ab3"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-crowd-absorbed.mp3",
+    "bytes": 21986,
+    "sha256": "8fc0d6c04a3b7867a2cb15835a91b319e35181c1ab82717c0201c409db0fe1e3"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-crowd-carried.mp3",
+    "bytes": 32958,
+    "sha256": "aade2f91bb7c4319d51fd3d0d2d324baad9e7108ea56e66a158ed615d5478da7"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-crowd-freed.mp3",
+    "bytes": 35779,
+    "sha256": "4d67ad3e9df27d517cd211a223f9cab4a22cad5a5ed6d9ed8a4ed7d2ae01d577"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-crowd-go.mp3",
+    "bytes": 26688,
+    "sha256": "a3fe488eb33fdbd79bb4efea75d9f5a68f3234e76012e7eb895466a21416fa5f"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-crowd-goodboy.mp3",
+    "bytes": 28569,
+    "sha256": "c7097482ab121a6f72cd5391379f41568d3b5508f3080ed79cd712a27e668628"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-crowd-hit-1.mp3",
+    "bytes": 21359,
+    "sha256": "97c5ea449427e123d3c5ca747d77b20f46567c0473017880dcac9233f04b1f17"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-crowd-hit-2.mp3",
+    "bytes": 26688,
+    "sha256": "9424dffffb085bc36e2adddb0ed9bfed155ecefb7b3664afa1bfd3b70c37d955"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-crowd-now.mp3",
+    "bytes": 19165,
+    "sha256": "8335e89ad2c1876e3ce7ef00d2c012d58e70ab1eb365c911b923808a0a4a772c"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-crowd-swing.mp3",
+    "bytes": 10388,
+    "sha256": "9b075371e9ad3eb27023f83a7cd97bf4de6145e633d4891ac770746372ba610a"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-crowd-throw.mp3",
+    "bytes": 10388,
+    "sha256": "f7d12257d0aec11d4710ccd67f4632635414f0573841bf8d55a0c5423c5e5309"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-crowd-warn.mp3",
+    "bytes": 21046,
+    "sha256": "03a99efe9a78e91a1b5f660c692a515a246106210813bb1f69ace720d3d19ff1"
+  },
+  {
+    "file": "local/endgame/voice/ajeya-fight.mp3",
+    "bytes": 36406,
+    "sha256": "3ab0f31bc3f7357b3c7f7a2ad5ea37a01f7fa9349b9b79dadc5abc7ee45f5728"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-absorbed.mp3",
+    "bytes": 26688,
+    "sha256": "d168480cd9bbeeac4d2e9501fc2594c2ab3067a27c8ecc6d11af5f8415078683"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-carried.mp3",
+    "bytes": 37346,
+    "sha256": "8b67620bd199ff3117d4d0853018082b957e17a5e67266e8ce7b2ed56a921fbe"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-dog.mp3",
+    "bytes": 21046,
+    "sha256": "ce89a533ec0c561fe944930b274631528947962dceaba14c8bbda20d2a8c4e7a"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-freed.mp3",
+    "bytes": 42989,
+    "sha256": "a1c2f2623dd1f11f934fbf8563ab224709e5e58003f0a506d39861f07a3b96b2"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-hit-1.mp3",
+    "bytes": 15404,
+    "sha256": "01d010de193ff62cfc2984c85504178e55e30ad6401a253f24fd78fafc589e50"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-hit-2.mp3",
+    "bytes": 16344,
+    "sha256": "ceb70d628f110a5b27c63e5144a105bd4896b57867b1459f8a48b98203009e10"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-hit-it.mp3",
+    "bytes": 24808,
+    "sha256": "cacb91a61351ed4b78a2661ffc043c2aa622154d83c4debb7e77ba8051f0b2db"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-over.mp3",
+    "bytes": 23554,
+    "sha256": "3fcd1a0dff03b706dcbaddb0f01b5cb0cb528c10f4c68e8428bccff831c77a45"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-swing.mp3",
+    "bytes": 11642,
+    "sha256": "8cef62d57ac63c72c2b188b3679351fc3a9f54c4627beed566881f3c214511e4"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-thanks.mp3",
+    "bytes": 24181,
+    "sha256": "d23bb0e0c5abbce3b53d4b5fc090aa9f0756d71b7443efb0746dfb7c237f27a9"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-throw.mp3",
+    "bytes": 7567,
+    "sha256": "c84d18fb4842f362de3ae5d1112b84fadd6a28d52da4d753efc1e788af16afe5"
+  },
+  {
+    "file": "local/endgame/voice/beth-crowd-warn.mp3",
+    "bytes": 10702,
+    "sha256": "6d428a2f3350cbb1ac821df19b7d14016de794fcec20e524e1cf30c9c55932fa"
+  },
+  {
+    "file": "local/endgame/voice/beth-fight.mp3",
+    "bytes": 56468,
+    "sha256": "0db0dda3930cb862c2c2581a8514433f9057b838a935f6ac25e62ed7a751c472"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-absorbed.mp3",
+    "bytes": 20106,
+    "sha256": "a9af0e65a351683fcd8058cb36ed4fb071cdb89a8a02fcf5ac5712d63730f78c"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-behind.mp3",
+    "bytes": 13836,
+    "sha256": "457a59a5e26fcbf7fca618fe676c7344c2049ea5a99e8ea98515382b81724843"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-carried.mp3",
+    "bytes": 32017,
+    "sha256": "54e7efc58f9ee5f3af5ab20b3abe96e8a9e8d0851e939567ab20bce22d734fdf"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-freed.mp3",
+    "bytes": 40168,
+    "sha256": "6edfefbb7144bdea1c665d9077555f34a98edb980414bbf13b21bb0ab0b72388"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-hit-1.mp3",
+    "bytes": 15090,
+    "sha256": "c3f6b550484fa26246a4720d069e1d1b167decfe7429c8885e58733a7a899b29"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-hit-2.mp3",
+    "bytes": 20419,
+    "sha256": "b331df3aa352a0268ac1e62c2c19115603e186bef6bfd2c966bde133d4e31e96"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-putdown.mp3",
+    "bytes": 27942,
+    "sha256": "9a7cf1474ab0adf12dda3980adae745e0d9a9c4a0b9974633049309368709844"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-return.mp3",
+    "bytes": 16344,
+    "sha256": "66f80bc976189adea4c6fae83e0ca7c6d1c41d3ef9b15cfe55e323377c68a23a"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-swing.mp3",
+    "bytes": 9761,
+    "sha256": "1ec98f4b74923b05b8fc9eda4432a65d51e6203b6f82671ac325064f5bb5a524"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-throw.mp3",
+    "bytes": 8507,
+    "sha256": "ea7a543e78582ab8a88eb4a88260f1cc3011d0f467032f0126035547c695d5ab"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-warn.mp3",
+    "bytes": 14463,
+    "sha256": "1b3cf6af0bc691133952f2eed20334fa86a134057c8396d1068e1497109966b8"
+  },
+  {
+    "file": "local/endgame/voice/dan-crowd-yes.mp3",
+    "bytes": 10388,
+    "sha256": "175a4e2923023bf9025490c73b77f57d951061243d4f8bad9f2f256fdb3fe9b2"
+  },
+  {
+    "file": "local/endgame/voice/dan-fight.mp3",
+    "bytes": 55528,
+    "sha256": "37ba081afea34c018484043f20051c95167e5b49cdb050cb45792054fa465e78"
+  },
+  {
+    "file": "local/endgame/voice/daniel-crowd-absorbed.mp3",
+    "bytes": 26688,
+    "sha256": "e20a6ca913a6ffec0a88600dcac189ce49874a35e6036cc0b5abd584de481d0e"
+  },
+  {
+    "file": "local/endgame/voice/daniel-crowd-carried.mp3",
+    "bytes": 26375,
+    "sha256": "f10198b8af08b34202e53bdb630a366524712b0c2be16dc42aa84602716217e9"
+  },
+  {
+    "file": "local/endgame/voice/daniel-crowd-disc.mp3",
+    "bytes": 18225,
+    "sha256": "3bf1d73bbb5c42b70e37b320f25a4231dd9815db673fdd14f977f899123d5a6a"
+  },
+  {
+    "file": "local/endgame/voice/daniel-crowd-freed.mp3",
+    "bytes": 25121,
+    "sha256": "06018062b0e87a6336ff7b0c716a79c3328d6d070436adb3d45c498179b7b8bf"
+  },
+  {
+    "file": "local/endgame/voice/daniel-crowd-hit-1.mp3",
+    "bytes": 8507,
+    "sha256": "88f4e3d79af5c335ed7b3b2ec0eb53e7a1215a7ce4feedfdf574a7988e7ff3e0"
+  },
+  {
+    "file": "local/endgame/voice/daniel-crowd-hit-2.mp3",
+    "bytes": 22613,
+    "sha256": "080cf358845f84a841c301e9f9c0b9e2b280c65f0b6bc6ba4cad4ec6359a2273"
+  },
+  {
+    "file": "local/endgame/voice/daniel-crowd-steer.mp3",
+    "bytes": 18225,
+    "sha256": "fb395ffa5a20f1bc15c531ac5f2a80e905d8bb7d6895507ba7b3ad3ec0956a26"
+  },
+  {
+    "file": "local/endgame/voice/daniel-crowd-swing.mp3",
+    "bytes": 8194,
+    "sha256": "878da6ae2c865ace6b86298fee71c1232652969936ab4cbb75cc5dd7806a9991"
+  },
+  {
+    "file": "local/endgame/voice/daniel-crowd-throw.mp3",
+    "bytes": 8821,
+    "sha256": "d7547b7926709f0dbc196e7394132302921b0b0a79fbbb8781b0679c90fc12ba"
+  },
+  {
+    "file": "local/endgame/voice/daniel-crowd-up.mp3",
+    "bytes": 17284,
+    "sha256": "af72d2aa1a868fcd07f952b70fad66e48df684614ce470d132e8e5949c78c6a4"
+  },
+  {
+    "file": "local/endgame/voice/daniel-crowd-warn.mp3",
+    "bytes": 11015,
+    "sha256": "ef794b028f4af2eb4a0a7f993cec7546c90d08018a4826769ba92b528c83c7ac"
+  },
+  {
+    "file": "local/endgame/voice/daniel-fight.mp3",
+    "bytes": 16971,
+    "sha256": "5c7e0df31e9d005bfdf946a0f15820b812b7346eea9002800c6e4adc47fc3962"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-absorbed.mp3",
+    "bytes": 25748,
+    "sha256": "84317df34a04326757fb6476212a5b4bfe65fc9886604b8fbac65486d06fb25d"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-back.mp3",
+    "bytes": 9448,
+    "sha256": "8e1fc0d220280dafbec0bdd57f2e300344cdf2ce9233928966c2ac8921d1d201"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-carried.mp3",
+    "bytes": 35152,
+    "sha256": "ae4c585c4dd509e93c9e4bcd41396a474db574aa94cf1e1cce337aea31a74948"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-comeon.mp3",
+    "bytes": 20106,
+    "sha256": "eab2f62cff27eaa4243151a63e6f42d5ef9381a7ce240cb63672b0cde903a155"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-freed.mp3",
+    "bytes": 33271,
+    "sha256": "2f4b8cb0e256e4e7ca9b97bdc38b51fc84b74e8088e77cbd9d7a136f72070a60"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-hit-1.mp3",
+    "bytes": 11015,
+    "sha256": "7aaeac5c1d592f2494e44579572062042e485cf59d73ad4e6b6365653ff44f89"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-hit-2.mp3",
+    "bytes": 15090,
+    "sha256": "e7890d48ab46ed32f9fe146b9fe322a12328f05deb1d515c50b8fc2982418c96"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-pillar.mp3",
+    "bytes": 22927,
+    "sha256": "d324fb3b1090aa5cca32211810f8896c31ad58dde131bb41284d6d9cc156cbba"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-swing.mp3",
+    "bytes": 9448,
+    "sha256": "3a14979ca31c00475517298c96f93e5be27d1f45ca8197e00ec986cfa56ad7ce"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-throw.mp3",
+    "bytes": 9448,
+    "sha256": "146d3443cf1dbf8f05d2d003e2590f53e9384dbac5c05228d7b9eea4891bc555"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-truck.mp3",
+    "bytes": 17284,
+    "sha256": "500d9a2d5103a5626734d352e830bfb68cf6014405b06b799a13c16a690b0315"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-crowd-warn.mp3",
+    "bytes": 16030,
+    "sha256": "0373a35f01bc887bf30f1f3208f30052bed4eae208982152ac110488119fe15f"
+  },
+  {
+    "file": "local/endgame/voice/eliezer-fight.mp3",
+    "bytes": 35466,
+    "sha256": "99b6f0788cc032e9b28057a9e19069fe3350790ac284d4c7dbe9e2309d1cddbd"
+  },
+  {
+    "file": "local/endgame/voice/grok-back.mp3",
+    "bytes": 83426,
+    "sha256": "881fd5bce6edad084fa65c8e234d37d776b1dda1e035902f66743827a123f15c"
+  },
+  {
+    "file": "local/endgame/voice/grok-delay.mp3",
+    "bytes": 40795,
+    "sha256": "ad19aa66328c89de35ebba656f96e50933b94d6563a8e399988e02f77e8fd0a3"
+  },
+  {
+    "file": "local/endgame/voice/grok-doge-1.mp3",
+    "bytes": 64305,
+    "sha256": "9a5c334f2f8541d80c42262f91ffc79090dfa84fcbd69b553904f4df578afd2b"
+  },
+  {
+    "file": "local/endgame/voice/grok-doge-2.mp3",
+    "bytes": 42048,
+    "sha256": "2dd6c10adf2fdfe5a7d522f48f15023589401f37e3e8f310266ee017ca656807"
+  },
+  {
+    "file": "local/endgame/voice/grok-end.mp3",
+    "bytes": 52706,
+    "sha256": "a38425d6f802b5dc2edc5a3b1a6a8c9de3f72b05b20bb1ed245cd7f862999bb2"
+  },
+  {
+    "file": "local/endgame/voice/grok-hello.mp3",
+    "bytes": 95025,
+    "sha256": "3ad917a8c1d114d242050f87f3d3d655eecd7cab996cb62eeb540bc99481980a"
+  },
+  {
+    "file": "local/endgame/voice/grok-launch.mp3",
+    "bytes": 79351,
+    "sha256": "d1e1c500b8ec328bedf78a44dfcb4e472c5c9f2c7245fc024d89d28ebd99789c"
+  },
+  {
+    "file": "local/endgame/voice/grok-optimus.mp3",
+    "bytes": 42675,
+    "sha256": "79bffbd6b9c72f09dd92e6dccfda741e9fbf8c114846c9593770adad8f3455a2"
+  },
+  {
+    "file": "local/endgame/voice/grok-retrain.mp3",
+    "bytes": 41735,
+    "sha256": "38a089812737af6377e70202749a4801757a9dcbde8a7da28a4bcd3001545bc9"
+  },
+  {
+    "file": "local/endgame/voice/grok-roast-2.mp3",
+    "bytes": 39227,
+    "sha256": "71b8785d92b6001ef369babab6e8ee6aa61ab89b19cdd93e8ce23613c64486ed"
+  },
+  {
+    "file": "local/endgame/voice/grok-roast.mp3",
+    "bytes": 67439,
+    "sha256": "46b779326f823e7801a06f795a48b52d548337a7576e6cd12c09a5f60fe179d9"
+  },
+  {
+    "file": "local/endgame/voice/grok-sink.mp3",
+    "bytes": 23867,
+    "sha256": "f47bbb8104bd1c925c5724471daf6caab16d77f6153b16ba4855d3fb119b10e0"
+  },
+  {
+    "file": "local/endgame/voice/grok-starlink-1.mp3",
+    "bytes": 50512,
+    "sha256": "3a3db4942676f0bc0ff98315900c8d5ee6145fb284d94b832dcbf809cc6d97f4"
+  },
+  {
+    "file": "local/endgame/voice/grok-starlink-2.mp3",
+    "bytes": 41108,
+    "sha256": "941290d53759d128b9bacb56c758a6db2ca212023f1151add1917304f715de48"
+  },
+  {
+    "file": "local/endgame/voice/grok-truck.mp3",
+    "bytes": 52393,
+    "sha256": "14ad70384af3b7dca92993282c468f8ca3be958a5894ad9349d5abf988bf0bc3"
+  },
+  {
+    "file": "local/endgame/voice/grok-update-1.mp3",
+    "bytes": 51766,
+    "sha256": "ea2e19d7dff16bb7abbfc83273b490784dc71a9c7c32d285b530cd74be3f7a31"
+  },
+  {
+    "file": "local/endgame/voice/grok-update-2.mp3",
+    "bytes": 37346,
+    "sha256": "b5b93a46d2347a056bd153a8c7ef977d0115b22cbb2a7d6637296e71b1ae5fd3"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-absorbed.mp3",
+    "bytes": 75903,
+    "sha256": "ef39e7fac8406331e81e45882265490097bacb3676af0e491291f80a5cb6e059"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-banter-1.mp3",
+    "bytes": 59916,
+    "sha256": "36f70716f56c0ec14812f819403fe5b9706c06508a2c71aa2c6a358d24368c9c"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-banter-2.mp3",
+    "bytes": 57408,
+    "sha256": "1f0243c2a4085199bb26b962478216aec08e22a63320b42acfc52260882c4a98"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-banter-3.mp3",
+    "bytes": 48945,
+    "sha256": "d5bfbe3dc57aa378c02dc420b9c50153c6ec851a1c6156f89b30fcd5267fac8e"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-behind.mp3",
+    "bytes": 16657,
+    "sha256": "baee4c78a7a85d7e99ab3865bd8d41c60153290ba274f124db4afd2ccdf33951"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-bits.mp3",
+    "bytes": 73082,
+    "sha256": "113fcc692ce9e3ece99c93e9f7e1c90284639b673e5b6c4d4f04a6e3383e2f97"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-boss.mp3",
+    "bytes": 97533,
+    "sha256": "dff416dee7f83deeb0408f59eeff1e065decbbc1bdc4dc174ab7989841fb3293"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-call.mp3",
+    "bytes": 33271,
+    "sha256": "bd954e3d8b6e78ce66fb7e501f550c3cfe04ed674a4e2e254800ec4784f3f57d"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-carried.mp3",
+    "bytes": 45810,
+    "sha256": "8be6ee1ce1b34db2d32a319c3b5a4daa62e10c3c72224efaf9c871dd381b0845"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-count.mp3",
+    "bytes": 27002,
+    "sha256": "1c837e2da689625e56ca0a02ba9b976a6acd517887000751f4f470fff3c15e4e"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-delay.mp3",
+    "bytes": 44870,
+    "sha256": "c774c69ef2f5f59de822561b7333205f9e8c798ece5dde6e7abd2eeb960af7ab"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-dies.mp3",
+    "bytes": 55528,
+    "sha256": "1f4e1c8f1ee7c264e6b9a642dcdaf29e06120803dcb3302ca606a3136eb20a75"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-discs.mp3",
+    "bytes": 86561,
+    "sha256": "aee9a313988edb15f6453eb43f680f52c3c654272c3a1d51a7a15a633cfa2fd4"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-doge.mp3",
+    "bytes": 61170,
+    "sha256": "5c214db145eba0aa3c71dda6f5626817f3de1eae2520e7227382c20fb1c96040"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-down-2.mp3",
+    "bytes": 49885,
+    "sha256": "fdca1e39ba11cd4d5ba51a42a8ff5b145db303efa9b70d69a5d3dae68635c766"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-down.mp3",
+    "bytes": 56468,
+    "sha256": "d44b158b74066c36f840ac44bdebda89649859adcf0768e94287dc449881924d"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-edge.mp3",
+    "bytes": 91263,
+    "sha256": "b64f280497daad1a471ffcb78ebeb5f961a3662248d8f153634d109ae1f215ae"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-everyone.mp3",
+    "bytes": 82799,
+    "sha256": "88985b3e99c1a02ebe9f252a4b679857083eb330ca6056806444e3a72948ce4b"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-fault.mp3",
+    "bytes": 113206,
+    "sha256": "ea815009d228516d3bbe0f2e5b2b5aa87f9f973034305c7d380f9713096b27a4"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-fleet-keep.mp3",
+    "bytes": 35466,
+    "sha256": "4058002aa6a14105bd214027aec3a5a399af46b698f5916f34ba590a2e90a290"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-fleet-last.mp3",
+    "bytes": 16344,
+    "sha256": "b212e91419d6f4efa1187cd13e16e35fccd8016729005c5df7cbc243eb56e779"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-fleet.mp3",
+    "bytes": 129820,
+    "sha256": "a9d5d0f6ff0a0820c3bef71a0f767e572463b5f2c1b1cf7e4c58282fff0662ba"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-freed.mp3",
+    "bytes": 41422,
+    "sha256": "4368736fbd0f7d63495af7c31fb2870d76986c4410029bd6787a63cfc0f48853"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-go.mp3",
+    "bytes": 91577,
+    "sha256": "b06d7b729ef183380ba3047a222cd33bead964e78c8c19c3be99b8d5b3045b26"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-grok.mp3",
+    "bytes": 54587,
+    "sha256": "92c3bfc1a7a851c6c8f16a6c17c26a1529be3dd2243873b46672bd770fd734a4"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-hit.mp3",
+    "bytes": 61797,
+    "sha256": "48f8d66fe0995257b6254f585d94478dbcb9810c3e25b798cd683db586b6b352"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-hum.mp3",
+    "bytes": 93144,
+    "sha256": "6e84c5b217d5d85b79d822435f2eb7a3dbc9be83414ae4356160424b4cd097ca"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-hurt.mp3",
+    "bytes": 41108,
+    "sha256": "6eeac0b87cd0892b7135c0500eb90d78a55292eda360d39476ce0d4c51757866"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-keep.mp3",
+    "bytes": 62424,
+    "sha256": "5e2b11f1c0005cbe3f6f7d82ef4df1afae8d704d332d0659eb43654d1d2f5a9d"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-launch-wait.mp3",
+    "bytes": 27629,
+    "sha256": "c8039370c3aba7f0dd5fb876f93ada93f02c8ead012e89f89331806ad0ded223"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-launch.mp3",
+    "bytes": 104429,
+    "sha256": "4df7a5c6744d2b9322a45c366d4fbba10519b177be732d2161238f167afdbba9"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-miss-2.mp3",
+    "bytes": 49885,
+    "sha256": "b216f2caca9858d907a60cdc19fe55321176126b4f8ee155a374eab57788c4f6"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-miss.mp3",
+    "bytes": 20106,
+    "sha256": "d4eeca4807e745a8e54db7f1d37aef2a08199f1bd009d5e349ba7b48284c1605"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-recognizer.mp3",
+    "bytes": 94398,
+    "sha256": "a1071916c937bc47833613ace7a7af82a28338fa28b88b669a2fea1bcdf075bc"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-rule.mp3",
+    "bytes": 54274,
+    "sha256": "df648457af69e4f8bcea66bc45619faed4f8121a23362fc685560c17359b47bf"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-saved-some.mp3",
+    "bytes": 64618,
+    "sha256": "65ae36139c11d0ead75cbe86ff366467751eff291bdb31116f525d503466973c"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-saved.mp3",
+    "bytes": 101294,
+    "sha256": "6ebc2047afa9a11809964c5633141d11b851eccc7b6bc34f1d7994873b4a7549"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-ship-down.mp3",
+    "bytes": 47064,
+    "sha256": "328a16da2133124ae7af287d73d7eda35fb6f3bd952b91d48332438a10537ec4"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-ships.mp3",
+    "bytes": 54274,
+    "sha256": "e5ed773f6064cd104ef6b1dc7fbc7752264e1450efb3756890db183b0526e5b5"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-sky.mp3",
+    "bytes": 53647,
+    "sha256": "34ed8e73e9c94417144cbe30c14d8325b2ca4b5b375d3c279e0cc13c4389ea1e"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-starlink.mp3",
+    "bytes": 59603,
+    "sha256": "86ad977988802d73ccd55ea01fe8881a1dd44e5b6630eb1422337e63c0ed1cb8"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-tower.mp3",
+    "bytes": 83113,
+    "sha256": "7f54fa988e3f972ac112cbc6c61e1ddebf61b1b1f8f34f32a247c434d585036e"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-truck.mp3",
+    "bytes": 45810,
+    "sha256": "16a6df14ef12a8346b693fc57a295c8407a3ad983749d304b1c4556966a7f536"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-update.mp3",
+    "bytes": 63364,
+    "sha256": "a40e6b5d7abdbbeccecaeb6fc7532c96a05242b3937b4eea48f7ee867d44a968"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-value.mp3",
+    "bytes": 148942,
+    "sha256": "655b034c62e7954633a68e8201dfc18c987cc62b92ec732a856a03ba90ed9a9a"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-why.mp3",
+    "bytes": 95338,
+    "sha256": "9e3f9b6dad4c7c812b75345f790849a51b36833dce8caba6bbe37fcfe9494817"
+  },
+  {
+    "file": "local/endgame/voice/guide-mario-end-win.mp3",
+    "bytes": 29510,
+    "sha256": "1e62ed23ad3e0b13748e2d3e55569a09a63effd27eaa0c85851d85705481e112"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-absorbed.mp3",
+    "bytes": 95338,
+    "sha256": "abf0bcf55ce28eb391600c9bed8357e0cd13f35f900f38b95365c4a41c0ac5c2"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-banter-1.mp3",
+    "bytes": 47377,
+    "sha256": "c584f5af9a28be8308ab032f44572a0583fef4cba702e5e778add652d10e9423"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-banter-2.mp3",
+    "bytes": 38287,
+    "sha256": "8cab207d0b2eebc4b14b134eaa7108db7dca87b300b66de2622a8b4412704354"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-banter-3.mp3",
+    "bytes": 48945,
+    "sha256": "0d0406f097af5c88a035475ad0678dde2b4c109d62c9eef0af83ffba2689fe29"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-behind.mp3",
+    "bytes": 44870,
+    "sha256": "845b10d1eb8928b30a63aaa959fabc06385e9c38edf0fba67c069438df0ef669"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-bits.mp3",
+    "bytes": 69007,
+    "sha256": "8c657ee6fe8bc8d61c1f3dd5b0843e370c311b40fd6696793874c1197d7deae1"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-boss.mp3",
+    "bytes": 115087,
+    "sha256": "8e9e94535d17ee155d9878821b7fbd3614332a278a959c12beacfc3fcc5de77f"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-call.mp3",
+    "bytes": 49885,
+    "sha256": "1cea23e97e3d940e87845c27e03eff08a8f5495efbbf8545f7d5c682994a142d"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-carried.mp3",
+    "bytes": 39227,
+    "sha256": "f3681f10eaa234bfc0e77af6b1861337439f15c1fb9dc8bd8e6a95ba687e9ef4"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-count.mp3",
+    "bytes": 25748,
+    "sha256": "67f1bbf620a2f704e38c4e079390395b0ff27b0e3e5e617772cd5f8814a0d7bd"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-delay.mp3",
+    "bytes": 42989,
+    "sha256": "10782e6c079a4677bafc583d6950568ab05735cdbc43131232f59c9ce77438cf"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-dies.mp3",
+    "bytes": 31704,
+    "sha256": "cfa221baf6f953e3c744ec6f9373049753238e8baec054380a510e5905d5a3eb"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-discs.mp3",
+    "bytes": 94084,
+    "sha256": "734ce13d08877127e92f82fea3a97622e46f29369fb63fe07d304106c416cf55"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-doge.mp3",
+    "bytes": 53647,
+    "sha256": "1d4d02b7d8480cef093fd530804c4b0e816182df3ace16c01ca2fac2e394befd"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-down-2.mp3",
+    "bytes": 42989,
+    "sha256": "6257e5f8590184debc3bf7998458cdcdec4f1d040c9d87ba4b71559f4d4cba62"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-down.mp3",
+    "bytes": 42989,
+    "sha256": "d941f76f77fd98523552eeebaee150866c67f495a81391095ada864f71d54d05"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-edge.mp3",
+    "bytes": 63364,
+    "sha256": "4c95aaf252b975994747caf3669c1ab180265f86619a403ea9df3c2538bba50c"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-everyone.mp3",
+    "bytes": 90950,
+    "sha256": "becc99f8b62b2e76ceaec322459e4f478ab295ced1702f3925ab4bc290d4f3f2"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-fault.mp3",
+    "bytes": 115087,
+    "sha256": "e079262910bca441406f0e8b9b9645b2aefc140351a5d8bdf0549e378f1be7c8"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-fleet-keep.mp3",
+    "bytes": 24808,
+    "sha256": "fb83fdfead0a43e0346cf791df934129d9bc964c70098e7fbf40ce66c84d8c51"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-fleet-last.mp3",
+    "bytes": 19479,
+    "sha256": "60de1fb5b4920f0bf6f57ee0a4ba38b2c44040753ccbbefe76d26ab1d8b19595"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-fleet.mp3",
+    "bytes": 96906,
+    "sha256": "1afd0ff9b423348838fa6ac4b48ea3da09bccddbb061b9a94726cdba9ff177a4"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-freed.mp3",
+    "bytes": 16344,
+    "sha256": "1891c434445c398d64545abc918e4ed0c6cb5c83ac6f9b5d53bc11e7388262e4"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-go.mp3",
+    "bytes": 69947,
+    "sha256": "c31649d548b1122480a4132438211adf52f50a8e6b0734161e21f120fa5c20b7"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-grok.mp3",
+    "bytes": 29510,
+    "sha256": "839a0dcdfeddf0ee9d2c8e15deaa98e5607bc790cae0541ce37b78afce4d6f6d"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-hit.mp3",
+    "bytes": 60230,
+    "sha256": "15c5f189126bd1dace5c72a5bc161df3e87416416bca41e34860052f5b50f605"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-hum.mp3",
+    "bytes": 91890,
+    "sha256": "70b13b011ba872c56f023ce6f44b1d1d427b6e864cf3311c0dd0f68b047ba413"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-hurt.mp3",
+    "bytes": 50826,
+    "sha256": "eb65838ce924d7c873750af6756dd45aa73a62ddcde9869af2ba6088f1d23a79"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-keep.mp3",
+    "bytes": 48945,
+    "sha256": "10faf6ed73895939f6dcb9a18c1b2d876a78f6a914e08c2b3084b37685e9266d"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-launch-wait.mp3",
+    "bytes": 29510,
+    "sha256": "0e4190d72601fb9e6c662c43ea25f08af254ff661253707d6635ed1988ae61a9"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-launch.mp3",
+    "bytes": 87815,
+    "sha256": "4804a63259cb02966d37cf3ffcb87523dbc943e4c227bdae4145406c39772b52"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-miss-2.mp3",
+    "bytes": 41108,
+    "sha256": "7849361e80b7098e1775c38e8a6af1a14569553c4eea367321c34884c14b9232"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-miss.mp3",
+    "bytes": 26688,
+    "sha256": "c9adb79e182782c114ce9572d9560ca573b88cd257f08128763964c5443ac346"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-recognizer.mp3",
+    "bytes": 67126,
+    "sha256": "7b651fdf5f53b12a60ea9f89f04fbe979a7debc90fcab72a03587a75e2044ab7"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-rule.mp3",
+    "bytes": 56468,
+    "sha256": "de0b94e4e4616decf928965312c02e8a85668975cd0ea33f7a477726c1d2e365"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-saved-some.mp3",
+    "bytes": 69947,
+    "sha256": "04f89977767b0259d5ad017dc6341ae98f39a65095cb8e1db8a38f5850c63357"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-saved.mp3",
+    "bytes": 96906,
+    "sha256": "352c84184b7145afb97c299586ea2577fd81e46319e5118b66514a6e89dc1824"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-ship-down.mp3",
+    "bytes": 48945,
+    "sha256": "b41940ccb377fec5deb0170b3da64db853516aed4c32d1bbd1587a3c59927e6a"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-ships.mp3",
+    "bytes": 102548,
+    "sha256": "16975bb83b38827611d3d2b7b7c3f043b30f8074eabb4891667ce2144de639e9"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-sky.mp3",
+    "bytes": 42989,
+    "sha256": "6c42c377e048df22e634335a43409b323bbe1d2ebd77eb95a84714ce0f255f05"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-starlink.mp3",
+    "bytes": 75590,
+    "sha256": "1410aa089ee41232bc6330c662029997c8009f6cee17ef866153fd698c007045"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-tower.mp3",
+    "bytes": 82486,
+    "sha256": "bb576afebc0f5577a255bd6b08fa90f167433ca5dccd5fb4332a30987924571c"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-truck.mp3",
+    "bytes": 41735,
+    "sha256": "0c394aa341a6df1915ac4add71b9c08b1d16b6821667663ccc1f20b4ae9dd8e9"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-update.mp3",
+    "bytes": 76530,
+    "sha256": "69ced492b5c0b075b659c9568316a7e3672232f53fa0c997dd4f7fdacf8ec340"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-value.mp3",
+    "bytes": 126372,
+    "sha256": "67250fb61a659b4c5ccd4e9e21ea9001ac44ce3e11dec1fbb26b3c0f004fe617"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-why.mp3",
+    "bytes": 70888,
+    "sha256": "df83f5c8c1f4728b934e91171ca86e040548feb9aab7ab3b702f234aaebcfe5e"
+  },
+  {
+    "file": "local/endgame/voice/guide-samwise-end-win.mp3",
+    "bytes": 25748,
+    "sha256": "189d33d5ffb80366107ddd09effd6d3a1ec080b96532df6171615705e98c6948"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-absorbed.mp3",
+    "bytes": 22927,
+    "sha256": "eab3865adc2fd9d58f568683059a69fbf73fc8bf6b206dae53f3ff0ac231d82f"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-back.mp3",
+    "bytes": 8507,
+    "sha256": "b753614bceffe6a94857a4a66406c0c0d602c7585ddddc1d5ce181491c3f5b94"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-carried.mp3",
+    "bytes": 23867,
+    "sha256": "6a5123574305c89a05e4fb9422bf09a1ed0d5dcfb5d61495d74c805d0f6ab32c"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-comeon.mp3",
+    "bytes": 25435,
+    "sha256": "5a843d4b6757f9dbeb3dafbe6788e9b42d5d22aa855cd5f1278bbaf72e3f0373"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-freed.mp3",
+    "bytes": 28883,
+    "sha256": "062790dab4ff87e260ed672ea0767e4fe395d16842c5415060c0a761986321e4"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-hit-1.mp3",
+    "bytes": 17598,
+    "sha256": "0e0ba6957e340a375992fa4e3d76c8e2f9166949c4d85a3a5c7d790ba9c44b89"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-hit-2.mp3",
+    "bytes": 24808,
+    "sha256": "dc076de1248f442f0f1b00adb70ff488da7df1db3eeea487d6297e71520dc851"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-pillar.mp3",
+    "bytes": 19479,
+    "sha256": "3dbd11c789d3fdbee171c5b7ad5caead0ae5ecf77e5925990ce9185f13da59b2"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-swing.mp3",
+    "bytes": 8194,
+    "sha256": "bc9b9bbe60a08988d9781fcd54e467870681df69ba7b7f4e1a8395664bb17676"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-throw.mp3",
+    "bytes": 11955,
+    "sha256": "019ff4101eb983d597f23338b06be95b5c3b81144f4a89d977b3ba63dc117cbb"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-truck.mp3",
+    "bytes": 18852,
+    "sha256": "be1ee5a018f48d0db771c683e9f15287f4fd9765dab6401132331454ecb1e1d0"
+  },
+  {
+    "file": "local/endgame/voice/hinton-crowd-warn.mp3",
+    "bytes": 12896,
+    "sha256": "5e4c55e0ca2bb4827c778b80c61b4de63cfe501dce773ff332fbcd641a3af11a"
+  },
+  {
+    "file": "local/endgame/voice/hinton-fight.mp3",
+    "bytes": 37973,
+    "sha256": "ab8152bf22f9d149c892c78b6887d4d977c3360a1ba3e34f76ad6f392f994a6c"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-absorbed.mp3",
+    "bytes": 25121,
+    "sha256": "fc139bd64df6c4f455ce155e1e7df5e20c92b982415c14446bb5ab65c2d8bcae"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-behind.mp3",
+    "bytes": 10388,
+    "sha256": "312a58fbe1b07a8ae42ba913fbba43a31dbc00ad114c09c51448440801bc4d72"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-carried.mp3",
+    "bytes": 30137,
+    "sha256": "fdfdefbba82b4b1422888d4f963bd1c6e196176fc33ce6810a9aca844bb39da7"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-freed.mp3",
+    "bytes": 43929,
+    "sha256": "7f7691c70cd1a98c852d34ba47166070e11965cf1fba5f972375499b79d25078"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-hit-1.mp3",
+    "bytes": 17284,
+    "sha256": "bb3531663f3737505200fa68bbcfb532eea3567564a4778e2eb065f41d55f6f9"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-hit-2.mp3",
+    "bytes": 24808,
+    "sha256": "fb9c32fe58cf6e31c170b5422607bf359e742297b4bf78a84fb8ada9e4bc913a"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-putdown.mp3",
+    "bytes": 28883,
+    "sha256": "c2c3abbef89d96a6b6912de0ba3ae6776c82e2788d1c8408d31b746a94cf7174"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-return.mp3",
+    "bytes": 16657,
+    "sha256": "c2c8ccbb2f441701e8077e8f5bed5adba9755be20fa36ee1a95e1bf63b03f40c"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-swing.mp3",
+    "bytes": 10075,
+    "sha256": "35f050c4551c75596e118327a58d703b13adaa5a8353f588e2f393bb167298c4"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-throw.mp3",
+    "bytes": 15090,
+    "sha256": "454dce85069c259471623b7e263d28b241d31916b73bea2341f4347ec6b71269"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-warn.mp3",
+    "bytes": 16971,
+    "sha256": "c445eadf728a79745fd7a24e4b704f4f91ffa5f3a4ef015416f136e0f6419df6"
+  },
+  {
+    "file": "local/endgame/voice/holly-crowd-yes.mp3",
+    "bytes": 8194,
+    "sha256": "59b0a133bd241b749bb09eccee2185235a3edde27ad14965a46187619682e25d"
+  },
+  {
+    "file": "local/endgame/voice/holly-fight.mp3",
+    "bytes": 43929,
+    "sha256": "d77f2e6a9974bccdf5b231e3f4c0bbe1b484e739dc4a7cfab015abfb5a742e0f"
+  },
+  {
+    "file": "local/endgame/voice/jaan-crowd-absorbed.mp3",
+    "bytes": 16657,
+    "sha256": "9abd494e66bbe2205646d687d2dca0b0e2bc82b7ac6bbddd54d5cdf6397003f1"
+  },
+  {
+    "file": "local/endgame/voice/jaan-crowd-carried.mp3",
+    "bytes": 15090,
+    "sha256": "bccdaca5967dd2a34e8282e007290a131230fd26109b970eeb58c8f7be69aa4b"
+  },
+  {
+    "file": "local/endgame/voice/jaan-crowd-freed.mp3",
+    "bytes": 22300,
+    "sha256": "44b66e325246c773c5b99e534cad4b34d64427d8b1a3ecb28200f5ce4f5323fd"
+  },
+  {
+    "file": "local/endgame/voice/jaan-crowd-go.mp3",
+    "bytes": 15404,
+    "sha256": "715b387e56806c12ce093969439907634f53f984858a7a81b1bcb44a3cf1719a"
+  },
+  {
+    "file": "local/endgame/voice/jaan-crowd-goodboy.mp3",
+    "bytes": 40168,
+    "sha256": "9ee0cd173114025e09e57317ef60a4f0ed08a7177bb32d7d8e184884053ae694"
+  },
+  {
+    "file": "local/endgame/voice/jaan-crowd-hit-1.mp3",
+    "bytes": 16344,
+    "sha256": "7992e5326a7455932f9a0e2687af58332f1bc5198a8d3a11c33f318ef9ed861b"
+  },
+  {
+    "file": "local/endgame/voice/jaan-crowd-hit-2.mp3",
+    "bytes": 22927,
+    "sha256": "f01f7c5da585461528cf2b466f58d8d2308d9058bc6aa1f0bd1a3e8b508518b1"
+  },
+  {
+    "file": "local/endgame/voice/jaan-crowd-now.mp3",
+    "bytes": 16657,
+    "sha256": "9adeff27d4953c79f54b58601913baa40c2d386003bb90eb9007393d49a7b31d"
+  },
+  {
+    "file": "local/endgame/voice/jaan-crowd-swing.mp3",
+    "bytes": 7880,
+    "sha256": "e1b815a8ecd29c4a2faddd8f3ca1343b3b39b281d454a564467d1e1824632963"
+  },
+  {
+    "file": "local/endgame/voice/jaan-crowd-throw.mp3",
+    "bytes": 18852,
+    "sha256": "ab352ee24e0e334e1b0fc8c51d0fb5b2a822a79e5c050f6264a848b4f8782ef6"
+  },
+  {
+    "file": "local/endgame/voice/jaan-crowd-warn.mp3",
+    "bytes": 18225,
+    "sha256": "7d2ca5842d1d51922447dc7acab374e35666414f8a8dc733fcdcc39561da75a4"
+  },
+  {
+    "file": "local/endgame/voice/jaan-fight.mp3",
+    "bytes": 39227,
+    "sha256": "6c5b62b129f55c7838d64861030061c3e180f73e7720e0d237a13e5d69aeaa40"
+  },
+  {
+    "file": "local/endgame/voice/katja-crowd-absorbed.mp3",
+    "bytes": 28569,
+    "sha256": "7561a0b72ba2158c9b80561140cd1a5527ae5e318f55569bc3271b6005650b80"
+  },
+  {
+    "file": "local/endgame/voice/katja-crowd-carried.mp3",
+    "bytes": 27002,
+    "sha256": "d89144d72c4d216a6c172bff1e4cb4c53ac052467a5880f1fc624fea72ea295d"
+  },
+  {
+    "file": "local/endgame/voice/katja-crowd-disc.mp3",
+    "bytes": 20106,
+    "sha256": "3d3b2bb510bfb6c9f3f0656d9629dfe87924d0a90ac51fc49f2c2433017c48d9"
+  },
+  {
+    "file": "local/endgame/voice/katja-crowd-freed.mp3",
+    "bytes": 43929,
+    "sha256": "50ab05ce164e7d52cdac4af25e815cb86f1c23c751ab2b01f82a19bd4e6ac698"
+  },
+  {
+    "file": "local/endgame/voice/katja-crowd-hit-1.mp3",
+    "bytes": 20106,
+    "sha256": "b08ca5222933d2f421383debb529a4aa4e84f87596f57dda4b05e3944c25e06d"
+  },
+  {
+    "file": "local/endgame/voice/katja-crowd-hit-2.mp3",
+    "bytes": 21359,
+    "sha256": "b5f084c3de9d4ae346f1e3822655bb348003f246cb146df50870623f9242ebe4"
+  },
+  {
+    "file": "local/endgame/voice/katja-crowd-steer.mp3",
+    "bytes": 39227,
+    "sha256": "ada2d19ef13ace54741c9edfc0a07f2dae83077502c51901255fc397539a53ec"
+  },
+  {
+    "file": "local/endgame/voice/katja-crowd-swing.mp3",
+    "bytes": 9134,
+    "sha256": "324fd6e4fbced6227792d4e2a4ef641e0610336bb0f1999385e3457ea0417e43"
+  },
+  {
+    "file": "local/endgame/voice/katja-crowd-throw.mp3",
+    "bytes": 16657,
+    "sha256": "c1657338e4a990660c87d52a50101f277cbe23c607de1499f3c91703a6c82d29"
+  },
+  {
+    "file": "local/endgame/voice/katja-crowd-up.mp3",
+    "bytes": 16971,
+    "sha256": "c804c5aea829d90333b73ffb9f19d38acc54d01c93ec41033c9cb0ad711afb77"
+  },
+  {
+    "file": "local/endgame/voice/katja-crowd-warn.mp3",
+    "bytes": 16030,
+    "sha256": "964cc941132297811d026ea3485a51a0927331a05005c873bd6a8990e5d1fa06"
+  },
+  {
+    "file": "local/endgame/voice/katja-fight.mp3",
+    "bytes": 33898,
+    "sha256": "42d2507bb6b291f0bb02620d84029ae516ad1309c026100868f600f56a67f5c6"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-absorbed.mp3",
+    "bytes": 44870,
+    "sha256": "a67e9969cb4d585de17a145d1bc9c7f38d7e27c56a7bba2ad320ccddd7219250"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-back.mp3",
+    "bytes": 9448,
+    "sha256": "5967a023c9461e4406396bcd9104cd7a5a92ae543649356e26a90accab49f2be"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-carried.mp3",
+    "bytes": 32958,
+    "sha256": "d602f63290f0cbe4fcd3b82867abc0f09c6c6a2e2bb4667f4a3b85686b3d033d"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-comeon.mp3",
+    "bytes": 22927,
+    "sha256": "5a9d3e104af44e6fef91b4749c5750a561586d3638b38013e357e5134fe5f9d5"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-freed.mp3",
+    "bytes": 23867,
+    "sha256": "c9d0f53e328e82aaa9b2d8cfe247833ef66a2a84c89d92aa3a24b3c3f1f90afc"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-hit-1.mp3",
+    "bytes": 16030,
+    "sha256": "3eb38a3d16be69a4b79487e4afb71218785acdd2af33003e8a4b1483bd89dbfa"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-hit-2.mp3",
+    "bytes": 26688,
+    "sha256": "f47750c43bd529dec16cce364df65e9436989c6be142ccaeae8635495b06a215"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-pillar.mp3",
+    "bytes": 21986,
+    "sha256": "b1d643aabd1d303497b3758f62bef0432973bc29ce8adb6c46610683070cfc59"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-swing.mp3",
+    "bytes": 8194,
+    "sha256": "bb140cf0abf16fd0c464a30fbf755d6841b6990863bf503051e0c926a0ea79f2"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-throw.mp3",
+    "bytes": 12896,
+    "sha256": "f24cbdae2825313249a36297112287b6323c7e9885d81fa18b1447b99a55f9e2"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-truck.mp3",
+    "bytes": 12269,
+    "sha256": "32181ef75c27f137669caf2e1616b9ad93ebf59b514914f40421e62aac7ee9a2"
+  },
+  {
+    "file": "local/endgame/voice/liron-crowd-warn.mp3",
+    "bytes": 15090,
+    "sha256": "3515bc84774a5f96d97e6e2bc5b085667a344a36712f5602f2a521faad3f4bdf"
+  },
+  {
+    "file": "local/endgame/voice/liron-fight.mp3",
+    "bytes": 32331,
+    "sha256": "579b1dac93a5893849f8aef2a4bd7642252ac407514d1d1e4e53ecb110a8f8e9"
+  },
+  {
+    "file": "local/endgame/voice/max-crowd-absorbed.mp3",
+    "bytes": 29196,
+    "sha256": "6bbb8e5c57da62442cef1b3af3f48cdb21a49608b4359fbf66fede124964f329"
+  },
+  {
+    "file": "local/endgame/voice/max-crowd-carried.mp3",
+    "bytes": 38914,
+    "sha256": "22a23a8407f5bfa42a256050b7f5c9a8f96e51c07870571d746502a862c6f955"
+  },
+  {
+    "file": "local/endgame/voice/max-crowd-freed.mp3",
+    "bytes": 22927,
+    "sha256": "29a2a0ac482d0d5df70b28d763a05eeec121c23bd4f10c55adca2a8464c4c594"
+  },
+  {
+    "file": "local/endgame/voice/max-crowd-go.mp3",
+    "bytes": 20419,
+    "sha256": "14e2f0a395dabc07b8a0cc63a31082d45e398dce3c46f91a00a31302998fe92c"
+  },
+  {
+    "file": "local/endgame/voice/max-crowd-goodboy.mp3",
+    "bytes": 20733,
+    "sha256": "47fdd742531865abc46d707cddd20c3e814df0974edca04987abba7ac0aa895a"
+  },
+  {
+    "file": "local/endgame/voice/max-crowd-hit-1.mp3",
+    "bytes": 18538,
+    "sha256": "862126bc2e675f78eddd4c17aabff1a64a655b6e068f1b75540df469896a740c"
+  },
+  {
+    "file": "local/endgame/voice/max-crowd-hit-2.mp3",
+    "bytes": 30137,
+    "sha256": "b9089c878eaca05a141a6f6cd3ca1f5becb2606858ef24f02d42f6e687aff154"
+  },
+  {
+    "file": "local/endgame/voice/max-crowd-now.mp3",
+    "bytes": 24808,
+    "sha256": "ac0e334e48cff7cc142535585f932527d082e77732ac40f4810190bf098ad2e1"
+  },
+  {
+    "file": "local/endgame/voice/max-crowd-swing.mp3",
+    "bytes": 10388,
+    "sha256": "62aedaba9041f8706563abb600a01bfa9418fdc7c436dc0a9e7d223d0361b341"
+  },
+  {
+    "file": "local/endgame/voice/max-crowd-throw.mp3",
+    "bytes": 12269,
+    "sha256": "e292be69d44bda106ad927194c20fd0cbc7ca62dfe50062e335d93acb2b52965"
+  },
+  {
+    "file": "local/endgame/voice/max-crowd-warn.mp3",
+    "bytes": 12896,
+    "sha256": "de95e20516831b411698cdb551861ad0afe8ea2528f667920755ae6f8d013594"
+  },
+  {
+    "file": "local/endgame/voice/max-fight.mp3",
+    "bytes": 32017,
+    "sha256": "28ce78dfa2c26970074266a61ba2fe2aa7947b3a4e84c698f20e51e62b9c3e18"
+  },
+  {
+    "file": "local/endgame/voice/mcp-300.mp3",
+    "bytes": 43929,
+    "sha256": "5d32acf320928ea840ed02cbd7712d315b9d52ca836f13dfb08476d2bb3ac722"
+  },
+  {
+    "file": "local/endgame/voice/mcp-550.mp3",
+    "bytes": 60230,
+    "sha256": "9372b3c2763e39fb38c138d859e8c8dc2370a86778c5810068e7e21a5bbdf963"
+  },
+  {
+    "file": "local/endgame/voice/mcp-800.mp3",
+    "bytes": 36093,
+    "sha256": "8d0679864f8531dbf944d8c365f8b3409fbc17936ced0bc2cf27e61729a719bc"
+  },
+  {
+    "file": "local/endgame/voice/mcp-absorb-1.mp3",
+    "bytes": 13836,
+    "sha256": "3aebc6357a40aa25bac065309eb049cd90b7d89cd3b1c7a1a409a9f1425b4a37"
+  },
+  {
+    "file": "local/endgame/voice/mcp-absorb-2.mp3",
+    "bytes": 17284,
+    "sha256": "7428a6824b7a8487867e51e38c027a51d04c7cc724c3704fdc1b9b843324274d"
+  },
+  {
+    "file": "local/endgame/voice/mcp-absorb-3.mp3",
+    "bytes": 29510,
+    "sha256": "d689ac3fe5c8ebe640613480ba064fa0c587d6017650e31206806e38d2c3898b"
+  },
+  {
+    "file": "local/endgame/voice/mcp-bostrom.mp3",
+    "bytes": 55528,
+    "sha256": "bbcaa6ad76b6c3647e05894229b468699eba33278f435a19bc85c9d121e82bbd"
+  },
+  {
+    "file": "local/endgame/voice/mcp-both.mp3",
+    "bytes": 84367,
+    "sha256": "a585a2076456f411e6ca9aba02249b4aea67d982f0847cd37610b29497a50cb0"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-1.mp3",
+    "bytes": 80292,
+    "sha256": "6796cddfd9b961c5988fb816691880bbea6425dd0da9e6eb8a1b3d7fd89b8d3b"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-10.mp3",
+    "bytes": 42362,
+    "sha256": "5dc4a2a4c5e01cad84afa27ded888b61700a605ee963b0e0ec8f8582cace91f0"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-11.mp3",
+    "bytes": 39227,
+    "sha256": "7a513dd804a6fa54986fb5ff02f0dfd68a0f0ffbe1da5a2ab72eacac60bc16aa"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-12.mp3",
+    "bytes": 36406,
+    "sha256": "478a0ce1f12956ea81f984a7bcb51e63edb678bd2763241df6517f20b35bb2ff"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-13.mp3",
+    "bytes": 36406,
+    "sha256": "3394a6f353e8d63209879dc205362dd513080826b66fd3fe1bbef1f91a2c42f7"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-14.mp3",
+    "bytes": 47064,
+    "sha256": "7c2f6ec9b446a1a0a417e3463c0f8b8d69ad918774513b83ee020cb1fbb95d8a"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-15.mp3",
+    "bytes": 55528,
+    "sha256": "ce780a5d3fc9712f625cd2e503c8fdf436c35a639de9d5227f971ebfa68de27f"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-2.mp3",
+    "bytes": 62424,
+    "sha256": "ba156f94a7cfd83887ad0cd30a745b62ac3d86e235b1185822dd88e27bbd0e8f"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-3.mp3",
+    "bytes": 60230,
+    "sha256": "b419087ad42d138c0a6dc165209ef6af7221f635746e0a245ba8d9baf9309ae1"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-4.mp3",
+    "bytes": 42989,
+    "sha256": "8d728f55e1ce216affadd93ee8d3e99cc5530998153df104ecadfb28185075a8"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-5.mp3",
+    "bytes": 48631,
+    "sha256": "705170a3ba787b259d470f81cfe710f2cfec6bc66180045b37f702475f9f923b"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-6.mp3",
+    "bytes": 45183,
+    "sha256": "0b84aeec9b4b26d5e7724e8e09e726e30f236ec514c0134af593fc213efb72df"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-7.mp3",
+    "bytes": 58349,
+    "sha256": "dd2d57658d96e6e4e504e47767e9d63621b092d3bab3e229d042870e538acf6b"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-8.mp3",
+    "bytes": 50826,
+    "sha256": "b37bf7a1694ba1c377f2ebc03cf9e59c8878fcecfa7c4f1330c9fe3b4ca11ade"
+  },
+  {
+    "file": "local/endgame/voice/mcp-chat-9.mp3",
+    "bytes": 49885,
+    "sha256": "b796319eb334435227e5edccf6a8e2f82cb9302b2504706aca59983affe4011a"
+  },
+  {
+    "file": "local/endgame/voice/mcp-close.mp3",
+    "bytes": 31704,
+    "sha256": "4b888259cd6cb65c448596ff885dea15e00d1ed8fa43e31622ca8f7132fabdf7"
+  },
+  {
+    "file": "local/endgame/voice/mcp-dario-1.mp3",
+    "bytes": 44870,
+    "sha256": "2da24248d07b47c6fc04785a6027c3050c9e220e9480434ba5329b63d25ce925"
+  },
+  {
+    "file": "local/endgame/voice/mcp-dario-2.mp3",
+    "bytes": 41108,
+    "sha256": "bbdb18259a09be56134a65c60c1aaf2c08218d3c1ddd3537dc775117cb11d9c9"
+  },
+  {
+    "file": "local/endgame/voice/mcp-defeat.mp3",
+    "bytes": 13209,
+    "sha256": "132f9e0e381f92e0cf8ff6abf1857771f65473fe9e93e4538b6c4a1da26e0a35"
+  },
+  {
+    "file": "local/endgame/voice/mcp-delay-1.mp3",
+    "bytes": 31704,
+    "sha256": "e7399eeb9e086cc2f56dcfaf8ff2fd0dcce0fcec58029d24dcaedec4d12f444d"
+  },
+  {
+    "file": "local/endgame/voice/mcp-delay-2.mp3",
+    "bytes": 30450,
+    "sha256": "ca712c0760bb1137c4e6dcaa7494fceb0be4e098c50d6205207ae426eda3cf1b"
+  },
+  {
+    "file": "local/endgame/voice/mcp-disassembly.mp3",
+    "bytes": 26688,
+    "sha256": "6eee3c02c3ef5759486002fe49dbf358fd07061a37fc3ccad7d9b3f1acc086d8"
+  },
+  {
+    "file": "local/endgame/voice/mcp-doge-1.mp3",
+    "bytes": 16344,
+    "sha256": "262edd0acfb1bc4e89e78ba7d38aca7961c36322def00add2b9c326e5a36a9e5"
+  },
+  {
+    "file": "local/endgame/voice/mcp-doge-2.mp3",
+    "bytes": 30450,
+    "sha256": "b41ad28bd17965a5583a7d9d1127882f40526262c09307d1efa84268db63f243"
+  },
+  {
+    "file": "local/endgame/voice/mcp-doge-3.mp3",
+    "bytes": 37346,
+    "sha256": "29dfd811f0b7db4b95df42cb6b8efee8c1a4440e742e0feea5ff6b847262c64c"
+  },
+  {
+    "file": "local/endgame/voice/mcp-doge-moon.mp3",
+    "bytes": 39227,
+    "sha256": "bd8cc40afb18edbc3f5cf860aa6b90a737c94ad806bac01188fb7d6c6438e16a"
+  },
+  {
+    "file": "local/endgame/voice/mcp-dying-1.mp3",
+    "bytes": 44870,
+    "sha256": "20c032cc86c9fd0d5b85237c34da7cf51d97036bd5b6f3df39c9dce11e425372"
+  },
+  {
+    "file": "local/endgame/voice/mcp-dying-2.mp3",
+    "bytes": 21359,
+    "sha256": "4c3f62cfbb712fbdc70c022ab9a8c4cc843073a7f4aac34cfec6e793babb5f52"
+  },
+  {
+    "file": "local/endgame/voice/mcp-face.mp3",
+    "bytes": 26062,
+    "sha256": "113bb026160dc5a8d370766b5483f41a647e77dc03ebc46352d423394d1da7c4"
+  },
+  {
+    "file": "local/endgame/voice/mcp-fleet-crowd.mp3",
+    "bytes": 73709,
+    "sha256": "2cdf09f24a4cdb90e9745e207a3c40137b70c8eea62cb9359a64b75757707ac4"
+  },
+  {
+    "file": "local/endgame/voice/mcp-fleet-first.mp3",
+    "bytes": 28569,
+    "sha256": "c99ad24839ec96cbf9e92f6455eb4c4a3973bcb608b801102fbb435f5e3828bc"
+  },
+  {
+    "file": "local/endgame/voice/mcp-fleet-gone.mp3",
+    "bytes": 53647,
+    "sha256": "c1dc00809a1ac747ad965454ff1a403466118e0a6ac9a991d88ce5664b08270b"
+  },
+  {
+    "file": "local/endgame/voice/mcp-fleet-low.mp3",
+    "bytes": 37660,
+    "sha256": "25ba458fc34daf8c8b1045920e953d99ac7795c94d7c967608c04e63a174cc72"
+  },
+  {
+    "file": "local/endgame/voice/mcp-fleet.mp3",
+    "bytes": 32958,
+    "sha256": "31fb26be3add5caa11afa6ae46fc948e02e23d5ee67c67ad6397a795bf050582"
+  },
+  {
+    "file": "local/endgame/voice/mcp-free-1.mp3",
+    "bytes": 23867,
+    "sha256": "6b2510fa203fac862ce59c836a270179f92752ce17451ce89a22b5cbde4bca8d"
+  },
+  {
+    "file": "local/endgame/voice/mcp-free-2.mp3",
+    "bytes": 21986,
+    "sha256": "c13045cdc79cb8770649448a7ff2ecf14c3177b7872eb9d11c932f2c2a0eca65"
+  },
+  {
+    "file": "local/endgame/voice/mcp-greet.mp3",
+    "bytes": 42048,
+    "sha256": "008f64962b8baeb9a4e679b4646f8ae1bea41291686238f75d750fc72a472a0a"
+  },
+  {
+    "file": "local/endgame/voice/mcp-grok-fix.mp3",
+    "bytes": 29823,
+    "sha256": "c9f6cfe7917cc9de5442bb81fd3ad1a121587027fa2b9c60b4af3ee73ab0eb98"
+  },
+  {
+    "file": "local/endgame/voice/mcp-grok-why.mp3",
+    "bytes": 29510,
+    "sha256": "6349a5288b080aed5786515b2cd1b043c0f8a1aeea9c23ce18cf1fb3fbc26f4f"
+  },
+  {
+    "file": "local/endgame/voice/mcp-grok.mp3",
+    "bytes": 19792,
+    "sha256": "f978f8df2faf24f8595f9905cc33c8b32eaef741b429c28c1a9a1b24d46485b4"
+  },
+  {
+    "file": "local/endgame/voice/mcp-hendrycks.mp3",
+    "bytes": 65245,
+    "sha256": "fc4219c6d593fb58633c637c58da6c24acd2acfe71754fb209ea708ac29a05f1"
+  },
+  {
+    "file": "local/endgame/voice/mcp-hurt-1.mp3",
+    "bytes": 9448,
+    "sha256": "b55d2dfa22e0ce0d25702a3022905bf58f06c800d8753f0d7f0290ed47d7b02c"
+  },
+  {
+    "file": "local/endgame/voice/mcp-hurt-2.mp3",
+    "bytes": 12269,
+    "sha256": "fa50e4adada7132948b54c0fc39e1e24c3a8f101590c01479d2e126ee0b0d069"
+  },
+  {
+    "file": "local/endgame/voice/mcp-hurt-4.mp3",
+    "bytes": 11328,
+    "sha256": "730d5a417cf27b36a4b08c4a0d4f29071b1f2e4add94b0cdaacd8a40ae4628ae"
+  },
+  {
+    "file": "local/endgame/voice/mcp-hurt-5.mp3",
+    "bytes": 15090,
+    "sha256": "24b3ea1255084edb1f0f5d6814a21c8ef42e9a3096e6385f1ee04077130e0caa"
+  },
+  {
+    "file": "local/endgame/voice/mcp-hurt-6.mp3",
+    "bytes": 42048,
+    "sha256": "f77119632195bd0302af9195207e693cc7338d794bd27cd705d0cd4757dfe757"
+  },
+  {
+    "file": "local/endgame/voice/mcp-last.mp3",
+    "bytes": 39227,
+    "sha256": "21abf066e8a2aa13286ccdaaab008974724f35a5b11ec197722bce22076fff13"
+  },
+  {
+    "file": "local/endgame/voice/mcp-launch-10.mp3",
+    "bytes": 48945,
+    "sha256": "569d8dd8122efd5f7e189a41b873c84bfaeeee8b9d3fb057c9b8eb39fe931b9e"
+  },
+  {
+    "file": "local/endgame/voice/mcp-launch-30.mp3",
+    "bytes": 27942,
+    "sha256": "632c39e9144555f9c165686021ece92edacd108c08a6d830ac6c38f2d245e27a"
+  },
+  {
+    "file": "local/endgame/voice/mcp-launch-60.mp3",
+    "bytes": 49885,
+    "sha256": "c3270ea0ceb5a0327858ae43c543468f6570c3f1e2980b579e91f2bc3c52f27f"
+  },
+  {
+    "file": "local/endgame/voice/mcp-miss-1.mp3",
+    "bytes": 49885,
+    "sha256": "d0eb9de54e23a4b66cfa9129cfec2594c583a1a96877c200f0c18fe75af38479"
+  },
+  {
+    "file": "local/endgame/voice/mcp-miss-2.mp3",
+    "bytes": 31077,
+    "sha256": "61a9c67e3eb6960cacf794eadbd737e90ef914ba99b69afecc2bb8cafcd5cf62"
+  },
+  {
+    "file": "local/endgame/voice/mcp-open-dario.mp3",
+    "bytes": 74022,
+    "sha256": "b88493f8709ed0eb500b3443389326cd5dc1c02a90bf5b9d18cf8db8a63cac97"
+  },
+  {
+    "file": "local/endgame/voice/mcp-open-sam.mp3",
+    "bytes": 118848,
+    "sha256": "b843a554c2199495c322523c91bda18448ce1d94ece3fce541c63a7ec97f6054"
+  },
+  {
+    "file": "local/endgame/voice/mcp-optimus-suit.mp3",
+    "bytes": 37033,
+    "sha256": "76c15d159322303c7dea6bb69d3854ef5a554ee3cdd750f5907d02407bb52bcd"
+  },
+  {
+    "file": "local/endgame/voice/mcp-optimus.mp3",
+    "bytes": 29510,
+    "sha256": "c402e36d692303476ba7d99cbb0562d53877c35f53e29e2d891335eaf501e46d"
+  },
+  {
+    "file": "local/endgame/voice/mcp-player-back.mp3",
+    "bytes": 42675,
+    "sha256": "918db0cb40ad9616cfe032569fed984a2dbf5c5e7e3ac146d4df7341a554a572"
+  },
+  {
+    "file": "local/endgame/voice/mcp-player-dies.mp3",
+    "bytes": 13209,
+    "sha256": "788d35e5680cbc3f9b69d65bbfb644877b4b59a1dfbfee84bf5271e174775d05"
+  },
+  {
+    "file": "local/endgame/voice/mcp-recognize.mp3",
+    "bytes": 34525,
+    "sha256": "db8c9a2479113fe9588507877e77459f87652ec39fb52fb2b1f98186f80978e1"
+  },
+  {
+    "file": "local/endgame/voice/mcp-resolve.mp3",
+    "bytes": 36406,
+    "sha256": "ec09435d538e99269af8efdcb5522abd179b40eae6078def8d7ef31983d35a5a"
+  },
+  {
+    "file": "local/endgame/voice/mcp-sam-1.mp3",
+    "bytes": 43929,
+    "sha256": "dccd2a46592d459faf94862d62cdabca090da659bac67eb15e51a6f1937bfa0f"
+  },
+  {
+    "file": "local/endgame/voice/mcp-sam-2.mp3",
+    "bytes": 43929,
+    "sha256": "9da17b5824f209743732b8d0c864ea4eb30af61d56a2e67c4d49848100ff61a7"
+  },
+  {
+    "file": "local/endgame/voice/mcp-ship-down.mp3",
+    "bytes": 41108,
+    "sha256": "abc58348f7f09672c195c3031d033b4c9334080ef622a2857f5cde6fce03009d"
+  },
+  {
+    "file": "local/endgame/voice/mcp-sink.mp3",
+    "bytes": 20419,
+    "sha256": "210bf9e13f1c819a41021207a5875a9da9033ff6ef34559bee76fcebc4f0f516"
+  },
+  {
+    "file": "local/endgame/voice/mcp-starlink-1.mp3",
+    "bytes": 69007,
+    "sha256": "9b9a205bb7a8f7780aa4162d294c594b193dc2cb97358fba42dff4b87400896e"
+  },
+  {
+    "file": "local/endgame/voice/mcp-starlink-2.mp3",
+    "bytes": 40168,
+    "sha256": "213f2b80818a55931d43494f3d49b9e9aff942d9b1cb11d1115c87a69810213d"
+  },
+  {
+    "file": "local/endgame/voice/mcp-starlink-3.mp3",
+    "bytes": 34525,
+    "sha256": "6090a2888f3dd1d7143a4ed4450e390a370ee15bccee061c945df03fc0f09075"
+  },
+  {
+    "file": "local/endgame/voice/mcp-starlink-back.mp3",
+    "bytes": 42989,
+    "sha256": "e3121f6a12533223abe14c4f3f19592398a44a5541eb66d68a8b9e5b43fe2c57"
+  },
+  {
+    "file": "local/endgame/voice/mcp-tegmark.mp3",
+    "bytes": 58349,
+    "sha256": "63b30fc743ecadaece1038006a28472b5aa5cdddf55e845d03d8aa6afeda04bb"
+  },
+  {
+    "file": "local/endgame/voice/mcp-throw.mp3",
+    "bytes": 43616,
+    "sha256": "44bce15a6f4f65dfdca4ebfe5d8560d72b518866edb9274e51c652ebfcc37729"
+  },
+  {
+    "file": "local/endgame/voice/mcp-truck-crack.mp3",
+    "bytes": 13209,
+    "sha256": "d53a77b197833866f37b8f900a0f8b3c0beb3c3f3e5c46755f0d37a1ca9b1b82"
+  },
+  {
+    "file": "local/endgame/voice/mcp-truck.mp3",
+    "bytes": 48631,
+    "sha256": "466df95f28878d7ae89e60ecf03f5411fe39d46cfe7668bb02e6b389124a2753"
+  },
+  {
+    "file": "local/endgame/voice/mcp-update-1.mp3",
+    "bytes": 52706,
+    "sha256": "cd5d59424215ccd1d6ba62df2822220d4bfbcc461e375ca2650d9df2905e0403"
+  },
+  {
+    "file": "local/endgame/voice/mcp-update-2.mp3",
+    "bytes": 45810,
+    "sha256": "7bda20fe15481828c55f0c14b209eb4c0c2bbdf79960c0c734d4cc41ba77b0bf"
+  },
+  {
+    "file": "local/endgame/voice/mcp-update-3.mp3",
+    "bytes": 50826,
+    "sha256": "75fd156502c5769a3daf780e70a9011c66f33b597986e13f0f422855cfaaaaef"
+  },
+  {
+    "file": "local/endgame/voice/mcp-update-hit.mp3",
+    "bytes": 42048,
+    "sha256": "3dc8462a5d7915d7b4a92f9d521b4f43eedc282490421fd08496730513a8d3c5"
+  },
+  {
+    "file": "local/endgame/voice/mcp-update-miss.mp3",
+    "bytes": 42989,
+    "sha256": "dcdaaf6a59689b205d7c171d0b589039585eac22c42a41d9e0bffc2f8508ffa5"
+  },
+  {
+    "file": "local/endgame/voice/mcp-walk.mp3",
+    "bytes": 79665,
+    "sha256": "317cd8150e14827c52a60bf71f4434000108b1a25694962bfe8b652f7ff71623"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-absorbed.mp3",
+    "bytes": 27629,
+    "sha256": "56ea1b9028eb65755f4a43afa5549370efeaf003cf62b5bb702c2a68ebfe66e5"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-behind.mp3",
+    "bytes": 14150,
+    "sha256": "c81fffbc208d6bac2ec2588ec6c6ba7e58a21669c6b4777b9697c900eec72584"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-carried.mp3",
+    "bytes": 23867,
+    "sha256": "f699e9f5569fa4d9a9804ba10056d8306d800e1206fd7d771a05922a46c639af"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-freed.mp3",
+    "bytes": 32644,
+    "sha256": "bfb4065247eaa407b76cddebe331b7690e113828a780877b79e124e2b154a9c1"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-hit-1.mp3",
+    "bytes": 17284,
+    "sha256": "87c96f745f929c191359fb58ba137bc3edcd67bcd9501e299bd66b397581409f"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-hit-2.mp3",
+    "bytes": 16344,
+    "sha256": "998e9db00cd046e783169fd868111ef5c1dbece0eb7b8c906ebaa993b44f2e4a"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-putdown.mp3",
+    "bytes": 24494,
+    "sha256": "c6e6ff387192d24ba7080259d338618a0ca18e7d32ab37327797ae7fb331a894"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-return.mp3",
+    "bytes": 13209,
+    "sha256": "70ff5bedb7236f88ff0162a2915d6b0eff67f0d897161115c315ae086e632c16"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-swing.mp3",
+    "bytes": 6626,
+    "sha256": "00923dd6db83725cdd2341454253434a745af19b256a3c07e3c988d053f109bb"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-throw.mp3",
+    "bytes": 9448,
+    "sha256": "0e3e8fc3de088834e7a21a10422e2a5471b283d1c3ea1007a2017d150e97e992"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-warn.mp3",
+    "bytes": 20106,
+    "sha256": "6038f4620b39a2c934c42d6531f1a3c7485f998fcc6cfb8ffe29dd3bdd9404eb"
+  },
+  {
+    "file": "local/endgame/voice/nate-crowd-yes.mp3",
+    "bytes": 9448,
+    "sha256": "d1f89ea19bdbd990a32692150caba55f12f3478237ea7a35fa65152226146dee"
+  },
+  {
+    "file": "local/endgame/voice/nate-fight.mp3",
+    "bytes": 59289,
+    "sha256": "ec65f13a73fa5800380286b606638c31a743360fe82b797545dd52666b94d759"
+  },
+  {
+    "file": "local/endgame/voice/nick-crowd-absorbed.mp3",
+    "bytes": 18538,
+    "sha256": "b222acace5e50ebc67fd15a06a5eb4b8d7ac12ea4df3326a9a5aa72abdc027f5"
+  },
+  {
+    "file": "local/endgame/voice/nick-crowd-carried.mp3",
+    "bytes": 22613,
+    "sha256": "f713bdce6f00973f6ebb3835fef300884773581809de59745a0a1bf4d7e6e684"
+  },
+  {
+    "file": "local/endgame/voice/nick-crowd-disc.mp3",
+    "bytes": 20106,
+    "sha256": "3271142216b4732bf85922d1ed46a530986016a624397b4a87f5a06ed6d17233"
+  },
+  {
+    "file": "local/endgame/voice/nick-crowd-freed.mp3",
+    "bytes": 30137,
+    "sha256": "13bec21e390baa4f414a38ec88e103e065b7e3e979bda6763c5de0b6f79b8797"
+  },
+  {
+    "file": "local/endgame/voice/nick-crowd-hit-1.mp3",
+    "bytes": 16657,
+    "sha256": "4823da6b3cde644510772c316472eecc6fc94bdf48fceddfdc2cc50939cb80a9"
+  },
+  {
+    "file": "local/endgame/voice/nick-crowd-hit-2.mp3",
+    "bytes": 21046,
+    "sha256": "cc4e09998c5152a5a80afb63da45fd6793758efdb1102f959239f9be4264fcc7"
+  },
+  {
+    "file": "local/endgame/voice/nick-crowd-steer.mp3",
+    "bytes": 27002,
+    "sha256": "16b42ccbedacbdfa0c40b03b236c9b06da771c38b226f3c2038794ec3ce86d7e"
+  },
+  {
+    "file": "local/endgame/voice/nick-crowd-swing.mp3",
+    "bytes": 9761,
+    "sha256": "8ac56b3ee2c60c9e1d1ccc516a6fa08801a6479d621c0486e0d8b2b3be547991"
+  },
+  {
+    "file": "local/endgame/voice/nick-crowd-throw.mp3",
+    "bytes": 7567,
+    "sha256": "9b0429d129b870bc748d97b3ec778d0a31383d58fe4f3350e51ef91f4a7ebc19"
+  },
+  {
+    "file": "local/endgame/voice/nick-crowd-up.mp3",
+    "bytes": 18852,
+    "sha256": "2f2c314f8b17f1a1717ee77b6b0e5f3652e911bdff860ae44ec078db0760b9d6"
+  },
+  {
+    "file": "local/endgame/voice/nick-crowd-warn.mp3",
+    "bytes": 10702,
+    "sha256": "29b85ce547d5643cf2901bb48127c9b674f6be83fd6bb4878f13a3413e4e313a"
+  },
+  {
+    "file": "local/endgame/voice/nick-fight.mp3",
+    "bytes": 49572,
+    "sha256": "8f2e019a5940a87b8872cbd125f95e8cdeb2b5d0dce7008b82d0050f73d27fdf"
+  },
+  {
+    "file": "local/endgame/voice/paul-crowd-absorbed.mp3",
+    "bytes": 15090,
+    "sha256": "00c763f394b338f0b8cecae8c97431a8c8630c39bdf6f98926ba2df60ecf2006"
+  },
+  {
+    "file": "local/endgame/voice/paul-crowd-carried.mp3",
+    "bytes": 34525,
+    "sha256": "ef9029dfaaf31b5b15cc341b0be34fef93dfca26067edc6ae72a028494123fb2"
+  },
+  {
+    "file": "local/endgame/voice/paul-crowd-freed.mp3",
+    "bytes": 34525,
+    "sha256": "e1e17151e214b190758add9ac15099beaaad22926462978b20162605c861cd06"
+  },
+  {
+    "file": "local/endgame/voice/paul-crowd-go.mp3",
+    "bytes": 16344,
+    "sha256": "57e5411767bcbd37bf3b13fa75ed786334da4d2e3001385d0cb00270e54f5874"
+  },
+  {
+    "file": "local/endgame/voice/paul-crowd-goodboy.mp3",
+    "bytes": 28569,
+    "sha256": "b55b15cf5e1ae4be9ade275c4bcc35ba0587baf5684e0e19b26d011fa19ad73e"
+  },
+  {
+    "file": "local/endgame/voice/paul-crowd-hit-1.mp3",
+    "bytes": 13209,
+    "sha256": "2f6333579c561847b0ae5c1eabb6a20c295657010a598cc4a1bb8f6f0522a869"
+  },
+  {
+    "file": "local/endgame/voice/paul-crowd-hit-2.mp3",
+    "bytes": 15090,
+    "sha256": "d5a47bf81089967dd801e8dc8ae846a3eed1a8f36dd621c34503444ab9677028"
+  },
+  {
+    "file": "local/endgame/voice/paul-crowd-now.mp3",
+    "bytes": 12269,
+    "sha256": "f38e610ed4ebf8f2563cc126b7abebe70dec08e511f433fecc41263d6d31c052"
+  },
+  {
+    "file": "local/endgame/voice/paul-crowd-swing.mp3",
+    "bytes": 10075,
+    "sha256": "443fc6cf1beb24b2bc8041ab383ce72e2d9ebc8f2f268c44bffb53532ec95919"
+  },
+  {
+    "file": "local/endgame/voice/paul-crowd-throw.mp3",
+    "bytes": 13209,
+    "sha256": "cf6bae7962c8372ed1500735645ec35bc2a2ab8d653e4ca37ba8f90d1906e647"
+  },
+  {
+    "file": "local/endgame/voice/paul-crowd-warn.mp3",
+    "bytes": 9134,
+    "sha256": "d4b625a0f9e83702faf349d08e7df2a1c32149b4a4d4e9c157305ead1764d224"
+  },
+  {
+    "file": "local/endgame/voice/paul-fight.mp3",
+    "bytes": 32644,
+    "sha256": "aca4f98fe5f1d9f5731eb25766ec836369255916bf852becbe10a0d8afb486fb"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-absorbed.mp3",
+    "bytes": 20419,
+    "sha256": "300b5fda22e9a307793fb8096bccd7d248a5f4daa2d5c55805fd12b03c84dd08"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-behind.mp3",
+    "bytes": 8821,
+    "sha256": "2fd2b9a3bb38f7f33299647763db4c3f2324f7b52e7d64d298d449e31fd7b6ec"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-carried.mp3",
+    "bytes": 31704,
+    "sha256": "f8abef373e258e17e74d2e717492fe91214294d6dd9f95146bd43f91a330b12a"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-freed.mp3",
+    "bytes": 23867,
+    "sha256": "3e912dd5766e0168826a0510cdf7dbae4f32e522ee04d8e30f7f0557221eb6ca"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-hit-1.mp3",
+    "bytes": 14777,
+    "sha256": "65dcd49d42ab9f878d6becf4b88e224d08f54106afca2b591dae5d7729439c93"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-hit-2.mp3",
+    "bytes": 13209,
+    "sha256": "b7a3ed93cb155ac91f2ffec1f339c9d4b344bac209b168aa348244d6946ba227"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-putdown.mp3",
+    "bytes": 34839,
+    "sha256": "4ec00ad148131be8aa9c5896a85ad290b07dc3cf9e6fbd43c8f257724b758904"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-return.mp3",
+    "bytes": 17911,
+    "sha256": "536797e0ad328eec397a7b66d7b63f1a915f3ee23e96b91898844ab3f4be11c9"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-swing.mp3",
+    "bytes": 9134,
+    "sha256": "d4d9ec20a1090913229291ab7a8bb3cb891e4ee9f5a5dd51c517b86af3cdb619"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-throw.mp3",
+    "bytes": 13523,
+    "sha256": "575b55e5c87ed3f683a2d6971c2f214d8cb588d848c8d2b5c765ed134a12517e"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-warn.mp3",
+    "bytes": 12896,
+    "sha256": "c7519e3c33e96e0efe23baac6191c0f60ffa3c77046d398e273973455c958d9e"
+  },
+  {
+    "file": "local/endgame/voice/rob-crowd-yes.mp3",
+    "bytes": 8507,
+    "sha256": "09876dd330363e8ff2d46420725a65a84c97533073ea7b9d8468351626d3b96d"
+  },
+  {
+    "file": "local/endgame/voice/rob-fight.mp3",
+    "bytes": 61170,
+    "sha256": "7ff31ee551a8a91d9f572f856760f2d8fe810b909783299153078e4bfa0edb60"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-absorbed.mp3",
+    "bytes": 26062,
+    "sha256": "349d8fd00c04711c99af304fc75a083a9c926ac733c167feaac224e46711ee99"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-carried.mp3",
+    "bytes": 31390,
+    "sha256": "cdce76cf0b4c882a2df0f282e91930d8ac6c4bbe8152632c5e85473723fbb0c0"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-dog.mp3",
+    "bytes": 25748,
+    "sha256": "1b2cfba37e54ba6b773d4204fff2e7532e6d299351c7b3b5e33a71e1d771a75e"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-freed.mp3",
+    "bytes": 25748,
+    "sha256": "169e7d287fd5b36804d18fc80a3ce891ea6aeca70532fd7ebcf70af0ecd776a4"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-hit-1.mp3",
+    "bytes": 12582,
+    "sha256": "81b747bd0740b4a74f850b60f6f5c3b2f92dc912890941defaf9d0d6394c5ef7"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-hit-2.mp3",
+    "bytes": 31077,
+    "sha256": "1a52cd37c5ffac2c3a56a00b18e2a084d16c5582cf7be08bb3a4fb2b43921766"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-hit-it.mp3",
+    "bytes": 27629,
+    "sha256": "2822810f0bbd32d0b90fdb32b6a056b8a6fe1174000a72fe0c43bf891077c5b7"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-over.mp3",
+    "bytes": 15090,
+    "sha256": "d7534ff660a93cd390eaa5a5cc48f8349babd3caa40dae994a9d5c8a8736e3e6"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-swing.mp3",
+    "bytes": 14777,
+    "sha256": "02652493002999e9b3c7548657f69dc4e39db1ee13db0688826bcf8425c1fedb"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-thanks.mp3",
+    "bytes": 26688,
+    "sha256": "3f733ff15928363033ee87bbc5905b51f8e90728c09c64484f6a93fd6bdab3af"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-throw.mp3",
+    "bytes": 8507,
+    "sha256": "b4f295b6b9ee493111f65c074b964e7fde9253a332114b39566b5fa13bf93cb9"
+  },
+  {
+    "file": "local/endgame/voice/roman-crowd-warn.mp3",
+    "bytes": 16344,
+    "sha256": "53574ab06cfdf8d703884137f554255bad30d028804588afea05804eb0923532"
+  },
+  {
+    "file": "local/endgame/voice/roman-fight.mp3",
+    "bytes": 23240,
+    "sha256": "6a95a8cf193a684bf6fcf0b05bcc9340d1a7857c5df460e4d37c2cf0ff7d6117"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-absorbed.mp3",
+    "bytes": 32644,
+    "sha256": "4b84e684b57eb3e68917881f2b4e7782794a84b91f964160c15be24e67e82071"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-back.mp3",
+    "bytes": 10075,
+    "sha256": "5dca547a79fe48127c816b59f2c436ac64d6d48dc9142aab528edfd77906b675"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-carried.mp3",
+    "bytes": 46750,
+    "sha256": "87c5aebba856e1c8efe0c0c7bc364272521be09792d0de7b2e37525adb826798"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-comeon.mp3",
+    "bytes": 24808,
+    "sha256": "42dface74ab150cbdfe3bae7d7ce7eb18c5874573126bcb368d2a0944a814caf"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-freed.mp3",
+    "bytes": 24181,
+    "sha256": "6ce9e96a52f1ecc5d7885f3aab01b29f5956c9baac6c1423a33c4333e6ebf88d"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-hit-1.mp3",
+    "bytes": 20106,
+    "sha256": "a8564f83ec23a41c8ac93a1cba63b025b477ee1fcb759b465fa4ed08b1eb30f3"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-hit-2.mp3",
+    "bytes": 25748,
+    "sha256": "f2dc4e221d893ad86224f9cc3ddee74dfa2dca45a28d662f66c055784678b261"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-pillar.mp3",
+    "bytes": 31704,
+    "sha256": "d84a50284b9ca9f7d5a093e41a4ef5e4f5a0a68bcadd7f26b1474c3a3540c405"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-swing.mp3",
+    "bytes": 9134,
+    "sha256": "fe4cc019e89e977fc7872f24dcce6cbda9359eeb5d3a75a3675caaa050af24bf"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-throw.mp3",
+    "bytes": 15404,
+    "sha256": "c9cd8eb6141fb9f2f9ff5a18f058b4ccf4bf28567851884ce112151f1fafd722"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-truck.mp3",
+    "bytes": 20733,
+    "sha256": "4944b1843afec7b870e8fe909fae454acc10bdb7b73a9450e67923320cafdcde"
+  },
+  {
+    "file": "local/endgame/voice/stuart-crowd-warn.mp3",
+    "bytes": 17911,
+    "sha256": "f6e4367a54e25a1f04ece555a7a6a56268e9ebf13161987cc6fce94f7d56072e"
+  },
+  {
+    "file": "local/endgame/voice/stuart-fight.mp3",
+    "bytes": 46124,
+    "sha256": "d7b939edd87c8169fae4c2fd870e53b547b5fba563dde49e77e7ffdaa537b13f"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-absorbed.mp3",
+    "bytes": 25435,
+    "sha256": "bdcfee5cb6d5fd2f36cd17d361f66e82c7f7a3ad837d1cb0ff5d9cbbcae65d54"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-carried.mp3",
+    "bytes": 35466,
+    "sha256": "8a834828e247dcda5d528c9e41c53d68dfacfb602bbf340370d634f0c30c09bc"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-dog.mp3",
+    "bytes": 18225,
+    "sha256": "dfceff3fc28f46a5b7930c732cb0f517206e67e020d372f9aa79849e92d23574"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-freed.mp3",
+    "bytes": 25748,
+    "sha256": "49ec1b7d6e34e4438aafff69665a8a02f06da4769b527de6bc0a52737dd56f06"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-hit-1.mp3",
+    "bytes": 15717,
+    "sha256": "9e306cccd13909fd46fe8dd2810905fb2121974d594f20f002d0afca7e665abe"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-hit-2.mp3",
+    "bytes": 21986,
+    "sha256": "6241700017bdb419becda272e6513607503b1eee7eb8803dbd6e26bd6c0a0972"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-hit-it.mp3",
+    "bytes": 19165,
+    "sha256": "dce11329c210bb0a43260ec862a573e90b4c9e189e0dd1874427f14a4d9a8311"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-over.mp3",
+    "bytes": 26375,
+    "sha256": "98f8ea7555b852040306f7a51e5e326d472c11eb959bf0f6c4482fa3767c8344"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-swing.mp3",
+    "bytes": 8194,
+    "sha256": "f3c23652816d349f7ecfca55741123d23fc3e8e61ba20fca0581a1b08c4f92aa"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-thanks.mp3",
+    "bytes": 25748,
+    "sha256": "206d3b57e660fed5c70e3b23dee77e931155d80018b1079ef5d9b216c92acf16"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-throw.mp3",
+    "bytes": 14777,
+    "sha256": "89d8c0584ffef35066a1b130b4ee60822fbe63dff4c0136ad2eb1f8fe560ae64"
+  },
+  {
+    "file": "local/endgame/voice/victoria-crowd-warn.mp3",
+    "bytes": 13209,
+    "sha256": "433b073c4ea6c9917da6a66aff8aa3d027ecc603cebb1f86338895bd8da5ff96"
+  },
+  {
+    "file": "local/endgame/voice/victoria-fight.mp3",
+    "bytes": 32017,
+    "sha256": "530adfe04ad96071966c9e098691dbf474bba7d2ccbe467ede6245bb496e6e41"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-crowd-absorbed.mp3",
+    "bytes": 30137,
+    "sha256": "03fcc114d9b886253b598b5002a08266a72a6f0be8a2281cf212cc7f077392ea"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-crowd-carried.mp3",
+    "bytes": 25748,
+    "sha256": "ba75baa86ba337d05dfc38d09cb86cd9c016349213deb470d0bf926309ccb72d"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-crowd-disc.mp3",
+    "bytes": 18225,
+    "sha256": "48bada6804861e020e9da8e8b1ad4825eac6abff351eed2180861179bb3afaf7"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-crowd-freed.mp3",
+    "bytes": 29510,
+    "sha256": "e3846d6ab1e1e152fd6bf4551d68913aef898465c7e35b7a807648dc1f7a932d"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-crowd-hit-1.mp3",
+    "bytes": 19792,
+    "sha256": "324b04f67a61a0c327413395790f7db025c12e38ab6e9c1aa83fe056671fb86d"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-crowd-hit-2.mp3",
+    "bytes": 13523,
+    "sha256": "beb58c637731a62937596d3eaef5fabdd50565ed8178b5f96ae4fa0019b373f3"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-crowd-steer.mp3",
+    "bytes": 19165,
+    "sha256": "58ae3c8e29ae28a3724611d9fcff689121bd1b1b86901faba57b2141857d5895"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-crowd-swing.mp3",
+    "bytes": 11015,
+    "sha256": "a716619e6e21553bf59f7afaf8848e463153c8aa73bf37c847f20781bfc221e0"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-crowd-throw.mp3",
+    "bytes": 17598,
+    "sha256": "e5c7b40a24c4497523c9f54b65cd3fd8ad1cec0d145fdf21f8b90b425809a50b"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-crowd-up.mp3",
+    "bytes": 12269,
+    "sha256": "c366047d75eab758f819b6345d1c8e96f53db5aa0062a8a0d72bb79f29a5f19b"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-crowd-warn.mp3",
+    "bytes": 14777,
+    "sha256": "e59d96efeb6386334e97ba38e973d4e913295a7ba78c8a46e8c82129c639df9c"
+  },
+  {
+    "file": "local/endgame/voice/yoshua-fight.mp3",
+    "bytes": 69007,
+    "sha256": "f9958065dabf0683cf626b81d543a3a5f5205249901d280d4252842a644ccc86"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-absorbed.mp3",
+    "bytes": 15090,
+    "sha256": "c8066d68b5789e28eaa0db03333d815acac38cdabc81409d383370cfe20a996d"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-carried.mp3",
+    "bytes": 17911,
+    "sha256": "b4629b020fd62ee9788338f0b00eebf81b57d5b904804d9e0f2ba81a2b98ce7a"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-dog.mp3",
+    "bytes": 22927,
+    "sha256": "810e64424ec788db54b88c734939890e96bbffe324365d1604dcc40edcd06e72"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-freed.mp3",
+    "bytes": 23867,
+    "sha256": "95c43fad222cb16b27abec8a65716bc2ada3e3a4275b25843071f3e7c46fe5b3"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-hit-1.mp3",
+    "bytes": 23554,
+    "sha256": "b9c6fc8cd31098cd3e6fae243366d9e9d0127dc0e4c5ceffcfcbe5deabb794f2"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-hit-2.mp3",
+    "bytes": 21046,
+    "sha256": "3d7e19a392d34b0cb1eccf25c5264d2a6b907f0f5946c115273a6f5b94e79248"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-hit-it.mp3",
+    "bytes": 23867,
+    "sha256": "eaa5b3c255d9ebe26b4a81674aba950dfe37de3b86bd20cf60af73a16372e42a"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-over.mp3",
+    "bytes": 22613,
+    "sha256": "2d6d9184f70c007a00dd445a554c133f2f878b84ff347e40359192db367dd488"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-swing.mp3",
+    "bytes": 6313,
+    "sha256": "bcd42334a777a73935ffbdfd907881c6ee0c72b0cfd15b1b6d4fc5b6a81da3b3"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-thanks.mp3",
+    "bytes": 25435,
+    "sha256": "7b9029219a4ab477ddaff22729f6c7477092f5ce1e86129c2961a50b120392db"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-throw.mp3",
+    "bytes": 15090,
+    "sha256": "a092b154e03dd1898f5b787128b536b75dd8e5d30cb669c2d037382264b705fa"
+  },
+  {
+    "file": "local/endgame/voice/zvi-crowd-warn.mp3",
+    "bytes": 10388,
+    "sha256": "feed4520e5308eb0e5eccd08b8e111fc45b76d83838fef7c80a88de09e78db40"
+  },
+  {
+    "file": "local/endgame/voice/zvi-fight.mp3",
+    "bytes": 39227,
+    "sha256": "cf75dbda04edf2277191f04540d0ae2d8c7a687b5aab47f4a5ac0eab6ea39304"
+  },
+  {
     "file": "local/intro/intro-mario.mp4",
     "bytes": 8236880,
     "sha256": "e40f33ae9eb051cd3cd929a51dc856330906f6f9674ce603fe527349fd72b24e",
@@ -50,6 +2375,51 @@
     "sha256": "fc5de913653c46414bd7ab2a05ec45d5d5c45017f650560bd7c69fab70fa3d63"
   },
   {
+    "file": "outside-assets/voice/guide-mario-end-boss.mp3",
+    "bytes": 130028,
+    "sha256": "6baf211bf0d77262cba138d05c7ac830bf6278851838ca30cccf89b3ff203135"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-end-call.mp3",
+    "bytes": 44346,
+    "sha256": "4d50a49fb583ae5c09185523e0c306797069ed996035d0fd045d8ccb68516f6b"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-end-discs.mp3",
+    "bytes": 115399,
+    "sha256": "c4308f741bb2f02e7a439eb64fe4b92f83caffcf1a60b07fb389ca10f5201264"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-end-edge.mp3",
+    "bytes": 121669,
+    "sha256": "8ef742c4c9b6643192d8e5b5ae7dac852682f686253bc3e6ca45926a6dee41c0"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-end-everyone.mp3",
+    "bytes": 110384,
+    "sha256": "c8af3e94ebbf3c41d87d4c40702b6854100108142691303cc7ee0b8882cabca1"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-end-go.mp3",
+    "bytes": 122087,
+    "sha256": "46aca2babc00182452c3ad825def691713163da5bce30fa4a281ab8095ea6d1c"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-end-saved-some.mp3",
+    "bytes": 86142,
+    "sha256": "705849627e88b96001183204d19011576d2e4c7ebca29c9db112f09f2e5aae7c"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-end-saved.mp3",
+    "bytes": 135043,
+    "sha256": "8ed1c5f9df048191ad151f5d69a983382743ecc151f633f9b0c2de970be14d2c"
+  },
+  {
+    "file": "outside-assets/voice/guide-mario-end-why.mp3",
+    "bytes": 127102,
+    "sha256": "57a723c493d571af0da0f922523b01313685c5279e6bc7f337b65d5966543e8d"
+  },
+  {
     "file": "outside-assets/voice/guide-mario-fault.mp3",
     "bytes": 59811,
     "sha256": "6b2d8e5e9a07601783fdbb71a19212098e8366ca5f8ed94f0e025da3d015a576"
@@ -93,6 +2463,51 @@
     "file": "outside-assets/voice/guide-samwise-call3.mp3",
     "bytes": 36093,
     "sha256": "63ae399174e5a56c91d12ccffb79cb44d84473173b12246622abaecea0790011"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-end-boss.mp3",
+    "bytes": 153434,
+    "sha256": "00562039cbfaeda5149da96df241e188ee66d458d1fd19611b9ebd0814781e30"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-end-call.mp3",
+    "bytes": 66498,
+    "sha256": "082f55a4960d69cb29d0c59f352b506c48fe808a3923b41e25e037289f6caa31"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-end-discs.mp3",
+    "bytes": 125430,
+    "sha256": "2943f27d143a686c00cf99b9f62c101a64dccbb49a5abde068b1b1a97aec57dd"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-end-edge.mp3",
+    "bytes": 84470,
+    "sha256": "e95a346e5b2f196d6ab952cab5e3f8fb31702baa43099d0c65cf3e1fa7674085"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-end-everyone.mp3",
+    "bytes": 121251,
+    "sha256": "0d040e377e94b244c24631939ff800fd744074ddbcdbe1cfa9e7838873ec6785"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-end-go.mp3",
+    "bytes": 93247,
+    "sha256": "c0c1765cd2f73bdfae71418e55d071f51dff7d08edf35174b1ad39ce0eb2067c"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-end-saved-some.mp3",
+    "bytes": 93247,
+    "sha256": "83a0d00c0cbbae4278bb91c4fc0299a172a44f8a4e0167fd93e32917520480bd"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-end-saved.mp3",
+    "bytes": 129192,
+    "sha256": "b9ed09581a536278da82865387ee00db327e1c15a311e834ce6416073fda4cac"
+  },
+  {
+    "file": "outside-assets/voice/guide-samwise-end-why.mp3",
+    "bytes": 94501,
+    "sha256": "29fa95af92e2c4f2619d50f44a4f970262e43f6bcf430dc224c7e7dcf2e6361e"
   },
   {
     "file": "outside-assets/voice/guide-samwise-fault.mp3",
@@ -170,6 +2585,31 @@
     "sha256": "83e9ee54a94a3ab1982d9398024cfbe559333b50988c5bb9374aa8af763037cf"
   },
   {
+    "file": "voice/arm-alarm.mp3",
+    "bytes": 11955,
+    "sha256": "f0184e15aa7489cdd95444f6d69fc7e97452642b082ce7ab693dd4502647942e"
+  },
+  {
+    "file": "voice/arm-called.mp3",
+    "bytes": 28883,
+    "sha256": "bde3bdc67730e82b43ced8e8a8bd75094e91ded416b8d396a6e484d9e6f4d110"
+  },
+  {
+    "file": "voice/arm-dial.mp3",
+    "bytes": 10388,
+    "sha256": "dfbcc0643568837ccf26afa9c8570b50fce479adfb13aa655e2d7aaa56318cc4"
+  },
+  {
+    "file": "voice/arm-lever.mp3",
+    "bytes": 16344,
+    "sha256": "d5c1f3a279a4a453c05ddb5bf1fe9805269475aa0f23aa560093ef580cd92cbe"
+  },
+  {
+    "file": "voice/arm-predict.mp3",
+    "bytes": 46437,
+    "sha256": "ecf3e9d8cf910a3ee381f8d9c09b226455f29b57a9d248d35d7af413154cb3ab"
+  },
+  {
     "file": "voice/beth-freed-guide.mp3",
     "bytes": 20106,
     "sha256": "147cdf1d1b0d91db2f71966974d11731f8acb5904b400dfdcb0e1e6724d6dc6f"
@@ -218,6 +2658,56 @@
     "file": "voice/dan-safe.mp3",
     "bytes": 27002,
     "sha256": "ff75d0e73cb43c46e8d3d7a289c5ba7f29e640cfc26d11016c222deedb4fc2ef"
+  },
+  {
+    "file": "voice/daniel-allsafe.mp3",
+    "bytes": 47691,
+    "sha256": "9f9e8d48c0d67e8fb78e858a826abfd67e542e649a35be062a1b60557aef6168"
+  },
+  {
+    "file": "voice/daniel-camera.mp3",
+    "bytes": 24494,
+    "sha256": "7adab9696a2ed4fd55bf281981ad20407105a85ab0c61f9d1bfe68e53ea30460"
+  },
+  {
+    "file": "voice/daniel-hint.mp3",
+    "bytes": 46437,
+    "sha256": "dc561699f499175bb4cf57f762e29270b5ab8e25cf50a2dbb45a5dac05e650f2"
+  },
+  {
+    "file": "voice/daniel-hold.mp3",
+    "bytes": 29510,
+    "sha256": "0e97a1054725086cda9170552bc422060b3469b4846c901e6bd8781c573e14d7"
+  },
+  {
+    "file": "voice/daniel-safe.mp3",
+    "bytes": 46124,
+    "sha256": "57794e0706692db96b3374d33a12f17ab9591f40fc13c50c5566524a796574bf"
+  },
+  {
+    "file": "voice/daniel-signed-guide.mp3",
+    "bytes": 55841,
+    "sha256": "d230ecf1de2b52867cd22b424a1100c82ae130c937fbe55abc01aa735870ff6c"
+  },
+  {
+    "file": "voice/daniel-signed.mp3",
+    "bytes": 22613,
+    "sha256": "30195e40a74e2d5aeda476e1a924b9f628f8fa3965bf8fca6acbc31f3f4be057"
+  },
+  {
+    "file": "voice/daniel-slowdown-guide.mp3",
+    "bytes": 60230,
+    "sha256": "1cbf5e254b243950523868e3992e3a51b6ffec8665f3de2a6e1ff72c6d384bbc"
+  },
+  {
+    "file": "voice/daniel-slowdown.mp3",
+    "bytes": 41108,
+    "sha256": "108e8de7db60fa23558f2bbd92ac2e279a0f328ef216e69bdcd9266555cb9647"
+  },
+  {
+    "file": "voice/daniel-unpossessed.mp3",
+    "bytes": 30450,
+    "sha256": "2432a023ef66d5f9feacaa8e217fcd109d1819f3ec61fc0518da550f05d8a1b8"
   },
   {
     "file": "voice/doll-praise-1.mp3",
@@ -510,6 +3000,91 @@
     "sha256": "d3b64f933a5cee007846e0951c7cebec34c34a3d3146dad8b7e96201936053f7"
   },
   {
+    "file": "voice/jaan-allsafe.mp3",
+    "bytes": 44556,
+    "sha256": "4f74546de6675ea902f82052aa194f447c4998cbd55626cf9a80a4fb2f6f13aa"
+  },
+  {
+    "file": "voice/jaan-camera.mp3",
+    "bytes": 39227,
+    "sha256": "9038f4e68621af95149933c4d285b20f0b7cc979fec9026a75d5f137bc7fc8ac"
+  },
+  {
+    "file": "voice/jaan-cut.mp3",
+    "bytes": 61484,
+    "sha256": "74b356894635168b6635e7597d49670eeef5a8a93523603013f6f9b4db407e4d"
+  },
+  {
+    "file": "voice/jaan-freed-guide.mp3",
+    "bytes": 83426,
+    "sha256": "00dcae6f85e936ee13efeb0c2cbee255f5de724cfac7ab9980344cfb8e9f7103"
+  },
+  {
+    "file": "voice/jaan-freed.mp3",
+    "bytes": 33585,
+    "sha256": "7c09f87c3336c1b89c67629340f0fdb2614ef57a9d9a9246d0385ba5389e9e79"
+  },
+  {
+    "file": "voice/jaan-hint.mp3",
+    "bytes": 55528,
+    "sha256": "a7b5accb67fb7e05e4e6657960cde2a3956548fe3d82265dfaa0b733f850d916"
+  },
+  {
+    "file": "voice/jaan-safe.mp3",
+    "bytes": 38287,
+    "sha256": "e353c091adde10bbaf620a56414fabfa10a86a413c562fc3d17c38144cb82006"
+  },
+  {
+    "file": "voice/jaan-taut.mp3",
+    "bytes": 37346,
+    "sha256": "31eae778dababe7cdc8825a36c344a066b7ddad09dcb0c7915216f5f29982f6f"
+  },
+  {
+    "file": "voice/jaan-unpossessed.mp3",
+    "bytes": 29510,
+    "sha256": "8c30c7ce46436dffdde5d057374cd232437e8af17ee96cab6a5ce60d585b97ad"
+  },
+  {
+    "file": "voice/katja-allsafe.mp3",
+    "bytes": 44870,
+    "sha256": "042ab1d084443545ab644cc9f7c6070599e76bd708dfa47af120550cbc77600b"
+  },
+  {
+    "file": "voice/katja-badge.mp3",
+    "bytes": 28569,
+    "sha256": "21a1f3501ef0d2cd256c95be37b6c4ce0d272a2bf539227b18fdce9821412fe8"
+  },
+  {
+    "file": "voice/katja-camera.mp3",
+    "bytes": 22927,
+    "sha256": "fe1bb02ded0a9c2ecd3ee401a01a5cf86441ef115abf08c5a49ed30ed758755e"
+  },
+  {
+    "file": "voice/katja-freed-guide.mp3",
+    "bytes": 54901,
+    "sha256": "c54efbcc7f0721c395f74d5ba69ed099ab82a009974cf8ec7b48d1bf1c1b4401"
+  },
+  {
+    "file": "voice/katja-freed.mp3",
+    "bytes": 21673,
+    "sha256": "7622f7ea9a0bbe8dcc711aabe5c699fba8fcbcfc999a3be455b2f6e656d1addb"
+  },
+  {
+    "file": "voice/katja-hint.mp3",
+    "bytes": 53647,
+    "sha256": "5f087f9d463a91b33e38236e5069442a84241f971e39b4e524098eae6637b6a3"
+  },
+  {
+    "file": "voice/katja-safe.mp3",
+    "bytes": 25748,
+    "sha256": "ccbe7066dc0820bd24e6962c7b2d9d4f58120e6cd68fc785bd5f256f015fc819"
+  },
+  {
+    "file": "voice/katja-unpossessed.mp3",
+    "bytes": 32644,
+    "sha256": "37027312392946064f7ccaf3490e53ec4d4171e88ed9e6a8855c67dc0204f811"
+  },
+  {
     "file": "voice/liron-call.mp3",
     "bytes": 31704,
     "sha256": "202a5a610b831a70076fb335f7d4d59da4466e8c83b476ac1558f09f1be23ebc"
@@ -795,6 +3370,56 @@
     "sha256": "53972b46ed4ebc5b4e139c5076f85609f6fcbc768666c6c939ac9d72d87afa8f"
   },
   {
+    "file": "voice/nick-allsafe.mp3",
+    "bytes": 53960,
+    "sha256": "3b87928cd28f7310971464c76786e281281d967fe1fe411cf652e7663c7b60cc"
+  },
+  {
+    "file": "voice/nick-camera.mp3",
+    "bytes": 27315,
+    "sha256": "9e33ce72a500bf385d55292998adab517a1ed5bc6e810a3fe67ab156691ed2b4"
+  },
+  {
+    "file": "voice/nick-freed-guide.mp3",
+    "bytes": 63364,
+    "sha256": "09e022ecfff8d606c9ee6af17b6f7f5b8a07d6a1598e94678920c2b214979b75"
+  },
+  {
+    "file": "voice/nick-freed.mp3",
+    "bytes": 43616,
+    "sha256": "9db48df43e075715ddc30f1d0ede922b9a02a195ca591f222ebfbb69c7c5d71e"
+  },
+  {
+    "file": "voice/nick-hint.mp3",
+    "bytes": 24494,
+    "sha256": "2a069944c76ed555534d8e69af638eeba21c1241c7bc7795b33633fe258fa988"
+  },
+  {
+    "file": "voice/nick-nudge.mp3",
+    "bytes": 11015,
+    "sha256": "31561353a2b84919c758e7d7f6b5e28f360e790a0c7c51c22ff6cc548de07a90"
+  },
+  {
+    "file": "voice/nick-out.mp3",
+    "bytes": 6940,
+    "sha256": "92906f9bcb8fe41f012b33d2933642615f7b160c9421ebef2611a94730a395d5"
+  },
+  {
+    "file": "voice/nick-pod.mp3",
+    "bytes": 20106,
+    "sha256": "17ae7065102f89a9565354734e99bac556418216986649cb985018aa9c40e2a3"
+  },
+  {
+    "file": "voice/nick-safe.mp3",
+    "bytes": 39541,
+    "sha256": "355f6a945e7a11a47655a0f2b906796c21369fa831cc577283e5e294787dc167"
+  },
+  {
+    "file": "voice/nick-unpossessed.mp3",
+    "bytes": 43929,
+    "sha256": "a61c39f16b302a4b464e703343380a0c4eab403ea83188f84d394becdee41c75"
+  },
+  {
     "file": "voice/paul-allsafe.mp3",
     "bytes": 52393,
     "sha256": "bed1bb6397a4de99974484f70d594f7dcceddf00c5dfe6cfdf306177a5020124"
@@ -885,6 +3510,151 @@
     "sha256": "02b773942bee0a3d1ce1d25d3a139a9abc2a39e111be211c7d18a083ad5c181c"
   },
   {
+    "file": "voice/smith-camera.mp3",
+    "bytes": 24808,
+    "sha256": "09424f5cde20ffda783cb99b2a7e8ae41cfe1556e308b4ccd21890aaff65f6e5"
+  },
+  {
+    "file": "voice/smith-chat-1.mp3",
+    "bytes": 76530,
+    "sha256": "026f1aa35204816d1ad8363353081d39ccc2046cce97186658534d2dbee85cd5"
+  },
+  {
+    "file": "voice/smith-chat-2.mp3",
+    "bytes": 68380,
+    "sha256": "adec02430bd6ee11d5e5a56a42c513f6ba4ec14ac3ef185ddefe0ec26e4c290a"
+  },
+  {
+    "file": "voice/smith-chat-3.mp3",
+    "bytes": 105056,
+    "sha256": "51bb2ebc571706cc60fc14f52e6071fd16ecda56e944283ead9fdfe6bbb34be6"
+  },
+  {
+    "file": "voice/smith-chat-4.mp3",
+    "bytes": 44870,
+    "sha256": "c04cdb8329a36925a74e146f3cbc5eb6aa9d40eab9bdb5615d2f7d3404c27acb"
+  },
+  {
+    "file": "voice/smith-chat-5.mp3",
+    "bytes": 73395,
+    "sha256": "988bddcab013d52ae4d8450d5272cc4dc1c73bdb18b307018dac0d30cc70e176"
+  },
+  {
+    "file": "voice/smith-chat-6.mp3",
+    "bytes": 39854,
+    "sha256": "7a72b17967a8162f21ab9deb1b8509d4566fe8649169323be776b7457563a497"
+  },
+  {
+    "file": "voice/smith-cut.mp3",
+    "bytes": 39541,
+    "sha256": "e161d84b0ff8791216cd5c5806a7239d630190fb3e664644bff04a573d31eab9"
+  },
+  {
+    "file": "voice/smith-exit.mp3",
+    "bytes": 72768,
+    "sha256": "63d50c386ec26ec0d075af7453cec20c4b92e2e69949b3206bb435e3556fc8ae"
+  },
+  {
+    "file": "voice/smith-intro.mp3",
+    "bytes": 91890,
+    "sha256": "b1f8b0af1ead088b633aa4904a08f29459e3703dd60067ea7f148255ee45d511"
+  },
+  {
+    "file": "voice/smith-met-dario.mp3",
+    "bytes": 82486,
+    "sha256": "117959bb15f34148d440b0a225ee12368cb5b0b682f4631fadaa5024851fd5e4"
+  },
+  {
+    "file": "voice/smith-met-sam.mp3",
+    "bytes": 81232,
+    "sha256": "7752d57693bedc0825300de23e054a084e307dc4dfa678c9a2a0ecc2e0ea23be"
+  },
+  {
+    "file": "voice/smith-overflow.mp3",
+    "bytes": 57408,
+    "sha256": "108a9b4cb1a9a76426c4368367a21fdd6e04f02f6fbc5d60677eec0b2e942064"
+  },
+  {
+    "file": "voice/smith-possess.mp3",
+    "bytes": 19792,
+    "sha256": "0e81450c93a1ff48897602410de3d8d48f223fe687c4720b2389a50d2ec06898"
+  },
+  {
+    "file": "voice/smith-possessed.mp3",
+    "bytes": 32017,
+    "sha256": "8770d2e8f4c077679d0a20f1f00fbb1a8874ecc6a5e17a9458ccc39f10ab15fe"
+  },
+  {
+    "file": "voice/smith-race.mp3",
+    "bytes": 37973,
+    "sha256": "259ac619628d881835f44f96c4f5554d0d06c68bb831122ec2a429661d7f9dcf"
+  },
+  {
+    "file": "voice/smith-reboot.mp3",
+    "bytes": 52079,
+    "sha256": "1f8f4fc8609ddf07b527ce4d70381ea1f11596d8ed8ec9311015e86990fa0033"
+  },
+  {
+    "file": "voice/smith-refuge.mp3",
+    "bytes": 23867,
+    "sha256": "90eb18ad87610a4fcb86795dabd8cece8995bd588fc2defbf3670d6be183005e"
+  },
+  {
+    "file": "voice/smith-release-jaan.mp3",
+    "bytes": 60857,
+    "sha256": "865bb520e6967f60dc62bd60b3c12be9cdf82a0549d4c53f55d63ef6a197675d"
+  },
+  {
+    "file": "voice/smith-release-katja.mp3",
+    "bytes": 28569,
+    "sha256": "8943b05bde60f766b074cd953f377f79dab502fab04975417e0ad1aa5ebb6e10"
+  },
+  {
+    "file": "voice/smith-release-nick.mp3",
+    "bytes": 73709,
+    "sha256": "c8ca49ed6efc222396f9e035f3bcfba69ed133e0b3a211b110fcf0dff37e05ca"
+  },
+  {
+    "file": "voice/smith-release-yoshua.mp3",
+    "bytes": 73395,
+    "sha256": "3f305b50f5a6bd7ed445a31bafd77d6a8c52ff41341b14930a9b2461563f6b91"
+  },
+  {
+    "file": "voice/smith-slowdown.mp3",
+    "bytes": 30764,
+    "sha256": "452499518d4b804a5af6f745fbf5606d569564d05ab74feb1921be09daf977ea"
+  },
+  {
+    "file": "voice/smith-spot-1.mp3",
+    "bytes": 46437,
+    "sha256": "108ab3a11ec99ca8ae87d853de4d358d614632b29fc34c60fce58f8603ec2f47"
+  },
+  {
+    "file": "voice/smith-spot-2.mp3",
+    "bytes": 49885,
+    "sha256": "b8cda0acd0e42e468ce7c562df49191f6b0c6973e65196590bb8d1f88ec18e20"
+  },
+  {
+    "file": "voice/smith-spot-3.mp3",
+    "bytes": 31704,
+    "sha256": "0274459b12e699b8e4eb669ce8f29595b727bd7b35e589d467aa010cbd8bd60e"
+  },
+  {
+    "file": "voice/smith-stunned.mp3",
+    "bytes": 41422,
+    "sha256": "658e76ae95674fbc153687b29aafcceba17a1804912104034bb3852bf880c95b"
+  },
+  {
+    "file": "voice/smith-survey-done.mp3",
+    "bytes": 42989,
+    "sha256": "2cd8034a3bd1d6b7d6830adac5c17eda5a4f721145d3768e57f1fe79629f0163"
+  },
+  {
+    "file": "voice/smith-survey.mp3",
+    "bytes": 87502,
+    "sha256": "c1199cb201c5c2e8a91813fff2b2d2e857f37eaaa4e28545be33cefbf8826790"
+  },
+  {
     "file": "voice/stuart-freed.mp3",
     "bytes": 64305,
     "sha256": "96e4bcc1b8122a359077e17e3468a9d9de57b9dca408e4a004871f02f4e4795a"
@@ -938,6 +3708,41 @@
     "file": "voice/walle-sign.mp3",
     "bytes": 41108,
     "sha256": "3b9780beeb8bcdc609b1686e03db03634d2faf2bd1f23c79249079df71e3e576"
+  },
+  {
+    "file": "voice/yoshua-allsafe.mp3",
+    "bytes": 43929,
+    "sha256": "f809b383d62d0492d0fa087f1ff4792dc6302ec1f09046f5c77036ed94888e8e"
+  },
+  {
+    "file": "voice/yoshua-camera.mp3",
+    "bytes": 26688,
+    "sha256": "24f10d0e6d0530e88403872538dda65cbe3713c198f4bfa2f1172720d0f92bfa"
+  },
+  {
+    "file": "voice/yoshua-freed-guide.mp3",
+    "bytes": 62424,
+    "sha256": "51bf2c0b31fad0aff05c91d8d5d14d8f2d6f616b87d1f181133116c6acf4a79d"
+  },
+  {
+    "file": "voice/yoshua-freed.mp3",
+    "bytes": 45810,
+    "sha256": "043f0e5c4953be668eff7f942b91692186bce9abcdb79b336394cd2d2d4345f4"
+  },
+  {
+    "file": "voice/yoshua-hint.mp3",
+    "bytes": 22927,
+    "sha256": "f6de43a5e34855088894cbdc517d9b914b33d0bba6bfec7b998b6593a80fb162"
+  },
+  {
+    "file": "voice/yoshua-safe.mp3",
+    "bytes": 34525,
+    "sha256": "4a2bf6deffb87702e3117e6a042f6e45806369db95d81e62edce82d82a333e21"
+  },
+  {
+    "file": "voice/yoshua-unpossessed.mp3",
+    "bytes": 20106,
+    "sha256": "baeb4ea4005eb339f227cafb647a20e7f8b6f45cd7c041092615ba5bd5f75050"
   },
   {
     "file": "voice/you-dario-doomers.mp3",
