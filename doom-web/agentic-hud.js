@@ -3,8 +3,8 @@ import {checkpointStatusBar,ensureStatusBar} from './checkpoint-hud.js';
 import {nativePersonRects} from './person-label.js';
 const el=id=>document.getElementById(id);
 
-// Level 4, AGENTIC SMITH's pod farm (E2M2, docs/LEVEL-04.md): a copy of factory-hud.js. Local development
-// only for now (levels.js local:true). ?puzzle= names for the loopback flag (CVar pdoom_agentic_site,
+// Level 4, AGENTIC SMITH's pod farm (E2M2, docs/LEVEL-04.md): a copy of factory-hud.js. Public since
+// 2026-11-03. ?puzzle= names for the loopback flag (CVar pdoom_agentic_site,
 // Agentic.zs): the five rescues, the refuge, and the exit (all five freed in the refuge, phone ringing).
 export const AGENTIC_SITES=['tallinn','bostrom','kokotajlo','grace','bengio','refuge','exit'];
 // Daniel's NDA ending by its saved code (campaign.js ending3, CVar pdoom_ending3): 1 race, 2 slowdown.

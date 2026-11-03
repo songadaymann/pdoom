@@ -28,8 +28,8 @@ import {browserStorage,resolveCeo,mountCeoPicker} from './ceo-pick.js';
 const DEBUG_OPTIONS={logs:new URLSearchParams(location.search).has('debug')};
 const requestedLevel=new URLSearchParams(location.search).get('level')||'five-prisons';
 let LEVEL=getLevel(requestedLevel);
-// Level 4 is local development only for now (levels.js local:true): off loopback, or with dev-config.json
-// off, its ?level= opens level 1's campaign page instead.
+// A level marked local:true in levels.js is loopback development only (none since level 4's release):
+// off loopback, or with dev-config.json off, its ?level= opens level 1's campaign page instead.
 if(LEVEL?.local&&!await localDevelopmentEnabled())LEVEL=getLevel('five-prisons');
 // The campaign page. MEG3N's factory is scored there since 2026-10-21 (started from the episode
 // menu); its own ?level=meg3n-factory page stays the unscored practice page with ?puzzle= flags.
@@ -308,7 +308,7 @@ async function enterOutside({intro=false,melt=false}={}){
   try{
     if(hub){outside=hub;outside.setActive(true,exitFrom);}
     else{const {createOutside}=await import('./outside/outside.js');
-      outside=hub=await createOutside({source:canvas,agenticDoor:await localDevelopmentEnabled(),stage:document.querySelector('#stage'),audio:audio.context,read:()=>state,campaign:()=>campaign.getState(),enter:enterLevel,onGate:goEndgame,prompt:text=>preferences.prompt(text),readThis:()=>gamePause?.openRead?.(),labels:(rects,surface,active)=>personLabel.update(rects,surface,active&&!uiBlocked)});}
+      outside=hub=await createOutside({source:canvas,agenticDoor:true,stage:document.querySelector('#stage'),audio:audio.context,read:()=>state,campaign:()=>campaign.getState(),enter:enterLevel,onGate:goEndgame,prompt:text=>preferences.prompt(text),readThis:()=>gamePause?.openRead?.(),labels:(rects,surface,active)=>personLabel.update(rects,surface,active&&!uiBlocked)});}
     outside.setActive(true,exitFrom);
     if(intro){await outside.startIntro(runningCeo);campaign.saveOpening('xp-intro');prologue.reset();document.querySelector('#reticle').hidden=true;}
     else syncEndgame();
@@ -417,8 +417,9 @@ async function startEngine(id,{load=false,prologue:playPrologue=false,skipOpenin
     document.querySelector('#dev-badge').hidden=!development;
     const site=FACTORY_SITE&&await localDevelopmentEnabled()?FACTORY_SITE:0;
     if(site){const badge=document.querySelector('#dev-badge');badge.textContent=`Dev: start at ${FACTORY_SITES[site-1]} · `;const a=document.createElement('a');a.href='?level=meg3n-factory';a.textContent='Start normally';badge.append(a);badge.hidden=false;}
-    // Level 4 is local development only: the engine refuses AGENTIC.BAT's door (pdoom_enter_agentic) without this.
-    const agenticEnabled=await localDevelopmentEnabled(),agenticAt=AGENTIC_SITE&&agenticEnabled?AGENTIC_SITE:0;
+    // The engine refuses AGENTIC.BAT's door (pdoom_enter_agentic) without this; level 4 is public since 2026-11-03.
+    // Starting beside a puzzle (?puzzle=) stays a loopback development flag.
+    const agenticEnabled=true,agenticAt=AGENTIC_SITE&&await localDevelopmentEnabled()?AGENTIC_SITE:0;
     if(agenticAt){const badge=document.querySelector('#dev-badge');badge.textContent=`Dev: start at ${AGENTIC_SITES[agenticAt-1]} · `;const a=document.createElement('a');a.href='?level=agentic-pods';a.textContent='Start normally';badge.append(a);badge.hidden=false;}
     const width=960,height=600;canvas.width=width;canvas.height=height;
     const offscreen=canvas.transferControlToOffscreen();
@@ -539,7 +540,7 @@ async function enterLevel(id,replay=false,restart=false){
  LEVEL=getLevel(id)||LEVEL;run.level=LEVEL;scoreView.setLevel(LEVEL);
  // MEG3N.AVI's door (2026-10-20): the factory, walked into from SAFE MODE, with its own HUD.
  useFactoryHud(LEVEL.id==='meg3n-factory');factoryExiting=false;state.factory=null;audio.holdMusic(false);
- // AGENTIC.BAT's door (local development only, doom-outside.ts): the pod farm, with its own HUD.
+ // AGENTIC.BAT's door (doom-outside.ts): the pod farm, with its own HUD.
  useAgenticHud(LEVEL.id==='agentic-pods');agenticExiting=false;state.agentic=null;
  awaitingRun=true;state.mode='loading';state.escape=null;state.dialogue=null;state.polish=null;state.lives=null;state.hal=null;state.doors=null;state.evaluationSign=null;state.world=null;
  gamePause.loading('ENTERING THE FACILITY');blockPanel('onboarding',true);clearTimeout(timeout);timeout=setTimeout(()=>fail('The facility did not finish loading. Reload to try again.'),45000);

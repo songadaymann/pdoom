@@ -233,9 +233,9 @@ export function makeSfx(){
  const clips=new Map<string,AudioBuffer[]>();
  async function loadClips(){
   try{
-   const r=await fetch('/local/endgame/sfx/manifest.json');if(!r.ok)return;const m=await r.json() as {clips:Record<string,string[]>};
+   const r=await fetch('../local/endgame/sfx/manifest.json');if(!r.ok)return;const m=await r.json() as {clips:Record<string,string[]>};
    for(const [name,files] of Object.entries(m.clips)){
-    const takes=await Promise.all(files.map(f=>fetch('/local/endgame/sfx/'+f).then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(b=>ctx!.decodeAudioData(b)).catch(()=>null)));
+    const takes=await Promise.all(files.map(f=>fetch('../local/endgame/sfx/'+f).then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(b=>ctx!.decodeAudioData(b)).catch(()=>null)));
     clips.set(name,takes.filter((b):b is AudioBuffer=>!!b));
    }
   }catch{/* none made: the synth */}

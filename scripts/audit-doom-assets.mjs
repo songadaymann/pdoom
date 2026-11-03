@@ -6,11 +6,9 @@ import {createHash} from 'node:crypto';
 import {AssetLoader} from '../doom-web/asset-loader.js';
 const root='doom-web',out='output/onboarding/assets';await fs.mkdir(out,{recursive:true});
 const files=new Set();
-// Level 4 (AGENTIC SMITH's pod farm) is local development only: its HUD images, the five captives'
-// meadow figures and its voice takes (real-person likenesses, ASSETS.md) stay out of the deploy until it
-// is released. The take prefixes are level 4's seven speakers only (scripts/agentic-lines.py).
-const UNRELEASED=/^(hardline\.png|held-badge\.png|outside-assets\/figure-(tallinn|bostrom|kokotajlo|grace|bengio)-.*|voice\/(smith|arm|jaan|nick|daniel|katja|yoshua)-[^/]*\.mp3)$/;
-async function add(name){if(UNRELEASED.test(name))return;await fs.stat(path.join(root,name));files.add(name);}
+// Level 4 (AGENTIC SMITH's pod farm) and the endgame were released on 2026-11-03; until then level 4's HUD
+// images, the five captives' meadow figures and its voice takes (real-person likenesses, ASSETS.md) were held back here.
+async function add(name){await fs.stat(path.join(root,name));files.add(name);}
 async function directory(name,filter=()=>true){for(const e of await fs.readdir(path.join(root,name),{withFileTypes:true})){const n=path.posix.join(name,e.name);if(e.isDirectory())await directory(n,filter);else if(filter(n))await add(n);}}
 for(const e of await fs.readdir(root,{withFileTypes:true}))if(e.isFile()&&/\.(js|css|html|cfg|json|png|svg|pk3)$/.test(e.name))await add(e.name);
 for(const n of ['engine/engine.worker.js','engine/gzdoom.js','engine/gzdoom.wasm','engine/gzdoom.pk3','engine/game_support.pk3','engine/game_widescreen_gfx.pk3','engine/brightmaps.pk3','engine/lights.pk3','engine/LICENSE','engine/provenance.json','local/DOOM.WAD','local/rescue-music.ogg','local/ui/doom-small.ttf','local/ui/doom-numbers.ttf','local/ui/pdoom-logo.png','local/ui/title-heroes.webp','local/ui/interpic.png','local/ui/textscreen-e1.png','local/ui/textscreen-e2.png','local/ui/menu-skull.png','local/ui/shotgun.png','local/ui/doom-success.wav','local/outside/doom-wall.png','outside/outside.js','music/bliss.mp3'])await add(n);
@@ -22,6 +20,14 @@ await add('local/prologue-music.ogg');
 await add('local/station-music.ogg');
 // MEG3N's factory plays E2M7's own track (scripts/prepare-doom-music.mjs D_E2M7 factory).
 await add('local/factory-music.ogg');
+// Level 4 plays E2M2's (D_E2M2 agentic).
+await add('local/agentic-music.ogg');
+// The endgame page (scripts/build-endgame-protos.mjs) and its media (scripts/import-endgame-assets.mjs):
+// the fight's default E2M8 and the epilogue's D_VICTOR only; ?music= and ?epilogue= try others locally.
+await directory('endgame-proto',n=>/\.(html|js)$/.test(n));
+await directory('local/endgame',n=>/\.(png|json|mp3|ogg|wav)$/.test(n));
+await add('local/boss-e2m8-music.ogg');
+await add('local/epilogue-victor-music.ogg');
 // The prologue's yard reuses the intake track; the Bliss guide's recorded lines are fetched by name.
 await add('local/intake-music.ogg');
 await directory('outside-assets/voice',n=>/\.(mp3|json)$/.test(n));

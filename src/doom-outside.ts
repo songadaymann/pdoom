@@ -170,7 +170,8 @@ export async function createOutside(options:Options){
   const lintel=new THREE.Mesh(new THREE.BoxGeometry(10.35,.35,.35),glow);lintel.position.set(GATE.x,7,GATE.z);gateFrame.add(lintel);}
  let nearestDoor:typeof HUB_DOORS[number]|null=null;
  // MEG3N.AVI is a real door (2026-10-20): Space walks into the factory. AGENTIC.BAT (level 4, 2026-10-21)
- // walks into the pod farm only in local development (options.agenticDoor); elsewhere it still installs.
+ // walks into the pod farm when options.agenticDoor is set (always, since its release on 2026-11-03);
+ // without it the door still installs.
  const factoryDoor=()=>nearestFuture==='meg3n';
  const agenticDoor=()=>!!options.agenticDoor&&nearestFuture==='agentic';
  enterButton.onclick=()=>{if(nearestDoor)options.enter?.(nearestDoor.id);else if(factoryDoor())options.enter?.('meg3n-factory');else if(agenticDoor())options.enter?.('agentic-pods');else if(nearestFuture)openDialog(nearestFuture);};replayButton.onclick=()=>{if(nearestDoor)options.enter?.(nearestDoor.id,true);};

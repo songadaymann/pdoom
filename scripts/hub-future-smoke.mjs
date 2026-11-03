@@ -1,10 +1,8 @@
-// SAFE MODE after level 2 (2026-10-14): level 4 as a locked structure with an install dialog (level 3's door opens since 2026-10-20),
-// the summit's Display Properties final door, the MCP face on the horizon, and kickable desktop icons.
-// Loads a campaign with both levels cleared (ten saved), muted. Screenshots in output/hub-future/.
-// By default it checks what mann.cool players see: dev-config.json is served off, so AGENTIC.BAT is the
-// install dialog. Level 4's door is live only in local development (dev-config.json on, 2026-10-21):
-// HUB_FUTURE_DEV=1 leaves dev-config.json alone and checks "Enter AGENTIC.BAT" instead (not pressed: that
-// loads E2M2). PDOOM_ORIGIN (e.g. http://127.0.0.1:5208) points it at another server.
+// SAFE MODE after level 2 (2026-10-14): the MEG3N.AVI and AGENTIC.BAT doors (real doors since 2026-10-20 and
+// 2026-11-03; not walked into here), the summit's Display Properties final door, the MCP face on the horizon,
+// and kickable desktop icons. Loads a campaign with both levels cleared (ten saved), muted. Screenshots in
+// output/hub-future/. By default it checks what mann.cool players see (dev-config.json served off);
+// HUB_FUTURE_DEV=1 leaves dev-config.json alone. PDOOM_ORIGIN (e.g. http://127.0.0.1:5208) points it at another server.
 import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -38,29 +36,13 @@ try{
  await view(126,56.4,deg(210),.42);await page.waitForTimeout(800);await shot('05-agentic');report.fps.agentic=await fps();await page.evaluate(()=>window.__DOOM_DEBUG__.outside.debug.setFuture(false));report.fps.agentic_without=await fps();await page.evaluate(()=>window.__DOOM_DEBUG__.outside.debug.setFuture(true));
  await view(100,20,-2.57,.55);await page.waitForTimeout(700);await shot('05b-agentic-top');
  await view(-19.8,-54.7,.593,.3);await page.waitForTimeout(800);await shot('06-summit-dialog');
- // MEG3N's door is a real door since 2026-10-20 (scripts/factory-hub-smoke.mjs walks in); AGENTIC's still installs.
+ // MEG3N's door is a real door since 2026-10-20 (scripts/factory-hub-smoke.mjs walks in).
  await view(-147.5,1.23,deg(115),0);s=await wait(s=>s.outside.nearest_future==='meg3n','Prompt at the MEG3N door');assert.match(String(await page.locator('#hub-enter').textContent()),/Enter MEG3N\.AVI/);
  report.cases.push('MEG3N.AVI: SPACE enters the factory (no install dialog)');
- // Local development: AGENTIC.BAT is a real door too (scripts/agentic-*-smoke.mjs play the level); not walked into here.
- if(dev){
-  await view(142,84.1,deg(210),.1);s=await wait(s=>s.outside.nearest_future==='agentic','Prompt at the AGENTIC door');assert.match(String(await page.locator('#hub-enter').textContent()),/Enter AGENTIC\.BAT/);
-  assert.equal(s.outside.dialog,null,'No install dialog');assert.equal(s.outside.future.agentic.live,false,'Its doorway is a still while level 4 is not loaded');assert.equal(s.outside.future.agentic.strip,'inside,inside,inside,inside,inside');
-  await page.waitForTimeout(400);await shot('07-agentic-live-door');report.cases.push('AGENTIC.BAT (local development): SPACE enters the pod farm (no install dialog)');
- }else{
- // AGENTIC's door: Space opens the install dialog; Space is Cancel, which isn't available; R opens READ THIS!.
- await view(142,84.1,deg(210),.1);s=await wait(s=>s.outside.nearest_future==='agentic','Prompt at the AGENTIC door');assert.match(String(await page.locator('#hub-enter').textContent()),/Open AGENTIC\.BAT/);
- await page.keyboard.press('Space');s=await wait(s=>s.outside.dialog?.id==='agentic','Install dialog opens');assert.match(s.outside.dialog.title,/Installing AGENTIC\.BAT/);assert.match(s.outside.dialog.status,/Copying /);
- await page.waitForTimeout(500);await shot('07-agentic-install-dialog');
- await page.keyboard.press('Space');s=await wait(s=>/Cancel is not available/.test(s.outside.dialog?.status||''),'Cancel refuses');await shot('08-cancel-not-available');
- report.cases.push('AGENTIC.BAT: SPACE opens "Installing AGENTIC.BAT", Cancel is not available');
- await page.keyboard.press('KeyR');await page.waitForFunction(()=>!document.querySelector('[data-view=read]').hidden,{},{timeout:5000});s=await read();assert.equal(s.outside.dialog,null,'Dialog closes for READ THIS!');await shot('09-read-this');
- await page.keyboard.press('Escape');await page.waitForTimeout(300);await page.keyboard.press('Escape');await page.waitForFunction(()=>!JSON.parse(window.render_game_to_text()).outside.paused,{},{timeout:5000});
- report.cases.push('R in the install dialog opens READ THIS!; Esc twice returns to SAFE MODE');
- // AGENTIC's door; walking away closes the dialog.
- await view(142,84.1,deg(210),.1);await wait(s=>s.outside.nearest_future==='agentic','Prompt at the AGENTIC door');await page.keyboard.press('Space');
- s=await wait(s=>s.outside.dialog?.id==='agentic','AGENTIC install dialog');assert.match(s.outside.dialog.title,/Installing AGENTIC\.BAT/);await page.waitForTimeout(400);await shot('10-agentic-install-dialog');
- await view(120,60,deg(210));await wait(s=>s.outside.dialog===null,'Walking away closes the dialog');report.cases.push('AGENTIC.BAT: install dialog, closes when you walk away');
- }
+ // AGENTIC.BAT is a real door since level 4's release (2026-11-03); scripts/agentic-*-smoke.mjs play the level, so it's not walked into here.
+ await view(142,84.1,deg(210),.1);s=await wait(s=>s.outside.nearest_future==='agentic','Prompt at the AGENTIC door');assert.match(String(await page.locator('#hub-enter').textContent()),/Enter AGENTIC\.BAT/);
+ assert.equal(s.outside.dialog,null,'No install dialog');assert.equal(s.outside.future.agentic.live,false,'Its doorway is a still while level 4 is not loaded');assert.equal(s.outside.future.agentic.strip,'inside,inside,inside,inside,inside');
+ await page.waitForTimeout(400);await shot('07-agentic-live-door');report.cases.push('AGENTIC.BAT: SPACE enters the pod farm (no install dialog)');
  // The final door: Display Properties, Wait 10 people, Preview not available, OK closes.
  await view(-41.6,-87,.593,.05);await wait(s=>s.outside.nearest_future==='final','Prompt at the final door');await page.keyboard.press('Space');
  s=await wait(s=>s.outside.dialog?.id==='final','Display Properties dialog');assert.match(await page.locator('#hub-dialog .win95-text').textContent(),/Wait: 10 people/);await page.waitForTimeout(400);await shot('11-display-properties');

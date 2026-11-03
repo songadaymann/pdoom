@@ -13,10 +13,9 @@ export const LEVELS=Object.freeze([
   Object.freeze({id:'meg3n-factory',version:'meg3n-factory-v1',title:"MEG3N's Toy Factory",subtitle:'Spawning Vats',
     episode:2,map:7,scored:true,peopleTotal:6,camerasTotal:20,camerasLabel:'Screens smashed',camerasPoints:'Screen points',
     scoreVersion:'rescue-v2',boardVersion:'v1',nextLevelId:null}),
-  // Level 4 (2026-10-21, in progress): unscored, and local:true keeps it to loopback development
-  // (dev-config.json on); anywhere else ?level=agentic-pods opens level 1 (main.js).
+  // Level 4 (2026-10-21; public since 2026-11-03): unscored, entered through SAFE MODE's AGENTIC.BAT door.
   Object.freeze({id:'agentic-pods',version:'agentic-pods-v1',title:"AGENTIC SMITH's Pod Farm",subtitle:'Containment Area',
-    episode:2,map:2,scored:false,local:true,nextLevelId:null}),
+    episode:2,map:2,scored:false,nextLevelId:null}),
   Object.freeze({id:'intake',version:'intake-prototype',title:'Intake',
     episode:1,map:1,scored:false,nextLevelId:null})
 ]);

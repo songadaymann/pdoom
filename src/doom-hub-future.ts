@@ -13,8 +13,8 @@ import {TRON} from './doom-hub-traces';
  * lights over a locked door that only opens an install dialog (doom-outside.ts). MEG3N's door is a
  * real door since 2026-10-19/20: Space walks into the factory, its way out comes back out here, its
  * lights go green per person saved and its doorway shows the live engine view while the factory is
- * loaded. AGENTIC.BAT's door works the same way for level 4 (2026-10-21), but only in local development
- * (doom-outside.ts options.agenticDoor); elsewhere it still installs. The summit holds
+ * loaded. AGENTIC.BAT's door works the same way for level 4 (2026-10-21; public since 2026-11-03,
+ * doom-outside.ts options.agenticDoor). The summit holds
  * the final door, a giant Display Properties dialog whose Wait box counts the people still out
  * there, under a giant hourglass. On the far south horizon the MCP column's face "downloads"
  * like a progressive JPEG over dial-up, one step per level cleared, too coarse to recognise. */

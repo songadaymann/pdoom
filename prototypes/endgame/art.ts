@@ -5,7 +5,7 @@ import * as THREE from 'three';
  * are sliced here by equal cells, as the doc promises the importer will. Each cell is trimmed to what's
  * drawn and shrunk to the meadow sprites' density (64 px for 1.8 m), so it reads as the same chunky
  * pixels. Anything missing returns null and the code-drawn placeholder stays. */
-const BASE='/local/endgame/sprites/';
+const BASE='../local/endgame/sprites/';  // relative to endgame-proto/play.html, so it works under /pdoom/
 export const DENSITY=64/1.8;// px per metre, the meadow figures'
 
 type Box={x:number;y:number;w:number;h:number};

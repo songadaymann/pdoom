@@ -203,12 +203,11 @@ palette-translation numbers only, never IWAD pixels. The level 4 voice takes (20
 are listed in section 4 above; without them the game shows subtitles. The level's ignored `local/agentic-music.ogg` (2026-10-23) is Doom's
 D_E2M2 track, rendered by `scripts/prepare-doom-music.mjs D_E2M2 agentic` like the other levels' tracks.
 
-Until level 4 is released, `scripts/audit-doom-assets.mjs` (the deploy allowlist) leaves out
+Until level 4's release on 2026-11-03, `scripts/audit-doom-assets.mjs` (the deploy allowlist) left out
 `hardline.png`, `held-badge.png`, the five captives' meadow figures and the 78 level 4 voice
-takes (`voice/{smith,arm,jaan,nick,daniel,katja,yoshua}-*.mp3`), so a mann.cool deploy does not
-publish real-person likenesses for a hidden level. The cast sprites still travel inside
-`pdoom.pk3`. At release, remove that exclusion and add `local/agentic-music.ogg`
-(E2M2's track, optional) to the allowlist, as `factory-music.ogg` is.
+takes (`voice/{smith,arm,jaan,nick,daniel,katja,yoshua}-*.mp3`), so a mann.cool deploy did not
+publish real-person likenesses for a hidden level. Since the release they ship, with
+`local/agentic-music.ogg`, under the terms above (see "Level 4 and endgame release" below).
 
 ### Factory helper-doll animations, 2026-10-18
 
@@ -332,3 +331,18 @@ October 30 walk additions: `guide-mario-end-keep`, `guide-samwise-end-keep`,
 `guide-mario-end-hum`, and `guide-samwise-end-hum` use the same saved Breeze
 profiles and exact supplied text. All four passed transcription and PCM checks.
 Source brief and subset manifest are in the existing endgame batch.
+
+### Level 4 and endgame release, 2026-11-03
+
+Jonathan released level 4 and the endgame on mann.cool on 2026-11-03. The deploy allowlist
+(`scripts/audit-doom-assets.mjs`) now also packages:
+- level 4's HUD images, the five captives' meadow figures, its 78 voice takes and `local/agentic-music.ogg`;
+- the endgame page `endgame-proto/` (built from `prototypes/endgame/` by `scripts/build-endgame-protos.mjs`);
+- the endgame media in ignored `local/endgame/`: the generated sprite sheets, the synthetic Breeze
+  voice takes (guides, prisoners and the MCP), and the kept Stable Audio Open effects, all described in the
+  sections above;
+- `local/boss-e2m8-music.ogg` and `local/epilogue-victor-music.ogg`, Doom's D_E2M8 and D_VICTOR from the
+  supplied DOOM.WAD, rendered like the levels' tracks.
+
+Each keeps the terms given where it is described above, including the real-person likeness
+carve-out and Breeze's limit on its output. The MCP stays a pixel caricature, never a photograph.

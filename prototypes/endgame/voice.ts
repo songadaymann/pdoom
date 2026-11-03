@@ -5,7 +5,7 @@
  * download in the background and decode when played. A line with no take stays a subtitle. Four buses:
  * Elon (a slapback off the arena), Grok (thin, like a chat app), the guide, and the crowd (panned to
  * where each shout comes from, and under everyone else). */
-const BASE='/local/endgame/voice/';
+const BASE='../local/endgame/voice/';  // relative to endgame-proto/play.html
 export type Bus='elon'|'grok'|'guide'|'crowd';
 export const MOUTH_FPS=25;
 type Chain={input:GainNode};

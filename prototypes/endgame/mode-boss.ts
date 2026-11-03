@@ -31,7 +31,7 @@ import {Wasteland,CAM_FROM,CAM_TO,CAM_LOOK} from './ending';
  * ?autosteer=1 steers the trick shot for smokes. */
 const DEG=Math.PI/180,UP=new THREE.Vector3(0,1,0),QUERY=new URLSearchParams(location.search);
 const FIGHT_MUSIC=QUERY.get('music')??'e2m8',END_MUSIC=QUERY.get('epilogue')??'victor';
-const fightMusic=(c:Ctx)=>{if(FIGHT_MUSIC!=='off')void c.sfx.music(`/local/boss-${FIGHT_MUSIC}-music.ogg`,{vol:.4});};
+const fightMusic=(c:Ctx)=>{if(FIGHT_MUSIC!=='off')void c.sfx.music(`../local/boss-${FIGHT_MUSIC}-music.ogg`,{vol:.4});};
 const MINE={speed:34,range:48,maxBounces:1,damage:5,faceDamage:5,backSpeed:40,color:PAL.line};
 const THEIRS={speed:30,range:44,maxBounces:0,damage:0,faceDamage:0,backSpeed:34,color:'#7fd6ff'};
 const SERVE=[1,2],SWARM=15,SWARM_LIVE=10,SHIPS=SERVE[0]+SERVE[1]+SWARM,SHIP_HP=3;
@@ -846,7 +846,7 @@ export const boss:Mode={
     if(pt>2.6&&pt-dt<=2.6)guide(c,'value',7.8,{prio:2,ttl:20,then:()=>{stareAt=pt+.7;}});
     if(ending==='waste'&&(pt>=stareAt||pt>32)){stareAt=pt;ending='stare';waste.stare(c.stage.camera.position,c.later);}
     if(ending==='stare'&&pt>=stareAt+2.8){ending='black';$('black').hidden=false;c.sfx.hush(true);if(FINALE)markDone();}
-    if(ending==='black'&&pt>=stareAt+4.8&&!$('black').classList.contains('title')){$('black').classList.add('title');if(FINALE)offerMeadow();if(END_MUSIC!=='off')void c.sfx.music(`/local/epilogue-${END_MUSIC}-music.ogg`,{vol:.6,fade:3});}
+    if(ending==='black'&&pt>=stareAt+4.8&&!$('black').classList.contains('title')){$('black').classList.add('title');if(FINALE)offerMeadow();if(END_MUSIC!=='off')void c.sfx.music(`../local/epilogue-${END_MUSIC}-music.ogg`,{vol:.6,fade:3});}
     break;}
   }
   updateArrows(c);

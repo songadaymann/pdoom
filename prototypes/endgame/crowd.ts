@@ -17,14 +17,14 @@ async function tex(url:string){try{const t=await loader.loadAsync(url);t.colorSp
 // a founder's meadow sprites: two walk rows and the idle row, 8 directions each
 export async function loadFounder(id:'mario'|'samwise'){
  const [walk,idle]=await Promise.all([
-  Promise.all(Array.from({length:16},(_,n)=>tex(`/outside-assets/guide-${id}-${Math.floor(n/8)}-${n%8}.png`))),
-  Promise.all(Array.from({length:8},(_,n)=>tex(`/outside-assets/guide-${id}-idle-${n}.png`))),
+  Promise.all(Array.from({length:16},(_,n)=>tex(`../outside-assets/guide-${id}-${Math.floor(n/8)}-${n%8}.png`))),
+  Promise.all(Array.from({length:8},(_,n)=>tex(`../outside-assets/guide-${id}-idle-${n}.png`))),
  ]);
  return {walk,idle};
 }
 export async function loadCast(guide:'mario'|'samwise'){
  const [people,{walk,idle}]=await Promise.all([
-  Promise.all(CAST.map(([id])=>Promise.all(Array.from({length:32},(_,n)=>tex(`/outside-assets/figure-${id}-${Math.floor(n/8)}-${n%8}.png`))))),
+  Promise.all(CAST.map(([id])=>Promise.all(Array.from({length:32},(_,n)=>tex(`../outside-assets/figure-${id}-${Math.floor(n/8)}-${n%8}.png`))))),
   loadFounder(guide),
  ]);
  return {people,walk,idle};
