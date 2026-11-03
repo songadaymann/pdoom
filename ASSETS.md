@@ -249,3 +249,8 @@ or CC BY-SA. Nine come from official organisation, company or channel pages with
 stated licence. Sources, cutouts, per-image page and image URLs, licences, authors,
 crops and checksums remain in ignored `private-assets/prisoner-photos/`. They are not
 packaged, and no rights to the photographs or likenesses are asserted.
+
+October 30 walk additions: `guide-mario-end-keep`, `guide-samwise-end-keep`,
+`guide-mario-end-hum`, and `guide-samwise-end-hum` use the same saved Breeze
+profiles and exact supplied text. All four passed transcription and PCM checks.
+Source brief and subset manifest are in the existing endgame batch.
