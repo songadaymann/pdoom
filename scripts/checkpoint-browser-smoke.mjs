@@ -15,24 +15,43 @@ const read=async p=>JSON.parse(await p.evaluate(()=>window.render_game_to_text()
 const world=async p=>(await read(p)).world;
 async function waitWorld(p,test,label,timeout=6000){const end=Date.now()+timeout;while(Date.now()<end){const r=await read(p);assert.notEqual(r.mode,'error',r.error);if(test(r.world,r))return r.world;await p.waitForTimeout(70);}throw Error(label+': '+JSON.stringify(await read(p)));}
 async function press(p,key){await p.keyboard.press(key,{delay:80});await p.waitForTimeout(230);}
-async function face(p,angle){for(let i=0;i<16;i++){const w=await world(p),delta=((angle-w.angle+540)%360)-180;if(Math.abs(delta)<6)return;const key=delta>0?'ArrowLeft':'ArrowRight';await p.keyboard.down(key);await p.waitForTimeout(Math.min(700,Math.max(60,Math.abs(delta)*9)));await p.keyboard.up(key);await p.waitForTimeout(200);}throw Error('Facing '+angle+' failed');}
-// Traverse the crawl with native movement, stopping at bends to inspect discovery.
+async function face(p,angle){for(let i=0;i<16;i++){if((await read(p)).uiBlocked)await running(p);const w=await world(p),delta=((angle-w.angle+540)%360)-180;if(Math.abs(delta)<6)return;const key=delta>0?'ArrowLeft':'ArrowRight';await p.keyboard.down(key);await p.waitForTimeout(Math.min(700,Math.max(60,Math.abs(delta)*9)));await p.keyboard.up(key);await p.waitForTimeout(200);}throw Error('Facing '+angle+' failed');}
+// The page pauses the native game behind its own panels: a prisoner's discovery card (released
+// cells, story-beats.js) holds a silent native menu open for 3.5 s (PlatformPanel.zs), and keys
+// sent meanwhile go to that menu or are dropped. Wait until no panel is up and the native clock
+// has moved on again, so that menu is gone.
+async function running(p,label='Game running'){
+ const end=Date.now()+15000;let since=null;
+ while(Date.now()<end){const r=await read(p);assert.notEqual(r.mode,'error',r.error);if(r.mode==='playing'&&!r.uiBlocked&&r.world){if(since===null)since=r.world.ticks;else if(r.world.ticks>=since+2)return r.world;}else since=null;await p.waitForTimeout(70);}
+ throw Error(label+': '+JSON.stringify(await read(p)));
+}
+// Doom players glide after a key is released (friction 0.90625 a tic), so a position read just
+// after key-up is not where they stop. Read only once they have come to rest.
+async function still(p){
+ const end=Date.now()+8000;let last=null;
+ while(Date.now()<end){const r=await read(p),w=r.world;if(r.mode!=='playing'||r.uiBlocked)last=null;else if(!last)last=w;else if(w.ticks-last.ticks>=3){if(Math.hypot(w.x-last.x,w.y-last.y)<1)return w;last=w;}await p.waitForTimeout(70);}
+ throw Error('Player did not come to rest: '+JSON.stringify(await world(p)));
+}
+// Traverse the crawl with native movement, stopping at bends to inspect discovery. Each press is
+// sized from how far the last one carried the player (crouched in a duct or standing).
 async function crawlAxis(p,axis,target){
- await face(p,90);
+ await face(p,90);let rate=1/9,last=null;// units per ms held; starts at the crouched pace
  for(let i=0;i<65;i++){
-  const w=await world(p),delta=target-w[axis];
+  const w=await still(p),delta=target-w[axis];
+  if(last&&Math.abs(w[axis]-last.at)>2)rate=Math.abs(w[axis]-last.at)/last.held;
   if(Math.abs(delta)<6)return w;
-  const key=axis==='x'?(delta>0?'KeyD':'KeyA'):(delta>0?'KeyW':'KeyS');
-  await p.keyboard.down(key);await p.waitForTimeout(Math.min(450,Math.max(28,Math.abs(delta)*9)));
-  await p.keyboard.up(key);await p.waitForTimeout(160);
+  const key=axis==='x'?(delta>0?'KeyD':'KeyA'):(delta>0?'KeyW':'KeyS'),held=Math.min(450,Math.max(28,Math.abs(delta)/rate));
+  await p.keyboard.down(key);await p.waitForTimeout(held);await p.keyboard.up(key);last={at:w[axis],held};
  }
  throw Error('Crawl movement '+axis+' to '+target+': '+JSON.stringify(await world(p)));
 }
 async function lookAtPerson(p){const w=await world(p);await face(p,(Math.atan2(w.companion_y-w.y,w.companion_x-w.x)*180/Math.PI+360)%360);}
-async function command(p,text){await waitWorld(p,(w,r)=>w.ticks>35&&!r.uiBlocked,'Console input warmup',8000);await p.keyboard.press('Backquote');await p.waitForTimeout(500);await p.evaluate(text=>{for(const key of text){const code=key.charCodeAt(0);window.__QA_WORKER__.postMessage({type:'input',target:'window',evType:'keypress',init:{key,keyCode:code,which:code,charCode:code,bubbles:true,cancelable:true}});}},text);await p.keyboard.press('Enter');await p.waitForTimeout(300);if(text!=='kill')await p.keyboard.press('Backquote');await p.waitForTimeout(500);}
+// A typed command must reach the open console: confirm it by the console's own echo.
+async function command(p,text){await waitWorld(p,(w,r)=>w.ticks>35&&!r.uiBlocked,'Console input warmup',8000);await running(p,`Game running before "${text}"`);const echoes=await p.evaluate(()=>window.__QA_ECHO__.length);await p.keyboard.press('Backquote');await p.waitForTimeout(500);await p.evaluate(text=>{for(const key of text){const code=key.charCodeAt(0);window.__QA_WORKER__.postMessage({type:'input',target:'window',evType:'keypress',init:{key,keyCode:code,which:code,charCode:code,bubbles:true,cancelable:true}});}},text);await p.keyboard.press('Enter');await p.waitForFunction(([n,line])=>window.__QA_ECHO__.slice(n).includes(line),[echoes,']'+text],{timeout:5000}).catch(async()=>{throw Error(`Console did not take "${text}": `+JSON.stringify(await read(p)));});await p.waitForTimeout(300);if(text!=='kill')await p.keyboard.press('Backquote');await p.waitForTimeout(500);}
 async function warp(p,x,y,d,angle){(d.warps??=[]).push({x,y});await command(p,`warp ${x} ${y}`);await waitWorld(p,w=>Math.hypot(w.x-x,w.y-y)<30,'Warp');if(angle!==undefined)await face(p,angle);}
 async function shot(p,name){await p.screenshot({path:`${out}/${name}.png`});}
-async function run(name,options,test){if(selected&&!selected.includes(name))return;const d={name,passed:false,errors:[]},c=await browser.newContext(options);let p;try{p=await c.newPage();p.on('pageerror',e=>d.errors.push(String(e)));p.on('console',m=>{if(m.type()==='error')d.errors.push(m.text());});await p.addInitScript(()=>{const W=window.Worker;window.Worker=class extends W{constructor(...a){super(...a);window.__QA_WORKER__=this;}};});await p.goto(url);await startGame(p);await p.waitForFunction(()=>['playing','error'].includes(window.__DOOM_DEBUG__?.state.mode),{},{timeout:55000});assert.equal((await read(p)).mode,'playing',JSON.stringify(await read(p)));await waitWorld(p,w=>w?.level==='first-rescue','Current checkpoint');d.initial=await read(p);assert.equal(d.initial.world.released,0);await test(p,d,c);d.final=await read(p);d.engineErrors=await p.evaluate(()=>window.__DOOM_DEBUG__.logs.filter(l=>/Script error|VM execution aborted|Unknown identifier|Unknown command|Execution could not continue/.test(l)));assert.deepEqual(d.errors,[]);assert.deepEqual(d.engineErrors,[]);d.passed=true;}catch(e){d.failure=String(e);if(p){d.final=await read(p).catch(()=>null);d.logs=await p.evaluate(()=>window.__DOOM_DEBUG__?.logs).catch(()=>null);await shot(p,name+'-failure').catch(()=>{});}}finally{report.cases.push(d);await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await c.close();console.log(name+': '+(d.passed?'PASS':d.failure));}}
+// Console echoes ("]warp x y"), cleaned as main.js cleans its log lines.
+async function run(name,options,test){if(selected&&!selected.includes(name))return;const d={name,passed:false,errors:[]},c=await browser.newContext(options);let p;try{p=await c.newPage();p.on('pageerror',e=>d.errors.push(String(e)));p.on('console',m=>{if(m.type()==='error')d.errors.push(m.text());});await p.addInitScript(()=>{window.__QA_ECHO__=[];const W=window.Worker;window.Worker=class extends W{constructor(...a){super(...a);window.__QA_WORKER__=this;this.addEventListener('message',e=>{if(e.data?.type!=='log')return;const line=String(e.data.msg).replace(/\x1B(?:\[[0-?]*[ -/]*[@-~]|[78])/g,'').replace(/\[[=.]{10,}\]/g,'').trim();if(line.startsWith(']'))window.__QA_ECHO__.push(line);});}};});await p.goto(url);await startGame(p);await p.waitForFunction(()=>['playing','error'].includes(window.__DOOM_DEBUG__?.state.mode),{},{timeout:55000});assert.equal((await read(p)).mode,'playing',JSON.stringify(await read(p)));await waitWorld(p,w=>w?.level==='first-rescue','Current checkpoint');d.initial=await read(p);assert.equal(d.initial.world.released,0);await test(p,d,c);d.final=await read(p);d.engineErrors=await p.evaluate(()=>window.__DOOM_DEBUG__.logs.filter(l=>/Script error|VM execution aborted|Unknown identifier|Unknown command|Execution could not continue/.test(l)));assert.deepEqual(d.errors,[]);assert.deepEqual(d.engineErrors,[]);d.passed=true;}catch(e){d.failure=String(e);if(p){d.final=await read(p).catch(()=>null);d.logs=await p.evaluate(()=>window.__DOOM_DEBUG__?.logs).catch(()=>null);await shot(p,name+'-failure').catch(()=>{});}}finally{report.cases.push(d);await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await c.close();console.log(name+': '+(d.passed?'PASS':d.failure));}}
 try{
 await run('natural-wrench-camera',{viewport:{width:1280,height:800}},async(p,d)=>{
  await shot(p,'original-map-start');await face(p,90);
@@ -80,7 +99,11 @@ await run('crouch-service-route',{viewport:{width:1280,height:800}},async(p,d)=>
  d.entered=await world(p);assert.ok(d.entered.x<1984,'Full native crawl reaches cell from east');assert.equal(d.entered.discovered,1,'Person discovered only at final approach');assert.equal(d.entered.released,0);
  d.crawlSeconds=(d.entered.ticks-begun)/35;await p.keyboard.up('KeyC');await p.waitForTimeout(350);await shot(p,'inside-cell-via-duct');const panel=wallMap.wall_mounts.find(p=>p.type===15105),at=await world(p);await face(p,(Math.atan2(panel.y-at.y,panel.x-at.x)*180/Math.PI+360)%360);await press(p,'KeyE');
  d.release=await waitWorld(p,w=>w.released===1&&w.route==='service','Inside manual release');assert.equal(d.release.gun,0);assert.equal(d.release.camera_broken,0);
- await crawlAxis(p,'y',1072);await crawlAxis(p,'y',1128);
+ // After the card and his quip Liron leads out by the front door; until then he stands beside
+ // the duct mouth. The player is still half in that mouth (x>1968 overlaps its jamb, the cell's
+ // east wall at 1984), so step fully into the cell before following him north.
+ d.lead=await waitWorld(p,w=>w.companion_y>1108,'Companion leads out by the front door',20000);
+ await crawlAxis(p,'x',1960);await crawlAxis(p,'y',1072);await crawlAxis(p,'y',1128);
  d.complete=await waitWorld(p,w=>w.completed===1&&w.companion_y>1108,'Player and companion use front door rather than duct');await shot(p,'service-rescue-complete');
 });
 await run('miss-keeps-wrench',{viewport:{width:1280,height:800}},async(p,d)=>{
