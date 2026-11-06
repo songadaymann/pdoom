@@ -16,10 +16,10 @@
     },
     {
       "file": "endgame-proto/proto.js",
-      "bytes": 853887,
-      "sha256": "ed25ea0ae099729b0e09d88675f85505daeb9dd07dc908be58325f5706da3866",
-      "gzip": 211797,
-      "brotli": 197612
+      "bytes": 910458,
+      "sha256": "6d2ffcf2fc2e4d4376e498bb94bea9fbda6714bbc1406bdc42b91178a4705726",
+      "gzip": 227780,
+      "brotli": 212229
     },
     {
       "file": "engine/brightmaps.pk3",
@@ -12674,8 +12674,8 @@
     },
     {
       "file": "pdoom.pk3",
-      "bytes": 10252026,
-      "sha256": "eeeba514b668d82a7c15ac0850d2964f7a748ec3c8dc0fce11f16a485f32f2c4"
+      "bytes": 10253096,
+      "sha256": "4afc5dcc1f0277fc3c7dca9475e604cb6d7d25ab756debe22eb125e799b6a820"
     },
     {
       "file": "slingshot-drawn.png",

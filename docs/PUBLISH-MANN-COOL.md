@@ -38,6 +38,28 @@ normal progression and Load Game. The fixture is available only on loopback with
 
 Local verification reports are ignored under `output/playtest/canonical/` and `output/playtest/canonical-shell/`.
 
+## Level 4 ranked, Cybertrucks and the sky glitch released 2026-11-06
+
+- Central Worker `mann-cool` version `9eb1fb5f-c636-4d25-8907-d91686d7edc3` from `claude/pdoom-level-4-board` (`567c2db`), which is `redesign/platform-v1` (`2750688`) plus one commit (PR #7). It registers the Level 4 board `agentic-pods-rescue-v1` (map `agentic-pods-v1`, board v1, 9 cameras, 3-minute review floor). The rollback point is `8a461121-c211-4065-ba9f-3f7e642d2911` (2026-10-22). Never deploy the central Worker from mann-cool's stale `main`.
+- Game `mann-cool-pdoom` version `571d00aa-3bcf-4cbb-950f-35ec93239e05` from `main` (`71b37ec`):
+  - The episode menu's fourth entry is HUMAN CONTAINMENT AREA (THY FLESH COMPUTED). A fresh run from it ranks on Level 4; AGENTIC.BAT walk-ins are practice.
+  - Four level tabs share one row at every width.
+  - The walk in gets two Cybertrucks (P4) and the sky glitch under `end-sky`.
+  - The live pk3 is byte-identical to the local build. Only `actors/Agentic.zs` changed; the entry was replaced in place.
+- Before deploy (local):
+  - `node --test tests/*.mjs` 51/51 and `npm test` 20/20.
+  - mann-cool `npm run test:pdoom` 14/14 and `catalog:validate`.
+  - These smokes passed: endgame-hookup (trucks, glitch), boss-check ALL OK, agentic-core (cold, exit, hub), the new agentic-menu, factory-menu (menu, handoff) and simple-leaderboard (4 tabs, desktop/phone/tablet).
+  - ranked-score-browser passed against the new central Worker under `wrangler dev --local` (port 5202), including Level 4's submit and menu ticket.
+- Live checks:
+  - All four boards read 200 (Level 1–4 labels, all empty); an unknown variant gives 400.
+  - The canonical host smoke passed (`node scripts/canonical-host-smoke.mjs https://mann.cool/pdoom/`).
+  - The canonical shell smoke passed with 4 level tabs on desktop, phone and tablet.
+  - A fresh HUMAN CONTAINMENT AREA run from the live episode menu boots E2M2 cold as a rankable run and gets its ticket.
+  - The live walk plays the sky glitch and both trucks, with no failed requests.
+  - No score submissions, guestbook posts or email requests were made; one run ticket was issued.
+- All four live boards read empty. Production D1 wasn't read: the agent's read was blocked. Check held rows with `npm run leaderboard:moderate -- list --slug pdoom --status all` in mann-cool.
+
 ## Level 4 and the endgame released 2026-11-03
 
 - Game `mann-cool-pdoom` version `b14ef678-9892-4a81-9fca-7dbd6facaceb` from `main` (`02baae3`, the `claude/endgame-hookup` work merged with main and the one-row leaderboard tabs fix). AGENTIC.BAT's door opens for everyone: level 4, AGENTIC SMITH's Pod Farm (E2M2), unscored, with its voice takes, music, HUD images and the five captives' meadow figures. SAFE MODE changes after each level. When all twenty are resolved, the meadow's gate leads to the endgame page (`endgame-proto/play.html?m=finale`: the walk, the MCP fight, the wasteland) and back to the meadow. The live pk3 is byte-identical to the local build.
