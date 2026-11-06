@@ -33,7 +33,7 @@ let LEVEL=getLevel(requestedLevel);
 if(LEVEL?.local&&!await localDevelopmentEnabled())LEVEL=getLevel('five-prisons');
 // The campaign page. MEG3N's factory is scored there since 2026-10-21 (started from the episode
 // menu); its own ?level=meg3n-factory page stays the unscored practice page with ?puzzle= flags.
-const CHECKPOINT=LEVEL?.scored===true&&LEVEL.id!=='meg3n-factory';
+const CHECKPOINT=LEVEL?.scored===true&&LEVEL.id!=='meg3n-factory'&&LEVEL.id!=='agentic-pods';
 const FACTORY=LEVEL?.id==='meg3n-factory';
 const DEV_END=CHECKPOINT&&new URLSearchParams(location.search).get('dev')==='end';
 // Loopback development flag: ?level=meg3n-factory&puzzle=zvi starts beside that puzzle (factory-hud.js).
@@ -195,7 +195,7 @@ function onMessage(m){
       if(event.type==='agentic-exit'&&LEVEL?.id==='agentic-pods')agenticExit(event);
       if(marker==='PDOOM_RESULT '){
         state.mode=event.saved>0?'escaped':'lost';releaseKeys();
-        if(CHECKPOINT&&event.saved>0&&LEVEL?.id!=='meg3n-factory'){pendingWin=event.saved;outside?.showWin(event.saved);}else if(CHECKPOINT){checkpointStatusBar()?.update(state.world,state.mode,state.escape);showCheckpointResult(event);}else showIntakeResult(event);
+        if(CHECKPOINT&&event.saved>0&&LEVEL?.id!=='meg3n-factory'&&LEVEL?.id!=='agentic-pods'){pendingWin=event.saved;outside?.showWin(event.saved);}else if(CHECKPOINT){checkpointStatusBar()?.update(state.world,state.mode,state.escape);showCheckpointResult(event);}else showIntakeResult(event);
         if(CHECKPOINT){const result=run.finish(event);scoreView.whenReady(result,()=>outside?.getState());window.dispatchEvent(new CustomEvent('pdoom:level-complete',{detail:{levelId:LEVEL.id,nextLevelId:LEVEL.nextLevelId,result}}));}
       }
     }catch(error){console.error('Native event:',error);}}
@@ -247,7 +247,8 @@ function onMessage(m){
   if(awaitingRun&&LEVEL?.id==='meg3n-factory'&&m.msg.includes('PDOOM_MOD_LOADED factory')){
     awaitingRun=false;hubBeforeCommit=null;state.prologue=null;storyBeats.reset();scoreView?.reset();state.mod=`p(DOOM): ${LEVEL.title}`;playLevelMusic();
   }
-  // The pod farm (unscored) the same way: SMITH's catch reloads E2M2, and AGENTIC.BAT's door has no run.
+  // The pod farm the same way: on the campaign page its PDOOM_RUN_START (2026-11-06) starts it, above; its own
+  // ?level=agentic-pods page has no run. SMITH's catch reloads E2M2, which holds at its loading gate again.
   if(!awaitingRun&&LEVEL?.id==='agentic-pods'&&state.mode==='playing'&&m.msg.includes('PDOOM_MOD_LOADED agentic'))for(const evType of ['keydown','keyup'])send({type:'input',target:'window',evType,init:{code:'F4',key:'F4',keyCode:115,which:115,bubbles:true,cancelable:true}});
   if(awaitingRun&&LEVEL?.id==='agentic-pods'&&m.msg.includes('PDOOM_MOD_LOADED agentic')){
     awaitingRun=false;hubBeforeCommit=null;state.prologue=null;storyBeats.reset();scoreView?.reset();state.mod=`p(DOOM): ${LEVEL.title}`;playLevelMusic();
@@ -401,6 +402,8 @@ async function startEngine(id,{load=false,prologue:playPrologue=false,skipOpenin
  runningCeo=ceoPick?.id||((FACTORY||AGENTIC)&&CEO_CHOICE.source!=='url'&&readCampaign(ceoStorage)?.ceo)||CEO_CHOICE.id;campaign=new Campaign(ceoStorage,runningCeo);run.level=LEVEL;scoreView?.setLevel(LEVEL);ceoPick?.lock();checkpointStatusBar()?.setCeo(runningCeo);
  // Started cold from the episode menu, the factory has its own HUD, as when walked in (enterLevel).
  if(CHECKPOINT&&LEVEL.id==='meg3n-factory'){useFactoryHud(true);state.mod=`p(DOOM): ${LEVEL.title}`;}
+ // So has the pod farm (since 2026-11-06, ranked from the episode menu like the factory).
+ if(CHECKPOINT&&LEVEL.id==='agentic-pods'){useAgenticHud(true);state.mod=`p(DOOM): ${LEVEL.title}`;}
  const resume=load?campaignResumePoint(campaign.data):null;resumeHub=resume==='hub'||resume==='xp-intro';openingCheckpointPending=skipOpening;
  const ready=new Promise((resolve,reject)=>{bootResolve=resolve;bootReject=reject;});
  try{

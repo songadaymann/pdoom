@@ -16,7 +16,8 @@ const loopback=['127.0.0.1','localhost','[::1]'].includes(new URL(base).hostname
 const BOARDS=[
  {variant:'five-prisons-rescue-v3',label:'Level 1',rows:[[1,'Alex',55200],[2,'Casey',54100],[3,'A player with a long name',48900]],cameras:9},
  {variant:'hal-station-rescue-v3',label:'Level 2',rows:[[1,'Morgan',55900],[2,'Riley',52350]],cameras:9},
- {variant:'meg3n-factory-rescue-v1',label:'Level 3',rows:[[1,'Jordan',61850],[2,'Sam',60400],[3,'Taylor',59020],[4,'Quinn',41000]],cameras:20}
+ {variant:'meg3n-factory-rescue-v1',label:'Level 3',rows:[[1,'Jordan',61850],[2,'Sam',60400],[3,'Taylor',59020],[4,'Quinn',41000]],cameras:20},
+ {variant:'agentic-pods-rescue-v1',label:'Level 4',rows:[[1,'Robin',55700],[2,'Drew',54250]],cameras:9}
 ];
 await fs.mkdir(out,{recursive:true});
 const browser=await chromium.launch({channel:'chrome',args:['--mute-audio']}),report={url:base,fixtureReads:fixtures,boards:BOARDS.map(b=>b.variant),cases:[],errors:[],scoreWrites:[]};let current;

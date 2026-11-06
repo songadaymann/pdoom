@@ -35,6 +35,16 @@ const game = createStaticGameWorker({
       "display": "integer",
       "aggregation": "best",
       "minimumMatches": 1
+    },
+    {
+      "variant": "agentic-pods-rescue-v1",
+      "label": "Level 4",
+      "metric": "rescueScoreV2",
+      "metricLabel": "Total score",
+      "direction": "desc",
+      "display": "integer",
+      "aggregation": "best",
+      "minimumMatches": 1
     }
   ],
   "shellTheme": {

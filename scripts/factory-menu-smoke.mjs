@@ -67,7 +67,7 @@ try{
   await t.page.click('#title-enter');await t.menu('main');await t.page.click('#menu-new');await t.menu('hero');await t.page.click('#hero-next');await t.menu('levels');
   const entry=t.page.locator('#level-meg3n-factory');
   assert.equal(await entry.isDisabled(),false,'SPAWNING CHATS is enabled');assert.match(await entry.innerText(),/SPAWNING CHATS\s*INFERENCE/);
-  assert.equal(await t.page.locator('[data-view="levels"] button:disabled').count(),1,'Only HUMAN CONTAINMENT AREA is still to come');
+  assert.equal(await t.page.locator('[data-view="levels"] button:disabled').count(),0,'All four levels are on the menu (HUMAN CONTAINMENT AREA since 2026-11-06)');
   await t.shot('1-levels');
   await entry.click();
   await film(t,'SPAWNING CHATS',{shot:'1-film'});

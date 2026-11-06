@@ -52,7 +52,9 @@ Run `node scripts/factory-browser-smoke.mjs` against the local server for native
 
 AGENTIC SMITH’s Pod Farm is the south half of E2M2, Containment Area, recoloured as a Matrix-style
 pod farm with five physical rescues, a camera-hopping guardian who possesses the people you free,
-and a ringing refuge payphone as the way out. It is unscored and local development only: the
+and a ringing refuge payphone as the way out. Since 2026-11-03 it is public through SAFE MODE's `AGENTIC.BAT` door, and since
+2026-11-06 a fresh HUMAN CONTAINMENT AREA run from the episode menu ranks on its own Level 4 board (see `docs/SCORING.md`).
+Before its release it was unscored and local development only: the
 [local page](http://127.0.0.1:5198/?level=agentic-pods) and SAFE MODE’s `AGENTIC.BAT` door work
 only on loopback with the server’s `dev-config.json`; everywhere else the link opens level 1 and
 the door still installs. It takes `?puzzle=` development flags. With the private

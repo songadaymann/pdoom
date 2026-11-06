@@ -78,6 +78,23 @@ try{
    await factory.p.waitForFunction(()=>{const id=JSON.parse(window.render_game_to_text()).run.runId;return JSON.parse(localStorage.getItem('pdoom.ranked-run.v1:'+id)||'null')?.ticketId;},{},{timeout:15000});
    await factory.p.screenshot({path:out+'/factory-ticket.png'});await factory.context.close();
    report.cases.push('A fresh SPAWNING CHATS run from the episode menu obtains its ticket from the real Worker');}
+  // Level 4 (2026-11-06): SMITH's pod farm submits to its own board, and a fresh menu run gets its ticket.
+  {const pods=await open(),id=randomUUID(),posted=[];
+   await pods.p.route(api+'/api/v1/leaderboard',async r=>{if(r.request().method()==='POST')posted.push(r.request().postDataJSON());await r.continue();});
+   await show(pods.p,id,'agentic-pods');
+   assert.match(await pods.p.locator('.score-stats').innerText(),/Cameras destroyed\s*9\/9/);assert.match(await pods.p.locator('#score-level').innerText(),/SMITH/);
+   await pods.p.fill('#score-name','Pod farm fixture');await pods.p.click('#submit-score');
+   await pods.p.waitForFunction(()=>document.querySelector('#submit-score').textContent==='Submitted');
+   assert.deepEqual(posted.map(b=>b.variant),['agentic-pods-rescue-v1']);assert.equal(posted[0].metadata.camerasTotal,9);
+   assert.match(await pods.p.locator('#score-status').innerText(),/held for review/);await pods.context.close();
+   report.cases.push('Level 4 total score (all five, 9 cameras) submits once to agentic-pods-rescue-v1 through the real Worker; the fixture is held for review');}
+  {const pods=await open();const page=view=>pods.p.waitForFunction(view=>JSON.parse(window.render_game_to_text()).menu?.page===view,view,{timeout:15000});
+   await pods.p.goto(base+'?ceo=altman&levels=1');await ready(pods.p);
+   await pods.p.click('#title-enter');await page('main');await pods.p.click('#menu-new');await page('hero');await pods.p.click('#hero-next');await page('levels');await pods.p.click('#level-agentic-pods');
+   await pods.p.waitForFunction(()=>{const s=JSON.parse(window.render_game_to_text());return s.levelId==='agentic-pods'&&s.run?.activeTics>35&&!s.run.practiceReason;},{},{timeout:90000});
+   await pods.p.waitForFunction(()=>{const id=JSON.parse(window.render_game_to_text()).run.runId;return JSON.parse(localStorage.getItem('pdoom.ranked-run.v1:'+id)||'null')?.ticketId;},{},{timeout:15000});
+   await pods.p.screenshot({path:out+'/pods-ticket.png'});await pods.context.close();
+   report.cases.push('A fresh HUMAN CONTAINMENT AREA run from the episode menu obtains its ticket from the real Worker');}
   assert.deepEqual(report.errors,[]);report.passed=true;
 }catch(error){report.failure=String(error.stack||error);report.state=await active?.evaluate(()=>JSON.parse(window.render_game_to_text?.()||'{}')).catch(()=>null);await active?.screenshot({path:out+'/failure.png'}).catch(()=>{});}
 finally{await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await Promise.race([browser.close(),new Promise(resolve=>setTimeout(resolve,5000))]);}

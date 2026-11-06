@@ -93,3 +93,16 @@ test('the factory scores all five plus you, twenty screens and its own board; wa
   // Twenty screens and every other side bonus are still worth less than one more person.
   assert.ok(20*250+1000+2000+1000<10000);
 });
+
+// Level 4 (2026-11-06): SMITH's pod farm scores like level 3, with his nine cameras as the side bonus.
+test('the pod farm scores all five plus you, nine cameras and its own board; walk-ins are practice',()=>{
+  const pods=getLevel('agentic-pods');
+  const native=o=>({level_id:pods.id,level_version:pods.version,score_version:'rescue-v2',outcome:'escaped',saved:6,total:6,saved_figures:5,ceo_state:'conscious',skill:3,entry:'cold',retreat:0,active_tics:35*600,p_doom_cover:3,cameras_total:9,cameras_broken:9,practice:0,routes:['hardline','catwalk','race','clipboard','rig'],...o});
+  const best=scoreRun(native(),pods,{runId:'pods-run'});
+  assert.deepEqual(best.breakdown,{rescue:50000,ceo:1000,cameras:2250,speed:1000,outlook:970});
+  assert.equal(best.totalScore,55220);assert.equal(best.camerasTotal,9);
+  assert.deepEqual(best.submissions,[{variant:'agentic-pods-rescue-v1',score:55220}]);
+  assert.equal(scoreRun(native({entry:'hub'}),pods,{runId:'walk-in'}).eligible,false,'Walking in through AGENTIC.BAT is practice');
+  assert.equal(scoreRun(native({practice:1}),pods,{runId:'qa'}).eligible,false,'A ?puzzle= site, QA shortcut or cheat is practice');
+  assert.throws(()=>scoreRun(native({cameras_total:20}),pods,{runId:'cameras'}),/Incomplete native result/);
+});

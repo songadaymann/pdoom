@@ -13,9 +13,10 @@ export const LEVELS=Object.freeze([
   Object.freeze({id:'meg3n-factory',version:'meg3n-factory-v1',title:"MEG3N's Toy Factory",subtitle:'Spawning Vats',
     episode:2,map:7,scored:true,peopleTotal:6,camerasTotal:20,camerasLabel:'Screens smashed',camerasPoints:'Screen points',
     scoreVersion:'rescue-v2',boardVersion:'v1',nextLevelId:null}),
-  // Level 4 (2026-10-21; public since 2026-11-03): unscored, entered through SAFE MODE's AGENTIC.BAT door.
+  // Level 4 (2026-10-21; public since 2026-11-03): ranked from the episode menu since 2026-11-06, like level 3
+  // (walking in through AGENTIC.BAT's door is practice). Its side bonus counts SMITH's nine cameras.
   Object.freeze({id:'agentic-pods',version:'agentic-pods-v1',title:"AGENTIC SMITH's Pod Farm",subtitle:'Containment Area',
-    episode:2,map:2,scored:false,nextLevelId:null}),
+    episode:2,map:2,scored:true,peopleTotal:6,camerasTotal:9,scoreVersion:'rescue-v2',boardVersion:'v1',nextLevelId:null}),
   Object.freeze({id:'intake',version:'intake-prototype',title:'Intake',
     episode:1,map:1,scored:false,nextLevelId:null})
 ]);

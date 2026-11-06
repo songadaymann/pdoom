@@ -1,11 +1,12 @@
 # Rescue score and leaderboards
 
 The game publishes only the current boards for Level 1, The Control Problem
-(E1M4), Level 2, Confabulation Station (E1M7), and since 2026-10-21 Level 3,
-MEG3N's Toy Factory (E2M7). Each level has one total-score board. The shared view
-has a Level 1 / Level 2 / Level 3 switch and displays only rank, name and score.
-All three use the rescue-v2 scoring formula; levels 1-2 have v3 board keys and
-level 3 starts at v1. Earlier board versions are retired from the menu and API
+(E1M4), Level 2, Confabulation Station (E1M7), since 2026-10-21 Level 3,
+MEG3N's Toy Factory (E2M7), and since 2026-11-06 Level 4, AGENTIC SMITH's Pod Farm
+(E2M2). Each level has one total-score board. The shared view has a Level 1 /
+Level 2 / Level 3 / Level 4 switch and displays only rank, name and score. All four
+use the rescue-v2 scoring formula; levels 1-2 have v3 board keys and levels 3-4
+start at v1. Earlier board versions are retired from the menu and API
 registration; their stored records are retained without mixing them into the
 current boards.
 
@@ -31,7 +32,7 @@ Clean sweep time boards are retired from the menu, submissions and API; their
 stored records are retained. Existing total-score records keep their current keys.
 
 Board keys are `<level-id>-rescue-<board version>`: `five-prisons-rescue-v3`,
-`hal-station-rescue-v3` and `meg3n-factory-rescue-v1`.
+`hal-station-rescue-v3`, `meg3n-factory-rescue-v1` and `agentic-pods-rescue-v1`.
 
 **Level 3.** The factory scores the same five figures plus you (MEG3N catching you
 restarts the level, so you are always conscious at its exit switch), 250 per smashed
@@ -43,6 +44,18 @@ when started from the episode menu (SPAWNING CHATS) on the campaign page; walkin
 in through MEG3N.AVI's door from SAFE MODE, a `?puzzle=` or QA site, and cheats are
 practice, and the stand-alone `?level=meg3n-factory` page has no run. Its server
 review floor is 3 minutes.
+
+**Level 4.** The pod farm scores the same way (SMITH catching you restarts the
+level, so you are always conscious at the payphone), with 250 per smashed camera:
+SMITH's nine (the tenth, C6, is behind glass), so its side bonuses stay under one
+figure too. Its outlook is taken when the payphone first rings for everyone. A
+fresh run can only leave with all five: 10 minutes, all nine cameras and 3% scores
+**55,220**. Its routes name each rescue's way, with Daniel's NDA ending (`nda`,
+`race` or `slowdown`). It ranks only when started from the episode menu (HUMAN
+CONTAINMENT AREA) on the campaign page; walking in through AGENTIC.BAT's door from
+SAFE MODE, a `?puzzle=` site, QA shortcuts and cheats are practice, and the
+stand-alone `?level=agentic-pods` page has no run. Its server review floor is 3
+minutes (the scripted playthrough takes about 9).
 Skill 3 is the standard ruleset. Only a fresh cold entry qualifies; hub returns,
 replays, retreats, development endings and console/cheat-assisted runs are
 practice. A death or body transfer never restarts the active clock. Failed

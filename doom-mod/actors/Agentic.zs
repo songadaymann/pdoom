@@ -86,6 +86,12 @@ class PDAgentic : EventHandler
     PDAgenticPerson People[5];PDAgenticNav Routes[5];
     // Homing: brought nearly home (NearRefuge), they walk on in whatever you do; HomingAt is when.
     bool Released[5],LeftCell[5],Called[5];int ReleasedAt[5],HomingAt[5];
+    // Level 4's ranked run (2026-11-06), like level 3's (Factory.zs): on the campaign page the pod farm
+    // reports a run start, its active clock and a result at the payphone. A fresh start from the episode
+    // menu can rank; a walk-in from SAFE MODE, a ?puzzle= site, QA shortcuts or cheats make it practice.
+    // CoverDoom is p(DOOM) when the payphone first rings for everyone.
+    int RunTics,CoverDoom;bool RunPractice,RunFinished;
+    static String RunVersion(){return "agentic-pods-v1";}
     PDAgenticPuzzle Puzzles[5];
     Array<PDAgenticProp> Props;
     Array<int> Links,MachineLinks,Doors,BridgeSectors,BridgeNodes,BridgeLinks;
@@ -208,6 +214,8 @@ class PDAgentic : EventHandler
         CloseCell(0,PDAgenticMap.BoothZone0(),PDAgenticMap.BoothZone1());
         CloseCell(2,PDAgenticMap.BayZone0(),PDAgenticMap.BayZone1());CloseCell(2,PDAgenticMap.CrusherZone0(),PDAgenticMap.CrusherZone1());
         CloseCell(3,PDAgenticMap.StoneZone0(),PDAgenticMap.StoneZone1());CloseCell(4,PDAgenticMap.RigZone0(),PDAgenticMap.RigZone1());
+        CoverDoom=-1;RunPractice=HubEntry||DevSite!=0||you.GetCVar("pdoom_dev_end")!=0;
+        if(Commits)Console.Printf("PDOOM_RUN_START {\"level_id\":\"agentic-pods\",\"level_version\":\"%s\",\"practice\":%d}",RunVersion(),RunPractice);
         Console.Printf("PDOOM_MOD_LOADED agentic-first-pass");
     }
 
@@ -815,7 +823,7 @@ class PDAgentic : EventHandler
         // Everyone is safe (people already at camp from an earlier visit count): the payphone rings.
         if(!AllSafe&&SafeCount()>0&&SafeCount()+CampedCount()==5)
         {
-            AllSafe=true;PhoneRinging=true;RingFrom=level.time;int n=Speaker();
+            AllSafe=true;PhoneRinging=true;RingFrom=level.time;SnapshotCover();int n=Speaker();
             if(n>=0)Speak(PersonName(n),"That's everyone. That ringing phone is our way out.",245,PersonKey(n).."-allsafe",People[n]);
         }
     }
@@ -982,7 +990,7 @@ class PDAgentic : EventHandler
     }
     void ArmExit()
     {
-        ExitArmed=true;
+        SnapshotCover();ExitArmed=true;
         if(DoorCamera&&!DoorCamera.Broken){DoorCamera.On=true;DoorPossessAt=level.time+105;GuideCameraAt=level.time+140;}
         SmithSays("Leaving? Every exit here is a phone line. And I am the operator.","exit",210,DoorCamera);
     }
@@ -1019,7 +1027,37 @@ class PDAgentic : EventHandler
         for(int i=0;i<5;i++)if(leaving&(1<<i)){People[i].bInvisible=true;People[i].bSolid=false;}
         you.Vel=(0,0,0);
         let session=PDCampaignSession.Get();if(Commits&&session)session.CommitAgentic(leaving,behind,EndingCode());
+        FinishRun(leaving);
         Console.Printf("PDOOM_EVENT {\"type\":\"agentic-exit\",\"saved\":%d,\"hub\":%d,\"committed\":%d}",leaving,HubEntry,Commits);
+    }
+
+    // The active clock: it counts world tics (menus and the boot hold do not tick); cheats mark practice.
+    void TickRun()
+    {
+        if(RunFinished)return;RunTics++;
+        if(players[0].cheats&(CF_NOCLIP|CF_NOCLIP2|CF_GODMODE|CF_GODMODE2|CF_BUDDHA|CF_BUDDHA2|CF_FLY|CF_NOTARGET|CF_FRIGHTENING|CF_NOVELOCITY))RunPractice=true;
+    }
+    // Levels 1-3's in-world outlook (PDRescueRun.SnapshotCover; survival-estimate.js), once:
+    // people already at camp count as freed and safe.
+    void SnapshotCover()
+    {
+        if(CoverDoom>=0)return;
+        int freed=0,safe=0;
+        for(int i=0;i<5;i++){bool camp=(Camped&(1<<i))!=0;if(Released[i]||camp)freed++;if(camp||(SafeMask&(1<<i))!=0)safe++;}
+        double outlook=12+freed*2+freed*8+safe*6+(Introduced||SafeMask!=0?4:0)+1-max(0,100-max(0,players[0].mo.health))*.12;
+        CoverDoom=100-int(floor(clamp(outlook,1,99)+.5));
+    }
+    // The run's result at the payphone: you (always conscious; SMITH catching you restarts the level)
+    // and whoever leaves with you. A fresh run can only leave with all five. The routes name each rescue's
+    // way: Daniel's is his NDA ending (none, race or slowdown).
+    void FinishRun(int leaving)
+    {
+        if(RunFinished||!Commits)return;
+        RunFinished=true;SnapshotCover();
+        int figures=0;for(int i=0;i<5;i++)if(leaving&(1<<i))figures++;
+        int ending=EndingCode();
+        Console.Printf("PDOOM_RESULT {\"outcome\":\"escaped\",\"saved\":%d,\"total\":6,\"level_id\":\"agentic-pods\",\"level_version\":\"%s\",\"score_version\":\"rescue-v2\",\"active_tics\":%d,\"p_doom_cover\":%d,\"cameras_broken\":%d,\"cameras_total\":%d,\"practice\":%d,\"routes\":[\"hardline\",\"catwalk\",\"%s\",\"clipboard\",\"rig\"],\"saved_figures\":%d,\"ceo_state\":\"conscious\",\"skill\":3,\"entry\":\"%s\",\"retreat\":%d}",
+            figures+1,RunVersion(),RunTics,CoverDoom,CamerasBroken,CamerasTotal(),RunPractice,ending==1?"race":ending==2?"slowdown":"nda",figures,HubEntry?"hub":"cold",figures<5);
     }
 
     // Walked in from SAFE MODE (AGENTIC.BAT): in at room 3 with the wrench, the bridge already up.
@@ -1068,6 +1106,7 @@ class PDAgentic : EventHandler
         if(!Active||!players[0].mo)return;
         if(Holding){if(level.time%7==0)Report();return;}
         if(!SiteApplied)ApplySite();
+        TickRun();
         if(!StartAt){StartAt=level.time;if(!IntroDone)IntroAt=level.time+210;}
         let you=players[0].mo;int buttons=you.player.cmd.buttons;
         if(!Finished&&you.health>0)
@@ -1100,7 +1139,7 @@ class PDAgentic : EventHandler
         // QA only (pdoom_development): free person N into their refuge slot (second argument 1: where they are).
         if(e.Name=="pdoom_agentic_qa_out"&&players[0].mo.GetCVar("pdoom_development")&&!ExitDone)
         {
-            int i=e.Args[0];
+            RunPractice=true;int i=e.Args[0];
             if(i>=0&&i<5&&!(Camped&(1<<i)))
             {
                 Release(i);
@@ -1116,6 +1155,7 @@ class PDAgentic : EventHandler
         // good; -1 lets him go), for art screenshots. Nothing else moves him.
         if(e.Name=="pdoom_agentic_qa_pose"&&players[0].mo.GetCVar("pdoom_development")&&Smith)
         {
+            RunPractice=true;
             if(e.Args[0]<0){QaPoseUntil=0;Smith.Pose=-1;return;}
             if(e.Args[0]>=10)Smith.Unbadged=true;
             let you=players[0].mo;Vector2 at=you.Pos.XY+(cos(you.Angle),sin(you.Angle))*max(32,e.Args[1]);
@@ -1126,7 +1166,7 @@ class PDAgentic : EventHandler
         // QA only (pdoom_development): SMITH possesses freed person N where they stand (no SMITH needed nearby).
         if(e.Name=="pdoom_agentic_qa_possess"&&players[0].mo.GetCVar("pdoom_development")&&!ExitDone)
         {
-            int i=e.Args[0];
+            RunPractice=true;int i=e.Args[0];
             if(i>=0&&i<5&&Released[i]&&!(Camped&(1<<i)))Possess(i);
         }
     }
@@ -1142,6 +1182,7 @@ class PDAgentic : EventHandler
     static String Clean(String text){text.Replace("\"","'");text.Replace(String.Format("%c",92),"/");return text;}
     void Report()
     {
+        if(Commits)Console.Printf("PDOOM_RUN {\"level_id\":\"agentic-pods\",\"level_version\":\"%s\",\"active_tics\":%d,\"p_doom_cover\":%d,\"practice\":%d}",RunVersion(),RunTics,CoverDoom,RunPractice);
         let you=players[0].mo;bool safe=PDAgenticMap.InRefuge(you.Pos.XY);
         String peopleJson="[";
         for(int i=0;i<5;i++)

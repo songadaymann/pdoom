@@ -4,7 +4,7 @@ import {detectWallet} from './wallet-detect.js';
 import {TOKEN} from './token-info.js';
 import {CAMPAIGN_KEY,OPENING_COMPLETE_KEY,readCampaign,campaignResumePoint,canSkipOpening} from './campaign.js';
 import {getLevel} from './levels.js';
-const MAPS=[['five-prisons','THE CONTROL PROBLEM','KNEE-DEEP IN THE DATA'],['hal-station','CONFABULATION STATION','THE SHORES OF HAL'],['meg3n-factory','SPAWNING CHATS','INFERENCE'],[null,'HUMAN CONTAINMENT AREA','COMING SOON']];
+const MAPS=[['five-prisons','THE CONTROL PROBLEM','KNEE-DEEP IN THE DATA'],['hal-station','CONFABULATION STATION','THE SHORES OF HAL'],['meg3n-factory','SPAWNING CHATS','INFERENCE'],['agentic-pods','HUMAN CONTAINMENT AREA','THY FLESH COMPUTED']];
 // Each level's intro film (scripts/build-level-intros.py, doom-web/local/intro/levels/manifest.json).
 const FILMS={'five-prisons':'E1M4','hal-station':'E1M7','meg3n-factory':'E2M7'};
 const seenKey='pdoom.level-intros.v1';
@@ -95,8 +95,9 @@ export function createOnboarding({stage,storage,preferences,picker,block,warm,st
    // Starting a new campaign from an existing worker needs a fresh canvas and
    // native session. Reload only after explicit confirmation, carrying choices.
    const prologue=!loadSave&&!skipOpening&&id==='five-prisons'&&(withPrologue||new URL(location.href).searchParams.get('prologue')==='1');
-   // MEG3N's factory starts from the campaign page too (start=): ?level=meg3n-factory is its stand-alone page.
-   if(active()){const u=new URL(location.href);if(getLevel(id)?.scored&&id!=='meg3n-factory'){u.searchParams.set('level',id);u.searchParams.delete('start');}else{u.searchParams.delete('level');u.searchParams.set('start',id);}u.searchParams.set('ceo',picker.id);u.searchParams.set('play','1');if(loadSave)u.searchParams.set('load','1');else u.searchParams.delete('load');if(prologue)u.searchParams.set('prologue','1');else u.searchParams.delete('prologue');if(skipOpening)u.searchParams.set('skipopening','1');else u.searchParams.delete('skipopening');location.assign(u);return;}
+   // MEG3N's factory and SMITH's pod farm start from the campaign page too (start=): ?level=meg3n-factory and
+   // ?level=agentic-pods are their stand-alone pages.
+   if(active()){const u=new URL(location.href);if(getLevel(id)?.scored&&id!=='meg3n-factory'&&id!=='agentic-pods'){u.searchParams.set('level',id);u.searchParams.delete('start');}else{u.searchParams.delete('level');u.searchParams.set('start',id);}u.searchParams.set('ceo',picker.id);u.searchParams.set('play','1');if(loadSave)u.searchParams.set('load','1');else u.searchParams.delete('load');if(prologue)u.searchParams.set('prologue','1');else u.searchParams.delete('prologue');if(skipOpening)u.searchParams.set('skipopening','1');else u.searchParams.delete('skipopening');location.assign(u);return;}
    // New Game (2026-10-12): the chosen founder's intro film, full-screen, then the prologue.
    // The engine keeps downloading behind it; any key or Skip ends it.
    const preload=warm();preload.catch(()=>{});if(prologue)await founderFilm();else if(!loadSave&&!skipOpening)await levelFilm(id);show('loading');await preload;if(!loadSave){try{if(canSkipOpening(storage))storage?.setItem(OPENING_COMPLETE_KEY,'1');storage?.removeItem(CAMPAIGN_KEY);}catch{}}loadingNote.textContent='STARTING ENGINE';await start(id,{load:loadSave,prologue,skipOpening});firstVisit=false;close();
