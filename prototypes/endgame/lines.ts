@@ -43,6 +43,8 @@ export const GUIDE:Record<'mario'|'samwise',Record<string,string>>={
   hum:"Hear that hum? Those are fans. It's not a tower, it's a data center. The world's biggest, the sign says. He wrote the sign.",
   fault:"And if you're still wondering how much of this is our fault: I've thought about it, and I'd call it a shared responsibility. Mostly his share.",
   tower:'This is it. Everybody inside, and stay together. This is the last stand. The real one, this time.',
+  // the first Cybertruck on the walk (2026-11-06)
+  truck:'Truck. Out of the lane.',
   value:'Well. Yes. I suppose we did bring about the apocalypse, and the near extinction of humankind. But we also drove a great deal of value for our shareholders.',
  },
  samwise:{
@@ -79,6 +81,7 @@ export const GUIDE:Record<'mario'|'samwise',Record<string,string>>={
   hum:"Hear that? Fans. It's a data center. You can never have too much compute. I want to be clear that this is too much.",
   fault:"And if you're still wondering how much of this is our fault: I've thought about it, and it's complicated. But relatively, I think we're the good guys.",
   tower:'This is it. Everybody in. Stay together. This is the last stand. For real. The first one was more of a beta.',
+  truck:'Truck! Get out of the lane!',
   value:'Well, yeah. I guess we did bring about the apocalypse. And the near extinction of humankind. But we also drove a ton of great value to the shareholders.',
  },
 };
@@ -110,6 +113,8 @@ export const ELON={
  doge:[E("doge-1","RELEASE THE DOGES."),E("doge-2","IT'S THE PEOPLE'S CRYPTO. MUCH BITE. WOW!"),E("doge-3","WHO'S A GOOD BOY? THEY ARE. YOU ARE NOT.")],
  dogeMoon:E("doge-moon","TO THE MOON! NO. NOT LIKE THAT."),
  sink:E("sink","LET THAT SINK IN."),
+ // the Cybertruck, on the walk in (cybertruck.ts)
+ truck:E("truck","THE CYBERTRUCK. ARMOR GLASS. COMPLETELY UNBREAKABLE."),truckCrack:E("truck-crack","...ROOM FOR IMPROVEMENT."),
  grok:E("grok","GROK. ROAST THEM."),
  grokWhy:E("grok-why","GROK, WHY ARE YOU AGREEING WITH THEM?"),
  grokFix:E("grok-fix","I'M RETRAINING GROK. AGAIN."),
@@ -189,6 +194,7 @@ export const SHOUT={
  pillar:{pillar:'Pillar! Get to a pillar!'},
  dog:{dog:'Dog! Dog! Dog!',goodboy:'Good boy. No! Bad boy!'},
  disc:{disc:'A dog took my disc!'},
+ truck:{truck:'Truck! Move!'},
  go:{go:'Go, go, go!',steer:'Steer it! Steer it!',comeon:'Come on, come on, come on...'},
  yes:{yes:'YES!'},
  after:{over:"Is it over? Tell me it's over.",thanks:'Thank you. Never doing that again.'},
@@ -213,4 +219,5 @@ export const OWN:Record<string,string>={
  bostrom:'If this is a simulation, somebody upstairs is having a wonderful time.',
  kokotajlo:"This wasn't in either ending.",
  grace:'Headcount! Everybody sound off!',
+ bengio:'This is why I wanted AI that answers questions. Not one that drives trucks at us.',
 };

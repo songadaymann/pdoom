@@ -6,7 +6,8 @@
 // 2. That page (reloaded with &auto=1, as a click would start it): the walk in, its three Recognizer beats (shot
 //    down by QA), the door opening once they're gone, and THE BOSS's intro once you're inside. The tower is a data
 //    center (2026-10-30): its sign and turbines are up, its hum swells as you near it and the guide remarks on it,
-//    the far Recognizer never shoots, and nothing on the walk talks about tennis.
+//    the far Recognizer never shoots, and nothing on the walk talks about tennis. Then two Cybertrucks (2026-11-06):
+//    a lane lights, one charges, and both are wrecked; Elon's truck lines and the guide's shout play.
 // 3. A save marked done (endgame 2) loads (?play=1&load=1, the game's own handoff) into a meadow without the
 //    column, and doesn't start the meeting again.
 // 4. The fixture's finale, from its last part (&part=3, the trick shot steered by &autosteer=1) to black: a click
@@ -78,7 +79,16 @@ try{
   if(beat===2)assert.ok(await page.evaluate(()=>window.__eg.ctx.recs.filter(r=>r.alive&&r.style==='bolt').every(r=>r.fireCd===Infinity&&r.state!=='charge')),'the far one never charges');
   await shoot();
  }
- s=await eg();assert.ok(s.mode_state.walk.heard.includes('walk-hum'),'the guide hears the data center on the way in');assert.equal(s.mode_state.shots,0,'nothing shoots on the walk');
+ // P4 (2026-11-06): two Cybertrucks come up the edges behind you, rev at the end of a red lane through where you
+ // stand, and charge down it; discs crack their glass and three wreck one
+ s=await until(async()=>{const e=await eg();return e.mode_state.walk.beat>=4&&e.mode_state.walk.trucks.length===2&&e;},'the Cybertrucks come after the squadron',60000);
+ s=await until(async()=>{const e=await eg();return e.mode_state.walk.trucks.some(t=>t.state==='rev'&&t.lane)&&e;},'a truck revs at the end of its lane',30000);
+ {const t=s.mode_state.walk.trucks.find(t=>t.state==='rev');await page.evaluate(([x,z])=>window.__eg.lookAt(x,1,z),[t.x,t.z]);await sleep(700);await page.screenshot({path:`${out}/4-truck.png`});
+  for(const tr of s.mode_state.walk.trucks)assert.ok(Math.abs(tr.x)<=22.6&&tr.z>=49.9,`a truck stays on the Grid, clear of the turbines and the wall (${JSON.stringify(tr)})`);}
+ s=await until(async()=>{const e=await eg();return e.mode_state.walk.trucks.some(t=>t.charges>0)&&e;},'a truck charges down its lane and stops',20000);
+ await page.evaluate(()=>window.__boss.hitTrucks());
+ s=await until(async()=>{const e=await eg();return e.mode_state.walk.trucks.length===0&&e;},'both trucks wrecked');assert.equal(s.mode_state.walk.trucksWrecked,2);
+ s=await eg();assert.ok(s.mode_state.walk.heard.includes('walk-hum'),'the guide hears the data center on the way in');assert.equal(s.mode_state.walk.skyGlitch,1,'the sky glitches once, before the sky line (skyglitch.ts)');assert.ok(s.mode_state.walk.heard.includes('walk-sky-line'));assert.equal(s.mode_state.shots,0,'nothing shoots on the walk');
  await page.evaluate(()=>{window.__eg.place(0,200);window.__eg.lookAt(0,21,47);});await sleep(600);await page.screenshot({path:`${out}/3-sign.png`});
  await page.evaluate(()=>window.__eg.place(0,58));
  s=await until(async()=>{const e=await eg();return e.mode_state.walk.door&&e;},'the door opens once the way is clear and everyone has had their say',60000);
@@ -91,11 +101,11 @@ try{
  assert.ok(shown.some(t=>/data center/i.test(t)),'the hum line is said');
  // 2026-10-30's walk takes are voiced (the guide here is Dario: the fixture plays Sam)
  const takes=await page.evaluate(()=>window.__takes);
- for(const k of ['guide-mario-end-keep','guide-mario-end-hum'])assert.ok(takes.includes(k),`${k} plays as a voice take (${takes.join(', ')})`);
+ for(const k of ['guide-mario-end-keep','guide-mario-end-hum','mcp-truck','guide-mario-end-truck','mcp-truck-crack'])assert.ok(takes.includes(k),`${k} plays as a voice take (${takes.join(', ')})`);
  assert.ok(!takes.some(k=>k.endsWith('-end-rule')),'the old tennis take never plays');
  assert.equal(await page.evaluate(()=>window.__eg.ctx.voices.failed),0,'no take failed to load');
  const tennis=shown.filter(t=>/tennis|hit it back|swing|send it/i.test(t));assert.deepEqual(tennis,[],'nothing on the walk teaches tennis');
- report.cases.push('Finale page: the walk in past the data center (sign, turbines, the hum line), three Recognizer beats with no tennis, the door opens once they are down, THE BOSS intro inside; the keep and hum lines voiced');
+ report.cases.push('Finale page: the walk in past the data center (sign, turbines, the hum line), three Recognizer beats with no tennis, the sky glitch under the sky line, two Cybertrucks (a lane, a charge, both wrecked, their lines voiced), the door opens once the way is clear, THE BOSS intro inside; the keep and hum lines voiced');
 
  // 3. back to the meadow after it
  await page.evaluate(()=>localStorage.setItem('pdoom.campaign.v1',JSON.stringify({version:1,ceo:'altman',hub:true,saved0:31,saved1:31,saved2:31,saved3:31,lost0:0,lost1:0,lost2:0,lost3:0,following0:0,following1:0,following2:0,following3:0,ending3:0,endgame:2})));

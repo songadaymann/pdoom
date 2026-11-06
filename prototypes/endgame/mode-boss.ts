@@ -8,6 +8,8 @@ import {Sink} from './threats';
 import {Update,Starlink,Doges,type Attack,type Env,type Hitter,type Source} from './attacks';
 import {GUIDE,ELON,GROK,SHOUT,OWN,VOICE,type Line} from './lines';
 import {Wasteland,CAM_FROM,CAM_TO,CAM_LOOK} from './ending';
+import {Truck} from './cybertruck';
+import {SkyGlitch} from './skyglitch';
 
 /* THE BOSS, as redesigned on 2026-10-26 (docs/ENDGAME.md, "The fight: three parts that escalate").
  * 1 THE FLEET (tennis): one ship, then two; click as a shot flashes white in front of you to send it
@@ -156,7 +158,7 @@ const elon=(c:Ctx,line:Line,sec=3.4,o:Opts={})=>say(c,'elon','',[line],sec,o);
 const grok=(c:Ctx,lines:Line|Line[],sec=4,o:Opts={})=>say(c,'grok','GROK',[lines].flat(),sec,{prio:2,ttl:10,...o});
 const speak=(c:Ctx,name:string,line:Line,sec=4.2,o:Opts={})=>say(c,'toast',name,[line],sec,o);
 // the guide's instructions jump the queue (Grok's warnings already say what each attack is); the rest waits its turn
-const URGENT=new Set(['ships','fleet','behind','bits','hurt','launch','dies']);
+const URGENT=new Set(['ships','fleet','behind','bits','hurt','launch','dies','truck']);
 function guide(c:Ctx,key:string,sec=4.2,o:Opts={}){
  const id=c.guide.id as 'mario'|'samwise',urgent=URGENT.has(key);
  speak(c,c.guide.name,{key:`guide-${id}-end-${key}`,text:GUIDE[id]?.[key]??GUIDE.mario[key]},sec,{prio:urgent?2:1,ttl:urgent?8:4,...o});
@@ -213,6 +215,14 @@ function onEvent(c:Ctx,name:string,arg?:unknown){
  if(name==='bonk'){if(arg)c.hud.pop('+1 DOGE','#ffd75e');if(once('moon'))elon(c,ELON.dogeMoon,2.6);}
  if(name==='disc-stolen')shout(c,arg as Person,'disc');
  if(name==='dog-spotted')shout(c,arg as Person,'dog');
+ // the Cybertrucks on the walk (cybertruck.ts)
+ if(name==='truck-rev'){
+  const t=arg as Truck;if(once('truck-first')){guide(c,'truck',3.4,{prio:3,ttl:6});c.hud.hint('Cybertrucks! Step out of the red lane. Three discs wreck one.');}
+  const near=c.people.filter(q=>q.down<=0&&t.inLane(q.pos,4)).sort((a,b)=>a.pos.distanceTo(t.pos)-b.pos.distanceTo(t.pos))[0];if(near)c.later(.4,()=>shout(c,near,'truck'));
+ }
+ if(name==='truck-crack'&&once('truck-crack'))elon(c,ELON.truckCrack,1.4,{prio:3,ttl:3});
+ if(name==='truck-stop'&&once('truck-stop'))c.later(1,()=>own(c,'bengio'));
+ if(name==='truck-wreck')trucksWrecked++;
 }
 const shipSrc=(c:Ctx,rec:Recognizer):Source=>({pos:()=>rec.alive?rec.corePos():null,hit:()=>c.hitRec(rec)});
 const faceSrc=(c:Ctx):Source=>({pos:()=>c.mcp.dead?null:c.mcp.facePos.clone(),hit:(byPlayer)=>{const cap=c.mcp.hurt(10,true);c.sfx.play.face();if(byPlayer)c.hud.pop('10',PAL.enemyCore);if(cap)hurtLine(c);}});
@@ -569,12 +579,14 @@ function clearAll(c:Ctx){
 // The walk in (?m=finale; docs/ENDGAME.md E4-E5): from the end of the meadow, north of the arena, straight to the
 // door in its wall, the guide at your shoulder and everyone alive in single file behind you. Practice on the
 // way: one Recognizer that drops on a shadow (P1), one that keeps its distance and never shoots, for a long throw
-// (P2; 2026-10-30, Jonathan: no tennis on the walk), and a squadron of three (P3). The tower is a data center
+// (P2; 2026-10-30, Jonathan: no tennis on the walk), and a squadron of three (P3), joined by two Cybertrucks (P4;
+// 2026-11-06, Jonathan: "we fight a few more but also the cyber trucks"; cybertruck.ts). The tower is a data center
 // (datacenter.ts): its hum swells as you near it, and the guide remarks on it. Nobody dies out here. Once the
 // way is clear the door opens; inside, THE BOSS begins.
-let walkRecs:{rec:Recognizer;beat:number}[]=[],beat=0,doorK=0,inside=0;const walkTrail:THREE.Vector3[]=[],slots=new Map<Person,THREE.Vector3>();
+let walkRecs:{rec:Recognizer;beat:number}[]=[],beat=0,doorK=0,inside=0,trucks:Truck[]=[],trucksWrecked=0,faultSaid=false,sky:SkyGlitch|null=null;const walkTrail:THREE.Vector3[]=[],slots=new Map<Person,THREE.Vector3>();
 function walkStart(c:Ctx){
  phase='walk';pt=0;WALK.on=true;WALK.door=false;c.stage.openDoor(0);c.dc.inside(false);
+ sky??=new SkyGlitch(c.stage.scene,c.mcp.faceTex,c.stage.floor.material as THREE.ShaderMaterial);
  for(const p of c.everyone())slots.set(p,p.pos.clone());// their places in the arena, for when they're in
  c.player.pos.set(0,0,WALK.far);c.input.state.yaw=0;c.input.state.pitch=0;
  walkTrail.length=0;for(let k=0;k<90;k++)walkTrail.push(new THREE.Vector3(0,0,WALK.far+k));// the file starts already formed behind you
@@ -591,6 +603,7 @@ function walk(c:Ctx,dt:number){
  const ahead=(dz:number)=>Math.max(ARENA.radius+40,z-dz);// a late beat still spawns out on the Grid, not in the tower
  const p=c.player.pos,z=p.z,live=(b:number)=>walkRecs.some(w=>w.beat===b&&w.rec.alive),spawn=(b:number,style:'slam'|'bolt',at:THREE.Vector3,hp:number)=>{const rec=c.spawnRec(0,hp,style,at);if(style==='bolt')rec.fireCd=Infinity;walkRecs.push({rec,beat:b});};// a bolt out here just circles: it never charges
  c.player.health=Math.max(c.player.health,40);// a stomp hurts, but nobody dies on the walk
+ sky?.update(dt,c.stage.camera.position,c.sfx);
  if(!walkTrail.length||walkTrail[0].distanceTo(p)>1){walkTrail.unshift(p.clone());walkTrail.length=Math.min(walkTrail.length,240);}
  // the data center's noise: faint far out, louder as you near the wall, all of it once the door opens
  c.sfx.near(WALK.door?1:.35+.45*clamp(1-(Math.hypot(p.x,p.z)-ARENA.radius)/260,0,1));
@@ -606,14 +619,18 @@ function walk(c:Ctx,dt:number){
  if(beat===0&&z<WALK.far-45&&hush()){beat=1;spawn(1,'slam',new THREE.Vector3(26,24,z-60),2);guide(c,'recognizer',6,wait);c.later(2.5,()=>elon(c,ELON.recognize,2.6,wait));}
  if(beat>=1&&walkRecs.length&&!live(1)&&once('walk-hit'))guide(c,'hit',3,first);
  if(beat===1&&z<WALK.far-150&&hush()){beat=2;spawn(2,'bolt',new THREE.Vector3(-22,10,ahead(55)),2);guide(c,'keep',5,wait);}
- if(beat===2&&z<WALK.far-205&&hush()&&once('walk-sky'))guide(c,'sky',4,wait);
+ // the sky glitches (skyglitch.ts, 2026-11-06), and a beat later the guide reacts
+ if(beat===2&&z<WALK.far-205&&hush()&&once('walk-sky')){sky?.start();c.later(.9,()=>{guide(c,'sky',4,wait);said.add('walk-sky-line');});}
  // in the gap after the sky, the hum (the sign reads by now)
- if(beat===2&&said.has('walk-sky')&&z<WALK.far-235&&hush()&&once('walk-hum'))guide(c,'hum',5.5,wait);
- if(beat===2&&said.has('walk-hum')&&z<WALK.far-260&&hush()){beat=3;for(let k=0;k<3;k++)spawn(3,'slam',new THREE.Vector3(-70,24,ahead(28)-k*9),1);c.later(2,()=>guide(c,'fault',6,wait));}
- if(beat===3&&z<ARENA.radius+50&&hush()&&once('walk-mcp'))elon(c,ELON.walk,4.4,wait);
+ if(beat===2&&said.has('walk-sky-line')&&z<WALK.far-235&&hush()&&once('walk-hum'))guide(c,'hum',5.5,wait);
+ if(beat===2&&said.has('walk-hum')&&z<WALK.far-260&&hush()){beat=3;for(let k=0;k<3;k++)spawn(3,'slam',new THREE.Vector3(-70,24,ahead(28)-k*9),1);c.later(2,()=>guide(c,'fault',6,{...wait,then:()=>{faultSaid=true;}}));}
+ // P4: once he's had his say about fault, the trucks come up behind you, whether or not the squadron's down
+ if(beat===3&&faultSaid&&hush()){beat=4;elon(c,ELON.truck,4,{...wait,prio:2});for(const side of [1,-1] as const)trucks.push(new Truck(env,side,side>0?0:1));}
+ for(const t of trucks)t.update(dt);trucks=trucks.filter(t=>!t.done);
+ if(beat===4&&!trucks.length&&z<ARENA.radius+50&&hush()&&once('walk-mcp'))elon(c,ELON.walk,4.4,wait);
  // the door: once nothing's left out here
  if(!WALK.door&&z<ARENA.radius+18){
-  if(walkRecs.some(w=>w.rec.alive)){if(once('walk-clear'))c.hud.hint('Clear the Recognizers, and the door opens.');}
+  if(walkRecs.some(w=>w.rec.alive)||trucks.length){if(once('walk-clear'))c.hud.hint('Clear the way, and the door opens.');}
   else if(said.has('walk-mcp')&&hush()){WALK.door=true;c.sfx.near(1);guide(c,'tower',5.5,{...wait,prio:2});c.sfx.play.charge();c.hud.hint('In you go.');}
  }
  if(WALK.door&&doorK<1){doorK=Math.min(1,doorK+dt/1.8);c.stage.openDoor(doorK);}
@@ -622,6 +639,7 @@ function walk(c:Ctx,dt:number){
 function walkEnd(c:Ctx,instant:boolean){
  if(!WALK.on)return;WALK.on=false;WALK.door=false;doorK=0;c.stage.openDoor(0);c.sfx.near(1);c.dc.inside(true);
  for(const w of walkRecs)if(w.rec.alive){w.rec.alive=false;w.rec.derez(c.sparks);}
+ for(const t of trucks)t.dispose();trucks=[];sky?.stop();
  for(const q of c.everyone()){const at=slots.get(q);if(instant&&at){q.pos.copy(at);q.target.copy(at);}}
  if(instant)c.player.pos.set(0,0,36);
  (c.stage.floor.material as THREE.ShaderMaterial).uniforms.uR.value=ARENA.radius;c.hud.hint('');
@@ -718,6 +736,7 @@ export const boss:Mode={
    env={c,fire:(from,target,speed,src)=>{shots.push(new Shot(c.stage.scene,from,target,speed,chest(c,target),src));c.sfx.play.serve(from);},
     knock:(p,from)=>knock(c,p,from),hurtPlayer:(n,from)=>hurtPlayer(c,n,from),throwAt:(p,at)=>c.throwAt(p,at,THEIRS,.03),event:(name,arg)=>onEvent(c,name,arg)};
    c.discs.probe=(d)=>{
+    if(phase==='walk')return trucks.some(t=>t.probe(d));
     if(phase!=='shieldDown')return false;
     for(const a of attacks)if(a instanceof Doges&&a.probe(d))return true;
     for(const s of spots){
@@ -733,7 +752,7 @@ export const boss:Mode={
    const other=c.guide.id==='mario'?'samwise':'mario';void c.voices.load(k=>!k.startsWith(`guide-${other}-`));
    c.mcp.voiceMouth=()=>c.voices.mouth();
    void grokFaces().then(f=>{grokArt=f;if(f)$('grok-ava').classList.add('art');});
-   (window as any).__boss={countdown:(n:number)=>{launchT=n;}};// for boss-check.mjs
+   (window as any).__boss={countdown:(n:number)=>{launchT=n;},hitTrucks:(n=Infinity)=>{for(const t of [...trucks])for(let i=0;i<n&&t.alive;i++)t.hit();},sky:()=>sky};// for boss-check.mjs and endgame-hookup-smoke.mjs
    const start=QUERY.get('part');
    if(start==='2')jump(c,'shieldDown');else if(start==='3')jump(c,'trick');else if(FINALE)walkStart(c);
   }
@@ -885,7 +904,7 @@ export const boss:Mode={
  hand:(c)=>phase==='trick'&&!trick&&c.held?1:null,
  state:(c)=>{
   const eye=c.player.eyePos(),mine=shots.filter(s=>s.alive&&s.enemy&&s.target.kind==='player').sort((a,b)=>a.pos.distanceTo(eye)-b.pos.distanceTo(eye))[0];
-  return {phase,pt:+pt.toFixed(2),ending,walk:FINALE?{on:WALK.on,beat,door:WALK.door,live:walkRecs.filter(w=>w.rec.alive).length,heard:[...said].filter(k=>k.startsWith('walk-')),near:+c.sfx.nearness.toFixed(2)}:null,fleet,wave,shipsDown,ships:SHIPS,crowdReturns,spots:spots.length,spotsAt:spots.map(s=>s.world().toArray().map(v=>+v.toFixed(2))),shots:shots.length,hot:shots.some(s=>s.hot),
+  return {phase,pt:+pt.toFixed(2),ending,walk:FINALE?{on:WALK.on,beat,door:WALK.door,live:walkRecs.filter(w=>w.rec.alive).length,trucks:trucks.map(t=>t.info()),trucksWrecked,skyGlitch:sky?.played??0,skyOn:!!sky?.on,heard:[...said].filter(k=>k.startsWith('walk-')),near:+c.sfx.nearness.toFixed(2)}:null,fleet,wave,shipsDown,ships:SHIPS,crowdReturns,spots:spots.length,spotsAt:spots.map(s=>s.world().toArray().map(v=>+v.toFixed(2))),shots:shots.length,hot:shots.some(s=>s.hot),
    incoming:mine&&mine.pos.distanceTo(eye)<8?mine.pos.toArray().map(v=>+v.toFixed(2)):null,
    attacks:attacks.map(a=>a.kind),started:Object.fromEntries(started),warnings,doges:attacks.filter((a):a is Doges=>a instanceof Doges).reduce((n,a)=>n+a.running,0),
    attempts,best,timeScale:+c.timeScale.toFixed(2),launchT:+launchT.toFixed(1),delays,pathKey,solves,

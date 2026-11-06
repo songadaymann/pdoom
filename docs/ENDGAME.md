@@ -28,7 +28,20 @@ What happens:
   - You start 450 m north of the arena on the Grid, with the guide at your shoulder and everyone in file behind.
   - P1 is one Recognizer that drops on a shadow (`end-recognizer`, `end-hit`).
   - P2 is one that keeps its distance, to practise long throws (`end-keep`, then `end-sky`). It never shoots: Jonathan, 2026-10-30, "the ships don't do tennis. and i don't think they should." `end-keep` replaced `end-rule` (whose takes taught hitting shots back), so the old takes can't play; until it's recorded it's a subtitle. Part 1's `end-ships` now introduces the swing on its own.
+  - **The sky glitches** for `end-sky` (`prototypes/endgame/skyglitch.ts`, 2026-11-06). Jonathan: "i never see anything happening in the sky at that point"; the line had been written for a glitch that was never built.
+    - For 6 s the void breaks up. Blocky patches of the meadow's Bliss sky flicker through the black, rows of it tear sideways, and the Grid's lines slip and flash (the floor shader's `uGlitch`).
+    - Elon's smug pixel face (the face sheet's first cell) comes up huge over the data center. It downloads in steps, 6 then 12, 24 and 48 cells wide, holds whole for about 2 s, then breaks up.
+    - It starts 0.9 s before the guide's line, so the line is a reaction. A stutter of corrupted bits plays at each surge (`kit.ts` glitch).
+    - Drawn in code, no new art. `end-hum` now waits for the line itself (`walk-sky-line`).
   - P3 is a squadron of three (`end-fault`).
+  - P4 is two Cybertrucks (`prototypes/endgame/cybertruck.ts`, 2026-11-06; Jonathan: "we fight the first ship and then after that we fight a few more but also the cyber trucks"). They were the fight's part 2 filler; they're on the walk instead.
+    - Once the guide has said `end-fault`, Elon says `mcp-truck` ("THE CYBERTRUCK. ARMOR GLASS. COMPLETELY UNBREAKABLE.") and two trucks come up the edges of the walk from behind you, whether or not the squadron is down. They overtake and skid round to face across.
+    - Each revs for 2 s at the end of a red lane (chevrons pointing its way) drawn from where it stands through where you stand, then charges down it at 28 m/s. It stops at the far end, turns, and does it again. The lanes stay on the Grid: |x| 22.5 at most, inside the turbine rows, and north of the wall.
+    - Whoever is in a lane steps out after their reaction time; a slow one is knocked down. It costs you 30, and you can't go down on the walk.
+    - A disc cracks a pane of its glass (the side windows, then the windshield). The first crack is Elon's `mcp-truck-crack` ("...ROOM FOR IMPROVEMENT."). Three wreck a truck: it derezzes.
+    - The first lane gets the guide's `end-truck` shout and a prisoner's "Truck! Move!"; after the first charge, Yoshua's own line (`yoshua-fight`). All were voiced in the 2026-10-27 batch. Grok stays out of the walk: he first speaks in the fight.
+    - The truck is drawn in code: a wedge in Elon's red-orange lines with dark glass, a white light bar across the front and a red one across the tailgate. Its sounds are synthesized (`kit.ts` rev, launch, screech) plus a ship's engine.
+    - `mcp-walk` and the door wait for both trucks.
   - Elon's walk lines are captions across the sky (`mcp-resolve`, `mcp-recognize`, `mcp-walk`).
   - All of the walk's lines are voiced since 2026-10-28 (`node scripts/import-endgame-assets.mjs <batch>`), about 45 s of them. They queue one at a time; each beat waits for the last one's lines, and the door for all of them, so nothing is dropped or said late. The walk grew from 290 m to 420 m to fit them, and to 450 m (2026-10-30) for `end-hum`.
   - A stomp hurts but nobody dies out here.
@@ -100,7 +113,7 @@ Every line and every sprite to generate is in the hand-off doc [p(DOOM) Boss Fig
 
 - **Colour is the tell.** Everything Elon sends at you glows red-orange (`#ff3b1f`), and everything on your side glows cyan. A ball you hit back turns cyan.
 - **You can die.** Integrity is 100. At 0, `ACCOUNT SUSPENDED.`, and the current part restarts with its absorbed people restored.
-- **People can be taken.** A knocked-down person stays down for 3 s. An Optimus robot walks out of the pit to collect them (at most two at once), and one disc hit makes it drop them. If it reaches the pit, they're absorbed: their face appears in one of the column's facets and they stop throwing. Hitting the face spot beside them drops them free.
+- ~~**People can be taken.**~~ Dropped 2026-11-06 (Jonathan): no Optimus robots and no absorbing. Kept here for the record: A knocked-down person stays down for 3 s. An Optimus robot walks out of the pit to collect them (at most two at once), and one disc hit makes it drop them. If it reaches the pit, they're absorbed: their face appears in one of the column's facets and they stop throwing. Hitting the face spot beside them drops them free.
 - **The guide fights at your shoulder** and can't die, as before.
 
 ### Part 1: the Fleet (tennis)
@@ -124,14 +137,14 @@ His attacks come on a cycle, and Grok's chat bubble warns you about 2 s before e
 | **Over-the-air update** | Tesla's over-the-air updates; Tesla coils | Arcs crawl up coils at the column's base for 3 s. A progress bar in the sky climbs to 100%, and a safe wedge glows on the floor behind each pillar ("no signal"). | Get behind a pillar. The crowd runs for cover too, and the slow ones don't make it. | A ring pulse sweeps the whole floor: 30 damage, a knockdown and 1 s of screen static. |
 | **Starlink** | SpaceX's satellite trains | A train of lights streams up from the crown and spreads into a grid over the arena. Red dots land on everyone. | Hit your ball back as it flashes, or step off your dot. | 20–30 balls at once from above, 15 damage each. A returned ball knocks out a satellite. |
 | **Doges** | Dogecoin | Barking from the pit, then MUCH WOW and VERY ATTACK floating over a pack of Shiba Inus | Bonk one with a disc and it rockets off to the moon. They also chase any disc in flight, so every volley drags the pack around. | Packs of 6, later 10. A tackle knocks someone down and steals their disc for 8 s, which weakens the volley. |
-| **Cybertruck** (below 550) | The Cybertruck and its armour-glass demo | A red lane lights across the floor for 2 s while the truck revs at one end | Step out of the lane. A disc cracks its window: `...ROOM FOR IMPROVEMENT.` | It charges down the lane: 40 damage and a knockdown. |
+| **Cybertruck** (moved to the walk, 2026-11-06: P4 above) | The Cybertruck and its armour-glass demo | A red lane lights across the floor for 2 s while the truck revs at one end | Step out of the lane. A disc cracks its window: `...ROOM FOR IMPROVEMENT.` | It charges down the lane: 40 damage and a knockdown. |
 | **Sinks** (below 550) | `LET THAT SINK IN.` | Shadows on the floor and a falling whistle, 2 s (kept from spec 05) | Step out of the shadow. | 25 damage. The sinks stay as cover for 10 s. |
 
 **The attacks speed up as his integrity falls.**
 
 - **The first three** always come in order (update, Starlink, doges), so everyone meets each one. After the first doge pack, Elon tells Grok to roast you, and Grok compliments you instead.
 - **Above 550:** one attack at a time, about every 13 s, the face open for 6 s. The face is smug, then annoyed after `EXTREMELY HARDCORE` (800).
-- **550–300:** `I'M POSTING THROUGH IT`. Attacks come two at a time, about every 12 s with the face open for 5 s (doges with an update, Starlink with sinks), and the Cybertruck joins (not built yet). The face is furious.
+- **550–300:** `I'M POSTING THROUGH IT`. Attacks come two at a time, about every 12 s with the face open for 5 s (doges with an update, Starlink with sinks), and the face is furious. (The Cybertruck moved to the walk, 2026-11-06.)
 
 ### Part 3: the Last Throw (the trick shot is now LAUNCH)
 
@@ -163,10 +176,10 @@ His attacks come on a cycle, and Grok's chat bubble warns you about 2 s before e
 8. **GRID RUN, the light-cycle phase.** With the fight now in three parts it would make a fourth. Suggestion: cut it. The walk and part 1 already have Recognizers.
 9. **Engine.** The spec makes the arena a GZDoom map. Leaning Three.js instead, continuing from the meadow: no load between the walk and the tower, glow lines and bloom come easily, and the fight is throws, sprites and simple AI. The cost is rebuilding the HUD bits the fight needs.
 10. ~~After the trick shot.~~ Proposed 2026-10-26: LAUNCH becomes part 3. The trick shot is thrown against its countdown, the props become the victory volley, and the beam is dropped. Say if you want the beam back.
-11. **Dying.** Draft: death restarts the current part. The softer option is respawning at the I/O tower after 3 s with one more person absorbed. Restarting is scarier; respawning keeps the flow.
-12. **The robots.** Optimus carrying people to the pit is a new system. Without it, a downed person would just be absorbed after a few seconds. The robots make losing people visible and give you something to save, which is why they're in.
+11. **Dying.** *Decided 2026-11-06: keep the simple respawn (Jonathan: "i like the simple respawning").* Draft: death restarts the current part. The softer option is respawning at the I/O tower after 3 s with one more person absorbed. Restarting is scarier; respawning keeps the flow.
+12. **The robots.** *Dropped 2026-11-06.* Optimus carrying people to the pit is a new system. Without it, a downed person would just be absorbed after a few seconds. The robots make losing people visible and give you something to save, which is why they're in.
 13. **Grok as a character.** It's a real product, voiced by a designed voice and kept on the same parody footing as the MCP. Its warnings are what make the busier fight readable.
-14. **Fillers.** The Cybertruck and the sinks both arrive below 550. Keep both, or pick one?
+14. **Fillers.** The Cybertruck and the sinks both arrive below 550. Keep both, or pick one? *Decided 2026-11-06: the sinks stay; the Cybertruck moved to the walk.*
 15. **The dawn.** The wasteland replaces E9's dawn on the crest (p(DOOM) rolling to 0%, the thank-yous moved there from camp night, the founders' nod). Keep the thank-yous somewhere, maybe over the credits, or cut them?
 
 ## Draft lines
@@ -189,7 +202,7 @@ These are the walk lines, from the door to the tower. The fight's lines are in t
 | `end-recognizer` | P1, the first Recognizer | "That's a Recognizer. It drops on you. Watch for the shadow, step out of it, then throw at the light in the middle." | "OK, that's a Recognizer. When you see the shadow, move. Then hit the glowing part in the middle." |
 | `end-hit` | P1 down | "Good. And it came back. I said it would come back." | "Nice! And it came back. Like I said. Roughly like I said." |
 | `end-keep` | P2, one that hangs back and never shoots (replaced `end-rule`, 2026-10-30) | "This one keeps its distance. It won't come to you, so throw from where you are." | "This one's hanging back. Just throw from here. Long throws are fine." |
-| `end-sky` | Mid-walk, the sky glitches | "Keep walking. The sky is doing something I don't have a framework for." | "Keep walking. And maybe don't look at the sky for a bit." |
+| `end-sky` | Mid-walk, the sky glitches (built 2026-11-06: Bliss sky breaking through, his face downloading over the tower) | "Keep walking. The sky is doing something I don't have a framework for." | "Keep walking. And maybe don't look at the sky for a bit." |
 | `end-hum` | After `end-sky`, as the data center's hum gets loud (2026-10-30) | "Hear that hum? Those are fans. It's not a tower, it's a data center. The world's biggest, the sign says. He wrote the sign." | "Hear that? Fans. It's a data center. You can never have too much compute. I want to be clear that this is too much." |
 | `end-fault` | P3, calls back to "How much of this is our fault?" | "And if you're still wondering how much of this is our fault: I've thought about it, and I'd call it a shared responsibility. Mostly his share." | "And if you're still wondering how much of this is our fault: I've thought about it, and it's complicated. But relatively, I think we're the good guys." |
 | `end-tower` | At the tower door | "This is it. Everybody inside, and stay together. This is the last stand. The real one, this time." | "This is it. Everybody in. Stay together. This is the last stand. For real. The first one was more of a beta." |
@@ -231,7 +244,7 @@ Three small Three.js scenes in the 1982 *Tron* end-game look: black void, neon g
     - `floppy-hand-bat.png`, the extended hand still gripping the disc: a swing shows it whenever the disc is in your hand, as a racket. With the disc thrown, a swing is still the bare palm.
     - The meltdown runs as long as Elon's last three takes (about 6.6 s), so the blast lands on the cut-off "MA—". The stare waits for the epilogue take to finish (10-12 s, deadpan).
     - 119 re-shouted takes ran on with up to 2 s of wordless noise after the line. `scripts/find-endgame-take-tails.py` (run with the voice lab's Python, for its Whisper) lists where each last word ends, and the importer cuts there, matched by the WAV's hash so a retake is never cut.
-    - Unused until their mechanics exist: the Optimus sheets, the roadster, the carried pose, and the absorb, free, truck and Optimus lines.
+    - Unused: the Optimus sheets, the roadster, the carried pose, and the absorb, free and Optimus lines (the robots were dropped on 2026-11-06), and Grok's `grok-truck`. The other truck lines play on the walk since 2026-11-06.
   - **Sound, 2026-10-27** (Jonathan: "there should be an overarching low computer hum, fans, and the ships should make noise, the doges should bark"). All synthesized live in `kit.ts`, heard from where they happen (the listener is the camera):
     - The arena sounds like the inside of a data center: mains hum, room air, a fan in each of the 8 pillars drifting in speed, and now and then a hard disk seeking in one. On the walk in it swells as you approach and pours out of the open door, and the turbines outside roar (on their own bus, two rows). In the meltdown it all winds down two octaves and dies. `?bed=0` leaves it out.
     - Every ship has an engine: a throbbing growl whose whine climbs as it charges a shot, with an overdone Doppler bend. A ship shot down winds down as it goes.
@@ -239,7 +252,7 @@ Three small Three.js scenes in the 1982 *Tron* end-game look: black void, neon g
     - The doges bark as they run (not with a disc in their mouth), growl on a tackle and yelp when bonked.
     - Recorded takes: `scripts/generate-endgame-sfx.py` makes barks, yelps, growls, the rocket, a sink smashing and the blast with Stable Audio Open 1.0, and keeps the takes LAION CLAP scores best. It runs in the voice lab at `runtime/stable-audio-open/.venv`, after accepting the model's terms on Hugging Face and `uvx hf auth login`. An effect with takes plays them; one without stays synthesized. First run, 2026-10-27: 36 takes in 40 minutes on the M5 Max, including the one-time model download; 16 kept. All five growls scored too far from "growl" (they were scattered clicks), so the growl is still the synth. On the Mac's GPU, diffusers' Brownian-tree noise for this sampler recurses forever; the script swaps in plain Gaussian noise.
   - **The end:** the meltdown, the disassembly and the dialog. Close takes you to the wasteland (`ending.ts`, drawn in code) for the guide's line, the stare and black.
-  - **Not built yet:** the Optimus robots and absorbing people, dying restarting the part (you still respawn), the Cybertruck, and the victory volley of props. 1, 2 and 3 jump to a part, N skips ahead, and T opens the trick-shot tuning panel.
+  - **Not built yet:** the victory volley of props (each survivor throws their signature prop at the falling column). Dropped on 2026-11-06: the Optimus robots and absorbing people, and dying restarting the part (you still respawn). The Cybertruck is on the walk (P4). 1, 2 and 3 jump to a part, N skips ahead, and T opens the trick-shot tuning panel.
 
 Build and serve (from the repo root):
 

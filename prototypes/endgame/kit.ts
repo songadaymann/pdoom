@@ -52,14 +52,18 @@ export function makeStage(canvas:HTMLCanvasElement,{door=false}={}){
  // The floor: black with a cyan grid, 4 m minor and 16 m major lines on world x/z (the hub's traces land on them).
  // 1200 m across, so the walk in (WALK.far) starts on it
  const floor=new THREE.Mesh(new THREE.PlaneGeometry(1200,1200).rotateX(-Math.PI/2),new THREE.ShaderMaterial({
-  uniforms:{uLine:{value:new THREE.Color(PAL.line)},uBase:{value:new THREE.Color(PAL.floor)},uPit:{value:new THREE.Color(PAL.enemy)},uR:{value:ARENA.radius},uPitGlow:{value:1}},
+  uniforms:{uLine:{value:new THREE.Color(PAL.line)},uBase:{value:new THREE.Color(PAL.floor)},uPit:{value:new THREE.Color(PAL.enemy)},uR:{value:ARENA.radius},uPitGlow:{value:1},uGlitch:{value:0},uGT:{value:0}},
   vertexShader:'varying vec3 vW;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
-  fragmentShader:`uniform vec3 uLine,uBase,uPit;uniform float uR,uPitGlow;varying vec3 vW;
+  fragmentShader:`uniform vec3 uLine,uBase,uPit;uniform float uR,uPitGlow,uGlitch,uGT;varying vec3 vW;
    float grid(vec2 p,float s,float w){vec2 q=p/s;vec2 g=abs(fract(q-.5)-.5)/(fwidth(q)*w);return 1.-min(min(g.x,g.y),1.);}
+   float hh(float x){return fract(sin(x*91.7+uGT*13.1)*43758.5453);}
    void main(){vec2 p=vW.xz;float r=length(p),d=length(vW.xz-cameraPosition.xz);
     float inside=1.-smoothstep(uR-1.,uR+.5,r)*.85;
     float fade=mix(.3,1.,exp(-d/70.));
-    vec3 c=uBase+uLine*(grid(p,4.,1.2)*.16+grid(p,16.,1.8)*.7)*fade*inside;
+    // the sky glitch (skyglitch.ts): rows of the Grid slip sideways and some lines flash white or red
+    vec3 line=uLine;
+    if(uGlitch>0.){float b=floor(p.y/6.);p.x+=step(.72,hh(b))*(hh(b+7.)-.5)*9.*uGlitch;float f=hh(floor(p.y/3.)+3.);line=mix(line,f>.5?vec3(1.):vec3(1.,.25,.12),step(.86,f)*uGlitch);}
+    vec3 c=uBase+line*(grid(p,4.,1.2)*.16+grid(p,16.,1.8)*.7)*fade*inside;
     c+=uPit*exp(-max(r-5.,0.)/3.5)*.5*uPitGlow;
     gl_FragColor=vec4(c,1.);}`,
  }));
@@ -348,6 +352,13 @@ export function makeSfx(){
   wind(){noise(18,.16,260,.4,-80);noise(18,.07,900,.8,300,1);},
   warp(at?:THREE.Vector3){from(at,()=>{noise(1.1,.22,3400,1,-3000);tone(1500,.9,'sawtooth',.05,-1300);},24);},
   portal(at?:THREE.Vector3){from(at,()=>{tone(48,2.6,'sawtooth',.22,30);tone(97,2.6,'square',.06,60);noise(2.4,.25,260,.5,1400);},40);},
+  // the Cybertruck (cybertruck.ts): revving at the end of its lane (an electric whine it doesn't need, and a
+  // growl it doesn't have), launching down it, and its tyres on the Grid
+  rev(at?:THREE.Vector3){from(at,()=>{tone(52,2,'sawtooth',.2,90);tone(104,2,'square',.06,200);tone(700,2,'sine',.03,2100);noise(2,.12,260,.7,700);},16);},
+  launch(at?:THREE.Vector3){from(at,()=>{tone(150,.9,'sawtooth',.18,-90);noise(.9,.3,900,.8,-600);tone(2800,.7,'sine',.04,-2000);},18);},
+  // the sky glitching (skyglitch.ts): a stutter of corrupted bits
+  glitch(){for(let i=0;i<12;i++){const d=i*.06+Math.random()*.03;tone(160+Math.random()*2400,.045,'square',.05,0,d);if(i%3===0)noise(.05,.1,2500+Math.random()*4000,2.5,0,d);}},
+  screech(at?:THREE.Vector3){from(at,()=>{noise(.55,.18,2900,7,-700);noise(.4,.08,1700,5,300,.05);},14);},
  };
  // Doom's tracks (scripts/prepare-doom-music.mjs renders them into ignored doom-web/local/): one at a time,
  // fading across; null fades out. A missing file is silence.
