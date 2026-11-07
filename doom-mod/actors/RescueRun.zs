@@ -4,13 +4,15 @@ class PDRescueRun : Object play
     int ActiveTics;
     int CoverDoom;
     bool Practice;
+    bool Assisted;   // cheats or a development ending, not just walking in from SAFE MODE (doom-web/speedrun.js)
     bool Finished;
 
     void Load()
     {
         ActiveTics = 0; CoverDoom = -1; Finished = false;
-        Practice = players[0].mo.GetCVar("pdoom_dev_end") != 0 || PDCampaignSession.Get().HubEntry;
-        Console.Printf("PDOOM_RUN_START {\"level_id\":\"%s\",\"level_version\":\"%s\",\"practice\":%d}", PDCampaignSession.Id(),PDCampaignSession.MapVersion(),Practice);
+        Assisted = players[0].mo.GetCVar("pdoom_dev_end") != 0;
+        Practice = Assisted || PDCampaignSession.Get().HubEntry;
+        Console.Printf("PDOOM_RUN_START {\"level_id\":\"%s\",\"level_version\":\"%s\",\"practice\":%d,\"assisted\":%d}", PDCampaignSession.Id(),PDCampaignSession.MapVersion(),Practice,Assisted);
     }
 
     void Tick()
@@ -18,7 +20,7 @@ class PDRescueRun : Object play
         if (Finished) return;
         ActiveTics++;
         int cheats = players[0].cheats;
-        if (cheats & (CF_NOCLIP | CF_NOCLIP2 | CF_GODMODE | CF_GODMODE2 | CF_BUDDHA | CF_BUDDHA2 | CF_FLY | CF_NOTARGET | CF_FRIGHTENING | CF_NOVELOCITY)) Practice = true;
+        if (cheats & (CF_NOCLIP | CF_NOCLIP2 | CF_GODMODE | CF_GODMODE2 | CF_BUDDHA | CF_BUDDHA2 | CF_FLY | CF_NOTARGET | CF_FRIGHTENING | CF_NOVELOCITY)) { Practice = true; Assisted = true; }
     }
 
     void SnapshotCover(PDCheckpoint game)
@@ -43,7 +45,7 @@ class PDRescueRun : Object play
 
     void Report()
     {
-        Console.Printf("PDOOM_RUN {\"level_id\":\"%s\",\"level_version\":\"%s\",\"active_tics\":%d,\"p_doom_cover\":%d,\"practice\":%d}", PDCampaignSession.Id(),PDCampaignSession.MapVersion(),ActiveTics,CoverDoom,Practice);
+        Console.Printf("PDOOM_RUN {\"level_id\":\"%s\",\"level_version\":\"%s\",\"active_tics\":%d,\"p_doom_cover\":%d,\"practice\":%d,\"assisted\":%d}", PDCampaignSession.Id(),PDCampaignSession.MapVersion(),ActiveTics,CoverDoom,Practice,Assisted);
     }
 
     void Finish(PDCheckpoint game, int saved)

@@ -7,6 +7,7 @@ class PDCheckpoint : EventHandler
     bool Initialized;
     bool BootHolding;
     bool Ended;
+    int RestartAt;    // nobody is ever lost: when someone goes down, this visit restarts at this tic (LoseAll)
     bool Awake;
     bool HasWrench;
     bool HasGun;
@@ -103,7 +104,7 @@ class PDCheckpoint : EventHandler
         players[0].cheats&=~(CF_TOTALLYFROZEN|CF_FROZEN|CF_NOCLIP|CF_NOCLIP2|CF_GODMODE|CF_GODMODE2|CF_BUDDHA|CF_BUDDHA2|CF_FLY|CF_NOTARGET|CF_FRIGHTENING|CF_NOVELOCITY);
         CeoDown=false;Retreat=false;EntryHub=false;Replay=false;
         BootHolding=players[0].mo.GetCVar("pdoom_boot_hold")!=0;
-        Ended=false;Awake=false;HasWrench=false;HasGun=false;HasKey=false;HasCharge=false;GroupGathered=false;
+        Ended=false;RestartAt=0;Awake=false;HasWrench=false;HasGun=false;HasKey=false;HasCharge=false;GroupGathered=false;
         Ammo=0;Tool=0;OldButtons=0;AttackUntil=0;WakeAt=0;MessageUntil=0;CameraReports=0;Impacts=0;DoorWait=0;Controlled=0;DialogueUntil=0;DialogueSite=-1;DialogueLine="";
         Links.Clear();HumanLinks.Clear();Doors.Clear();
         PDCampaignSession.Get().Load();
@@ -478,17 +479,34 @@ class PDCheckpoint : EventHandler
         if (HasKey) Actor.Spawn('PDCheckpointKey', at);
         if (HasCharge) Actor.Spawn('PDCheckpointCharge', at);
         HasGun = false; Ammo = 0; HasKey = false; HasCharge = false;
+        // Wearing someone you freed: they're the one who went down.
+        if (Controlled != 0) { Cast.People[Controlled - 1].Alive = false; LoseAll(String.Format("%s is gone.", PDCheckpointMap.SiteName(Controlled - 1))); return; }
+        // Nobody freed and standing to hand the CEO's job to: straight to the restart, no handover lines.
+        bool heir = false;
+        for (int i = 0; i < Cast.People.Size(); i++) { let q = Cast.People[i]; if (q.Alive && q.Released && q.Body && !q.Taken) heir = true; }
+        if (!heir) { LoseAll("Nobody is left to take over."); return; }
         Lives.Down(self);
         if (Cast.TakeNext(self))
         {
             if (Hunter) { Hunter.AimTics = 0; Hunter.ReloadUntil = level.time + 105; }
         }
-        else
-        {
-            pawn.health = 0; pawn.player.health = 0;
-            Ended = true; pawn.player.cheats |= CF_TOTALLYFROZEN;
-            Run.Finish(self, 0);
-        }
+        else LoseAll("Nobody is left to take over.");
+    }
+
+    // Nobody is ever lost (2026-11-07, Jonathan: "when a prisoner is lost, they have to restart that level that
+    // the prisoner was lost on. There can be no lose of prisoners."). Someone you freed going down, or you going
+    // down with nobody to take over, holds the level for three seconds and restarts this visit, the way MEG3N
+    // and SMITH catching you does. People already at camp from an earlier visit stay saved; the speedrun clock
+    // (doom-web/speedrun.js) keeps running, so the restart is the cost.
+    void LoseAll(String why)
+    {
+        if (Ended) return;
+        Ended = true; RestartAt = level.time + 105;
+        let pawn = players[0].mo;
+        pawn.Vel = (0, 0, 0); pawn.player.cheats |= CF_TOTALLYFROZEN;
+        Polish.Stinger("pdoom/loss");
+        Say(why .. " Restarting the level.", 105);
+        Console.Printf("PDOOM_EVENT {\"type\":\"level-restart\",\"level_id\":\"%s\"}", PDCampaignSession.Id());
     }
 
     override void WorldThingDied(WorldEvent e)
@@ -539,6 +557,7 @@ class PDCheckpoint : EventHandler
     {
         if (!Initialized || !players[0].mo) return;
         if(BootHolding){if(level.time%7==0)Report();return;}
+        if(RestartAt>0&&level.time>=RestartAt){RestartAt=0;PDCampaignSession.Get().Restart();return;}
         if (!Ended)
         {
             Run.Tick();

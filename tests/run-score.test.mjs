@@ -1,108 +1,88 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {getLevel,boardsForLevel,nextLevel} from '../doom-web/levels.js';
-import {scoreRun,RunTracker} from '../doom-web/run-score.js';
-import {LeaderboardSubmission,submissionBodies,stablePlayer} from '../doom-web/leaderboard-client.js';
-import {createLocalLeaderboards} from '../scripts/local-leaderboards.mjs';
-import http from 'node:http';
-import {mkdtemp,rm} from 'node:fs/promises';
-import os from 'node:os';
-import path from 'node:path';
+import {readLevelResult,RunTracker} from '../doom-web/run-score.js';
+import {getLevel,LEVELS,SPEEDRUN_BOARD} from '../doom-web/levels.js';
+import {SpeedrunClock,SPEEDRUN,SPLITS,speedrunResult,speedrunMs,freshCampaign,savedCount,cleanSpeedrun,formatRunTime} from '../doom-web/speedrun.js';
+import {submissionBodies} from '../doom-web/leaderboard-client.js';
+import {Campaign,CAMPAIGN_KEY} from '../doom-web/campaign.js';
 
-const level=getLevel(),payload=(overrides={})=>({level_id:level.id,level_version:level.version,score_version:level.scoreVersion,outcome:'escaped',saved:6,total:6,active_tics:21000,p_doom_cover:5,cameras_broken:9,cameras_total:9,practice:0,routes:['vent','turret','key','breach','pad'],saved_figures:overrides.outcome==='lost'?0:Math.max(0,(overrides.saved??6)-1),ceo_state:overrides.outcome==='lost'?'downed':'conscious',skill:3,entry:'cold',retreat:0,...overrides});
-const result=(overrides={},options={})=>scoreRun(payload(overrides),level,{runId:'run-test',...options});
-test('approved formula, rescue dominance and gentle speed',()=>{
-  assert.equal(result().totalScore,55200);assert.equal(result().submissions.length,1);
-  assert.equal(result({saved:5}).submissions.length,1);
-  assert.ok(result({saved:5,active_tics:1,p_doom_cover:1}).totalScore<result({cameras_broken:0,active_tics:210000000,p_doom_cover:99}).totalScore);
-  assert.ok(result({active_tics:42000}).breakdown.speed>0);
-});
-test('native completion freezes once, restart isolates run and clock, no lowest-ever outlook',()=>{
-  let n=0;const run=new RunTracker(level,{uuid:()=>`run-${++n}`});
-  run.begin(payload());run.update(payload({active_tics:100,p_doom_cover:8}));run.update(payload({active_tics:1000,p_doom_cover:15}));
-  const first=run.finish(payload({p_doom_cover:15}));assert.equal(first.breakdown.outlook,850);
-  run.update(payload({active_tics:999999}));assert.equal(run.finish(payload({saved:1})),first);assert.equal(run.activeTics,21000);
-  assert.ok(Object.isFrozen(first)&&Object.isFrozen(first.breakdown)&&Object.isFrozen(first.submissions));
-  run.begin(payload());assert.equal(run.runId,'run-2');assert.equal(run.result,null);assert.equal(run.activeTics,0);assert.equal(run.coverDoom,null);
-});
-test('practice persists when cheats are later disabled; loss never submits',()=>{
-  const run=new RunTracker(level,{uuid:()=> 'practice'});run.begin(payload());run.update(payload({practice:1}));run.update(payload({practice:0}));
-  assert.equal(run.finish(payload()).eligible,false);assert.equal(result({}, {practiceReason:'Console used'}).submissions.length,0);
-  assert.equal(result({outcome:'lost',saved:0,p_doom_cover:-1}).totalScore,0);
-  assert.equal(result({outcome:'lost',saved:0,p_doom_cover:-1}).eligible,false);
-});
-test('exact map totals, IDs, version and complete cover snapshot required',()=>{
-  for(const override of [{level_id:'future'},{level_version:'old'},{score_version:'old'},{cameras_total:8},{saved:7},{active_tics:0},{active_tics:1.2},{p_doom_cover:-1},{cameras_broken:10}])assert.throws(()=>result(override));
-  assert.throws(()=>new RunTracker(level).finish(payload()));
-});
-test('future levels have isolated board keys, configurable targets and no invented next level',()=>{
-  const future={...level,id:'level-two',version:'level-two-v1',title:'Second Level',peopleTotal:4,camerasTotal:3};
-  assert.equal(new Set([...boardsForLevel(level),...boardsForLevel(future)].map(b=>b.variant)).size,2);
-  const second=scoreRun({...payload(),level_id:future.id,level_version:future.version,total:4,saved:4,saved_figures:3,cameras_total:3,cameras_broken:3},future,{runId:'second'});
-  assert.equal(second.submissions.length,1);assert.ok(second.submissions.every(b=>b.variant.startsWith('level-two-')));
-  // The next board version after the current one (level 1 is already on v3).
-  const next=`v${Number(level.boardVersion.slice(1))+1}`,revised={...level,version:`five-prisons-${next}`,boardVersion:next};
-  assert.equal(new Set([...boardsForLevel(level),...boardsForLevel(revised)].map(b=>b.variant)).size,2);
-  assert.equal(nextLevel(level),null);assert.equal(getLevel('rescue'),level);assert.equal(getLevel('absent'),null);assert.equal(boardsForLevel(getLevel('intake')).length,0);
-});
-test('stable browser ID, small frozen metadata and same per-board IDs on retry',async()=>{
-  const map=new Map(),storage={getItem:k=>map.get(k),setItem:(k,v)=>map.set(k,v)};
-  assert.equal(stablePlayer(storage,()=> 'id-one'),stablePlayer(storage,()=> 'id-two'));
-  const bodies=submissionBodies(result(),'  Player  ','id-one');assert.equal(bodies[0].name,'Player');assert.ok(JSON.stringify(bodies[0].metadata).length<2048);
-  assert.throws(()=>submissionBodies(result({practice:1}),'Player','id'));assert.throws(()=>submissionBodies(result(),' ','id'));
-  const sent=[];let fail=true;
-  const service=new LeaderboardSubmission(result(),{playerId:'id-one',fetcher:async(_,request)=>{
-    const body=JSON.parse(request.body);sent.push(body);
-    if(fail){fail=false;throw Error('Uncertain network response');}
-    return {ok:true,json:async()=>({success:true})};
-  }});
-  await assert.rejects(service.submit('Original'));const retried=await service.submit('Changed');assert.equal(retried.complete,true);
-  assert.equal(sent.filter(b=>b.variant===bodies[0].variant).length,2);
-  assert.equal(sent[0].submissionId,sent[1].submissionId);assert.ok(sent.every(b=>b.name==='Original'));
-  await service.submit('Original');assert.equal(sent.length,2);
-});
-test('loopback API persists, sorts each board, rejects unknown levels and deduplicates retries',async()=>{
-  const temp=await mkdtemp(path.join(os.tmpdir(),'pdoom-boards-')),store=path.join(temp,'scores.json');
-  const handler=createLocalLeaderboards({store});const server=http.createServer(async(req,res)=>{if(!await handler(req,res,new URL(req.url,'http://localhost')))res.end();});
-  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin=`http://127.0.0.1:${server.address().port}`;
-  const post=async body=>{const response=await fetch(origin+'/api/v1/leaderboard',{method:'POST',body:JSON.stringify(body)});return {status:response.status,...await response.json()};};
-  try{
-    const bodies=submissionBodies(result(),'Fixture','fixture');for(const body of bodies)assert.equal((await post(body)).success,true);
-    assert.equal((await post(bodies[0])).success,true);
-    assert.equal((await post({...bodies[0],score:1})).status,400);
-    assert.equal((await post({...bodies[0],variant:'other-level'})).status,400);
-    const again=createLocalLeaderboards({store});assert.equal(typeof again,'function');
-    const data=await(await fetch(origin+`/api/v1/leaderboard?slug=pdoom&variant=${bodies[0].variant}`)).json();assert.equal(data.entries.length,1);assert.equal(data.entries[0].score,55200);
-    await post({...bodies[0],submissionId:'higher',score:56000});
-    const scores=await(await fetch(origin+`/api/v1/leaderboard?slug=pdoom&variant=${bodies[0].variant}`)).json();assert.equal(scores.entries[0].score,56000);assert.equal(scores.entries[1].score,55200);
-    for(const category of ['perfect','clean-sweep'])assert.equal((await post({...bodies[0],variant:`five-prisons-${category}-v3`})).status,400);
-  }finally{await new Promise(resolve=>server.close(resolve));await rm(temp,{recursive:true,force:true});}
+const memory=()=>{const data=new Map();return {data,getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,String(v)),removeItem:k=>data.delete(k)};};
+const native=(level,o={})=>({level_id:level.id,level_version:level.version,outcome:'escaped',saved:6,total:6,saved_figures:5,entry:'cold',retreat:0,active_tics:21000,cameras_broken:9,cameras_total:level.camerasTotal,routes:['a','b','c','d','e','extra'],...o});
+
+test('a level result belongs to its level and keeps what the meadow reads, with no score',()=>{
+  for(const level of LEVELS.filter(l=>l.scored)){
+    const result=readLevelResult(native(level),level,{runId:'attempt-1'});
+    assert.equal(result.levelId,level.id);assert.equal(result.savedFigures,5);assert.equal(result.activeMs,600000);assert.equal(result.routes.length,5);
+    assert.equal('totalScore' in result||'submissions' in result||'eligible' in result,false);
+  }
+  const level=getLevel();
+  assert.throws(()=>readLevelResult(native(level,{level_version:'old'}),level,{runId:'x'}),/different level/);
+  assert.throws(()=>readLevelResult(native(level,{saved:7}),level,{runId:'x'}),/Incomplete/);
+  assert.throws(()=>readLevelResult(native(level,{outcome:'won'}),level,{runId:'x'}),/Unknown/);
+  const tracker=new RunTracker(level,{uuid:()=>'attempt-2'});assert.throws(()=>tracker.finish(native(level)),/No native run start/);
+  tracker.begin({level_id:level.id,level_version:level.version});tracker.update({level_id:level.id,level_version:level.version,active_tics:40});
+  assert.equal(tracker.getState().activeTics,40);assert.equal(tracker.finish(native(level)).runId,'attempt-2');
 });
 
-// Level 3 (2026-10-21): MEG3N's factory scores like levels 1-2, with her 20 screens as the side bonus.
-test('the factory scores all five plus you, twenty screens and its own board; walk-ins are practice',()=>{
-  const factory=getLevel('meg3n-factory');
-  const native=o=>({level_id:factory.id,level_version:factory.version,score_version:'rescue-v2',outcome:'escaped',saved:6,total:6,saved_figures:5,ceo_state:'conscious',skill:3,entry:'cold',retreat:0,active_tics:35*600,p_doom_cover:3,cameras_total:20,cameras_broken:20,practice:0,routes:['music','fabric','pause','trained','helper'],...o});
-  const best=scoreRun(native(),factory,{runId:'factory-run'});
-  assert.deepEqual(best.breakdown,{rescue:50000,ceo:1000,cameras:5000,speed:1000,outlook:970});
-  assert.equal(best.totalScore,57970);assert.equal(best.camerasTotal,20);
-  assert.deepEqual(best.submissions,[{variant:'meg3n-factory-rescue-v1',score:57970}]);
-  assert.equal(scoreRun(native({entry:'hub'}),factory,{runId:'walk-in'}).eligible,false,'Walking in through MEG3N.AVI is practice');
-  assert.equal(scoreRun(native({entry:'hub',saved:3,saved_figures:2,retreat:1}),factory,{runId:'retreat'}).submissions.length,0);
-  assert.throws(()=>scoreRun(native({cameras_total:9}),factory,{runId:'cameras'}),/Incomplete native result/);
-  // Twenty screens and every other side bonus are still worth less than one more person.
-  assert.ok(20*250+1000+2000+1000<10000);
+test('one speedrun board: the whole game, fastest first, in milliseconds',()=>{
+  assert.deepEqual({...SPEEDRUN_BOARD},{variant:'campaign-speedrun-v1',label:'Speedrun',metric:'activeMs',metricLabel:'Time',direction:'asc',display:'time-ms',aggregation:'best'});
+  assert.deepEqual({...SPEEDRUN},{levelId:'campaign',levelVersion:'campaign-v1',scoreVersion:'speedrun-v1',boardVersion:'v1'});
+  assert.deepEqual(SPLITS.slice(0,4),LEVELS.filter(l=>l.scored).map(l=>l.id),'one split per campaign level');
+  assert.equal(formatRunTime(0),'0:00.00');assert.equal(formatRunTime(61_234),'1:01.23');assert.equal(formatRunTime(3_723_450),'1:02:03.45');
 });
 
-// Level 4 (2026-11-06): SMITH's pod farm scores like level 3, with his nine cameras as the side bonus.
-test('the pod farm scores all five plus you, nine cameras and its own board; walk-ins are practice',()=>{
-  const pods=getLevel('agentic-pods');
-  const native=o=>({level_id:pods.id,level_version:pods.version,score_version:'rescue-v2',outcome:'escaped',saved:6,total:6,saved_figures:5,ceo_state:'conscious',skill:3,entry:'cold',retreat:0,active_tics:35*600,p_doom_cover:3,cameras_total:9,cameras_broken:9,practice:0,routes:['hardline','catwalk','race','clipboard','rig'],...o});
-  const best=scoreRun(native(),pods,{runId:'pods-run'});
-  assert.deepEqual(best.breakdown,{rescue:50000,ceo:1000,cameras:2250,speed:1000,outlook:970});
-  assert.equal(best.totalScore,55220);assert.equal(best.camerasTotal,9);
-  assert.deepEqual(best.submissions,[{variant:'agentic-pods-rescue-v1',score:55220}]);
-  assert.equal(scoreRun(native({entry:'hub'}),pods,{runId:'walk-in'}).eligible,false,'Walking in through AGENTIC.BAT is practice');
-  assert.equal(scoreRun(native({practice:1}),pods,{runId:'qa'}).eligible,false,'A ?puzzle= site, QA shortcut or cheat is practice');
-  assert.throws(()=>scoreRun(native({cameras_total:20}),pods,{runId:'cameras'}),/Incomplete native result/);
+test('only a fresh campaign starts a run; its levels, restarts and the meadow add up',()=>{
+  const storage=memory(),campaign=new Campaign(storage,'altman');let t=0,ids=0;
+  const clock=new SpeedrunClock(campaign,{uuid:()=>`run-${++ids}-fixture`,now:()=>t});
+  assert.equal(freshCampaign(campaign.data),true);
+  clock.begin('five-prisons');assert.equal(clock.run.runId,'run-1-fixture');assert.ok(storage.data.has(CAMPAIGN_KEY),'written at once');
+  clock.level('five-prisons',35);clock.level('five-prisons',70);
+  // someone was lost: the level restarts and its own clock starts again from zero
+  clock.begin('five-prisons');clock.level('five-prisons',35);
+  assert.equal(clock.run.restarts,1);assert.equal(clock.run.splits['five-prisons'],3000);
+  // reports for another level, or before that level's start, don't count
+  clock.level('hal-station',350);assert.equal(clock.run.splits['hal-station'],0);
+  clock.leaveLevel();
+  clock.meadow(10);clock.meadow(10.5);clock.meadow(null);clock.meadow(50);clock.meadow(50.25);clock.meadow(99);// a jump counts at most one second
+  assert.equal(clock.run.splits['safe-mode'],500+250+1000);
+  clock.begin('hal-station');clock.level('hal-station',35);assert.equal(clock.run.restarts,1,'a new visit is not a restart');
+  assert.equal(speedrunMs(clock.run),3000+1750+1000);
+  t=10_000;clock.flush();
+  const reloaded=new Campaign(storage,'altman');assert.deepEqual(reloaded.data.speedrun,clock.run,'the save carries it across pages');
+  // an older save, already in SAFE MODE without a run, never starts one
+  const old=memory();old.setItem(CAMPAIGN_KEY,JSON.stringify({version:1,ceo:'altman',hub:true,saved0:31}));
+  const later=new SpeedrunClock(new Campaign(old,'altman'));later.begin('hal-station');assert.equal(later.run,null);
+});
+
+test('cheats or QA shortcuts make the run practice; it never goes backwards or past done',()=>{
+  const campaign=new Campaign(memory(),'amodei'),clock=new SpeedrunClock(campaign,{uuid:()=>'run-practice-1'});
+  clock.begin('agentic-pods');clock.level('agentic-pods',350,{assisted:true});assert.match(clock.run.practice,/Cheats/);
+  clock.level('agentic-pods',100);assert.equal(clock.run.splits['agentic-pods'],10000+Math.floor(100000/35),'a lower count is a new attempt, never a rewind');
+  clock.run.done=true;clock.level('agentic-pods',1000);clock.meadow(1);clock.meadow(2);
+  assert.equal(clock.run.splits['agentic-pods'],10000+2857);assert.equal(clock.run.splits['safe-mode'],0);
+});
+
+test('the finished run is rankable only with everyone home and every part timed',()=>{
+  const run=cleanSpeedrun({runId:'run-finished-1',splits:{'five-prisons':200000,'hal-station':250000,'meg3n-factory':300000,'agentic-pods':310000,'safe-mode':90000,endgame:500000},restarts:3,done:true});
+  const result=speedrunResult(run,{saved:20,ceo:'amodei'});
+  assert.equal(result.eligible,true);assert.equal(result.activeMs,1650000);assert.equal(result.restarts,3);assert.equal(result.ceo,'amodei');
+  assert.match(speedrunResult(run,{saved:19}).practiceReason,/everyone/);
+  assert.match(speedrunResult({...run,done:false},{saved:20}).practiceReason,/not finished/);
+  assert.match(speedrunResult({...run,splits:{...run.splits,endgame:0}},{saved:20}).practiceReason,/Endgame/);
+  assert.match(speedrunResult({...run,practice:'Development ending selected.'},{saved:20}).practiceReason,/Development/);
+  const [body]=submissionBodies(result,' Speedy ','player-1');
+  assert.equal(body.variant,'campaign-speedrun-v1');assert.equal(body.submissionId,'run-finished-1:campaign-speedrun-v1');assert.equal(body.score,1650000);assert.equal(body.name,'Speedy');
+  assert.deepEqual(body.metadata,{...SPEEDRUN,outcome:'complete',practice:false,saved:20,total:20,activeMs:1650000,splits:{...run.splits},restarts:3,ceo:'amodei'});
+  assert.equal('ceo' in submissionBodies(speedrunResult(run,{saved:20}),'P','id')[0].metadata,false,'no hero: left out, never null');
+  assert.throws(()=>submissionBodies(speedrunResult(run,{saved:19}),'P','id'),/everyone/);
+  assert.throws(()=>submissionBodies({...result,scoreVersion:'rescue-v2'},'P','id'),/current leaderboard/);
+});
+
+test('nobody stays lost: lost masks are dropped from saves and commits',()=>{
+  const storage=memory();storage.setItem(CAMPAIGN_KEY,JSON.stringify({version:1,ceo:'altman',hub:true,saved0:3,lost0:4,following0:24}));
+  const campaign=new Campaign(storage,'altman');assert.equal(campaign.data.lost0,0);assert.equal(campaign.getState().lost,0);
+  assert.equal(campaign.roster()[2].state,'imprisoned','an old save\'s lost person is back in their cell');
+  campaign.commit({saved0:3,lost0:4,following0:8,saved1:1,lost1:2,following1:0});
+  assert.equal(campaign.data.lost0,0);assert.equal(campaign.data.lost1,0);assert.equal(campaign.data.following0,8);assert.equal(savedCount(campaign.data),3);
+  assert.match(campaign.bootArgs().join(' '),/pdoom_lost0 0 .*pdoom_lost1 0/);
 });

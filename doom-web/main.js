@@ -18,6 +18,7 @@ import {survivalEstimate} from './survival-estimate.js';
 import {openingState} from './opening.js';
 import {getLevel} from './levels.js';
 import {RunTracker} from './run-score.js';
+import {SpeedrunClock,SPEEDRUN,speedrunResult,savedCount,formatRunTime} from './speedrun.js';
 import {connectPlatform} from './platform.js';
 import {createScoreView} from './score-view.js';
 import {localDevelopmentEnabled} from './dev-capabilities.js';
@@ -80,6 +81,9 @@ let yardMusic=false;const logs=[];let worker=null,timeout=null,outside=null,hub=
 let campaign=new Campaign(ceoStorage,CEO_CHOICE.id),runningCeo=null,bootResolve=null,bootReject=null,resumeHub=false,awaitingRun=false,nativeResume=null,openingCheckpointPending=false;
 launcher.hidden=CHECKPOINT;
 if(!CHECKPOINT)document.querySelector('#onboarding').hidden=true;
+// The whole-game speedrun (speedrun.js): one clock in the campaign save, from a new campaign's first level to the
+// MCP going down on the endgame page.
+const speedrun=new SpeedrunClock(campaign);let speedrunShown=null;
 const run=new RunTracker(LEVEL),panels=new Set();let uiBlocked=false,meadowPanelPaused=false;
 let nativePanelPaused=false,mouseAttack=false;
 let factoryPaused=false,agenticPaused=false;
@@ -117,10 +121,22 @@ const prologue=createPrologue({stage:document.querySelector('#stage'),source:can
 
 const storyBeats=createStoryBeats(blockPanel,()=>audio.playCue());
 const platform=LEVEL?await connectPlatform(LEVEL,{block:blockPanel}):null;
-scoreView=CHECKPOINT?createScoreView({level:LEVEL,config:platform.config,block:blockPanel,openBoards:platform.openBoards,ceo:()=>ceoPick?.id,retry:()=>enterLevel(LEVEL.id,false,true),onPendingChange:()=>gamePause.refreshSavedResults?.()}):null;
+scoreView=CHECKPOINT?createScoreView({config:platform.config,block:blockPanel,openBoards:platform.openBoards,ceo:()=>ceoPick?.id,onPendingChange:()=>gamePause.refreshSavedResults?.()}):null;
 gamePause.refreshSavedResults?.();
-window.render_game_to_text=()=>JSON.stringify({...state,voiceOver:voiceOver.getState(),melt:screenMelt.getState(),exitText:exitText.getState(),levelId:LEVEL?.id,ceo:ceoPick?.id??null,ceoPick:ceoPick?.getState()??null,campaign:campaign.getState(),run:CHECKPOINT?run.getState():null,scoreView:scoreView?.getState()||null,uiBlocked,personLabel:personLabel.getState(),gamePaused:gamePause.isOpen()||factoryPaused||agenticPaused,menu:gamePause.getState(),opening:openingState(),prologueUi:prologue.getState(),survivalEstimate:prologue.active?{doom:state.prologue?.pdoom,kind:'historical in-world estimate'}:CHECKPOINT?survivalEstimate(state.world,state.mode,state.escape):null,statusBar:(CHECKPOINT||FACTORY||AGENTIC)&&!prologue.active?checkpointStatusBar()?.getState()??null:null,...(LEVEL?.id==='agentic-pods'?{agenticHud:agenticHudState()}:{}),outside:outside?.getState()||null,audioBuffers:audio.played,sound:audio.getState(),audioState:audio.context?.state||'uninitialized',musicPlaying:!!audio.musicSource,coordinateSystem:'Native world: Doom units; x east, y north, z up. Outside: metres; x east, z south, y up.'});
+window.render_game_to_text=()=>JSON.stringify({...state,voiceOver:voiceOver.getState(),melt:screenMelt.getState(),exitText:exitText.getState(),levelId:LEVEL?.id,ceo:ceoPick?.id??null,ceoPick:ceoPick?.getState()??null,campaign:campaign.getState(),run:CHECKPOINT?run.getState():null,speedrun:CHECKPOINT?speedrun.getState():null,scoreView:scoreView?.getState()||null,uiBlocked,personLabel:personLabel.getState(),gamePaused:gamePause.isOpen()||factoryPaused||agenticPaused,menu:gamePause.getState(),opening:openingState(),prologueUi:prologue.getState(),survivalEstimate:prologue.active?{doom:state.prologue?.pdoom,kind:'historical in-world estimate'}:CHECKPOINT?survivalEstimate(state.world,state.mode,state.escape):null,statusBar:(CHECKPOINT||FACTORY||AGENTIC)&&!prologue.active?checkpointStatusBar()?.getState()??null:null,...(LEVEL?.id==='agentic-pods'?{agenticHud:agenticHudState()}:{}),outside:outside?.getState()||null,audioBuffers:audio.played,sound:audio.getState(),audioState:audio.context?.state||'uninitialized',musicPlaying:!!audio.musicSource,coordinateSystem:'Native world: Doom units; x east, y north, z up. Outside: metres; x east, z south, y up.'});
 window.__DOOM_DEBUG__={state,logs};
+// SAFE MODE's share of the speedrun (the meadow's own clock, which stops while it's paused or hidden), and the
+// timer at the top of the screen, whole seconds (a level's clock reports five times a second).
+const speedrunTimer=document.createElement('div');speedrunTimer.id='speedrun-timer';speedrunTimer.hidden=true;speedrunTimer.setAttribute('aria-hidden','true');document.querySelector('#stage')?.append(speedrunTimer);
+function speedrunFrame(){
+ requestAnimationFrame(speedrunFrame);
+ speedrun.meadow(outside&&!outsideLoading?outside.clock?.()??null:null);
+ const now=speedrun.getState(),show=!!now&&(state.mode==='playing'||!!outside&&!outsideLoading);
+ speedrunTimer.hidden=!show;if(!show)return;
+ const text=formatRunTime(now.ms).slice(0,-3)+(now.practice?' PRACTICE':'');if(speedrunTimer.textContent!==text)speedrunTimer.textContent=text;
+ speedrunTimer.classList.toggle('practice',!!now.practice);speedrunTimer.classList.toggle('done',now.done);
+}
+if(CHECKPOINT){requestAnimationFrame(speedrunFrame);addEventListener('pagehide',()=>speedrun.flush(true));document.addEventListener('visibilitychange',()=>{if(document.hidden)speedrun.flush(true);});}
 
 function send(message){worker?.postMessage(message);}
 function fail(message){
@@ -170,14 +186,15 @@ function onMessage(m){
     const i=m.msg.indexOf(marker);
     if(CHECKPOINT&&i!==-1){try{
       const payload=JSON.parse(m.msg.slice(i+marker.length));
-      if(method==='begin'&&getLevel(payload.level_id)){LEVEL=getLevel(payload.level_id);run.level=LEVEL;scoreView.setLevel(LEVEL);state.mod=`p(DOOM): ${LEVEL.title}`;}
+      if(method==='begin'&&getLevel(payload.level_id)){LEVEL=getLevel(payload.level_id);run.level=LEVEL;state.mod=`p(DOOM): ${LEVEL.title}`;}
       run[method](payload);
       if(method==='begin'){
         playLevelMusic();
         state.prologue=null;awaitingRun=false;hubBeforeCommit=null;storyBeats.reset();scoreView.reset();if(!outside){state.mode='loading';state.world=null;}
-        if(!run.practiceReason)scoreView.beginRun({runId:run.runId,levelId:LEVEL.id,levelVersion:LEVEL.version,scoreVersion:LEVEL.scoreVersion,boardVersion:LEVEL.boardVersion});
-      }
-      if(method==='begin'&&DEV_END)run.markPractice('Development ending selected.');
+        // A new campaign's first level starts the speedrun; every level start asks for its ticket until one arrives.
+        speedrun.begin(payload.level_id,{assisted:!!payload.assisted,practice:DEV_END?'Development ending selected.':''});
+        if(speedrun.running&&!speedrun.run.practice)scoreView.beginRun({...SPEEDRUN,runId:speedrun.run.runId});
+      }else speedrun.level(payload.level_id,payload.active_tics,{assisted:!!payload.assisted});
     }catch(error){console.error('Run tracking:',error);}}
   }
   for(const marker of ['PDOOM_EVENT ','PDOOM_RESULT ']){
@@ -190,13 +207,15 @@ function onMessage(m){
       // PDOOM_ESCAPE only reports every 7 tics, but the exit that ends a run commits the camp in that same tic.
       // Record each exit as it happens so the meadow walks the last one out of the door instead of placing them in camp.
       if(event.type==='person-outside'&&state.escape?.saved_people)state.escape.saved_people[event.id-1]=1;
+      // Someone was lost (levels 1-2, Checkpoint.zs LoseAll): the level restarts itself in three seconds.
+      if(event.type==='level-restart'){releaseKeys();personLabel.hide();}
       if(event.type==='outside-reveal')levelExit();
       if(event.type==='factory-exit'&&LEVEL?.id==='meg3n-factory')factoryExit(event);
       if(event.type==='agentic-exit'&&LEVEL?.id==='agentic-pods')agenticExit(event);
       if(marker==='PDOOM_RESULT '){
         state.mode=event.saved>0?'escaped':'lost';releaseKeys();
         if(CHECKPOINT&&event.saved>0&&LEVEL?.id!=='meg3n-factory'&&LEVEL?.id!=='agentic-pods'){pendingWin=event.saved;outside?.showWin(event.saved);}else if(CHECKPOINT){checkpointStatusBar()?.update(state.world,state.mode,state.escape);showCheckpointResult(event);}else showIntakeResult(event);
-        if(CHECKPOINT){const result=run.finish(event);scoreView.whenReady(result,()=>outside?.getState());window.dispatchEvent(new CustomEvent('pdoom:level-complete',{detail:{levelId:LEVEL.id,nextLevelId:LEVEL.nextLevelId,result}}));}
+        if(CHECKPOINT){speedrun.level(event.level_id,event.active_tics);const result=run.finish(event);window.dispatchEvent(new CustomEvent('pdoom:level-complete',{detail:{levelId:LEVEL.id,nextLevelId:LEVEL.nextLevelId,result}}));}
       }
     }catch(error){console.error('Native event:',error);}}
   }
@@ -277,7 +296,14 @@ function onMessage(m){
 // outside it, and the meadow's south gate leads to the endgame page (doom-web/endgame-proto/, built from
 // prototypes/endgame/ by scripts/build-endgame-protos.mjs). That page marks the save ENDGAME_DONE and comes back
 // (?play=1&load=1) to a meadow without the column.
+// The end of a speedrun: its results card, once the MCP is down (the endgame page sets `done`). It opens by itself
+// until the time is submitted; after that it waits behind the Results button.
+function showSpeedrun(){
+ const finished=speedrun.run;if(!finished?.done||!scoreView||speedrunShown===finished.runId)return;speedrunShown=finished.runId;
+ scoreView.show(speedrunResult(finished,{saved:savedCount(campaign.data),ceo:runningCeo}),{automatic:!scoreView.submitted(finished.runId)});
+}
 function syncEndgame(){
+ showSpeedrun();
  const camp=campaign.getState();
  if(camp.endgame===ENDGAME_DONE){outside.endgameDone();return;}
  if(!camp.hub||camp.saved+camp.lost<20)return;
@@ -294,6 +320,7 @@ function goEndgame(){
 }
 async function enterOutside({intro=false,melt=false}={}){
   if(outside||outsideLoading)return;
+  speedrun.leaveLevel();
   // Leaving a level (2026-10-14): the last frame holds over the window while the meadow gets
   // ready behind it, then melts away (screen-melt.js). It used to be a straight cut.
   if(melt)screenMelt.capture();
@@ -399,7 +426,7 @@ async function startEngine(id,{load=false,prologue:playPrologue=false,skipOpenin
  // The campaign page runs the scored levels and, from the episode menu, MEG3N's unscored factory.
  const next=getLevel(id);if(!next||CHECKPOINT&&!next.scored)throw Error('THIS LEVEL IS NOT AVAILABLE.');LEVEL=next;
  // The factory has no hero picker: it plays as the saved campaign's CEO, so its clear joins that save.
- runningCeo=ceoPick?.id||((FACTORY||AGENTIC)&&CEO_CHOICE.source!=='url'&&readCampaign(ceoStorage)?.ceo)||CEO_CHOICE.id;campaign=new Campaign(ceoStorage,runningCeo);run.level=LEVEL;scoreView?.setLevel(LEVEL);ceoPick?.lock();checkpointStatusBar()?.setCeo(runningCeo);
+ runningCeo=ceoPick?.id||((FACTORY||AGENTIC)&&CEO_CHOICE.source!=='url'&&readCampaign(ceoStorage)?.ceo)||CEO_CHOICE.id;campaign=new Campaign(ceoStorage,runningCeo);speedrun.setCampaign(campaign);run.level=LEVEL;ceoPick?.lock();checkpointStatusBar()?.setCeo(runningCeo);
  // Started cold from the episode menu, the factory has its own HUD, as when walked in (enterLevel).
  if(CHECKPOINT&&LEVEL.id==='meg3n-factory'){useFactoryHud(true);state.mod=`p(DOOM): ${LEVEL.title}`;}
  // So has the pod farm (since 2026-11-06, ranked from the episode menu like the factory).
@@ -540,7 +567,7 @@ async function enterLevel(id,replay=false,restart=false){
  const pausedTic=nativePanelPaused?state.world?.ticks:null;
  resumeHub=false;gamePause.close();if(nativePanelPaused){nativePanelKey(false);nativePanelPaused=false;}personLabel.hide();storyBeats.reset();scoreView.reset();releaseKeys();if(document.pointerLockElement)document.exitPointerLock();
  if(hub)hub.setActive(false);outside=null;outsideLoading=false;pendingWin=0;nativePanelPaused=false;meadowPanelPaused=false;
- LEVEL=getLevel(id)||LEVEL;run.level=LEVEL;scoreView.setLevel(LEVEL);
+ LEVEL=getLevel(id)||LEVEL;run.level=LEVEL;
  // MEG3N.AVI's door (2026-10-20): the factory, walked into from SAFE MODE, with its own HUD.
  useFactoryHud(LEVEL.id==='meg3n-factory');factoryExiting=false;state.factory=null;audio.holdMusic(false);
  // AGENTIC.BAT's door (doom-outside.ts): the pod farm, with its own HUD.

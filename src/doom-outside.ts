@@ -389,7 +389,7 @@ export async function createOutside(options:Options){
   const matching=camp?.roster.filter(p=>p.id>=((nearestDoor?.id==='hal-station')?5:0)&&p.id<((nearestDoor?.id==='hal-station')?10:5))||[];
   replayButton.hidden=!nearestDoor||!matching.some(p=>p.state==='lost');
   if(gotUntil&&time>gotUntil){gotUntil=0;hubUi.querySelector<HTMLElement>('#hub-got')!.hidden=true;}
-  hubUi.querySelector('#hub-count')!.textContent=camp?`FREED ${camp.saved}/20 · LOST ${camp.lost} · WORLD p(DOOM) ${camp.worldPdoom}%`:'';
+  hubUi.querySelector('#hub-count')!.textContent=camp?`FREED ${camp.saved}/20 · WORLD p(DOOM) ${camp.worldPdoom}%`:'';// nobody is lost since 2026-11-07
   el('people').textContent=won?'You made it out':'Fresh air';
   // Nobody came out with you this visit (a Load Game, or back out empty-handed): the last level's escape line would
   // read as someone missing, so show who's still out there instead (and drop its camera tally).
@@ -423,7 +423,9 @@ export async function createOutside(options:Options){
   setFuture(value:boolean){future.setVisible(value);icons.setVisible(value);},icons:icons.debug,
   // dev mock-ups of the hub's buildings (docs/SAFE-MODE-PROGRESSION.md) add scenery through these
   scene,THREE,groundY};
- return {key,release,showWin,setActive,startIntro,startEndgame,endgameDone,getState,debug,
+ // The meadow's own clock in seconds: it only runs while the meadow is up, unpaused and visible (the speedrun's
+ // SAFE MODE split, doom-web/speedrun.js).
+ return {key,release,showWin,setActive,startIntro,startEndgame,endgameDone,getState,debug,clock:()=>time,
   dispose(){active=false;cancelAnimationFrame(frameId);icons.dispose();future.dispose();renderer.dispose();canvas.remove();hubUi.remove();dialog.remove();window.removeEventListener('resize',resize);}
  };
 }

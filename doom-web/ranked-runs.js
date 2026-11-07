@@ -53,9 +53,12 @@ export class RankedRuns{
   save(result,ceo){
     if(!this.enabled||!result.eligible)return null;
     const record=this.record(result);
+    // A submitted run stays submitted: seeing its results card again doesn't queue it to send again.
+    if(record.submitted)return null;
     record.pending??={result,ceo,bodies:null,accepted:[]};this.persist(record);return record.pending;
   }
+  submitted(runId){return !!this.records.get(runId)?.submitted;}
   progress(runId,state){const record=this.records.get(runId);if(record?.pending){Object.assign(record.pending,state);this.persist(record);}}
-  complete(runId){const record=this.records.get(runId);if(record){delete record.pending;this.persist(record);}}
+  complete(runId){const record=this.records.get(runId);if(record){delete record.pending;record.submitted=true;this.persist(record);}}
   pending(){this.load();return [...this.records.values()].filter(r=>r.pending).sort((a,b)=>b.createdAt-a.createdAt).map(r=>r.pending);}
 }

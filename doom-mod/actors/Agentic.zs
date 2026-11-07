@@ -91,6 +91,9 @@ class PDAgentic : EventHandler
     // menu can rank; a walk-in from SAFE MODE, a ?puzzle= site, QA shortcuts or cheats make it practice.
     // CoverDoom is p(DOOM) when the payphone first rings for everyone.
     int RunTics,CoverDoom;bool RunPractice,RunFinished;
+    // RunAssisted: cheats, QA shortcuts or a development site, not just walking in from SAFE MODE (which is
+    // practice for the old level boards but part of a speedrun; doom-web/speedrun.js).
+    bool RunAssisted;
     static String RunVersion(){return "agentic-pods-v1";}
     PDAgenticPuzzle Puzzles[5];
     Array<PDAgenticProp> Props;
@@ -214,8 +217,8 @@ class PDAgentic : EventHandler
         CloseCell(0,PDAgenticMap.BoothZone0(),PDAgenticMap.BoothZone1());
         CloseCell(2,PDAgenticMap.BayZone0(),PDAgenticMap.BayZone1());CloseCell(2,PDAgenticMap.CrusherZone0(),PDAgenticMap.CrusherZone1());
         CloseCell(3,PDAgenticMap.StoneZone0(),PDAgenticMap.StoneZone1());CloseCell(4,PDAgenticMap.RigZone0(),PDAgenticMap.RigZone1());
-        CoverDoom=-1;RunPractice=HubEntry||DevSite!=0||you.GetCVar("pdoom_dev_end")!=0;
-        if(Commits)Console.Printf("PDOOM_RUN_START {\"level_id\":\"agentic-pods\",\"level_version\":\"%s\",\"practice\":%d}",RunVersion(),RunPractice);
+        CoverDoom=-1;RunAssisted=DevSite!=0||you.GetCVar("pdoom_dev_end")!=0;RunPractice=HubEntry||RunAssisted;
+        if(Commits)Console.Printf("PDOOM_RUN_START {\"level_id\":\"agentic-pods\",\"level_version\":\"%s\",\"practice\":%d,\"assisted\":%d}",RunVersion(),RunPractice,RunAssisted);
         Console.Printf("PDOOM_MOD_LOADED agentic-first-pass");
     }
 
@@ -1035,7 +1038,7 @@ class PDAgentic : EventHandler
     void TickRun()
     {
         if(RunFinished)return;RunTics++;
-        if(players[0].cheats&(CF_NOCLIP|CF_NOCLIP2|CF_GODMODE|CF_GODMODE2|CF_BUDDHA|CF_BUDDHA2|CF_FLY|CF_NOTARGET|CF_FRIGHTENING|CF_NOVELOCITY))RunPractice=true;
+        if(players[0].cheats&(CF_NOCLIP|CF_NOCLIP2|CF_GODMODE|CF_GODMODE2|CF_BUDDHA|CF_BUDDHA2|CF_FLY|CF_NOTARGET|CF_FRIGHTENING|CF_NOVELOCITY)){RunPractice=true;RunAssisted=true;}
     }
     // Levels 1-3's in-world outlook (PDRescueRun.SnapshotCover; survival-estimate.js), once:
     // people already at camp count as freed and safe.
@@ -1139,7 +1142,7 @@ class PDAgentic : EventHandler
         // QA only (pdoom_development): free person N into their refuge slot (second argument 1: where they are).
         if(e.Name=="pdoom_agentic_qa_out"&&players[0].mo.GetCVar("pdoom_development")&&!ExitDone)
         {
-            RunPractice=true;int i=e.Args[0];
+            RunPractice=true;RunAssisted=true;int i=e.Args[0];
             if(i>=0&&i<5&&!(Camped&(1<<i)))
             {
                 Release(i);
@@ -1155,7 +1158,7 @@ class PDAgentic : EventHandler
         // good; -1 lets him go), for art screenshots. Nothing else moves him.
         if(e.Name=="pdoom_agentic_qa_pose"&&players[0].mo.GetCVar("pdoom_development")&&Smith)
         {
-            RunPractice=true;
+            RunPractice=true;RunAssisted=true;
             if(e.Args[0]<0){QaPoseUntil=0;Smith.Pose=-1;return;}
             if(e.Args[0]>=10)Smith.Unbadged=true;
             let you=players[0].mo;Vector2 at=you.Pos.XY+(cos(you.Angle),sin(you.Angle))*max(32,e.Args[1]);
@@ -1166,7 +1169,7 @@ class PDAgentic : EventHandler
         // QA only (pdoom_development): SMITH possesses freed person N where they stand (no SMITH needed nearby).
         if(e.Name=="pdoom_agentic_qa_possess"&&players[0].mo.GetCVar("pdoom_development")&&!ExitDone)
         {
-            RunPractice=true;int i=e.Args[0];
+            RunPractice=true;RunAssisted=true;int i=e.Args[0];
             if(i>=0&&i<5&&Released[i]&&!(Camped&(1<<i)))Possess(i);
         }
     }
@@ -1182,7 +1185,7 @@ class PDAgentic : EventHandler
     static String Clean(String text){text.Replace("\"","'");text.Replace(String.Format("%c",92),"/");return text;}
     void Report()
     {
-        if(Commits)Console.Printf("PDOOM_RUN {\"level_id\":\"agentic-pods\",\"level_version\":\"%s\",\"active_tics\":%d,\"p_doom_cover\":%d,\"practice\":%d}",RunVersion(),RunTics,CoverDoom,RunPractice);
+        if(Commits)Console.Printf("PDOOM_RUN {\"level_id\":\"agentic-pods\",\"level_version\":\"%s\",\"active_tics\":%d,\"p_doom_cover\":%d,\"practice\":%d,\"assisted\":%d}",RunVersion(),RunTics,CoverDoom,RunPractice,RunAssisted);
         let you=players[0].mo;bool safe=PDAgenticMap.InRefuge(you.Pos.XY);
         String peopleJson="[";
         for(int i=0;i<5;i++)

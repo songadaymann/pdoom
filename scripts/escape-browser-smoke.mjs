@@ -151,9 +151,17 @@ try{
  await run('losses-keep-escape',desktop,async(p,d)=>{
   await command(p,'kill');await waitWorld(p,w=>w.controlled>0&&w.alive===5,'Permanent loss and inheritance');await warp(p,832,880,d,90);await command(p,'centerview');await warp(p,864,856,d,90);await press(p,'KeyE');await waitWorld(p,w=>w.wrench===1,'Recover spare after lost tool');await warp(p,832,880,d,90);await bolts(p,d);await toMeadow(p,d);assert.equal(d.won.escape.saved,5);
  });
- await run('solo-survivor-escape',desktop,async(p,d)=>{
-  for(let remaining=5;remaining>=1;remaining--){await command(p,'kill');await waitWorld(p,w=>w.alive===remaining,'Remaining survivors '+remaining);}
-  await warp(p,864,856,d,90);await press(p,'KeyE');await waitWorld(p,w=>w.wrench===1,'Solo survivor recovers spare');await warp(p,832,880,d,90);await command(p,'centerview');await bolts(p,d);await toMeadow(p,d);assert.equal(d.won.escape.saved,1);assert.equal(d.won.outside.saved_visual,1,'The lone survivor waits in camp');
+ // Nobody stays lost (2026-11-07): the CEO going down still hands you someone you freed, but losing that body
+ // holds the level for three seconds and restarts it, with the speedrun clock still running.
+ await run('lost-survivor-restarts-level',desktop,async(p,d)=>{
+  await command(p,'kill');await waitWorld(p,w=>w.controlled>0&&w.alive===5,'CEO down: you take over someone you freed');
+  d.before=(await read(p)).speedrun;
+  await command(p,'kill');
+  await p.waitForFunction(()=>JSON.parse(window.render_game_to_text()).events.some(e=>e.type==='level-restart'),{},{timeout:10000});
+  d.held=await waitWorld(p,w=>/is gone\. Restarting the level\./.test(w.message||''),'The restart is announced',3000);await shot(p,'lost-survivor-restart');
+  await waitWorld(p,w=>w.controlled===0&&w.freed===5&&w.alive===6,'The level restarts with everyone back, you included',45000);
+  d.after=(await read(p)).speedrun;
+  if(d.before)assert.ok(d.after.restarts===d.before.restarts+1&&d.after.ms>=d.before.ms,'A restart counts and the clock keeps its time');
  });
  url='http://127.0.0.1:5198/';
  await run('ordinary-start-and-sealed-cover',desktop,async(p,d)=>{

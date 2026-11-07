@@ -21,7 +21,6 @@
     "test:doom:feedback": "node scripts/camera-feedback-browser-smoke.mjs",
     "test:doom:statusbar": "node --test tests/doom-statusbar.test.mjs tests/ceo-pick.test.mjs && node scripts/statusbar-browser-smoke.mjs && node scripts/ceo-pick-browser-smoke.mjs",
     "test:doom:score": "node --test tests/run-score.test.mjs",
-    "test:doom:leaderboards": "node scripts/leaderboard-browser-smoke.mjs",
     "test:doom:questions": "node scripts/hal-question-ui-smoke.mjs",
     "test:doom:thaw": "node scripts/hal-thaw-smoke.mjs",
     "test:doom:campaign-v2": "node --test tests/run-score.test.mjs tests/campaign-v2.test.mjs && node scripts/control-polish-smoke.mjs && node scripts/hal-browser-smoke.mjs && node scripts/hal-single-route-smoke.mjs && node scripts/hal-exit-smoke.mjs && node scripts/campaign-lifecycle-smoke.mjs && node scripts/campaign-roundtrip-smoke.mjs",

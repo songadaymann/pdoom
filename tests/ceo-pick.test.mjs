@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {CEOS,CEO_STORAGE_KEY,parseCeo,readCeo,rememberCeo,resolveCeo,restartUrl} from '../doom-web/ceo-pick.js';
 import {getLevel} from '../doom-web/levels.js';
-import {scoreRun} from '../doom-web/run-score.js';
+import {speedrunResult,cleanSpeedrun} from '../doom-web/speedrun.js';
 import {submissionBodies,LeaderboardSubmission} from '../doom-web/leaderboard-client.js';
 
 function memory(){const data=new Map();return {getItem:k=>data.has(k)?data.get(k):null,setItem:(k,v)=>data.set(k,String(v)),data};}
@@ -56,8 +56,7 @@ test('Restart keeps the CEO: a plain reload when remembered, else the choice rid
 });
 
 test('the CEO is free-form run metadata only: never in the score, board or submission identity',async()=>{
-  const level=getLevel(),result=scoreRun({level_id:level.id,level_version:level.version,score_version:level.scoreVersion,outcome:'escaped',saved:6,total:6,
-    saved_figures:5,ceo_state:'conscious',skill:3,entry:'cold',retreat:0,active_tics:21000,p_doom_cover:5,cameras_broken:9,cameras_total:9,practice:0,routes:['vent']},level,{runId:'run-ceo'});
+  const result=speedrunResult(cleanSpeedrun({runId:'run-ceo-1',splits:{'five-prisons':1,'hal-station':1,'meg3n-factory':1,'agentic-pods':1,endgame:1},done:true}),{saved:20});
   const plain=submissionBodies(result,'Player','id-1'),tagged=submissionBodies(result,'Player','id-1',{ceo:'amodei'});
   assert.equal(plain[0].metadata.ceo,undefined,'No CEO given: payload unchanged');
   assert.deepEqual(tagged.map(({metadata,...body})=>body),plain.map(({metadata,...body})=>body),'Same slug, variant, score and submission ids');

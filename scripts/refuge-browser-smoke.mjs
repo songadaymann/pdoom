@@ -72,10 +72,13 @@ try {
   assert.equal(d.arrival.sheltered,1);assert.equal(d.arrival.refuge_known,1);assert.ok(d.trace.length>=4,'Guide walks through authored map');assert.ok(d.trace[0].people[0].x-d.arrival.people[0].x>700,'Guide travels physically');
  });
 
-await run('four-hits-and-death',desktop,async(p,d)=>{
+// The fourth hit with nobody freed to take over restarts the level (2026-11-07: nobody stays lost, no fail screen).
+await run('four-hits-restart-level',desktop,async(p,d)=>{
  await warp(p,-1104,1664,d,90);d.hits=[];
  for(const health of [70,40,10]){const w=await waitWorld(p,w=>w.health===health,'Survives shot at '+health,15000);d.hits.push(w);assert.equal((await read(p)).mode,'playing');}
- await waitWorld(p,(w,r)=>r.mode==='lost'&&w.health===0,'Fourth hit kills and fatal state arrives',15000);d.lost=await world(p);assert.equal(d.lost.health,0);await shot(p,'fourth-hit-loss');
+ await p.waitForFunction(()=>JSON.parse(window.render_game_to_text()).events.some(e=>e.type==='level-restart'),{},{timeout:15000});
+ d.held=await waitWorld(p,w=>/Nobody is left to take over\. Restarting the level\./.test(w.message||''),'The restart is announced',3000);assert.notEqual((await read(p)).mode,'lost');await shot(p,'fourth-hit-restart');
+ await waitWorld(p,(w,r)=>r.mode==='playing'&&w.health===100,'The level restarts at full health',45000);
 });
 // Liron's release is the only way out of quarantine (its gates also wall the refuge
 // off from the west), so he is always the first guide. Sam guides when he takes over.

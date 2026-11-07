@@ -1,3 +1,5 @@
+import {cleanSpeedrun} from './speedrun.js';
+
 // Opening checkpoints precede the committed camp. Failed attempts cannot erase camp.
 export const CAMPAIGN_KEY='pdoom.campaign.v1';
 export const OPENING_COMPLETE_KEY='pdoom.opening-complete.v1';
@@ -12,14 +14,17 @@ export const ENDGAME_GATE=1,ENDGAME_DONE=2;
 const endgame=n=>n===ENDGAME_GATE||n===ENDGAME_DONE?n:0;
 // One five-person group per structure; ids 10-14 are the factory's, 15-19 AGENTIC SMITH's pod farm (camp spots, meadow art).
 const MASKS=['saved0','saved1','saved2','saved3','lost0','lost1','lost2','lost3','following0','following1','following2','following3'];
+// Nobody is ever lost (2026-11-07): someone going down restarts the level instead (Checkpoint.zs LoseAll), so the
+// lost masks are always 0. An older save's lost people go back to their cells, to be rescued like anyone else.
+const LOST=new Set(['lost0','lost1','lost2','lost3']);
 const LEVEL_IDS=['five-prisons','hal-station','meg3n-factory','agentic-pods'];
 const ROSTER=[['Liron Shapira','Stuart Russell','Eliezer Yudkowsky','Geoffrey Hinton','Holly Elmore'],['Rob Miles','Dan Hendrycks','Nate Soares','Roman Yampolskiy','Beth Barnes'],['Zvi Mowshowitz','Victoria Krakovna','Max Tegmark','Paul Christiano','Ajeya Cotra'],['Jaan Tallinn','Nick Bostrom','Daniel Kokotajlo','Katja Grace','Yoshua Bengio']];
 export function campaignResumePoint(value){return value?.hub?'hub':openingPoints.includes(value?.checkpoint)?value.checkpoint:null;}
 export function readCampaign(storage){try{const value=JSON.parse(storage?.getItem(CAMPAIGN_KEY)||'null');return value?.version===1&&['altman','amodei'].includes(value.ceo)&&campaignResumePoint(value)?value:null;}catch{return null;}}
 export function canSkipOpening(storage){try{if(storage?.getItem(OPENING_COMPLETE_KEY)==='1')return true;}catch{}const point=campaignResumePoint(readCampaign(storage));return point==='level-one'||point==='hub';}
 export class Campaign{
- constructor(storage,ceo){this.storage=storage;this.ceo=ceo;this.data={version:1,ceo,hub:false,...Object.fromEntries(MASKS.map(key=>[key,0])),ending3:0,endgame:0};this.error=null;
-  try{const value=JSON.parse(storage?.getItem(CAMPAIGN_KEY)||'null');if(value?.version===1&&value.ceo===ceo){this.data={...this.data,hub:!!value.hub};if(openingPoints.includes(value.checkpoint))this.data.checkpoint=value.checkpoint;for(const key of MASKS)this.data[key]=mask(value[key]);this.data.ending3=ending(value.ending3);this.data.endgame=endgame(value.endgame);this.data.ceoPdoom=Number.isInteger(value.ceoPdoom)?value.ceoPdoom:null;}}catch{}
+ constructor(storage,ceo){this.storage=storage;this.ceo=ceo;this.data={version:1,ceo,hub:false,...Object.fromEntries(MASKS.map(key=>[key,0])),ending3:0,endgame:0,speedrun:null};this.error=null;
+  try{const value=JSON.parse(storage?.getItem(CAMPAIGN_KEY)||'null');if(value?.version===1&&value.ceo===ceo){this.data={...this.data,hub:!!value.hub};if(openingPoints.includes(value.checkpoint))this.data.checkpoint=value.checkpoint;for(const key of MASKS)this.data[key]=LOST.has(key)?0:mask(value[key]);this.data.ending3=ending(value.ending3);this.data.speedrun=cleanSpeedrun(value.speedrun);this.data.endgame=endgame(value.endgame);this.data.ceoPdoom=Number.isInteger(value.ceoPdoom)?value.ceoPdoom:null;}}catch{}
  }
  saveOpening(point){
   if(!openingPoints.includes(point)||this.data.hub||MASKS.some(key=>this.data[key])||this.data.checkpoint==='level-one'&&point==='xp-intro')return false;
@@ -29,7 +34,7 @@ export class Campaign{
  }
  // Levels 1-2 report both of their groups (PDOOM_CAMPAIGN); the factory and the pod farm report only
  // their own, so only the groups a report names are written (a group-3-only report used to wipe 0-1).
- commit(native){const groups=[0,1,2,3].filter(i=>'saved'+i in native);for(const i of groups){this.data['saved'+i]|=mask(native['saved'+i]);this.data['lost'+i]=mask(native['lost'+i])&~this.data['saved'+i];this.data['following'+i]=mask(native['following'+i])&~(this.data['saved'+i]|this.data['lost'+i]);}if(ending(native.ending3))this.data.ending3=native.ending3;this.data.hub=true;delete this.data.checkpoint;this.persist();}
+ commit(native){const groups=[0,1,2,3].filter(i=>'saved'+i in native);for(const i of groups){this.data['saved'+i]|=mask(native['saved'+i]);this.data['lost'+i]=0;this.data['following'+i]=mask(native['following'+i])&~this.data['saved'+i];}if(ending(native.ending3))this.data.ending3=native.ending3;this.data.hub=true;delete this.data.checkpoint;this.persist();}
  // MEG3N's factory (2026-10-19): its clear is written only to a save that already reached SAFE MODE,
  // so a first visit by link never skips a new player's opening; this tab's meadow counts it either way.
  // The pod farm (level 4, group 3) follows the same rule through commitGroup(3,saved).

@@ -2,10 +2,11 @@
 import {readFile,writeFile,mkdir,rename} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
-import {GAME_SLUG,LEVELS,boardsForLevel} from '../doom-web/levels.js';
+import {GAME_SLUG} from '../doom-web/levels.js';
+import {SPEEDRUN_BOARD} from '../doom-web/speedrun.js';
 
 export function createLocalLeaderboards({store=fileURLToPath(new URL('../output/local-leaderboards/scores.json',import.meta.url))}={}){
-  const boards=LEVELS.flatMap(boardsForLevel);
+  const boards=[SPEEDRUN_BOARD];// one board since 2026-11-07: the whole-game speedrun, fastest first
   let queue=Promise.resolve();
   const json=(res,status,body)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(body));};
   const load=async()=>{try{return JSON.parse(await readFile(store,'utf8'));}catch(e){if(e.code==='ENOENT')return [];throw e;}};

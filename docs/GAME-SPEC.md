@@ -12,6 +12,8 @@
 
 Every line given to a real person in this game is **parody written for the game**, never a quote. Lines that point at something real allude to a public statement or event that was verified (sources in [06 §12](spec/06-names-and-antagonists.md) and [03 §12](spec/03-prisoners-and-rescues.md)). **No p(doom) number is attributed to anyone, ever.**
 
+> **2026-11-07: nobody is lost, and the game is one speedrun.** A death among the people you freed restarts that level, so replays, memorial plates, the LOST count, the "can't come with you" warning and the partial endings below can no longer happen. The four per-level score boards are replaced by one whole-game speedrun board ([SCORING.md](SCORING.md)).
+
 > **What changed in revision 2** (details in [Appendix C, Editor's notes](#appendix-c-editors-notes-revision-2)):
 > - **Rescues feel different in play, not just on paper.** Generic "shoot the lock / hit it N times" skips are gone from all 15 new cells. Each new level gets 3 rounds. Loud routes are either bespoke jokes or the failure branch of the signature. No rescue hold is longer than 2 s.
 > - **Six signatures were replaced** so each guardian is a tool somewhere and no level repeats a verb: Hinton (*let the Inferminator cut you out*), Yampolskiy (*jailbreak HAL*), Soares (*the shutdown problem*, plus *flash and thaw*), Zvi (*don't worry about the vase*), Tallinn (*run the hardline*), Grace (*agents skip the queue*). Kokotajlo's cell is now one choice: sign or don't.
@@ -405,7 +407,7 @@ The maps help too: 20 sites across 10 physical affordance types ([02 §8](spec/0
 
 **Retreat is always allowed**, except level 3 (2026-10-30, Jonathan: "once we enter, we should not be able to leave until we save everyone"): the factory's exit switch waits for everyone still inside, and LOAD GAME (or a browser reload) is the only way out, dropping that visit's rescues. Every front-door seal is a crank. Walk back out mid-level: anyone already freed and with you is safe. **Per-person state** (imprisoned / following / at camp / lost) lives in the campaign save `pdoom.campaign.v1` and is applied at every map load, whether or not GZDoom's hub snapshots work in this port: a saved person's cell spawns open and empty, and a lost person's cell spawns sealed with a memorial plate. If the hub-snapshot spike passes (§10), switches and doors also persist; if it fails, the geometry resets but nobody is duplicated. On return, the guardian resets to its patrol start.
 
-**Replays.** Until you press the final [Preview], any structure where someone was lost offers **Replay level**. Saved people stay at camp and their cells are empty; **only the lost respawn as captives**, so a replay is a mission to bring them back. The better campaign result is kept; replays don't post to the per-level boards.
+**Replays** (dormant since 2026-11-07: nobody can be lost, so no level offers one). Until you press the final [Preview], any structure where someone was lost offers **Replay level**. Saved people stay at camp and their cells are empty; **only the lost respawn as captives**, so a replay is a mission to bring them back. The better campaign result is kept; replays don't post to the per-level boards.
 
 ### 5.2 When your CEO goes down: "Demoted, not dead"
 

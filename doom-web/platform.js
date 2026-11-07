@@ -1,4 +1,5 @@
-import {GAME_SLUG,LEVELS,boardsForLevel} from './levels.js';
+import {GAME_SLUG} from './levels.js';
+import {SPEEDRUN_BOARD} from './speedrun.js';
 export const SHELL_THEME=Object.freeze({paper:'#241c17',ink:'#dcc18e',muted:'#bca67d',rule:'#736250',accent:'#ef573c',panel:'#241c17',panelInk:'#edca93',panelMuted:'#bca67d',field:'#100c09',focus:'#ffe3a3',font:'DoomSmall, monospace',headingFont:'DoomSmall, monospace',controlRadius:'0px',panelRadius:'0px'});
 
 export async function connectPlatform(level,{block}){
@@ -11,7 +12,7 @@ export async function connectPlatform(level,{block}){
   if(!script){
     script=document.createElement('script');script.src=config.shellSrc;script.defer=true;
     script.dataset.slug=GAME_SLUG;script.dataset.title=`p(DOOM) · ${level.title}${config.mode==='local'?' · Local scores':''}`;
-    script.dataset.leaderboard=String(config.enabled);script.dataset.leaderboardBoards=JSON.stringify(LEVELS.filter(l=>l.scored).flatMap((l,index)=>boardsForLevel(l).map(b=>({...b,label:`Level ${index+1}`}))));script.dataset.shellTheme=JSON.stringify(theme);
+    script.dataset.leaderboard=String(config.enabled);script.dataset.leaderboardBoards=JSON.stringify([{...SPEEDRUN_BOARD,minimumMatches:1}]);script.dataset.shellTheme=JSON.stringify(theme);
     // mann.cool's shell offers "Save your scores" (email code) and a shared player ID;
     // the playtest and local hosts serve an older shell copy without its API.
     script.dataset.playerIdentity=String(config.mode==='public');

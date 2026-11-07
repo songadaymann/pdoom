@@ -2,15 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {RankedRuns} from '../doom-web/ranked-runs.js';
 import {LeaderboardSubmission} from '../doom-web/leaderboard-client.js';
-import {scoreRun} from '../doom-web/run-score.js';
-import {getLevel} from '../doom-web/levels.js';
+import {speedrunResult,cleanSpeedrun} from '../doom-web/speedrun.js';
 import {localDevelopmentEnabled} from '../doom-web/dev-capabilities.js';
 
 const storage=()=>{const data=new Map();return{get length(){return data.size;},key:index=>[...data.keys()][index]||null,getItem:key=>data.get(key)||null,setItem:(key,value)=>data.set(key,value)};};
 const receipt=body=>({ok:true,json:async()=>({success:true,runId:body.runId,ticketId:'12345678-1234-1234-1234-123456789abc',expiresAt:Date.now()+1e9})});
-const result=(id='run-fixture')=>{
-  const l=getLevel();return scoreRun({level_id:l.id,level_version:l.version,score_version:l.scoreVersion,outcome:'escaped',saved:6,total:6,active_tics:21000,p_doom_cover:5,cameras_broken:9,cameras_total:9,practice:0,saved_figures:5,ceo_state:'conscious',skill:3,entry:'cold',retreat:0,routes:[]},l,{runId:id});
-};
+const result=(id='run-fixture')=>speedrunResult(cleanSpeedrun({runId:id,splits:{'five-prisons':200000,'hal-station':250000,'meg3n-factory':300000,'agentic-pods':310000,'safe-mode':90000,endgame:500000},restarts:2,done:true}),{saved:20,ceo:'altman'});
 test('public hosts never enable fixtures, and loopback requires explicit development capability',async()=>{
   let reads=0;const enabled=async()=>{reads++;return {ok:true,json:async()=>({enabled:true})};};
   for(const hostname of ['mann.cool','www.mann.cool','mann-cool-pdoom.novox-robot.workers.dev'])assert.equal(await localDevelopmentEnabled({hostname,fetcher:enabled}),false);
@@ -42,7 +39,7 @@ test('failed submission and refresh retain the original name, IDs and result',as
   let submission=create();await assert.rejects(submission.submit('Original'),/Temporary outage/);
   ranked=new RankedRuns({endpoint:'/runs',storage:saved,fetcher});submission=create();const accepted=await submission.submit('Changed after reload');
   assert.equal(accepted.complete,true);assert.equal(sent.length,2);assert.ok(sent.every(body=>body.name==='Original'));assert.equal(sent[0].submissionId,sent[1].submissionId);
-  assert.ok(sent.every(body=>body.variant==='five-prisons-rescue-v3'));assert.ok(sent.every(body=>body.runTicket.token===sent[0].runTicket.token));
+  assert.ok(sent.every(body=>body.variant==='campaign-speedrun-v1'));assert.ok(sent.every(body=>body.runTicket.token===sent[0].runTicket.token));
   assert.ok(sent.every(body=>!JSON.stringify(body.metadata).includes(body.runTicket.token)));
   ranked.complete(value.runId);assert.equal(new RankedRuns({endpoint:'/runs',storage:saved,fetcher}).pending().length,0);
 });
@@ -67,22 +64,17 @@ test('independent game tabs retain each other\'s results and observe completed s
   a.save(result('tab-one-run'),'altman');b.save(result('tab-two-run'),'amodei');assert.equal(a.pending().length,2);assert.equal(b.pending().length,2);
   a.complete('tab-one-run');assert.equal(b.pending().length,1);assert.equal(b.pending()[0].result.runId,'tab-two-run');
 });
-test('old three-category results submit only the original frozen total score',async()=>{
-  const value=result(),rescue='five-prisons-rescue-v3',perfect='five-prisons-perfect-v3',clean='five-prisons-clean-sweep-v3';
-  const original=new LeaderboardSubmission(value,{playerId:'original-player',fetcher:async()=>{throw Error('offline');}});
-  await assert.rejects(original.submit('Frozen name'));
-  const bodies=[original.bodies[0],...[[perfect,600000],[clean,600000]].map(([variant,score])=>({...original.bodies[0],variant,score,submissionId:`${value.runId}:${variant}`}))];
-  const oldResult={...value,submissions:bodies.map(({variant,score})=>({variant,score}))};
-  const sent=[];const restored=new LeaderboardSubmission(oldResult,{state:{bodies,accepted:[perfect]},fetcher:async(_,request)=>{sent.push(JSON.parse(request.body));return{ok:true,json:async()=>({success:true})};}});
-  assert.equal((await restored.submit('Changed name')).complete,true);assert.equal(sent.length,1);assert.deepEqual(sent[0],bodies[0]);assert.deepEqual([...restored.accepted],[rescue]);
-  let reads=0;const acknowledged=new LeaderboardSubmission(oldResult,{state:{bodies,accepted:[rescue,perfect,clean]},ticket:async()=>{reads++;throw Error('Should not need a new ticket');},fetcher:async()=>{reads++;throw Error('Should not post again');}});
-  assert.deepEqual(await acknowledged.submit('Another name'),{accepted:[rescue],held:[],complete:true});assert.equal(reads,0);
-  const fresh=new LeaderboardSubmission(oldResult,{playerId:'player',fetcher:async(_,request)=>{assert.equal(JSON.parse(request.body).variant,rescue);return{ok:true,json:async()=>({success:true})};}});
-  await fresh.submit('New name');assert.equal(fresh.bodies.length,1);
+test('results saved for the retired per-level boards are never resent; a submitted run is not queued again',async()=>{
+  const value=result('fresh-run'),old={slug:'pdoom',variant:'five-prisons-rescue-v3',name:'Old',playerId:'p',submissionId:'fresh-run:five-prisons-rescue-v3',score:55200,metadata:{}};
+  const sent=[];const restored=new LeaderboardSubmission(value,{playerId:'player',state:{bodies:[old],accepted:['five-prisons-rescue-v3']},fetcher:async(_,request)=>{sent.push(JSON.parse(request.body));return{ok:true,json:async()=>({success:true})};}});
+  assert.equal(restored.bodies,null);assert.equal(restored.accepted.size,0);
+  assert.equal((await restored.submit('New name')).complete,true);assert.equal(sent.length,1);assert.equal(sent[0].variant,'campaign-speedrun-v1');
+  const ranked=new RankedRuns({endpoint:'/runs',storage:storage()});ranked.save(value,'altman');ranked.complete(value.runId);
+  assert.equal(ranked.submitted(value.runId),true);assert.equal(ranked.save(value,'altman'),null);assert.equal(ranked.pending().length,0);
 });
 test('a run the server holds for review completes without retrying and reports the hold',async()=>{
   const value=result('held-run'),sent=[];
   const submission=new LeaderboardSubmission(value,{playerId:'player',fetcher:async(_,request)=>{sent.push(JSON.parse(request.body));return {ok:true,json:async()=>({success:true,held:true,rank:null})};}});
-  const outcome=await submission.submit('Fast player');assert.equal(outcome.complete,true);assert.deepEqual(outcome.held,[value.submissions[0].variant]);
-  assert.deepEqual(await submission.submit('Fast player'),{accepted:[value.submissions[0].variant],held:[value.submissions[0].variant],complete:true});assert.equal(sent.length,1);
+  const outcome=await submission.submit('Fast player');assert.equal(outcome.complete,true);assert.deepEqual(outcome.held,['campaign-speedrun-v1']);
+  assert.deepEqual(await submission.submit('Fast player'),{accepted:['campaign-speedrun-v1'],held:['campaign-speedrun-v1'],complete:true});assert.equal(sent.length,1);
 });

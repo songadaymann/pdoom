@@ -257,10 +257,10 @@ class PDRescueCast : Object play
             let p = People[i];
             if (p.Body != body || !p.Alive || !p.Released) continue;
             p.Alive = false; p.Holding = false;
-            game.Polish.Stinger("pdoom/loss");
             body.bShootable = false; body.bSolid = false; body.SetStateLabel('Death');
-            game.Say(String.Format("%s is gone.", PDCheckpointMap.SiteName(i)),175);
             game.Speak(-1,"...That is on me.",140,"loss");
+            // Nobody stays lost: the level restarts (PDCheckpoint.LoseAll).
+            game.LoseAll(String.Format("%s is gone.", PDCheckpointMap.SiteName(i)));
             return;
         }
     }

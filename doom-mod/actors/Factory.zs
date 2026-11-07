@@ -28,6 +28,7 @@ class PDFactory : EventHandler
     // from the episode menu can rank; a walk-in from SAFE MODE, a ?puzzle= site or cheats make it
     // practice. CoverDoom is p(DOOM) when the broadcast opens the way out.
     int RunTics,CoverDoom;bool RunPractice,RunFinished;
+    bool RunAssisted;   // cheats or a development site, not just walking in from SAFE MODE (doom-web/speedrun.js)
     static String RunVersion(){return "meg3n-factory-v1";}
     int DoorChaseUntil,MeganChatAt,MeganChats,MeganSpotAt,MeganSpots,LostSince,MeganPoseAt,MeganHugAt,MeganStunAt,MeganDoorAt,MeganWaitAt,MeganWaits,MeganReact;
     bool Called[5],DollPraised,SiteApplied,SchemerPressed,SchemerRush;
@@ -253,8 +254,8 @@ class PDFactory : EventHandler
         let session=PDCampaignSession.Get();if(session){session.Load();HubEntry=session.FactoryEntry;}
         Commits=HubEntry||players[0].mo.GetCVar("pdoom_factory_commit")!=0;
         let you=players[0].mo;CoverDoom=-1;
-        RunPractice=HubEntry||you.GetCVar("pdoom_dev_end")!=0||you.GetCVar("pdoom_factory_site")!=0;
-        if(Commits)Console.Printf("PDOOM_RUN_START {\"level_id\":\"meg3n-factory\",\"level_version\":\"%s\",\"practice\":%d}",RunVersion(),RunPractice);
+        RunAssisted=you.GetCVar("pdoom_dev_end")!=0||you.GetCVar("pdoom_factory_site")!=0;RunPractice=HubEntry||RunAssisted;
+        if(Commits)Console.Printf("PDOOM_RUN_START {\"level_id\":\"meg3n-factory\",\"level_version\":\"%s\",\"practice\":%d,\"assisted\":%d}",RunVersion(),RunPractice,RunAssisted);
         Console.Printf("PDOOM_MOD_LOADED factory-first-pass");
     }
     int Node(Vector2 p)
@@ -644,7 +645,7 @@ class PDFactory : EventHandler
     void TickRun()
     {
         if(RunFinished)return;RunTics++;
-        if(players[0].cheats&(CF_NOCLIP|CF_NOCLIP2|CF_GODMODE|CF_GODMODE2|CF_BUDDHA|CF_BUDDHA2|CF_FLY|CF_NOTARGET|CF_FRIGHTENING|CF_NOVELOCITY))RunPractice=true;
+        if(players[0].cheats&(CF_NOCLIP|CF_NOCLIP2|CF_GODMODE|CF_GODMODE2|CF_BUDDHA|CF_BUDDHA2|CF_FLY|CF_NOTARGET|CF_FRIGHTENING|CF_NOVELOCITY)){RunPractice=true;RunAssisted=true;}
     }
     // Levels 1-2's in-world outlook (PDRescueRun.SnapshotCover; survival-estimate.js), once:
     // people already at camp count as freed and safe.
@@ -1204,7 +1205,7 @@ class PDFactory : EventHandler
     }
     void Report()
     {
-        if(Commits)Console.Printf("PDOOM_RUN {\"level_id\":\"meg3n-factory\",\"level_version\":\"%s\",\"active_tics\":%d,\"p_doom_cover\":%d,\"practice\":%d}",RunVersion(),RunTics,CoverDoom,RunPractice);
+        if(Commits)Console.Printf("PDOOM_RUN {\"level_id\":\"meg3n-factory\",\"level_version\":\"%s\",\"active_tics\":%d,\"p_doom_cover\":%d,\"practice\":%d,\"assisted\":%d}",RunVersion(),RunTics,CoverDoom,RunPractice,RunAssisted);
         let pawn=players[0].mo;String peopleJson="[";
         for(int i=0;i<5;i++)
         {

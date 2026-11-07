@@ -28,7 +28,7 @@ test('legacy camp saves keep priority and cannot be overwritten by an opening ch
 test('committing the first exit replaces the opening checkpoint with the camp save',()=>{
  const storage=memory(),campaign=new Campaign(storage,'altman');campaign.saveOpening('level-one');campaign.commit({saved0:1,lost0:2});
  assert.equal(campaignResumePoint(readCampaign(storage)),'hub');assert.equal(readCampaign(storage).checkpoint,undefined);
- assert.equal(campaign.getState().saved,1);assert.equal(campaign.getState().lost,1);assert.equal(campaign.saveOpening('xp-intro'),false);
+ assert.equal(campaign.getState().saved,1);assert.equal(campaign.getState().lost,0);assert.equal(campaign.saveOpening('xp-intro'),false);
 });
 test('invalid saves and unavailable storage never report a successful checkpoint',()=>{
  const storage=memory();for(const value of ['{',JSON.stringify({version:1,ceo:'altman',checkpoint:'unknown'}),JSON.stringify({version:2,ceo:'altman',checkpoint:'xp-intro'}),JSON.stringify({version:1,ceo:'other',checkpoint:'level-one'})]){storage.setItem(CAMPAIGN_KEY,value);assert.equal(readCampaign(storage),null);assert.equal(canSkipOpening(storage),false);}

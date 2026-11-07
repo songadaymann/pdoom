@@ -7,7 +7,7 @@
 ## In the game
 
 Built 2026-10-28 on `claude/endgame-hookup` (the hub-progression and endgame branches merged), from Jonathan's picks that day:
-- **Trigger:** all 20 resolved, freed or lost, at whichever door that happens. Normally that's the level 4 exit.
+- **Trigger:** all 20 resolved, at whichever door that happens. Since 2026-11-07 nobody can be lost, so that means all 20 freed and `end-saved-some` never plays. The speedrun's clock stops when the MCP goes down ([SCORING.md](SCORING.md)). Normally that's the level 4 exit.
 - **Survivors:** only the people you saved come with you.
 - **The door scene:** in the meadow.
 - **The rest:** one page.

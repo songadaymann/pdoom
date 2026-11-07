@@ -60,6 +60,25 @@ const autosteer=QUERY.has('autosteer');
 const FINALE=QUERY.get('m')==='finale';
 // played from the meadow's SAFE MODE fixture (doom-web/main.js): this browser's real save is left alone
 const FIXTURE=FINALE&&QUERY.get('safemode')==='1';
+// The speedrun's endgame split (doom-web/speedrun.js, 2026-11-07): this page's own frame time from the walk in to
+// the MCP going down, added to the campaign save's `speedrun`, whose clock stops there (`done`). Only a run in this
+// browser's save that isn't finished yet; never the SAFE MODE fixture's.
+type Speedrun={runId:string;splits:Record<string,number>;practice?:string;done?:boolean};
+const SAVE_KEY='pdoom.campaign.v1',SPLIT_KEYS=['five-prisons','hal-station','meg3n-factory','agentic-pods','safe-mode','endgame'];
+const RUN:Speedrun|null=(()=>{if(!FINALE||FIXTURE)return null;try{const r=JSON.parse(localStorage.getItem(SAVE_KEY)||'null')?.speedrun;return r&&typeof r.runId==='string'&&r.splits&&!r.done?r:null;}catch{return null;}})();
+let runCarry=0,runSavedAt=-1e9,runTimer:HTMLElement|null=null;
+function runSave(force=false){
+ if(!RUN)return;const now=performance.now();if(!force&&now-runSavedAt<2000)return;runSavedAt=now;
+ try{const v=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(v?.version===1&&v.speedrun?.runId===RUN.runId){v.speedrun.splits.endgame=RUN.splits.endgame;v.speedrun.done=!!RUN.done;localStorage.setItem(SAVE_KEY,JSON.stringify(v));}}catch{/* storage gone: the time stays in this tab */}
+}
+function runTime(){const ms=SPLIT_KEYS.reduce((a,k)=>a+(Number(RUN?.splits[k])||0),0),s=Math.floor(ms/1000),two=(n:number)=>String(n).padStart(2,'0');return `${s>=3600?Math.floor(s/3600)+':'+two(Math.floor(s/60)%60):Math.floor(s/60)}:${two(s%60)}`;}
+function runTick(dt:number){
+ if(!RUN||RUN.done)return;runCarry+=dt*1000;const whole=Math.floor(runCarry);runCarry-=whole;RUN.splits.endgame=(Number(RUN.splits.endgame)||0)+whole;runSave();
+ if(!runTimer){runTimer=document.createElement('div');runTimer.id='speedrun-timer';runTimer.setAttribute('aria-hidden','true');runTimer.style.cssText='position:fixed;z-index:30;top:10px;left:50%;transform:translateX(-50%);padding:2px 8px;font:15px DoomSmall,monospace;letter-spacing:1px;color:#f0d4a1;background:#100c0999;text-shadow:2px 2px #100c09;pointer-events:none;white-space:nowrap';document.body.append(runTimer);}
+ const text=runTime()+(RUN.practice?' PRACTICE':'');if(runTimer.textContent!==text)runTimer.textContent=text;
+}
+function runDone(){if(!RUN||RUN.done)return;RUN.done=true;runSave(true);if(runTimer){runTimer.textContent=runTime();runTimer.style.color='#7dff8a';}}
+if(RUN)addEventListener('pagehide',()=>runSave(true));
 
 type Phase='walk'|'intro'|'ships'|'shieldDown'|'trick'|'down'|'waste';
 type Kind='update'|'starlink'|'doge'|'sink';
@@ -678,7 +697,7 @@ function go(c:Ctx,to:Phase,instant=false){
   c.later(instant?2.4:6.4,()=>grok(c,GROK.launch,4.6));c.later(instant?5:10,()=>own(c,'kokotajlo'));lastThrowAt=c.t+(instant?3:7);
  }
  if(to==='down'){
-  c.phase='down';ending='meltdown';c.player.frozen=true;$('countdown').hidden=true;c.hud.hint('');c.hud.reticle(false);c.discs.clear();$('hud').classList.add('cinema');
+  c.phase='down';ending='meltdown';runDone();c.player.frozen=true;$('countdown').hidden=true;c.hud.hint('');c.hud.reticle(false);c.discs.clear();$('hud').classList.add('cinema');
   founder=loadFounder(c.guide.id==='mario'?'samwise':'mario');void props();// the wasteland's, ready for after the dialog
   // as long as his last lines take, and the blast lands on the cut-off "MA—"
   const sec=(l:Line,min:number)=>Math.max(min,c.voices.sec(l.key)+.1);
@@ -757,6 +776,7 @@ export const boss:Mode={
    if(start==='2')jump(c,'shieldDown');else if(start==='3')jump(c,'trick');else if(FINALE)walkStart(c);
   }
   pt+=dt;swingCd=Math.max(0,swingCd-dt);const mcp=c.mcp;
+  if(ending===null)runTick(dt);
   if(shield){shield.t+=dt;const k=Math.min(1,shield.t/shield.dur);mcp.shieldY=shield.from+(shield.to-shield.from)*k*k*(3-2*k);if(k>=1){const then=shield.then;shield=null;then?.();}}
   tickVoices(c);updateArrivals(c,dt);c.sfx.duck(c.voices.talking());c.dc.quiet(phase==='trick');
   switch(phase){

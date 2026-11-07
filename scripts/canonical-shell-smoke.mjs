@@ -15,13 +15,10 @@ try{
  await p.screenshot({path:`${out}/${name}-meadow.png`});
  await shell.locator('.menu-button').click();assert.equal(await shell.locator('[data-support]').getAttribute('href'),'https://songaday.studio/?from=pdoom#donate');
  assert.equal(await shell.getByText('Guestbook ↗',{exact:true}).getAttribute('href'),'https://mann.cool/?guestbook=1');
- await shell.locator('[data-open="leaderboard"]').click();const tabs=shell.locator('[data-leaderboard-board]');assert.equal(await tabs.count(),4);
- for(let i=0;i<4;i++){
- const tab=tabs.nth(i),variant=await tab.getAttribute('data-leaderboard-board');
- if(i)await tab.click();await p.waitForFunction(()=>{const r=document.querySelector('mann-cool-game-shell').shadowRoot;return !r.querySelector('.scores').textContent.includes('Loading');});
- assert.equal(await tabs.nth(i).getAttribute('aria-selected'),'true');
- const result=await p.request.get(`https://mann.cool/api/v1/leaderboard?slug=pdoom&variant=${variant}`);assert.equal(result.status(),200,variant);assert.equal((await result.json()).success,true,variant);
- }
+ await shell.locator('[data-open="leaderboard"]').click();const tabs=shell.locator('[data-leaderboard-board]');assert.equal(await tabs.count(),1,'One board since 2026-11-07: the speedrun');
+ assert.equal(await tabs.first().getAttribute('data-leaderboard-board'),'campaign-speedrun-v1');
+ await p.waitForFunction(()=>{const r=document.querySelector('mann-cool-game-shell').shadowRoot;return !r.querySelector('.scores').textContent.includes('Loading');});
+ {const result=await p.request.get('https://mann.cool/api/v1/leaderboard?slug=pdoom&variant=campaign-speedrun-v1');assert.equal(result.status(),200);const data=await result.json();assert.equal(data.success,true);assert.equal(data.direction,'asc','Fastest first');}
  await p.screenshot({path:`${out}/${name}-boards.png`});
  const panel=await shell.locator('[data-modal="leaderboard"] .panel').boundingBox();assert.ok(panel.x>=0&&panel.x+panel.width<=width+1&&panel.y>=0&&panel.y+panel.height<=height+1);
  const bg=await shell.locator('[data-modal="leaderboard"] .panel').evaluate(e=>getComputedStyle(e).backgroundColor);assert.equal(bg,'rgb(36, 28, 23)');

@@ -12,7 +12,9 @@ You wake up alone inside Doom. Somewhere in the facility, five other humans are 
 
 The emotional progression is **isolation → discovery → resourcefulness → solidarity → disbelief → relief**. The first objective is “Find the others.” No escape marker, green daylight, visible rescue gate, outside relay, map label or loading-screen artwork gives away the meadow. Original Doom sky windows remain: they appear to be the normal, hostile world of Doom.
 
-Jonathan chose **permanent losses with escape still possible for fewer survivors**, rather than checkpoint restarts on a death. Finding/freeing everyone is the campaign's intended progression; keeping everyone alive is the mastery challenge. A death never removes an already-earned rescue or an essential clue.
+**Superseded 2026-11-07: nobody is lost.** Jonathan: "when a prisoner is lost, they have to restart that level that the prisoner was lost on. There can be no lose of prisoners." Someone you freed going down (or you going down with nobody to take over) holds the level for three seconds and restarts it (`Checkpoint.zs LoseAll`), as MEG3N and SMITH catching you does in levels 3-4. The CEO going down still hands you someone you freed. An older save's lost people are back in their cells. The game is timed as one speedrun ([SCORING.md](SCORING.md)).
+
+Before that, Jonathan chose **permanent losses with escape still possible for fewer survivors**, rather than checkpoint restarts on a death. Finding/freeing everyone is the campaign's intended progression; keeping everyone alive is the mastery challenge. A death never removes an already-earned rescue or an essential clue.
 
 For the first version, end on the group reaching the meadow and a quiet chance to look back. Another outdoor task remains an open creative decision. Do not add a relay errand simply because the old level had one.
 
@@ -58,6 +60,8 @@ Use a small vocabulary of reusable systems: projectiles, locks/keys, electrical 
 All five rescue encounters now have playable overlays. Every cell needs a non-consumable way to resolve it; missed shots, a lost wrench, using the charge early, or losing an ally must not make the campaign impossible. Tools buy time or change danger, rather than serving as five mandatory inventory tokens.
 
 ## Rescued people and permanent loss
+
+(Permanent loss is gone since 2026-11-07: a loss restarts the level. See the note at the top.)
 
 The first released human leads to the original side room between the central ring and the east starting hall. They walk the native route and wait beyond speaking distance if the player falls behind; a persistent HUD clue identifies the guide. A tagged native bulkhead seals the entrance once people clear it, and a visible fixed grate bars the secondary lift entrance. Machinery masks people inside: the hunter cannot navigate into the refuge or acquire targets there.
 

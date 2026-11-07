@@ -1,5 +1,5 @@
-// Add a descriptor and its native map/controller to introduce another level.
-// Never reuse board keys after changing a map or scoring rules.
+// Add a descriptor and its native map/controller to introduce another level. A new level changes the speedrun,
+// so it needs a new speedrun board key (speedrun.js SPEEDRUN, SPEEDRUN_BOARD).
 export const GAME_SLUG='pdoom';
 export const LEVELS=Object.freeze([
   // v3 (2026-10-10): one solution per prisoner, so earlier times are not comparable.
@@ -24,11 +24,9 @@ export function getLevel(id='five-prisons'){
   if(id==='rescue'||id==='first-rescue')id='five-prisons';
   return LEVELS.find(level=>level.id===id)||null;
 }
-export function boardsForLevel(level){
-  if(!level?.scored)return [];
-  const prefix=`${level.id}-rescue-${level.boardVersion}`;
-  return [{variant:prefix,label:'Total score',metric:level.scoreVersion==='rescue-v2'?'rescueScoreV2':'rescueScoreV1',metricLabel:'Total score',direction:'desc',display:'integer',aggregation:'best'}];
-}
+// One leaderboard for the whole game since 2026-11-07: the speedrun (speedrun.js). The levels have no boards of
+// their own; `scored` now only means a campaign level you can start from the episode menu.
+export {SPEEDRUN_BOARD} from './speedrun.js';
 export function nextLevel(level){return level?.nextLevelId?getLevel(level.nextLevelId):null;}
 
 export const ARCHIVED_LEVELS=Object.freeze([Object.freeze({...LEVELS[0],version:"five-prisons-v1",title:"Five Prisons (legacy)",scoreVersion:"rescue-v1",boardVersion:"v1"}),

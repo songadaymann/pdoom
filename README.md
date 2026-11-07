@@ -31,8 +31,8 @@ requires the source media described in ASSETS.md; it is not required to run the 
 MEG3N’s Toy Factory is E2M7, Spawning Vats, with bright toy-factory materials and five physical
 rescue puzzles. Since 2026-10-20 it is part of the campaign: in SAFE MODE, `MEG3N.AVI`’s door
 walks into it and its exit switch comes back out there (the five at camp, the clear in the save).
-Since 2026-10-21 it has its own Level 3 scoreboard: a fresh SPAWNING CHATS run from the
-episode menu ranks (see `docs/SCORING.md`). The unscored
+From 2026-10-21 to 2026-11-07 it had its own Level 3 scoreboard; since then the whole game is one
+speedrun (see `docs/SCORING.md`). The unscored
 [practice page](http://127.0.0.1:5198/?level=meg3n-factory) starts in the showroom and takes the
 `?puzzle=` development flags. Full guardian vent traversal and final sound/animation remain later work.
 
@@ -53,7 +53,7 @@ Run `node scripts/factory-browser-smoke.mjs` against the local server for native
 AGENTIC SMITH’s Pod Farm is the south half of E2M2, Containment Area, recoloured as a Matrix-style
 pod farm with five physical rescues, a camera-hopping guardian who possesses the people you free,
 and a ringing refuge payphone as the way out. Since 2026-11-03 it is public through SAFE MODE's `AGENTIC.BAT` door, and since
-2026-11-06 a fresh HUMAN CONTAINMENT AREA run from the episode menu ranks on its own Level 4 board (see `docs/SCORING.md`).
+2026-11-06 it is on the episode menu (HUMAN CONTAINMENT AREA). Its own Level 4 board lasted a day: since 2026-11-07 the whole game is one speedrun (see `docs/SCORING.md`).
 Before its release it was unscored and local development only: the
 [local page](http://127.0.0.1:5198/?level=agentic-pods) and SAFE MODE’s `AGENTIC.BAT` door work
 only on loopback with the server’s `dev-config.json`; everywhere else the link opens level 1 and
@@ -136,7 +136,7 @@ New generated camera assets: [intact source](art/checkpoint/camera-source.png), 
 
 [Sam’s rear-shutter acceptance](output/sam-shutter/acceptance-summary.json) records eight targeted checks on the current build. `npm run test:doom:sam` checks the rear shutter, real wrench range/wall collision, standing player/companion passage and automatic inside latch. `npm run test:doom` (or `npm run test:doom:checkpoint`) runs the original seven camera, crawl, parking, control-transfer and portrait/landscape touch cases. `npm run test:doom:campaign` runs the additional encounter and group checks. `npm run test:doom:refuge` runs health/healing, first guides, inherited wounds, five-person staging/recall, native bulkhead protection and touch cases. Legacy follow/order fixtures first establish the refuge as known; first-guide behavior has its own tests. Browser tests use native player-position fixtures followed by actual keyboard input with the normal hunter active; companions always walk. The close-range gate check places the real hunter outside through an unbound QA console event while leaving its normal rules active. Touch checks are Chrome emulation, not physical-phone certification. [Previous health/refuge acceptance](output/checkpoint/refuge/acceptance-summary.json) records 27 passing cases on the served build, with per-case report provenance and final mobile layout reruns. [Earlier five-prison acceptance](output/checkpoint/five-prisons/acceptance-summary.json) records the original 18 cases before health/refuge changes.
 
-[Single-player scoring and mann.cool leaderboard integration](docs/SCORING.md) now provides a frozen Doom-style scorecard, exact native active time, cover-opening p(DOOM) snapshot and rescue/fastest-perfect/fastest-clean-sweep boards. The loopback server stores local scores on this computer; public mann.cool registration/deployment remains separate. Development endings and console/cheat runs show scores but cannot submit. [The level registry and completion hook](docs/LEVELS.md) support future maps, per-level targets and isolated boards. `npm run test:doom:score` checks the score/lifecycle/API; `npm run test:doom:leaderboards` checks native clock/pause/cheats and isolated scorecard/shared-shell submission fixtures.
+**[The speedrun](docs/SCORING.md)** (2026-11-07) is the game's one leaderboard: how fast you beat the whole game, from a new campaign's first level to the MCP going down, in game time (each level's native clock, the meadow's clock and the endgame's frame time; menus, films and loading never count). Nobody can be lost: someone you freed going down restarts that level, and restarts cost time. A timer shows at the top of the screen, and one results card at the end has the six splits and name entry. Cheats, QA shortcuts and development endings make a run practice. `npm run test:doom:score` and `npm run test:doom:ranked` check the clock, the save and the submission; `npm run test:doom:ranked-browser` runs the whole path against a loopback copy of the mann.cool Worker. [The level registry](docs/LEVELS.md) supports future maps.
 
 ### Previous Intake test
 
@@ -156,7 +156,7 @@ SAFE MODE (Bliss) promises what's next (2026-10-14, `src/doom-hub-future.ts`). L
 
 After both facilities are resolved, meadow movement unlocks a faster travel pace: walking is
 6 m/s (previously 3.6), running is 10 m/s (previously 6). The opening and first return retain their
-original pace. This counts both rescued and lost people, so a completed run with losses still
+original pace. This counts both rescued and lost people (nobody can be lost since 2026-11-07), so a completed run with losses still
 unlocks it. `node scripts/meadow-travel-smoke.mjs` checks actual movement and the unlock conditions.
 The varied toy weights and faster travel are deployed to the friends playtest (2026-10-15).
 

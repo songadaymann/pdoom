@@ -4,45 +4,14 @@ const game = createStaticGameWorker({
   "title": "p(DOOM)",
   "leaderboard": true,
   "leaderboardUrl": "",
-  "leaderboardVariant": "five-prisons-rescue-v3",
+  "leaderboardVariant": "campaign-speedrun-v1",
   "leaderboardBoards": [
     {
-      "variant": "five-prisons-rescue-v3",
-      "label": "Level 1",
-      "metric": "rescueScoreV2",
-      "metricLabel": "Total score",
-      "direction": "desc",
-      "display": "integer",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "hal-station-rescue-v3",
-      "label": "Level 2",
-      "metric": "rescueScoreV2",
-      "metricLabel": "Total score",
-      "direction": "desc",
-      "display": "integer",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "meg3n-factory-rescue-v1",
-      "label": "Level 3",
-      "metric": "rescueScoreV2",
-      "metricLabel": "Total score",
-      "direction": "desc",
-      "display": "integer",
-      "aggregation": "best",
-      "minimumMatches": 1
-    },
-    {
-      "variant": "agentic-pods-rescue-v1",
-      "label": "Level 4",
-      "metric": "rescueScoreV2",
-      "metricLabel": "Total score",
-      "direction": "desc",
-      "display": "integer",
+      "variant": "campaign-speedrun-v1",
+      "label": "Speedrun",
+      "metric": "activeMs",
+      "direction": "asc",
+      "display": "time-ms",
       "aggregation": "best",
       "minimumMatches": 1
     }

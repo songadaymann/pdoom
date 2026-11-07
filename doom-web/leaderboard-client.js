@@ -1,36 +1,34 @@
-import {GAME_SLUG,getLevel,boardsForLevel} from './levels.js';
+import {GAME_SLUG} from './levels.js';
+import {SPEEDRUN,SPEEDRUN_BOARD,SPLITS} from './speedrun.js';
 
-const currentVariants=result=>new Set(boardsForLevel(getLevel(result.levelId)).map(board=>board.variant));
+// One board since 2026-11-07: the whole-game speedrun. Older saved results (the per-level rescue boards) have
+// no current board and are never resent.
+const currentVariants=()=>new Set([SPEEDRUN_BOARD.variant]);
 
 export function stablePlayer(storage,uuid=()=>crypto.randomUUID()){
   try{let id=storage.getItem('pdoom-player-v1');if(!id){id=uuid();storage.setItem('pdoom-player-v1',id);}return id;}
   catch{return uuid();}
 }
-// ceo: free-form run metadata only (GAME-SPEC §5.4, TEAM SAM vs TEAM DARIO); it
-// is not part of the score, the board or the submission identity.
+// ceo: free-form run metadata only (GAME-SPEC §5.4, TEAM SAM vs TEAM DARIO); it is not part of the time, the
+// board or the submission identity. Left out, never null, when unknown (the server rejects null).
 export function submissionBodies(result,name,playerId,{ceo}={}){
   const clean=name.trim();
   if(!clean||clean.length>32)throw Error('Enter a name of 1–32 characters.');
-  if(!result.eligible)throw Error(result.practiceReason||'Only completed escapes can be submitted.');
-  const metadata={levelId:result.levelId,levelVersion:result.levelVersion,scoreVersion:result.scoreVersion,boardVersion:result.boardVersion,
-    savedFigures:result.savedFigures,ceoState:result.ceoState,skill:result.skill,entry:result.entry,retreat:result.retreat,
-    outcome:result.outcome,practice:!result.eligible,saved:result.saved,total:result.total,camerasDestroyed:result.camerasDestroyed,camerasTotal:result.camerasTotal,
-    activeMs:result.activeMs,activeTics:result.activeTics,pDoomAtCoverOpen:result.pDoomAtCoverOpen,
-    pDoomFinal:result.pDoomFinal,breakdown:result.breakdown,routes:result.routes};
-  if(/^(altman|amodei|doomguy)$/.test(ceo||''))metadata.ceo=ceo;
-  const variants=currentVariants(result),boards=result.submissions.filter(board=>variants.has(board.variant));
-  if(!boards.length)throw Error('This result does not have a current leaderboard.');
-  return boards.map(board=>({slug:GAME_SLUG,variant:board.variant,name:clean,playerId,
-    submissionId:`${result.runId}:${board.variant}`,score:board.score,metadata}));
+  if(result?.scoreVersion!==SPEEDRUN.scoreVersion||result.levelId!==SPEEDRUN.levelId)throw Error('This result does not have a current leaderboard.');
+  if(!result.eligible)throw Error(result.practiceReason||'Only a finished speedrun can be submitted.');
+  const metadata={...SPEEDRUN,outcome:'complete',practice:false,saved:result.saved,total:result.total,activeMs:result.activeMs,
+    splits:Object.fromEntries(SPLITS.map(key=>[key,result.splits[key]])),restarts:result.restarts};
+  const hero=ceo??result.ceo;if(/^(altman|amodei)$/.test(hero||''))metadata.ceo=hero;
+  return [{slug:GAME_SLUG,variant:SPEEDRUN_BOARD.variant,name:clean,playerId,
+    submissionId:`${result.runId}:${SPEEDRUN_BOARD.variant}`,score:result.activeMs,metadata}];
 }
 
 // Retain the identical name and IDs after a partial success or uncertain response.
 export class LeaderboardSubmission{
   constructor(result,{endpoint='/api/v1/leaderboard',fetcher=(...args)=>fetch(...args),playerId,ceo,ticket=async()=>null,state,onProgress=()=>{}}={}){
     this.result=result;this.endpoint=endpoint;this.fetcher=fetcher;this.playerId=playerId;this.ceo=ceo;
-    // Old saved results may still include retired time boards. Keep the frozen
-    // total-score body, name and receipt without retrying removed categories.
-    const variants=currentVariants(result),bodies=state?.bodies?.filter(body=>variants.has(body.variant));
+    // Keep the frozen body, name and receipt; bodies for retired boards are dropped, never retried.
+    const variants=currentVariants(),bodies=state?.bodies?.filter(body=>variants.has(body.variant));
     this.bodies=bodies?.length?bodies:null;this.accepted=new Set((state?.accepted||[]).filter(variant=>variants.has(variant)));this.held=new Set();this.inflight=null;this.ticket=ticket;this.onProgress=onProgress;
   }
   submit(name){
