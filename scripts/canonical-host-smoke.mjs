@@ -26,7 +26,7 @@ try{
  const dev=await get('dev-config.json');assert.equal((await dev.json()).enabled,false);
  for(const file of ['dev/ending-qa.pk3','local/promo/pdoom-promo-fullframe.mp4','outside/outside.js.map','.env'])assert.equal((await get(file)).status,404,file);
  const config=await (await get('leaderboard-config.json')).json();assert.equal(config.mode,'public');assert.equal(config.endpoint,'https://mann.cool/api/v1/leaderboard');
- const scores=await (await fetch('https://mann.cool/api/v1/leaderboard?slug=pdoom&variant=hal-station-rescue-v3')).json();assert.equal(scores.success,true);
+ const scores=await (await fetch('https://mann.cool/api/v1/leaderboard?slug=pdoom&variant=campaign-speedrun-v1')).json();assert.equal(scores.success,true);assert.equal(scores.direction,'asc');
  report.cases.push('Dev shortcuts off; source/QA/promo excluded; scoreboards read from public platform API');
  // Public New Game: title -> menu -> hero -> the Last Stand prologue, no level select.
  {const ctx=await browser.newContext({viewport:{width:1280,height:800}}),p=await ctx.newPage();observe(p);

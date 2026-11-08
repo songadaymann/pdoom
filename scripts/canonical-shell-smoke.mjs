@@ -25,7 +25,7 @@ try{
  await shell.locator('[data-modal="leaderboard"] .close').click();await shell.locator('.menu-button').click();await shell.locator('[data-open="player"]').click();await shell.locator('[data-player-step="email"] input').waitFor({state:'visible'});
  await shell.locator('[data-modal="player"] .close').click();
  if(!touch){await p.keyboard.press('f');await p.waitForFunction(()=>!!document.fullscreenElement);await p.keyboard.press('f');await p.waitForFunction(()=>!document.fullscreenElement);await p.keyboard.press('Tab');}
- assert.equal(plays,1,'one automatic play');report.cases.push(`${name}: themed shell, HUD clearance, Tip, Support, guestbook link, 4 total-score level tabs, player panel, single play`);await ctx.close();
+ assert.equal(plays,1,'one automatic play');report.cases.push(`${name}: themed shell, HUD clearance, Tip, Support, guestbook link, the one speedrun board, player panel, single play`);await ctx.close();
  }
  const ctx=await b.newContext({viewport:{width:1280,height:800}}),p=await ctx.newPage();
  await p.goto('https://mann.cool/?guestbook=1');await p.getByRole('dialog',{name:'Guestbook'}).waitFor();await p.waitForFunction(()=>!document.querySelector('.guestbook-entries')?.textContent.includes('Loading'));

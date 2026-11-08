@@ -38,6 +38,21 @@ normal progression and Load Game. The fixture is available only on loopback with
 
 Local verification reports are ignored under `output/playtest/canonical/` and `output/playtest/canonical-shell/`.
 
+## The speedrun and no lost prisoners released 2026-11-07
+
+- Central Worker `mann-cool` version `f67893c9-7c56-4090-9ffc-fd4f09481fab` from `redesign/platform-v1` (`7617e0b`, the merge of PR #8, whose tree equals `claude/pdoom-speedrun-board` `ff6e4a3`). It retires the four per-level rescue boards and registers the one board `campaign-speedrun-v1` (asc, `time-ms`, `server-rules-v2`, 20-minute review floor). The rollback point is `9eb1fb5f-c636-4d25-8907-d91686d7edc3` (2026-11-06).
+- Game `mann-cool-pdoom` version `64466121-9456-49c4-9399-363f54a37b0a` from `main` (`5afa024`):
+  - A freed person going down in levels 1–2, or the player going down with nobody to take over, restarts the level. Nobody can be lost.
+  - One whole-game speedrun clock in the save, a timer on screen in levels, SAFE MODE and the endgame, and one results card at the end with the splits. The levels have no score cards.
+  - The endgame page was rebuilt (`node scripts/build-endgame-protos.mjs`) before the deploy; the live `proto.js` matches the local build.
+- Before deploy (local): `node --test tests/*.test.mjs` 46/46 and `npm test` 20/20; mann-cool `npm run test:pdoom` 12/12 and `catalog:validate`; the speedrun end-to-end (`ranked-score-browser-smoke`) against `wrangler dev --local`; agentic-menu, factory-menu, the escape and refuge restart cases, endgame-hookup, checkpoint-browser 8/8 and simple-leaderboard at three sizes.
+- Live checks:
+  - `campaign-speedrun-v1` reads 200 (asc, empty); a retired board such as `five-prisons-rescue-v2` and an unknown variant give 400; a ticketless POST gives 401.
+  - The canonical host smoke passed, now reading the speedrun board.
+  - The canonical shell smoke passed with the one speedrun board on desktop, phone and tablet.
+  - A fresh HUMAN CONTAINMENT AREA run from the live episode menu starts the speedrun (not practice, timer on screen) and gets its `campaign` / `speedrun-v1` ticket (201).
+  - No score submissions, guestbook posts or email requests were made; one run ticket was issued.
+
 ## Level 4 ranked, Cybertrucks and the sky glitch released 2026-11-06
 
 - Central Worker `mann-cool` version `9eb1fb5f-c636-4d25-8907-d91686d7edc3` from `claude/pdoom-level-4-board` (`567c2db`), which is `redesign/platform-v1` (`2750688`) plus one commit (PR #7). It registers the Level 4 board `agentic-pods-rescue-v1` (map `agentic-pods-v1`, board v1, 9 cameras, 3-minute review floor). The rollback point is `8a461121-c211-4065-ba9f-3f7e642d2911` (2026-10-22). Never deploy the central Worker from mann-cool's stale `main`.
