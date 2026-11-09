@@ -22,4 +22,8 @@
 #bliss-guide p{margin:0;line-height:var(--doom-lead);overflow-wrap:anywhere}
 #bliss-guide .guide-speaker{color:#e4b97b;font-size:var(--doom-small);margin-bottom:8px}
 #bliss-guide .guide-line{font-size:var(--doom-text)}
-#bliss-guide .guide-skip{position:fixed;right:0;bottom:calc(100% + 12px);font:10px DoomSmall,monospace;color:#c7b78e;pointer-events:auto}
+#guide-skip{appearance:none;-webkit-appearance:none;box-shadow:none;outline:none;position:absolute;z-index:8;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));margin:0;padding:6px 0;background:none;border:0;font-family:DoomSmall,monospace;font-size:var(--doom-small);letter-spacing:.08em;color:#c7b78e;text-shadow:var(--px) var(--px) #000;cursor:pointer;pointer-events:auto}
+#guide-skip[hidden]{display:none}
+#guide-skip:hover,#guide-skip:focus-visible{color:#ead9b6}
+/* touch: a chip above the touch controls (two rows of them in portrait), big enough to tap */
+@media (pointer:coarse){#guide-skip{bottom:calc(max(16px,env(safe-area-inset-bottom)) + 128px);right:16px;padding:10px 12px;background:#251b13e6;border:2px solid #5a4630}}

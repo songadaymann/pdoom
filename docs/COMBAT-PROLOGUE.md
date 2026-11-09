@@ -251,6 +251,9 @@ changes saved/lost counts. Subtitles live in their own single text panel, pause
 with Esc and stop advancing when the player wanders out of conversation range.
 Space or the visible Skip Walk button finishes exposition without bypassing
 the portal interaction. The first entrance becomes usable after the talk.
+(2026-11-09: the Skip Walk button was in fact placed off the top of the window. It now shows at the bottom right
+from the start of the walk, `SPACE — SKIP WALK`, or `TAP — SKIP WALK` above the touch controls; Jonathan asked for a
+skip there.)
 
 The walk (`src/doom-bliss-guide.ts`): start (-45,-150) behind the dome, the
 founder at (-45,-120) on the slope above, route over the crest (reveal ~18 m

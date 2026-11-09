@@ -19,7 +19,7 @@ What happens:
   - Then he says `end-saved` (`end-saved-some` if anyone was lost), `end-boss`, `end-why`, and `end-discs` with the floppy flying into your hands (`YOU GOT A FLOPPY DISK! 1.44 MEGABYTES OF PAYBACK.`).
   - At `end-everyone` everyone in camp falls in behind you in single file.
   - At `end-go` a cyan frame opens in the meadow's south edge at (80, 180), where the hub's traces land.
-  - He leads you there and says `end-edge`. Space skips him, as it skips the wake-up walk.
+  - He leads you there and says `end-edge`. Space skips him, as it skips the wake-up walk. Since 2026-11-09 the `SPACE — SKIP` button shows at the bottom right the whole time (`TAP — SKIP` above the touch controls on a phone); before, it was placed off the top of the window, so nobody saw it.
   - Voiced since 2026-10-28 from the boss-fight batch (`python3 scripts/import-guide-voices.py --endgame art/endgame-2026-10-26` writes `guide-<mario|samwise>-end-<key>.mp3` and lists them in `guide-voices.json`). The floppy lands on "Take" in `end-discs` (its `handoff`, timed with Whisper).
 - **The handoff:** walking through the gate fades to black and opens `endgame-proto/play.html?m=finale`.
   - That page reads the save (`pdoom.campaign.v1`, same origin) for your hero and who's alive.

@@ -85,7 +85,10 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
  const ui=document.createElement('section');ui.id='bliss-guide';ui.hidden=true;ui.setAttribute('aria-label','Your guide');
  const speaker=document.createElement('p'),line=document.createElement('p'),skip=document.createElement('button');
  speaker.className='guide-speaker';line.className='guide-line';line.setAttribute('aria-live','polite');
- skip.type='button';skip.className='guide-skip';ui.append(speaker,line,skip);stage.append(ui);
+ // The skip (2026-11-09): its own button at the bottom right, there the whole time the walk can be skipped. It sat
+ // inside the subtitle box, placed off the top of the window, so nobody ever saw it. SPACE, or a click or tap.
+ skip.type='button';skip.id='guide-skip';skip.hidden=true;ui.append(speaker,line);stage.append(ui,skip);
+ const coarse=matchMedia('(pointer:coarse)').matches;
  // He is placed in 3D (HRTF): a shout from behind sounds behind. Far away he is quieter,
  // duller (air) and wetter (a light outdoor reverb off the hills); close, he is dry.
  const out=audio.createGain(),air=audio.createBiquadFilter(),panner=audio.createPanner(),wet=audio.createGain(),hills=audio.createConvolver();
@@ -166,7 +169,7 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
  }
  function updateUi(){
   speaker.textContent=guide.name;line.textContent=speaking&&clock<speaking.until?speaking.text:'';
-  ui.hidden=!active||!line.textContent;skip.hidden=ready;
+  ui.hidden=!active||!line.textContent;skip.hidden=!active||ready;
  }
  function finish(){
   // Skip lands both founders at the door, so the entrance still has to be found and used.
@@ -177,10 +180,10 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
   const end=routePoint(walked);sprite.position.set(end.x,groundY(end.x,end.z),end.z);
   onSkip?.();updateUi();
  }
- skip.onclick=finish;
+ skip.onclick=()=>{finish();skip.blur();};
  function start(ceo:string,walk:Scene=INTRO){
   who=ceo==='amodei'?'samwise':'mario';guide=LINES[who] as Guide;
-  walkScene=walk;ROUTE=walk.route;ROUTE_LENGTH=routeLength(ROUTE);CUES=walk.cues;skip.textContent=walk.skipLabel;
+  walkScene=walk;ROUTE=walk.route;ROUTE_LENGTH=routeLength(ROUTE);CUES=walk.cues;skip.textContent=coarse?walk.skipLabel.replace(/^SPACE — /,'TAP — '):walk.skipLabel;
   wrench.material.map=walk.item==='floppy'?floppyTexture:wrenchTexture;wrench.scale.set(walk.item==='floppy'?.3:.22,walk.item==='floppy'?.3:.33,1);
   // This walk's own lines (the endgame's are end-*, voiced 2026-10-28). Extra shouts (call2, call3) and the
   // endgame's lines are used only once they're recorded and listed in guide-voices.json.
@@ -189,7 +192,7 @@ export async function makeBlissGuide(scene:THREE.Scene,stage:HTMLElement,audio:A
   handoffAt=-1;handoffStart=-1;handedOver=false;wrench.visible=false;
   const [px,pz]=ROUTE[0];facing=Math.atan2(walk.faceFrom.x-px,walk.faceFrom.z-pz);sprite.visible=true;sprite.position.set(px,groundY(px,pz),pz);updateUi();
  }
- function stop(){active=false;sprite.visible=false;ui.hidden=true;silence();}
+ function stop(){active=false;sprite.visible=false;ui.hidden=true;skip.hidden=true;silence();}
  function tick(dt:number,pos:THREE.Vector3,paused:boolean,yaw:number){
   if(!active)return;
   pause(paused);
