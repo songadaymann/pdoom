@@ -10,7 +10,7 @@
 // Films, loading screens and menus never count. Restarts (someone lost, caught, F5) don't stop it: they're the cost.
 export const SPEEDRUN=Object.freeze({levelId:'campaign',levelVersion:'campaign-v1',scoreVersion:'speedrun-v1',boardVersion:'v1'});
 export const SPEEDRUN_BOARD=Object.freeze({variant:'campaign-speedrun-v1',label:'Speedrun',metric:'activeMs',metricLabel:'Time',
-  direction:'asc',display:'time-ms',aggregation:'best'});
+  direction:'asc',display:'time-ms',aggregation:'player-best'});
 // The splits, in the order the results card lists them. The levels can be played in any order after the first.
 export const SPLITS=Object.freeze(['five-prisons','hal-station','meg3n-factory','agentic-pods','safe-mode','endgame']);
 export const SPLIT_LABELS=Object.freeze({'five-prisons':'Level 1','hal-station':'Level 2','meg3n-factory':'Level 3','agentic-pods':'Level 4','safe-mode':'SAFE MODE','endgame':'Endgame'});

@@ -14,18 +14,23 @@
 import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {randomUUID} from 'node:crypto';
+import {randomUUID,randomBytes} from 'node:crypto';
 const base=process.env.DOOM_URL||'http://127.0.0.1:5198/',api=process.env.PDOOM_SCORE_API||'http://127.0.0.1:5202';
 if(!['127.0.0.1','localhost','[::1]'].includes(new URL(api).hostname))throw Error('Score fixtures require an isolated loopback API.');
 const out=process.env.DOOM_OUT||'output/ranked-validation/speedrun';await fs.mkdir(out,{recursive:true});
 const browser=await chromium.launch({channel:'chrome',args:['--mute-audio']}),report={cases:[],errors:[]};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const record=text=>{report.cases.push(text);console.log(text);};
-async function open(seed){
+// The shell's player (mannCool.player) stands in for the local game server's old shell copy: signed in or not, its
+// credential (a real browser secret, which the test signs in through the loopback Worker's email code flow).
+const PLAYER_SECRET=randomBytes(32).toString('base64url'),PLAYER_EMAIL=`speedrun-qa-${randomBytes(4).toString('hex')}@example.test`;
+async function open(seed,{player=false}={}){
  const context=await browser.newContext({viewport:{width:1280,height:800}}),p=await context.newPage();p.on('pageerror',e=>report.errors.push(String(e)));
  await p.route('**/leaderboard-config.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({mode:'public',enabled:true,endpoint:api+'/api/v1/leaderboard',runEndpoint:api+'/api/v1/pdoom/runs',shellSrc:'/platform/v1/game-shell.js'})}));
  await p.route('https://mann.cool/api/v1/**',r=>r.request().method()==='POST'?r.fulfill({contentType:'application/json',body:'{"success":true}'}):r.continue());
  await p.addInitScript(seed=>{if(sessionStorage.getItem('qa-seeded'))return;sessionStorage.setItem('qa-seeded','1');localStorage.removeItem('pdoom.campaign.v1');if(seed){localStorage.setItem('pdoom.campaign.v1',seed);localStorage.setItem('pdoom.opening-complete.v1','1');}},seed??null);
+ if(player)await p.addInitScript(secret=>{window.__qaPlayer={linked:false,emailHint:null,opened:0,secret};window.mannCool=window.mannCool||{};
+  window.mannCool.player={getId:async()=>'qa',get:async()=>({playerId:'qa',linked:window.__qaPlayer.linked,emailHint:window.__qaPlayer.emailHint}),openSave:()=>{window.__qaPlayer.opened++;},credential:async()=>window.__qaPlayer.secret};},PLAYER_SECRET);
  return {context,p};
 }
 const read=p=>p.evaluate(()=>JSON.parse(window.render_game_to_text()));
@@ -89,9 +94,22 @@ try{
  {const runId=randomUUID(),splits={'five-prisons':300000,'hal-station':320000,'meg3n-factory':400000,'agentic-pods':420000,'safe-mode':150000,endgame:240000};
   const masks={saved0:31,saved1:31,saved2:31,saved3:31,lost0:0,lost1:0,lost2:0,lost3:0,following0:0,following1:0,following2:0,following3:0};
   const seed=JSON.stringify({version:1,ceo:'altman',hub:true,...masks,ending3:0,endgame:2,speedrun:{runId,splits,restarts:3,practice:'',done:true,startedAt:Date.now()-3600e3}});
-  const {context,p}=await open(seed);active=p;
+  const {context,p}=await open(seed,{player:true});active=p;
+  const posted=[];p.on('request',r=>{if(r.method()==='POST'&&r.url().startsWith(api+'/api/v1/leaderboard'))posted.push(JSON.parse(r.postData()||'{}'));});
   await p.goto(`${base}?play=1&load=1`);
   let s=await wait(p,s=>s.scoreView?.open,'The results card opens by itself in the meadow',120000);
+  // not signed in: the card offers it; Sign in steps aside for the shell's panel, and comes back once you are
+  assert.match(s.scoreView.signin?.text??'',/Sign in with your email to count your time for the challenge/);assert.equal(s.scoreView.signin.button,true);
+  await p.click('#score-signin-button');await wait(p,s=>!s.scoreView.open,'the card steps aside',5000);
+  assert.equal(await p.evaluate(()=>window.__qaPlayer.opened),1,'the shell\'s email panel opened');
+  const call=async(path,body)=>{const r=await fetch(api+path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});return r.json();};
+  const started=await call('/api/v1/player/email/start',{secret:PLAYER_SECRET,email:PLAYER_EMAIL});
+  const verified=await call('/api/v1/player/email/verify',{secret:PLAYER_SECRET,email:PLAYER_EMAIL,code:started.devCode});
+  assert.equal(verified.linked,true,JSON.stringify(verified));report.playerId=verified.playerId;
+  await p.evaluate(hint=>{Object.assign(window.__qaPlayer,{linked:true,emailHint:hint});dispatchEvent(new CustomEvent('mann-cool:player',{detail:{linked:true,emailHint:hint}}));},verified.emailHint);
+  s=await wait(p,s=>s.scoreView.open&&/Signed in as/.test(s.scoreView.signin?.text??''),'back, signed in',5000);
+  assert.equal(s.scoreView.signin.button,false);
+  record(`Not signed in, the card offers it; Sign in opens the email panel and the card comes back signed in (${verified.emailHint})`);
   const total=Object.values(splits).reduce((a,b)=>a+b,0);
   assert.equal(s.scoreView.result.activeMs,total);assert.equal(s.scoreView.result.eligible,true);
   const card=await p.locator('#score-dialog').innerText();
@@ -111,6 +129,8 @@ try{
   await p.fill('#score-video-later','https://vimeo.com/42');await p.click('#save-video');
   await p.waitForFunction(()=>/Video link saved/.test(document.querySelector('#score-status')?.textContent||''),{},{timeout:10000});
   ranked=await p.evaluate(id=>JSON.parse(localStorage.getItem('pdoom.ranked-run.v1:'+id)),runId);assert.equal(ranked.videoUrl,'https://vimeo.com/42');
+  assert.equal(posted[0]?.playerSecret,PLAYER_SECRET,'the time went with the player\'s credential');
+  assert.ok(!JSON.stringify(ranked).includes(PLAYER_SECRET),'which is not kept with the run');
   report.runId=runId;await p.screenshot({path:`${out}/5b-video-changed.png`});
   record('The link changes from the card afterwards (a non-video site is refused by the server)');
   // a later visit: the card waits behind the Results button

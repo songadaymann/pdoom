@@ -15,6 +15,7 @@ export function createScoreView({config,block,openBoards,ceo=()=>null,onPendingC
     <dl class="score-stats"></dl><dl class="score-points"></dl><p class="score-total"></p>
     <form id="score-submit"><label for="score-name">Your name</label><div class="score-name-row"><input id="score-name" name="name" maxlength="32" required autocomplete="nickname"><button id="submit-score">Submit time</button></div>
       <div class="score-video"><label for="score-video">Video of your run (optional)</label><input id="score-video" name="video" type="url" maxlength="300" inputmode="url" autocomplete="off" placeholder="https://youtu.be/…"></div></form>
+    <p id="score-signin" hidden><span></span> <button type="button" id="score-signin-button">Sign in</button></p>
     <form id="score-video-form" hidden><label for="score-video-later">Video of your run</label><div class="score-name-row"><input id="score-video-later" type="url" maxlength="300" inputmode="url" autocomplete="off" placeholder="https://youtu.be/…"><button id="save-video">Save link</button></div></form>
     <p id="score-status" role="status"></p><div class="score-actions"><button type="button" id="view-boards">Leaderboard</button><button type="button" id="back-meadow">Look around</button></div></div>`;
   document.querySelector('#stage').append(dialog);
@@ -60,6 +61,19 @@ export function createScoreView({config,block,openBoards,ceo=()=>null,onPendingC
     catch(error){if(result?.runId===runId)el('#score-status').textContent=error.message;}
     finally{button.disabled=false;}
   });
+  // Signing in (the shell's email code) makes a time count for Jonathan's challenge, and can come later: the board
+  // checks it when it's read (2026-11-09). The card is a modal dialog, so it steps aside for the shell's panel and
+  // comes back once you're signed in.
+  const signin=el('#score-signin'),signinText=signin.querySelector('span'),signinButton=el('#score-signin-button');let backAfterSignIn=false;
+  async function syncSignIn(){
+    const player=window.mannCool?.player;
+    if(config.mode!=='public'||!player?.get||!result?.eligible){signin.hidden=true;return;}
+    try{const me=await player.get();signin.hidden=false;signinButton.hidden=me.linked;
+      signinText.textContent=me.linked?`Signed in as ${me.emailHint}: your time counts for the challenge.`:'Sign in with your email to count your time for the challenge.';}
+    catch{signin.hidden=true;}
+  }
+  signinButton.addEventListener('click',()=>{const player=window.mannCool?.player;if(!player?.openSave)return;backAfterSignIn=true;close();player.openSave();});
+  addEventListener('mann-cool:player',event=>{void syncSignIn();if(backAfterSignIn&&event.detail?.linked){backAfterSignIn=false;open();}});
   function row(list,label,value){const term=document.createElement('dt'),detail=document.createElement('dd');term.textContent=label;detail.textContent=value;list.append(term,detail);}
   return {
     // The run's ticket, asked for when the run starts (and again at each level, until one arrives), so the
@@ -71,7 +85,8 @@ export function createScoreView({config,block,openBoards,ceo=()=>null,onPendingC
     show(value,{automatic=true,saved}={}){
       result=value;const pendingRun=saved||ranked.save(result,ceo());onPendingChange();
       submission=new LeaderboardSubmission(result,{endpoint:config.endpoint,playerId:stablePlayer(storage),ceo:pendingRun?.ceo??result.ceo??ceo(),state:pendingRun,
-        ticket:()=>ranked.ticket(value),onProgress:state=>ranked.progress(value.runId,state)});
+        ticket:()=>ranked.ticket(value),onProgress:state=>ranked.progress(value.runId,state),
+        credential:()=>config.mode==='public'?window.mannCool?.player?.credential?.():null});
       // On mann.cool, submit as the shell's player (it can be saved to an email and follow you to other
       // browsers); the local random ID stays the fallback.
       const current=submission;window.mannCool?.player?.getId?.().then(id=>{if(id&&!current.bodies)current.playerId=id;}).catch(()=>{});
@@ -85,7 +100,7 @@ export function createScoreView({config,block,openBoards,ceo=()=>null,onPendingC
       const label=document.createElement('span');label.className='score-total-label';label.textContent='TIME ';el('.score-total').replaceChildren(label,formatRunTime(result.activeMs));
       const already=ranked.submitted(result.runId),enabled=result.eligible&&config.enabled&&!already;
       el('#score-submit').hidden=!enabled;el('#score-name').disabled=!!submission.bodies;if(submission.bodies)el('#score-name').value=submission.bodies[0].name;el('#submit-score').disabled=false;el('#submit-score').textContent='Submit time';
-      el('.score-video').hidden=!ranked.enabled||already;el('#score-video').disabled=!!submission.bodies;el('#score-video').value=submission.bodies?.[0]?.videoUrl||'';showVideoForm(result.runId);
+      void syncSignIn();el('.score-video').hidden=!ranked.enabled||already;el('#score-video').disabled=!!submission.bodies;el('#score-video').value=submission.bodies?.[0]?.videoUrl||'';showVideoForm(result.runId);
       el('#score-status').textContent=result.practiceReason?`Practice run — ${result.practiceReason}`:already?'This run is already submitted.'
         :!config.enabled?'The leaderboard is not connected yet.':config.mode==='local'?'Times here stay on this computer.':'Submit your time.';
       reopen.hidden=false;
@@ -94,6 +109,7 @@ export function createScoreView({config,block,openBoards,ceo=()=>null,onPendingC
     reset(){if(showing)close();result=null;submission=null;reopen.hidden=true;reopen.classList.remove('score-unread');},
     getState(){return {open:showing,available:!!result,unread:reopen.classList.contains('score-unread'),accepted:submission?[...submission.accepted]:[],scope:config.mode,
       result:result?{activeMs:result.activeMs,eligible:result.eligible,practiceReason:result.practiceReason}:null,
-      video:result?{field:!el('.score-video').hidden&&!el('#score-submit').hidden,later:!el('#score-video-form').hidden,link:ranked.video(result.runId)}:null};}
+      video:result?{field:!el('.score-video').hidden&&!el('#score-submit').hidden,later:!el('#score-video-form').hidden,link:ranked.video(result.runId)}:null,
+      signin:signin.hidden?null:{text:signinText.textContent,button:!signinButton.hidden}};}
   };
 }

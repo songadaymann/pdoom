@@ -25,7 +25,7 @@ test('a level result belongs to its level and keeps what the meadow reads, with 
 });
 
 test('one speedrun board: the whole game, fastest first, in milliseconds',()=>{
-  assert.deepEqual({...SPEEDRUN_BOARD},{variant:'campaign-speedrun-v1',label:'Speedrun',metric:'activeMs',metricLabel:'Time',direction:'asc',display:'time-ms',aggregation:'best'});
+  assert.deepEqual({...SPEEDRUN_BOARD},{variant:'campaign-speedrun-v1',label:'Speedrun',metric:'activeMs',metricLabel:'Time',direction:'asc',display:'time-ms',aggregation:'player-best'});
   assert.deepEqual({...SPEEDRUN},{levelId:'campaign',levelVersion:'campaign-v1',scoreVersion:'speedrun-v1',boardVersion:'v1'});
   assert.deepEqual(SPLITS.slice(0,4),LEVELS.filter(l=>l.scored).map(l=>l.id),'one split per campaign level');
   assert.equal(formatRunTime(0),'0:00.00');assert.equal(formatRunTime(61_234),'1:01.23');assert.equal(formatRunTime(3_723_450),'1:02:03.45');

@@ -12,7 +12,7 @@ const game = createStaticGameWorker({
       "metric": "activeMs",
       "direction": "asc",
       "display": "time-ms",
-      "aggregation": "best",
+      "aggregation": "player-best",
       "minimumMatches": 1
     }
   ],

@@ -87,6 +87,15 @@ from the browser that played the run (`POST /api/v1/pdoom/runs/video`, proven by
 token; `ranked-runs.js attachVideo`). The board shows a ▶ by the name, and the moderation list shows each held run's
 link. The link isn't part of the time.
 
+**One row per player; signing in for the challenge (2026-11-09).** The board (`aggregation: 'player-best'`) shows each
+player once, with their best approved time. The results card sends the browser's mann.cool player secret with the time
+(`mannCool.player.credential()`), so the server knows the player without trusting a claimed ID. Signing in is optional.
+Jonathan: "if they want to have their run count for the contest, they have to sign in, but if they just want to put
+their run there, they don't have to". The card says whether you're signed in. Its Sign in button opens the shell's
+email panel, and the card comes back once you're in. A signed-in player's row has a ✓, and signing in later counts the
+runs that browser already posted. The top-ten hold counts players, not runs. The moderation list shows each run's
+player, the email hint and how many other players posted from the same IP.
+
 Held runs are stored as `pending` and stay off the board until approved. Retries keep that status, and the card
 says the run is held. Moderation is `npm run leaderboard:moderate` in the mann.cool repo. It needs
 `CLOUDFLARE_ACCOUNT_ID` set to the Novox account.

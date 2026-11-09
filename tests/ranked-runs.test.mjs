@@ -99,3 +99,12 @@ test('a run carries an optional video link, and the browser that played it can a
   await ranked.attachVideo('run-video','');assert.equal(ranked.video('run-video'),'','cleared');
   const none=new LeaderboardSubmission(result('run-plain'),{fetcher});assert.equal('videoUrl' in (await none.submit('P'),none.bodies[0]),false,'no link: no field');
 });
+test('the player credential goes with the time, but is never kept with the saved submission (2026-11-09)',async()=>{
+  const sent=[],kept=[],secret='s'.repeat(43);
+  const fetcher=async(url,request)=>{sent.push(JSON.parse(request.body));return {ok:true,json:async()=>({success:true,rank:1})};};
+  const signedIn=new LeaderboardSubmission(result('run-credential'),{fetcher,playerId:'p',credential:async()=>secret,onProgress:state=>kept.push(JSON.stringify(state))});
+  await signedIn.submit('Speedy');
+  assert.equal(sent[0].playerSecret,secret);assert.ok(kept.every(state=>!state.includes(secret)),'not in the saved bodies');assert.equal(signedIn.bodies[0].playerSecret,undefined);
+  const anonymous=new LeaderboardSubmission(result('run-no-shell'),{fetcher,credential:async()=>{throw Error('no shell');}});
+  await anonymous.submit('P');assert.equal('playerSecret' in sent[1],false,'no shell: anonymous');
+});
