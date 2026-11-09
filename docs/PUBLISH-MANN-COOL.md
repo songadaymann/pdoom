@@ -38,6 +38,22 @@ normal progression and Load Game. The fixture is available only on loopback with
 
 Local verification reports are ignored under `output/playtest/canonical/` and `output/playtest/canonical-shell/`.
 
+## Wallet sign-in (Ethereum) released 2026-11-09
+
+- Production D1: migration `0012_player_wallets.sql` (`player_wallets`, `player_wallet_challenges`) applied with `wrangler d1 migrations apply mann-cool-platform --remote`. It was the only pending migration.
+- Central Worker `mann-cool` version `83546af7-d2f9-490a-9915-0a84d726b6da` from `redesign/platform-v1` (`4c5baf0`, the merge of PR #11, whose tree equals `claude/player-wallet-signin` `d57a26f`). The rollback point is `6d1674dd-ef94-4484-bfd3-b8636b904b46`.
+  - The Save your scores panel lists the browser's Ethereum wallets.
+  - `/api/v1/player/wallet/start` writes the Sign-In with Ethereum message; `/api/v1/player/wallet/verify` checks it and links the address like an email.
+  - The shell is `?v=20261109-wallet-signin1`.
+- Game `mann-cool-pdoom` version `a420261d-3183-4df3-a2cd-bd76d2d18dc7` from `main` (`0082f93`): the card says "email or a wallet".
+- Before deploy (local): mann-cool tests 29/29, `catalog:validate`, a `wrangler deploy --dry-run` bundle (gzip 155 KiB), and the panel with a test wallet against `wrangler dev --local` (a cancel, then a sign-in that linked). The game's unit tests and speedrun end-to-end passed.
+- Live checks:
+  - The session route reads the new table; `wallet/start` refuses a bad address (400) and another site (403); the old shell URL redirects to the new one.
+  - On the live page a test wallet's button appeared ("Sign in with QA Wallet"). The live server wrote the message ("mann.cool wants you to sign in with your Ethereum account"). The test wallet then refused to sign, so nothing was linked; one unused challenge row was written.
+  - The canonical host smoke passed.
+  - The canonical shell smoke passed on desktop, phone and tablet with its fullscreen step skipped. This machine's Chrome refused fullscreen even on a blank page at the time (`not granted`), so that step couldn't run.
+- Not yet: Solana wallets (Jonathan, 2026-11-09: "we need solana wallets"), WalletConnect, and a real smart-contract wallet test.
+
 ## One row per player and challenge sign-in released 2026-11-09
 
 - Central Worker `mann-cool` version `6d1674dd-ef94-4484-bfd3-b8636b904b46` from `redesign/platform-v1` (`72ae826`, the merge of PR #10, whose tree equals `claude/pdoom-one-per-player` `7631da3`). The rollback point is `516b3eab-69da-4967-99ed-f997baac88d6`.
