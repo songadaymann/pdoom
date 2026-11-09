@@ -38,6 +38,23 @@ normal progression and Load Game. The fixture is available only on loopback with
 
 Local verification reports are ignored under `output/playtest/canonical/` and `output/playtest/canonical-shell/`.
 
+## One row per player and challenge sign-in released 2026-11-09
+
+- Central Worker `mann-cool` version `6d1674dd-ef94-4484-bfd3-b8636b904b46` from `redesign/platform-v1` (`72ae826`, the merge of PR #10, whose tree equals `claude/pdoom-one-per-player` `7631da3`). The rollback point is `516b3eab-69da-4967-99ed-f997baac88d6`.
+  - The board is `player-best`: one row per player, their best.
+  - The player comes from the browser's secret, never a claimed ID. A signed-in (email) player's row is `signedIn`, checked when the board is read.
+  - The top-ten hold counts players.
+  - The moderation list shows player_id, signed_in and same_ip_players.
+  - The shell (`?v=20261109-player-best1`) marks ✓ with a key and has `mannCool.player.credential()`.
+- Game `mann-cool-pdoom` version `69341c96-b3c4-432f-b603-b5a6c6ad6ccc` from `main` (`63e5bca`): the card sends the credential and offers signing in for the challenge.
+- Before deploy (local): mann-cool tests 26/26 and `catalog:validate`; game unit tests 49/49; the speedrun end-to-end against `wrangler dev --local --var PLAYER_EMAIL_DEV:1`, with a real email-code sign-in and the run stored under the signed-in player.
+- Live checks:
+  - The board reads `player-best`; an old shell URL redirects to the new version, which has `credential()`.
+  - The live game files match the build.
+  - The canonical host and shell smokes passed.
+  - A throwaway browser with a seeded finished run opened the live card, showing the sign-in line, the video field and a credential from the real shell. Nothing was posted.
+  - One approved run was already on the live board.
+
 ## Top-ten review and run videos released 2026-11-09
 
 - Central Worker `mann-cool` version `516b3eab-69da-4967-99ed-f997baac88d6` from `redesign/platform-v1` (`b99d5ee`, the merge of PR #9, whose tree equals `claude/pdoom-video-links` `5f8f97e`). The rollback point is `f67893c9-7c56-4090-9ffc-fd4f09481fab`.
