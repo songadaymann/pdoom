@@ -38,6 +38,20 @@ normal progression and Load Game. The fixture is available only on loopback with
 
 Local verification reports are ignored under `output/playtest/canonical/` and `output/playtest/canonical-shell/`.
 
+## Top-ten review and run videos released 2026-11-09
+
+- Central Worker `mann-cool` version `516b3eab-69da-4967-99ed-f997baac88d6` from `redesign/platform-v1` (`b99d5ee`, the merge of PR #9, whose tree equals `claude/pdoom-video-links` `5f8f97e`). The rollback point is `f67893c9-7c56-4090-9ffc-fd4f09481fab`.
+  - Every time that would make the top ten of the approved board is held for review (`PDOOM_REVIEW_TOP`, default 10).
+  - A run can carry a `videoUrl` (https, known video sites). `POST /api/v1/pdoom/runs/video` adds, changes or clears it later with the run's ticket.
+  - The shared shell (now `?v=20261109-run-videos1`) shows a ▶ link and times over an hour as h:mm:ss.cc. The moderation list shows `video`.
+- Game `mann-cool-pdoom` version `6993a1e6-b467-456f-b0b9-466c1a3ba523` from `main` (`487ebd1`): the results card's video field and the add-later form.
+- Before deploy (local): mann-cool `node --test tests/*.test.mjs` 24/24 and `catalog:validate`; the game's unit tests 48/48; the speedrun end-to-end against `wrangler dev --local` (a link sent with the time and held as top ten, a bad link refused, the link changed); the board rendered with a video row and an hour-long row.
+- Live checks:
+  - The board reads 200; the video route answers a ticketless request with 401; an old shell URL redirects to the new version.
+  - The live `score-view.js`, `ranked-runs.js`, `leaderboard-client.js` and `score.css` match the build.
+  - The canonical host and shell smokes passed.
+  - A throwaway browser with a seeded finished run opened the live results card with the video field and the new shell. Nothing was submitted.
+
 ## Persistent levels released 2026-11-09
 
 - Game `mann-cool-pdoom` version `3a8c5915-f998-493e-82db-cb9fc529a7e7` from `main` (`9b30785`). No central Worker change.
