@@ -38,6 +38,17 @@ normal progression and Load Game. The fixture is available only on loopback with
 
 Local verification reports are ignored under `output/playtest/canonical/` and `output/playtest/canonical-shell/`.
 
+## Persistent levels released 2026-11-09
+
+- Game `mann-cool-pdoom` version `3a8c5915-f998-493e-82db-cb9fc529a7e7` from `main` (`9b30785`). No central Worker change.
+  - Going back into a level keeps what you broke: the campaign save's `broken0`-`broken3` (`doom-web/campaign.js` BROKEN), written at the exit and put back quietly on a walk-in (`CampaignSession.zs RestoreBroken`, `Factory.zs` and `Agentic.zs ApplyHubEntry`).
+  - The live `pdoom.pk3` (four entries patched locally: CVARINFO, CampaignSession.zs, Factory.zs, Agentic.zs) and `campaign.js` match the build.
+- Before deploy (local): unit tests 47/47; persistent-levels-smoke (all four levels); checkpoint 9/9, level-exit, campaign-roundtrip, hal-exit, escape 7/7, factory hub/exit, agentic-menu.
+- Live checks:
+  - The canonical host and shell smokes passed.
+  - A throwaway browser with a seeded save walked into CONTROL.EXE (cameras 0, 4 and 8 broken, the turret off, no break events) and HAL3000.SYS (cameras 1 and 7, four modules out, HAL pacified) on mann.cool.
+  - Nothing was submitted.
+
 ## The meadow walks' skip button released 2026-11-09
 
 - Game `mann-cool-pdoom` version `b49d8c4d-5a21-4b83-aa8d-5d657f138eef` from `main` (`5b783c7`). No central Worker change.
