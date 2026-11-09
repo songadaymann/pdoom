@@ -99,7 +99,7 @@ try{
   await p.goto(`${base}?play=1&load=1`);
   let s=await wait(p,s=>s.scoreView?.open,'The results card opens by itself in the meadow',120000);
   // not signed in: the card offers it; Sign in steps aside for the shell's panel, and comes back once you are
-  assert.match(s.scoreView.signin?.text??'',/Sign in with your email to count your time for the challenge/);assert.equal(s.scoreView.signin.button,true);
+  assert.match(s.scoreView.signin?.text??'',/Sign in with your email or a wallet to count your time for the challenge/);assert.equal(s.scoreView.signin.button,true);
   await p.click('#score-signin-button');await wait(p,s=>!s.scoreView.open,'the card steps aside',5000);
   assert.equal(await p.evaluate(()=>window.__qaPlayer.opened),1,'the shell\'s email panel opened');
   const call=async(path,body)=>{const r=await fetch(api+path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});return r.json();};

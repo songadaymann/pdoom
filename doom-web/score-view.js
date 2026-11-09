@@ -61,7 +61,7 @@ export function createScoreView({config,block,openBoards,ceo=()=>null,onPendingC
     catch(error){if(result?.runId===runId)el('#score-status').textContent=error.message;}
     finally{button.disabled=false;}
   });
-  // Signing in (the shell's email code) makes a time count for Jonathan's challenge, and can come later: the board
+  // Signing in (the shell's email code, or a wallet since 2026-11-09) makes a time count for Jonathan's challenge, and can come later: the board
   // checks it when it's read (2026-11-09). The card is a modal dialog, so it steps aside for the shell's panel and
   // comes back once you're signed in.
   const signin=el('#score-signin'),signinText=signin.querySelector('span'),signinButton=el('#score-signin-button');let backAfterSignIn=false;
@@ -69,7 +69,7 @@ export function createScoreView({config,block,openBoards,ceo=()=>null,onPendingC
     const player=window.mannCool?.player;
     if(config.mode!=='public'||!player?.get||!result?.eligible){signin.hidden=true;return;}
     try{const me=await player.get();signin.hidden=false;signinButton.hidden=me.linked;
-      signinText.textContent=me.linked?`Signed in as ${me.emailHint}: your time counts for the challenge.`:'Sign in with your email to count your time for the challenge.';}
+      signinText.textContent=me.linked?`Signed in as ${me.emailHint||me.walletHint}: your time counts for the challenge.`:'Sign in with your email or a wallet to count your time for the challenge.';}
     catch{signin.hidden=true;}
   }
   signinButton.addEventListener('click',()=>{const player=window.mannCool?.player;if(!player?.openSave)return;backAfterSignIn=true;close();player.openSave();});
