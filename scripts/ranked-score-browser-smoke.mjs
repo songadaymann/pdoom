@@ -7,8 +7,9 @@
 //     practice (2026-11-09). SPACE skips the end to black (and marks the endgame done); back in the meadow the card
 //     opens by itself as a practice run, with no way to submit it.
 //  3. A seeded finished run, loaded into the meadow: the results card opens by itself with the time and the splits,
-//     and the time submits to the one board (held for review: a seeded run is faster than its fresh ticket's age).
-//     After that it doesn't open by itself again.
+//     and the time submits to the one board with a link to its recording, held for review (every top-ten time is,
+//     since 2026-11-09). The link can then be changed from the card (POST /api/v1/pdoom/runs/video). After that the
+//     card doesn't open by itself again, and Results shows the link.
 // node scripts/ranked-score-browser-smoke.mjs   (DOOM_URL, PDOOM_SCORE_API)
 import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
@@ -96,18 +97,29 @@ try{
   const card=await p.locator('#score-dialog').innerText();
   for(const label of ['Level 1','Level 2','Level 3','Level 4','SAFE MODE','Endgame','Restarts','20/20 people home'])assert.ok(card.includes(label),`The card lists ${label}`);
   assert.match(card,/TIME \d+:\d\d\.\d\d/);await p.screenshot({path:`${out}/4-results.png`});
-  await p.fill('#score-name','Speedrun QA');await p.click('#submit-score');
-  await p.waitForFunction(()=>/held for review|Saved to the leaderboard/.test(document.querySelector('#score-status')?.textContent||''),{},{timeout:20000});
-  const status=await p.locator('#score-status').innerText();assert.match(status,/held for review/,'A seeded run is faster than its fresh ticket: held, not rejected');
-  const ranked=await p.evaluate(id=>JSON.parse(localStorage.getItem('pdoom.ranked-run.v1:'+id)),runId);assert.equal(ranked.submitted,true);assert.equal(ranked.pending,undefined);
+  assert.equal(await p.locator('#score-video').isVisible(),true,'the video field is on the card');
+  await p.fill('#score-name','Speedrun QA');await p.fill('#score-video','https://youtu.be/speedrun-qa');await p.click('#submit-score');
+  await p.waitForFunction(()=>/checked before|held for review|Saved to the leaderboard/.test(document.querySelector('#score-status')?.textContent||''),{},{timeout:20000});
+  const status=await p.locator('#score-status').innerText();assert.match(status,/Top-ten times are checked before they appear/i,'Every top-ten time is held for review');
+  let ranked=await p.evaluate(id=>JSON.parse(localStorage.getItem('pdoom.ranked-run.v1:'+id)),runId);assert.equal(ranked.submitted,true);assert.equal(ranked.pending,undefined);assert.equal(ranked.videoUrl,'https://youtu.be/speedrun-qa');
   await p.screenshot({path:`${out}/5-submitted.png`});
-  record(`A finished run: the meadow's results card lists the six splits and ${total} ms, and the time submits to campaign-speedrun-v1 (held for review)`);
+  record(`A finished run: the meadow's results card lists the six splits and ${total} ms, and the time submits to campaign-speedrun-v1 with its video link, held because it's top ten`);
+  // change the link afterwards
+  assert.equal(await p.locator('#score-video-form').isVisible(),true,'the card offers the link afterwards');assert.equal(await p.inputValue('#score-video-later'),'https://youtu.be/speedrun-qa');
+  await p.fill('#score-video-later','https://evil.example/x');await p.click('#save-video');
+  await p.waitForFunction(()=>/video site|https link/i.test(document.querySelector('#score-status')?.textContent||''),{},{timeout:10000});
+  await p.fill('#score-video-later','https://vimeo.com/42');await p.click('#save-video');
+  await p.waitForFunction(()=>/Video link saved/.test(document.querySelector('#score-status')?.textContent||''),{},{timeout:10000});
+  ranked=await p.evaluate(id=>JSON.parse(localStorage.getItem('pdoom.ranked-run.v1:'+id)),runId);assert.equal(ranked.videoUrl,'https://vimeo.com/42');
+  report.runId=runId;await p.screenshot({path:`${out}/5b-video-changed.png`});
+  record('The link changes from the card afterwards (a non-video site is refused by the server)');
   // a later visit: the card waits behind the Results button
   await p.goto(`${base}?play=1&load=1`);
   s=await wait(p,s=>s.outside?.active&&s.scoreView?.available,'The meadow again',120000);
   assert.equal(s.scoreView.open,false,'A submitted run does not open the card again');assert.equal(s.scoreView.unread,true);
   await p.click('#show-score');assert.match(await p.locator('#score-status').innerText(),/already submitted/);assert.equal(await p.locator('#score-submit').isHidden(),true);
-  record('After the submission the card no longer opens by itself; Results shows it, already submitted');
+  assert.equal(await p.inputValue('#score-video-later'),'https://vimeo.com/42','Results still offers the link');
+  record('After the submission the card no longer opens by itself; Results shows it, already submitted, with its link to change');
   await context.close();}
  assert.deepEqual(report.errors,[]);report.passed=true;
 }catch(error){report.failure=String(error.stack||error);await active?.screenshot({path:`${out}/failure.png`}).catch(()=>{});report.state=await active?.evaluate(()=>window.render_game_to_text?.()).catch(()=>null);}

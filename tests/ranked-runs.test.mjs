@@ -78,3 +78,24 @@ test('a run the server holds for review completes without retrying and reports t
   const outcome=await submission.submit('Fast player');assert.equal(outcome.complete,true);assert.deepEqual(outcome.held,['campaign-speedrun-v1']);
   assert.deepEqual(await submission.submit('Fast player'),{accepted:['campaign-speedrun-v1'],held:['campaign-speedrun-v1'],complete:true});assert.equal(sent.length,1);
 });
+test('a run carries an optional video link, and the browser that played it can add or change one later (2026-11-09)',async()=>{
+  const saved=storage(),calls=[];
+  const fetcher=async(url,request)=>{const body=JSON.parse(request.body);calls.push({url,body});
+    if(url==='/runs')return receipt(body);
+    if(url==='/runs/video')return {ok:true,json:async()=>({success:true,videoUrl:body.videoUrl||null,held:true})};
+    return {ok:true,json:async()=>({success:true,held:true,entry:{metadata:{review:['top-ten']}}})};};
+  const ranked=new RankedRuns({endpoint:'/runs',storage:saved,makeNonce:()=>'b'.repeat(64),fetcher});
+  const run=result('run-video');ranked.save(run,'altman');
+  await assert.rejects(ranked.attachVideo('run-video','https://youtu.be/x'),/submitted run/,'not before the time is in');
+  const submission=new LeaderboardSubmission(run,{endpoint:'/board',fetcher,playerId:'p',ticket:()=>ranked.ticket(run)});
+  assert.throws(()=>new LeaderboardSubmission(run,{fetcher}).submit('P',{videoUrl:'ftp://nope'}),/https link/);
+  const outcome=await submission.submit('Speedy',{videoUrl:' https://youtu.be/abc '});
+  assert.deepEqual(outcome.held,['campaign-speedrun-v1']);assert.deepEqual(outcome.review,['top-ten']);
+  const sent=calls.find(c=>c.url==='/board').body;assert.equal(sent.videoUrl,'https://youtu.be/abc');assert.equal('videoUrl' in sent.metadata,false,'not part of the time');
+  ranked.complete('run-video',{videoUrl:sent.videoUrl});assert.equal(ranked.video('run-video'),'https://youtu.be/abc');
+  const later=await ranked.attachVideo('run-video','https://vimeo.com/7');
+  const call=calls.at(-1);assert.equal(call.url,'/runs/video');assert.deepEqual(call.body,{runTicket:{id:'12345678-1234-1234-1234-123456789abc',token:'b'.repeat(64)},videoUrl:'https://vimeo.com/7'});
+  assert.equal(later.held,true);assert.equal(new RankedRuns({endpoint:'/runs',storage:saved}).video('run-video'),'https://vimeo.com/7','kept after a reload');
+  await ranked.attachVideo('run-video','');assert.equal(ranked.video('run-video'),'','cleared');
+  const none=new LeaderboardSubmission(result('run-plain'),{fetcher});assert.equal('videoUrl' in (await none.submit('P'),none.bodies[0]),false,'no link: no field');
+});

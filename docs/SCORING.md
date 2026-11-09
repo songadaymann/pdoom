@@ -39,8 +39,8 @@ time is the only thing to rank.
   from a SAFE MODE walk-in, which is a normal part of a run.
 
 The board is `campaign-speedrun-v1` (label Speedrun, metric `activeMs`, direction `asc`, display `time-ms`):
-fastest first. Every submitted run is its own row. The shared shell shows times as minutes:seconds.hundredths,
-with no hours (a 75-minute run reads 75:00.00).
+fastest first. Every submitted run is its own row. The shared shell shows times as minutes:seconds.hundredths, and
+from an hour as h:mm:ss.cc (since 2026-11-09; a 75-minute run reads 1:15:00.00).
 
 ## In the game
 
@@ -72,10 +72,20 @@ splits (every level and the endgame above 0), and `activeMs` equal to their sum.
 result, player and name. Retries reuse the same submission ID (`<runId>:campaign-speedrun-v1`) and can't change a
 stored time. The hero (`ceo`, `altman` or `amodei`) is optional metadata; it's left out, never sent as null.
 
-Two checks hold a run for review instead of rejecting it:
+Three checks hold a run for review instead of rejecting it:
 - **Below 20 minutes.** This is an estimate, to tighten once real runs exist.
 - **Faster than real time:** more active time than has passed since its ticket was issued. A ticket fetched late,
   for example offline at the start, can hold a genuine run.
+- **Top ten (2026-11-09):** any time that would make the top ten of the approved board. Jonathan's challenge is judged
+  on screen recordings, so whatever reaches the top has been checked by a person. `PDOOM_REVIEW_TOP` in the Worker's
+  vars changes the ten.
+
+**Videos (2026-11-09).** The results card takes an optional link to the run's recording (`videoUrl`: https, on a
+known video site such as YouTube, Twitch, Vimeo, Google Drive or Dropbox). Once the time is in, the card keeps a
+"Video of your run" field: Results, or Saved Results in the main menu, can add, change or clear the link later
+from the browser that played the run (`POST /api/v1/pdoom/runs/video`, proven by the run's ticket and its private
+token; `ranked-runs.js attachVideo`). The board shows a ▶ by the name, and the moderation list shows each held run's
+link. The link isn't part of the time.
 
 Held runs are stored as `pending` and stay off the board until approved. Retries keep that status, and the card
 says the run is held. Moderation is `npm run leaderboard:moderate` in the mann.cool repo. It needs

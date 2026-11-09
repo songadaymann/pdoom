@@ -59,6 +59,21 @@ export class RankedRuns{
   }
   submitted(runId){return !!this.records.get(runId)?.submitted;}
   progress(runId,state){const record=this.records.get(runId);if(record?.pending){Object.assign(record.pending,state);this.persist(record);}}
-  complete(runId){const record=this.records.get(runId);if(record){delete record.pending;record.submitted=true;this.persist(record);}}
+  complete(runId,{videoUrl}={}){const record=this.records.get(runId);if(record){delete record.pending;record.submitted=true;if(videoUrl)record.videoUrl=videoUrl;this.persist(record);}}
+  video(runId){return this.records.get(runId)?.videoUrl||'';}
+  // A recording added (or changed, or cleared with '') after the time went in (2026-11-09). Only this browser can:
+  // the run's ticket and its private nonce prove the run is yours (POST <run endpoint>/video).
+  async attachVideo(runId,videoUrl){
+    const record=this.records.get(runId);
+    if(!this.endpoint||!record?.submitted||!record.ticketId)throw Error('Only a submitted run from this browser can take a video link.');
+    let response;
+    try{response=await this.fetcher(this.endpoint+'/video',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({runTicket:{id:record.ticketId,token:record.nonce},videoUrl}),signal:AbortSignal.timeout(10000)});}
+    catch{throw Error('The leaderboard did not answer. Try again.');}
+    let data;try{data=await response.json();}catch{data={};}
+    if(!response.ok||data.success!==true)throw Error(data.error||'The video link could not be saved.');
+    if(data.videoUrl)record.videoUrl=data.videoUrl;else delete record.videoUrl;this.persist(record);
+    return data;
+  }
   pending(){this.load();return [...this.records.values()].filter(r=>r.pending).sort((a,b)=>b.createdAt-a.createdAt).map(r=>r.pending);}
 }
