@@ -16,10 +16,10 @@
     },
     {
       "file": "endgame-proto/proto.js",
-      "bytes": 912342,
-      "sha256": "3d399a56ccadf54bc8245b5d91adb0020c0533704e0a527d912526fd63faf9c1",
-      "gzip": 228562,
-      "brotli": 212934
+      "bytes": 914580,
+      "sha256": "7a84275ada04d6988fe1c34a6e05b8c0810403c893dc73e213aaae6eea0f29b5",
+      "gzip": 229332,
+      "brotli": 213561
     },
     {
       "file": "engine/brightmaps.pk3",

@@ -38,6 +38,21 @@ normal progression and Load Game. The fixture is available only on loopback with
 
 Local verification reports are ignored under `output/playtest/canonical/` and `output/playtest/canonical-shell/`.
 
+## Skipping the exposition released 2026-11-09
+
+- Game `mann-cool-pdoom` version `ef8a878f-27ce-41a9-ac70-4575a4eb56df` from `main` (`e8a45eb`). No central Worker change (it stays `f67893c9`).
+  - No exit text screen after any level: every exit melts straight into SAFE MODE (`doom-web/exit-text.js` is gone; it now 404s).
+  - SPACE, ENTER or E closes a freed prisoner's card.
+  - In the endgame SPACE skips his opening and the end after the MCP falls, and cuts the line playing on the walk in.
+  - The endgame's test shortcuts (1, 2, 3, N, `?part=`, `?autosteer`, a tuned trick shot) now make a real speedrun practice. On the live site before this, they could jump a real run to the last throw.
+  - The endgame page was rebuilt (`node scripts/build-endgame-protos.mjs`) before the deploy.
+- Before deploy (local): `node --test tests/*.test.mjs` 46/46; endgame-skip (new), level-exit (renamed from level-exit-text), the speedrun end-to-end against `wrangler dev --local`, factory exit/hub/menu, agentic-menu, endgame-hookup, checkpoint 9/9 (new `discovery-card-skips`) and escape 7/7.
+- Live checks:
+  - The live `main.js`, `story-beats.js`, `level-polish.css` and `endgame-proto/proto.js` match the staged build. For about 10 s after the deploy the edge still served the old files.
+  - The canonical host smoke passed, and the canonical shell smoke passed on desktop, phone and tablet.
+  - `endgame-skip-smoke` passed against `https://mann.cool/pdoom/` (`PDOOM_ORIGIN`): the walk line, the opening, the end, and a test key marking a real run practice (in a throwaway browser).
+  - No score submissions, guestbook posts or email requests were made.
+
 ## The speedrun and no lost prisoners released 2026-11-07
 
 - Central Worker `mann-cool` version `f67893c9-7c56-4090-9ffc-fd4f09481fab` from `redesign/platform-v1` (`7617e0b`, the merge of PR #8, whose tree equals `claude/pdoom-speedrun-board` `ff6e4a3`). It retires the four per-level rescue boards and registers the one board `campaign-speedrun-v1` (asc, `time-ms`, `server-rules-v2`, 20-minute review floor). The rollback point is `9eb1fb5f-c636-4d25-8907-d91686d7edc3` (2026-11-06).
