@@ -38,6 +38,13 @@ normal progression and Load Game. The fixture is available only on loopback with
 
 Local verification reports are ignored under `output/playtest/canonical/` and `output/playtest/canonical-shell/`.
 
+## The meadow walks' skip button released 2026-11-09
+
+- Game `mann-cool-pdoom` version `b49d8c4d-5a21-4b83-aa8d-5d657f138eef` from `main` (`5b783c7`). No central Worker change.
+  - The XP intro's `SPACE — SKIP WALK` and the after-level-4 meeting's `SPACE — SKIP` now show at the bottom right the whole time the walk can be skipped. On a phone the label is `TAP — SKIP` and sits above the touch controls. The button used to be placed off the top of the window. SPACE skipped both all along.
+- Before deploy (local): meadow-skip-smoke (intro, door, phone in landscape and portrait), endgame-hookup, onboarding (with two stale checks updated).
+- Live checks: the live `outside/outside.js` and `prologue.css` match the build. `CASES=intro` meadow-skip-smoke passed against `https://mann.cool/pdoom/` (New Game, the film and prologue skipped, the button on screen, SPACE lands you in front of CONTROL.EXE). The canonical host and shell smokes passed. Nothing was submitted.
+
 ## Skipping the exposition released 2026-11-09
 
 - Game `mann-cool-pdoom` version `ef8a878f-27ce-41a9-ac70-4575a4eb56df` from `main` (`e8a45eb`). No central Worker change (it stays `f67893c9`).
