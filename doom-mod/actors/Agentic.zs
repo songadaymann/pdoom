@@ -1029,7 +1029,7 @@ class PDAgentic : EventHandler
         Say("The line connects.",1050);
         for(int i=0;i<5;i++)if(leaving&(1<<i)){People[i].bInvisible=true;People[i].bSolid=false;}
         you.Vel=(0,0,0);
-        let session=PDCampaignSession.Get();if(Commits&&session)session.CommitAgentic(leaving,behind,EndingCode());
+        let session=PDCampaignSession.Get();if(Commits&&session)session.CommitAgentic(leaving,behind,EndingCode(),BrokenMask());
         FinishRun(leaving);
         Console.Printf("PDOOM_EVENT {\"type\":\"agentic-exit\",\"saved\":%d,\"hub\":%d,\"committed\":%d}",leaving,HubEntry,Commits);
     }
@@ -1082,7 +1082,12 @@ class PDAgentic : EventHandler
         // Daniel's ending holds for the rest of the level, across visits (after Free, so his rescue's
         // Released() keeps SMITH's list quiet on the way in).
         if(Released[2]&&session&&session.Ending3)SetPaceFactor(session.Ending3==1?RACE_PACE:SLOWDOWN_PACE);
+        // The cameras you broke last time stay broken (2026-11-09, CampaignSession.zs Broken3), quietly: no SMITH.
+        int broken=session?session.Broken3:0;
+        for(int i=0;i<Cameras.Size();i++){let cam=Cameras[i];if(cam&&!cam.Broken&&!(cam.Args[1]&1)&&cam.Args[0]>=0&&cam.Args[0]<30&&(broken&(1<<cam.Args[0]))){cam.Broken=true;CamerasBroken++;}}
     }
+    // The cameras broken now, one bit per camera's Args[0] (doom-web/campaign.js BROKEN).
+    int BrokenMask(){int m=0;for(int i=0;i<Cameras.Size();i++){let cam=Cameras[i];if(cam&&cam.Broken&&cam.Args[0]>=0&&cam.Args[0]<30)m|=1<<cam.Args[0];}return m;}
     // Local development (?puzzle=, CVar pdoom_agentic_site): start beside a rescue with the wrench,
     // slingshot (5 shots) and pill; 6 the refuge; 7 the exit (all five safe, the phone ringing).
     void ApplySite()

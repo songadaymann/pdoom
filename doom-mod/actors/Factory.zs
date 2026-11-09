@@ -701,7 +701,7 @@ class PDFactory : EventHandler
         pawn.Angle+=180;pawn.Pitch=0;pawn.Vel=(0,0,0);
         // On the campaign page the save is committed here, like levels 1-2 (PDOOM_CAMPAIGN);
         // the ?level=meg3n-factory page records its clear in the browser (main.js factoryExit).
-        if(Commits)PDCampaignSession.Get().CommitFactory(leaving,behind);
+        if(Commits)PDCampaignSession.Get().CommitFactory(leaving,behind,BrokenMask());
         FinishRun(leaving);
         Console.Printf("PDOOM_EVENT {\"type\":\"factory-exit\",\"saved\":%d,\"hub\":%d,\"committed\":%d}",leaving,HubEntry,Commits);
     }
@@ -1025,6 +1025,16 @@ class PDFactory : EventHandler
             People[i].bInvisible=false;People[i].SetOrigin((slot,level.PointInSector(slot).floorplane.ZatPoint(slot)),false);
             SafeMask|=1<<i;Introduced=true;
         }
+        // What you broke last time stays broken (2026-11-09, CampaignSession.zs Broken2), quietly: no glass, no MEG3N.
+        int broken=session.Broken2;
+        for(int i=0;i<min(20,Screens.Size());i++)if((broken&(1<<i))&&Screens[i]&&!Screens[i].Broken){Screens[i].Broken=true;Screens[i].Frame=16;ScreensBroken++;}
+        if((broken&(1<<20))&&Props[13]&&!CameraBroken){CameraBroken=true;DollRevealAt=level.time;Props[13].Frame=1;}
+    }
+    // The screens (bits 0-19, Screens[] in map order) and Ajeya's teddy camera (bit 20) broken now (doom-web/campaign.js BROKEN).
+    int BrokenMask()
+    {
+        int m=0;for(int i=0;i<min(20,Screens.Size());i++)if(Screens[i]&&Screens[i].Broken)m|=1<<i;
+        if(CameraBroken)m|=1<<20;return m;
     }
     // ?puzzle=exit: a free spot in the exit area (AtExit) that can see the player, off the paint.
     void PlaceAtExit(int i)

@@ -409,6 +409,29 @@ The maps help too: 20 sites across 10 physical affordance types ([02 §8](spec/0
 
 **Replays** (dormant since 2026-11-07: nobody can be lost, so no level offers one). Until you press the final [Preview], any structure where someone was lost offers **Replay level**. Saved people stay at camp and their cells are empty; **only the lost respawn as captives**, so a replay is a mission to bring them back. The better campaign result is kept; replays don't post to the per-level boards.
 
+### 5.1a Going back into a level: it stays as you left it (2026-11-09)
+
+Jonathan: "if we enter back in a level after clearing it, the level should not reset. it should be persistent. so if we
+saved everyone, they are no longer there. the exit should remain open. all cameras, tvs and stuff that we destroyed
+should remain so - and if people want to go back and destroy the rest of the things they missed, they can."
+
+- **People:** everyone at camp stays out of the level, as before.
+- **The way out:** a crank waits at the entrance of levels 1-2 on every walk-in. Level 3 starts you in the exit room,
+  and its switch lets you out once nobody is left inside. Level 4's payphone answers at any time.
+- **What you broke:** written to the campaign save when you leave through the exit, one bit per thing
+  (`doom-web/campaign.js` `broken0`-`broken3`). It's put back on the next walk-in, quietly, with no blast, alarm,
+  line or event (`CampaignSession.zs RestoreBroken`, `Factory.zs` and `Agentic.zs ApplyHubEntry`). Anything you
+  missed can still be broken, and is added the next time you leave.
+  - Level 1: the nine cameras, the shutter and its cut junction, the turret, the bridge.
+  - Level 2: the nine cameras, HAL's jammed door panels, the memory modules you pulled (all four keep HAL pacified),
+    the breaker glass.
+  - Level 3: the 20 screens and Ajeya's teddy camera.
+  - Level 4: the cameras.
+- **Restarts:** a restart wipes that attempt, as before. Only what you'd broken when you left counts.
+- **Not kept:** pickups (the slingshot and so on lie in their places again), and the half-done puzzles of anyone
+  still inside.
+- **Test:** `scripts/persistent-levels-smoke.mjs`.
+
 ### 5.2 When your CEO goes down: "Demoted, not dead"
 
 The CEO is the protagonist, and the maze needs your face, so **the CEO is never killed** ([01 §2.5](spec/01-five-prisons-polish.md)):

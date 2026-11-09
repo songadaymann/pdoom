@@ -29,6 +29,11 @@ server bool pdoom_agentic_commit = false;
 server int pdoom_agentic_site = 0;
 // Daniel Kokotajlo's NDA ending in the pod farm (0 none yet, 1 race, 2 slowdown), kept with group 3.
 server int pdoom_ending3 = 0;
+// What was broken in each level (doom-web/campaign.js BROKEN, CampaignSession.zs), put back on a walk-in.
+server int pdoom_broken0 = 0;
+server int pdoom_broken1 = 0;
+server int pdoom_broken2 = 0;
+server int pdoom_broken3 = 0;
 // Level 4 is local development only: the browser sets this on loopback with dev-config.json on, and
 // AGENTIC.BAT's door (netevent pdoom_enter_agentic, Checkpoint.zs) does nothing without it. Remove at release.
 server bool pdoom_agentic_enabled = false;
