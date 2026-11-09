@@ -1,9 +1,9 @@
 // Level 3's way out into the meadow (2026-10-19), from the ?puzzle=exit loopback start: all five
 // beside you at E2M7's exit switch. Muted. Two playthroughs:
-//  first: no campaign save, so no exit text screen; the meadow at MEG3N.AVI's door, the five
-//         coming out 1.2 s apart to their own camp spot, lights green, README gloating, nothing saved.
-//  later: a save that already reached SAFE MODE (levels 1-2 cleared), so the exit text types out
-//         over Doom's flat first; then the meadow, and the save gains the factory's five (15/20).
+//  first: no campaign save; the meadow at MEG3N.AVI's door, the five coming out 1.2 s apart to
+//         their own camp spot, lights green, README gloating, nothing saved.
+//  later: a save that already reached SAFE MODE (levels 1-2 cleared): straight into the meadow too
+//         (the exit text screen is gone since 2026-11-09), and the save gains the factory's five (15/20).
 // node scripts/factory-exit-smoke.mjs   (CASES=first or CASES=later to limit)
 import {chromium} from '@playwright/test';
 import {startGame} from './doom-qa-ui.mjs';
@@ -33,7 +33,7 @@ async function playthrough(name,save){
  return {page,read,wait,shot};
 }
 async function meadow({page,read,wait,shot},name){
- const s=await wait(s=>s.outside?.active&&s.outside.currentLevel==='meg3n-factory'&&s.melt.phase==='idle'&&!s.exitText.visible,'Out of MEG3N.AVI into the meadow',30000);
+ const s=await wait(s=>s.outside?.active&&s.outside.currentLevel==='meg3n-factory'&&s.melt.phase==='idle'&&!s.outside.paused,'Out of MEG3N.AVI into the meadow',30000);
  assert.ok(Math.hypot(s.outside.x-MEG3N_DOOR.x,s.outside.z-MEG3N_DOOR.z)<4,`Player stands at MEG3N.AVI's door (${s.outside.x},${s.outside.z})`);
  assert.equal(s.outside.future.meg3n.live,true,"MEG3N.AVI's doorway shows the live factory view");
  await shot('arrival');
@@ -56,10 +56,8 @@ async function meadow({page,read,wait,shot},name){
 try{
  if(!only||only.includes('first')){
   const run=await playthrough('first',null);
-  // The first exit of a playthrough: straight into the meadow, no text screen.
-  const seen=new Set();
-  for(let i=0;i<40;i++){const s=await run.read();seen.add(s.exitText.phase);if(s.outside?.active&&s.melt.phase==='idle')break;await run.page.waitForTimeout(150);}
-  assert.ok(!seen.has('typing'),'No exit text on the first exit');
+  // straight into the meadow; there's no text screen any more
+  assert.equal(await run.page.evaluate(()=>!!document.getElementById('exit-text')),false,'No exit text screen');
   const s=await meadow(run,'first');
   assert.equal(s.campaign.saved,5,'This tab counts the five');
   assert.equal(await run.page.evaluate(()=>localStorage.getItem('pdoom.campaign.v1')),null,'A first visit by link writes no campaign save');
@@ -69,20 +67,12 @@ try{
  if(!only||only.includes('later')){
   const save={version:1,ceo:'amodei',hub:true,saved0:31,saved1:31,lost0:0,lost1:0,following0:0,following1:0};
   const run=await playthrough('later',save);
-  const typing=await run.wait(s=>s.exitText.phase==='typing'&&s.exitText.visible&&s.melt.phase==='idle'&&s.exitText.chars>40,'The exit text types out over the flat',15000);
-  assert.ok(typing.exitText.chars<typing.exitText.total,'Typed a character at a time');
-  await run.shot('text-typing');
-  await run.page.keyboard.press('Space');await run.wait(s=>s.exitText.chars===s.exitText.total,'Space finishes the text',3000);
-  await run.page.waitForTimeout(500);assert.equal((await run.read()).exitText.chars,typing.exitText.total,'The finished text stays finished');
-  await run.shot('text-full');
-  assert.match((await run.read()).exitText.text,/read your whole essay/,"Dario's line closes the text");
-  const text=await run.page.evaluate(()=>window.__DOOM_DEBUG__.state.mode);assert.equal(text,'outside');
-  await run.page.keyboard.press('Space');
+  assert.equal(await run.page.evaluate(()=>!!document.getElementById('exit-text')),false,'No exit text screen');
   const s=await meadow(run,'later');
   assert.equal(s.campaign.saved,15);assert.equal(s.campaign.worldPdoom,99-4*15);
   const stored=JSON.parse(await run.page.evaluate(()=>localStorage.getItem('pdoom.campaign.v1')));
   assert.equal(stored.saved2,31,'The save gains the factory five');assert.equal(stored.saved0,31);assert.equal(stored.ceo,'amodei');
-  record("Later exit: the exit text types over Doom's E2 flat (Dario's line), Space finishes it, Space melts into the meadow; save now FREED 15/20");
+  record('Later exit: straight into the meadow with no text screen; save now FREED 15/20');
   // Walk up to CONTROL.EXE: the campaign page takes over and resumes this save in SAFE MODE there.
   await run.page.evaluate(()=>window.__DOOM_DEBUG__.outside.debug.setView(17,-3,0,0));
   await run.wait(s=>s.outside.nearestDoor==='five-prisons','At CONTROL.EXE',5000);

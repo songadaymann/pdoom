@@ -52,7 +52,7 @@ What happens:
     - The sign, struts and turbines hide once you're inside. Inside, the pillars are server racks with blinking white and green lights (dimmed for the trick shot, so its cyan marks read) and a fan on top; in the meltdown the fans and lights die with the sound.
     - The Grid floor is now 1200 m across, so the walk starts on it.
   - Near the wall, a door in it opens once the Recognizers are down (`end-tower`).
-  - Inside, everyone takes their places and THE BOSS's intro begins. N skips the walk.
+  - Inside, everyone takes their places and THE BOSS's intro begins. N skips the walk (a test key: in a real run it makes the speedrun practice).
 - **E6-E9:** THE BOSS as before.
 - **After the black:** the save is marked done, and a click returns through the game's own handoff (`?play=1&load=1`) to the meadow.
   - There the column is gone and the summit stops pointing south. The dialog reads "Screen saver: none. Nothing left to wait for."
@@ -61,7 +61,13 @@ What happens:
   - It plays from an in-memory save, and so does the endgame page it leads to (`&safemode=1&saved=`, a mask per level), so a real save in the browser is left alone.
   - After the black it comes back to `?safemode=1&after=5`, the meadow after the boss with the column gone.
   - `&ceo=amodei` plays Dario (Sam guides you).
-- **Smoke:** `scripts/endgame-hookup-smoke.mjs` covers all of this.
+- **Skipping (2026-11-09).** Jonathan: "for people who are replaying, i don't want to force them to listen to the exposition again". SPACE skips, and `SPACE — SKIP` shows at the bottom right while it does something:
+  - His opening: straight on to the ships.
+  - The end, from the moment the MCP goes down: straight to black and `CLICK TO GO BACK TO THE MEADOW`. The save is still marked done, so the meltdown, the dialog and the wasteland can all be skipped.
+  - On the walk in, the line that's playing (`SPACE — SKIP LINE`). Each beat waits for the lines before it, so the next one comes as soon as you reach it; the walk's fights and the trucks stay.
+  - The speedrun's rules don't change: its clock runs through the walk and the fight as before (it stopped at the MCP going down already).
+  - The test shortcuts (1, 2, 3, N, `?part=`, `?autosteer`, and a tuned trick shot from T) make a real run practice. Before, they could jump a real run straight to the last throw.
+- **Smoke:** `scripts/endgame-hookup-smoke.mjs` covers all of this; `scripts/endgame-skip-smoke.mjs` covers the skips and the test shortcuts.
 - **Not in the game's release build yet:** the page is built by `node scripts/build-endgame-protos.mjs` into ignored `doom-web/endgame-proto/`, and level 4 itself is still local-only.
 
 ## Where this differs from the spec

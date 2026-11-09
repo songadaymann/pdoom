@@ -1,7 +1,6 @@
 import {createPreferences} from './preferences.js';
 import {createPrologue} from './prologue.js';
 import {createScreenMelt} from './screen-melt.js';
-import {createExitText,levelExitText,EPISODE_ONE_FLAT} from './exit-text.js';
 import {AssetLoader} from './asset-loader.js';
 import {createOnboarding} from './onboarding.js';
 import {isGameControl} from './game-controls.js';
@@ -22,8 +21,8 @@ import {SpeedrunClock,SPEEDRUN,speedrunResult,savedCount,formatRunTime} from './
 import {connectPlatform} from './platform.js';
 import {createScoreView} from './score-view.js';
 import {localDevelopmentEnabled} from './dev-capabilities.js';
-import {configureFactory,updateFactory,pauseFactory,factorySite,FACTORY_SITES,factoryExitText,useFactoryHud} from './factory-hud.js';
-import {configureAgentic,updateAgentic,pauseAgentic,agenticSite,AGENTIC_SITES,AGENTIC_ENDINGS,agenticExitText,useAgenticHud,hideAgenticExtras,agenticHudState} from './agentic-hud.js';
+import {configureFactory,updateFactory,pauseFactory,factorySite,FACTORY_SITES,useFactoryHud} from './factory-hud.js';
+import {configureAgentic,updateAgentic,pauseAgentic,agenticSite,AGENTIC_SITES,AGENTIC_ENDINGS,useAgenticHud,hideAgenticExtras,agenticHudState} from './agentic-hud.js';
 import {browserStorage,resolveCeo,mountCeoPicker} from './ceo-pick.js';
 
 const DEBUG_OPTIONS={logs:new URLSearchParams(location.search).has('debug')};
@@ -87,8 +86,6 @@ const speedrun=new SpeedrunClock(campaign);let speedrunShown=null;
 const run=new RunTracker(LEVEL),panels=new Set();let uiBlocked=false,meadowPanelPaused=false;
 let nativePanelPaused=false,mouseAttack=false;
 let factoryPaused=false,agenticPaused=false;
-// The save's SAFE MODE flag from just before this level's exit committed to it (levelExit()).
-let hubBeforeCommit=null;
 function nativePanelKey(open){const code=open?'F10':'F11',kc=open?121:122;for(const evType of ['keydown','keyup'])send({type:'input',target:'window',evType,init:{code,key:code,keyCode:kc,which:kc,bubbles:true,cancelable:true}});}
 function syncPanelPause(){
   if(outside||outsideLoading||!worker||state.mode!=='playing')return;
@@ -113,7 +110,6 @@ let scoreView=null;
 const gamePause=CHECKPOINT?createOnboarding({stage:document.querySelector('#stage'),storage:ceoStorage,preferences,picker:ceoPick,block:blockPanel,warm:()=>assets.warm(),start:startEngine,validate:validateEngine,restart:()=>enterLevel(LEVEL.id,false,true),active:()=>worker?(outside?'outside':'native'):null,activeHero:()=>runningCeo,unlock:()=>audio.unlock(),fullscreen,savedResults:()=>scoreView?.savedCount()||0,openSavedResults:()=>scoreView?.openSaved()}):{isOpen:()=>false,isVisible:()=>false,close(){},toggle(){},getState:()=>null,progress(){},loading(){}};
 // Leaving a level melts the last Doom frame away into Bliss, as Doom does between screens.
 const screenMelt=createScreenMelt({stage:document.querySelector('#stage'),source:canvas,audio});
-const exitText=createExitText({stage:document.querySelector('#stage')});
 const prologue=createPrologue({stage:document.querySelector('#stage'),source:canvas,audio,skip:()=>{
  releaseKeys();
  for(const evType of ['keydown','keyup'])send({type:'input',target:'window',evType,init:{code:'F3',key:'F3',keyCode:114,which:114,bubbles:true,cancelable:true}});
@@ -123,7 +119,7 @@ const storyBeats=createStoryBeats(blockPanel,()=>audio.playCue());
 const platform=LEVEL?await connectPlatform(LEVEL,{block:blockPanel}):null;
 scoreView=CHECKPOINT?createScoreView({config:platform.config,block:blockPanel,openBoards:platform.openBoards,ceo:()=>ceoPick?.id,onPendingChange:()=>gamePause.refreshSavedResults?.()}):null;
 gamePause.refreshSavedResults?.();
-window.render_game_to_text=()=>JSON.stringify({...state,voiceOver:voiceOver.getState(),melt:screenMelt.getState(),exitText:exitText.getState(),levelId:LEVEL?.id,ceo:ceoPick?.id??null,ceoPick:ceoPick?.getState()??null,campaign:campaign.getState(),run:CHECKPOINT?run.getState():null,speedrun:CHECKPOINT?speedrun.getState():null,scoreView:scoreView?.getState()||null,uiBlocked,personLabel:personLabel.getState(),gamePaused:gamePause.isOpen()||factoryPaused||agenticPaused,menu:gamePause.getState(),opening:openingState(),prologueUi:prologue.getState(),survivalEstimate:prologue.active?{doom:state.prologue?.pdoom,kind:'historical in-world estimate'}:CHECKPOINT?survivalEstimate(state.world,state.mode,state.escape):null,statusBar:(CHECKPOINT||FACTORY||AGENTIC)&&!prologue.active?checkpointStatusBar()?.getState()??null:null,...(LEVEL?.id==='agentic-pods'?{agenticHud:agenticHudState()}:{}),outside:outside?.getState()||null,audioBuffers:audio.played,sound:audio.getState(),audioState:audio.context?.state||'uninitialized',musicPlaying:!!audio.musicSource,coordinateSystem:'Native world: Doom units; x east, y north, z up. Outside: metres; x east, z south, y up.'});
+window.render_game_to_text=()=>JSON.stringify({...state,voiceOver:voiceOver.getState(),melt:screenMelt.getState(),levelId:LEVEL?.id,ceo:ceoPick?.id??null,ceoPick:ceoPick?.getState()??null,campaign:campaign.getState(),run:CHECKPOINT?run.getState():null,speedrun:CHECKPOINT?speedrun.getState():null,scoreView:scoreView?.getState()||null,uiBlocked,personLabel:personLabel.getState(),gamePaused:gamePause.isOpen()||factoryPaused||agenticPaused,menu:gamePause.getState(),opening:openingState(),prologueUi:prologue.getState(),survivalEstimate:prologue.active?{doom:state.prologue?.pdoom,kind:'historical in-world estimate'}:CHECKPOINT?survivalEstimate(state.world,state.mode,state.escape):null,statusBar:(CHECKPOINT||FACTORY||AGENTIC)&&!prologue.active?checkpointStatusBar()?.getState()??null:null,...(LEVEL?.id==='agentic-pods'?{agenticHud:agenticHudState()}:{}),outside:outside?.getState()||null,audioBuffers:audio.played,sound:audio.getState(),audioState:audio.context?.state||'uninitialized',musicPlaying:!!audio.musicSource,coordinateSystem:'Native world: Doom units; x east, y north, z up. Outside: metres; x east, z south, y up.'});
 window.__DOOM_DEBUG__={state,logs};
 // SAFE MODE's share of the speedrun (the meadow's own clock, which stops while it's paused or hidden), and the
 // timer at the top of the screen, whole seconds (a level's clock reports five times a second).
@@ -190,7 +186,7 @@ function onMessage(m){
       run[method](payload);
       if(method==='begin'){
         playLevelMusic();
-        state.prologue=null;awaitingRun=false;hubBeforeCommit=null;storyBeats.reset();scoreView.reset();if(!outside){state.mode='loading';state.world=null;}
+        state.prologue=null;awaitingRun=false;storyBeats.reset();scoreView.reset();if(!outside){state.mode='loading';state.world=null;}
         // A new campaign's first level starts the speedrun; every level start asks for its ticket until one arrives.
         speedrun.begin(payload.level_id,{assisted:!!payload.assisted,practice:DEV_END?'Development ending selected.':''});
         if(speedrun.running&&!speedrun.run.practice)scoreView.beginRun({...SPEEDRUN,runId:speedrun.run.runId});
@@ -220,7 +216,7 @@ function onMessage(m){
     }catch(error){console.error('Native event:',error);}}
   }
   const campaignPos=m.msg.indexOf('PDOOM_CAMPAIGN ');
-  if(campaignPos!==-1){try{const native=JSON.parse(m.msg.slice(campaignPos+15));hubBeforeCommit??=campaign.data.hub;campaign.commit(native);}catch{}}
+  if(campaignPos!==-1){try{const native=JSON.parse(m.msg.slice(campaignPos+15));campaign.commit(native);}catch{}}
   const environmentPos=m.msg.indexOf('PDOOM_ENVIRONMENT ');
   if(environmentPos!==-1){try{state.environment=JSON.parse(m.msg.slice(environmentPos+18));}catch{}}
   const signPos=m.msg.indexOf('PDOOM_SIGN ');
@@ -264,13 +260,13 @@ function onMessage(m){
   // E2M7, which holds at its loading gate again: release it.
   if(!awaitingRun&&LEVEL?.id==='meg3n-factory'&&state.mode==='playing'&&m.msg.includes('PDOOM_MOD_LOADED factory'))for(const evType of ['keydown','keyup'])send({type:'input',target:'window',evType,init:{code:'F4',key:'F4',keyCode:115,which:115,bubbles:true,cancelable:true}});
   if(awaitingRun&&LEVEL?.id==='meg3n-factory'&&m.msg.includes('PDOOM_MOD_LOADED factory')){
-    awaitingRun=false;hubBeforeCommit=null;state.prologue=null;storyBeats.reset();scoreView?.reset();state.mod=`p(DOOM): ${LEVEL.title}`;playLevelMusic();
+    awaitingRun=false;state.prologue=null;storyBeats.reset();scoreView?.reset();state.mod=`p(DOOM): ${LEVEL.title}`;playLevelMusic();
   }
   // The pod farm the same way: on the campaign page its PDOOM_RUN_START (2026-11-06) starts it, above; its own
   // ?level=agentic-pods page has no run. SMITH's catch reloads E2M2, which holds at its loading gate again.
   if(!awaitingRun&&LEVEL?.id==='agentic-pods'&&state.mode==='playing'&&m.msg.includes('PDOOM_MOD_LOADED agentic'))for(const evType of ['keydown','keyup'])send({type:'input',target:'window',evType,init:{code:'F4',key:'F4',keyCode:115,which:115,bubbles:true,cancelable:true}});
   if(awaitingRun&&LEVEL?.id==='agentic-pods'&&m.msg.includes('PDOOM_MOD_LOADED agentic')){
-    awaitingRun=false;hubBeforeCommit=null;state.prologue=null;storyBeats.reset();scoreView?.reset();state.mod=`p(DOOM): ${LEVEL.title}`;playLevelMusic();
+    awaitingRun=false;state.prologue=null;storyBeats.reset();scoreView?.reset();state.mod=`p(DOOM): ${LEVEL.title}`;playLevelMusic();
   }
   if(pos!==-1&&!awaitingRun){
     try{state.world={...JSON.parse(m.msg.slice(pos+12)),...state.combat,...state.polish,...state.lives};}catch{state.world={raw:m.msg.slice(pos+12)};}
@@ -350,68 +346,38 @@ async function enterOutside({intro=false,melt=false}={}){
 }
 
 // Level 3's way out (2026-10-19): E2M7's exit switch, pressed with all five, comes out of
-// MEG3N.AVI's door into the meadow, as levels 1-2's outside-reveal does. The first exit of a
-// playthrough melts straight into the meadow; a later one (this save has reached SAFE MODE
-// before) types the exit text over a Doom flat first (spec 06 section 8.3).
+// MEG3N.AVI's door into the meadow, as levels 1-2's outside-reveal does. Since 2026-11-09 every exit
+// melts straight into the meadow: the typed exit-text screens are gone (Jonathan: "go straight from
+// beating the level back to windows xp land").
 // Walked in from SAFE MODE (2026-10-20, event.hub): event.saved says who came out with you and the
 // native exit has already committed the save (PDOOM_CAMPAIGN). Since 2026-10-30 the switch only
 // works once everyone still inside is with you, so nobody is left behind (no retreat). A cold run from the episode menu
-// commits natively too (event.committed); the ?level=meg3n-factory page records its clear here
-// instead. The text screen shows only when this exit finishes the factory, on a save that had
-// already reached SAFE MODE before this exit committed to it (levelExit()'s rule).
+// commits natively too (event.committed); the ?level=meg3n-factory page records its clear here instead.
 let factoryExiting=false;
 async function factoryExit(event){
  if(factoryExiting)return;factoryExiting=true;
  const mask=Number.isInteger(event?.saved)?event.saved:31,out=[0,1,2,3,4].map(i=>mask>>i&1),count=out.filter(Boolean).length;
- const later=!!event?.hub||(hubBeforeCommit??campaign.data.hub);hubBeforeCommit=null;
  state.escape={saved_people:out,saved:count,outside:count};pendingWin=count;
  if(!event?.committed)campaign.commitFactory(mask);
- const text=later&&count>0&&campaign.data.saved2===31?exitText.prepare(factoryExitText(runningCeo)):null;
  await new Promise(resolve=>setTimeout(resolve,700));// the exit switch's clunk
- if(!text){await enterOutside({melt:true});return;}
- await exitThroughText(text);
+ await enterOutside({melt:true});
 }
 
-// Level 4's way out (2026-10-21): answering the refuge payphone, as the factory's exit switch (above):
-// group 3, its text screen when this exit finishes the pod farm on a save that had reached SAFE MODE.
+// Level 4's way out (2026-10-21): answering the refuge payphone, as the factory's exit switch (above), for group 3.
 let agenticExiting=false;
 async function agenticExit(event){
  if(agenticExiting)return;agenticExiting=true;
  const mask=Number.isInteger(event?.saved)?event.saved:31,out=[0,1,2,3,4].map(i=>mask>>i&1),count=out.filter(Boolean).length;
- const later=!!event?.hub||(hubBeforeCommit??campaign.data.hub);hubBeforeCommit=null;
  state.escape={saved_people:out,saved:count,outside:count};pendingWin=count;
- // Daniel's ending (race/slowdown) is kept with group 3 (campaign.js ending3), so a clear on a later visit still names it.
+ // Daniel's ending (race/slowdown) is kept with group 3 (campaign.js ending3).
  const ending=state.agentic?.ending||AGENTIC_ENDINGS[campaign.data.ending3]||'';
  if(!event?.committed)campaign.commitGroup(3,mask,AGENTIC_ENDINGS.indexOf(ending));
- const text=later&&count>0&&campaign.data.saved3===31?exitText.prepare(agenticExitText(runningCeo,ending)):null;
  await new Promise(resolve=>setTimeout(resolve,700));// the receiver goes down
- if(!text){await enterOutside({melt:true});return;}
- await exitThroughText(text);
+ await enterOutside({melt:true});
 }
 
-// Levels 1-2's way out (2026-10-20), on the same rule: the first exit melts straight into the meadow;
-// a later one that saved someone types the level's exit text over Doom's episode 1 flat first. The
-// hub crank's exit commits to the campaign before its outside-reveal (RescueLives.zs), so "later"
-// is the save's SAFE MODE flag from before that commit. Its result also arrives first, so a crank
-// retreat that brings nobody out (everyone already camped, say) melts straight to the meadow.
-function levelExit(){
- const later=hubBeforeCommit??campaign.data.hub;hubBeforeCommit=null;
- const text=later&&run.result?.savedFigures!==0?levelExitText(LEVEL?.id,runningCeo):null;
- if(!text||outside||outsideLoading){enterOutside({melt:true});return;}
- exitThroughText(exitText.prepare(text,{flatUrl:EPISODE_ONE_FLAT}));
-}
-
-// Doom: the level melts into the text screen; the text screen melts into the next one. The meadow
-// gets ready behind the text, paused until the player moves on.
-async function exitThroughText(prepared){
- screenMelt.capture();
- const meadow=enterOutside();blockPanel('exit-text',true);
- await prepared;
- const typed=exitText.open();
- await meadow;await screenMelt.play();await typed;
- screenMelt.capture([exitText.canvas]);exitText.close();blockPanel('exit-text',false);
- await screenMelt.play();
-}
+// Levels 1-2's way out (2026-10-20): the level melts straight into the meadow.
+function levelExit(){enterOutside({melt:true});}
 
 function validateEngine(id){
  if(!window.Worker||!canvas.transferControlToOffscreen||!WebAssembly.Suspending)throw Error('PLAY IN CURRENT CHROME OR EDGE — THIS ENGINE NEEDS WEBASSEMBLY JSPI.');

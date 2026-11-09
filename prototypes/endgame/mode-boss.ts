@@ -29,7 +29,9 @@ import {SkyGlitch} from './skyglitch';
  * MUSIC: Doom's boss tracks from the ships to the trick shot, cut dead when it lands; D_VICTOR after the
  *   black. ?music=e1m8|e2m8|e3m8|off picks the fight's (E2M8, the Cyberdemon's, by default), ?epilogue=victor|bunny|off
  *   the end's.
- * Keys 1, 2, 3 jump to each part; N skips to the next; T opens the trick-shot tuning panel.
+ * SPACE skips (2026-11-09): his opening, the end after the MCP falls, and on the walk in the line that's playing.
+ * Keys 1, 2, 3 jump to each part; N skips to the next; T opens the trick-shot tuning panel. In a real run these
+ * test shortcuts (and ?part=, ?autosteer) make the speedrun practice.
  * ?autosteer=1 steers the trick shot for smokes. */
 const DEG=Math.PI/180,UP=new THREE.Vector3(0,1,0),QUERY=new URLSearchParams(location.search);
 const FIGHT_MUSIC=QUERY.get('music')??'e2m8',END_MUSIC=QUERY.get('epilogue')??'victor';
@@ -69,7 +71,7 @@ const RUN:Speedrun|null=(()=>{if(!FINALE||FIXTURE)return null;try{const r=JSON.p
 let runCarry=0,runSavedAt=-1e9,runTimer:HTMLElement|null=null;
 function runSave(force=false){
  if(!RUN)return;const now=performance.now();if(!force&&now-runSavedAt<2000)return;runSavedAt=now;
- try{const v=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(v?.version===1&&v.speedrun?.runId===RUN.runId){v.speedrun.splits.endgame=RUN.splits.endgame;v.speedrun.done=!!RUN.done;localStorage.setItem(SAVE_KEY,JSON.stringify(v));}}catch{/* storage gone: the time stays in this tab */}
+ try{const v=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(v?.version===1&&v.speedrun?.runId===RUN.runId){v.speedrun.splits.endgame=RUN.splits.endgame;v.speedrun.done=!!RUN.done;if(RUN.practice)v.speedrun.practice=RUN.practice;localStorage.setItem(SAVE_KEY,JSON.stringify(v));}}catch{/* storage gone: the time stays in this tab */}
 }
 function runTime(){const ms=SPLIT_KEYS.reduce((a,k)=>a+(Number(RUN?.splits[k])||0),0),s=Math.floor(ms/1000),two=(n:number)=>String(n).padStart(2,'0');return `${s>=3600?Math.floor(s/3600)+':'+two(Math.floor(s/60)%60):Math.floor(s/60)}:${two(s%60)}`;}
 function runTick(dt:number){
@@ -79,6 +81,12 @@ function runTick(dt:number){
 }
 function runDone(){if(!RUN||RUN.done)return;RUN.done=true;runSave(true);if(runTimer){runTimer.textContent=runTime();runTimer.style.color='#7dff8a';}}
 if(RUN)addEventListener('pagehide',()=>runSave(true));
+// The test shortcuts make a real run practice (doom-web/speedrun.js): it keeps timing but can't be submitted. They are
+// the part jumps (1, 2, 3, N and ?part=), a tuned trick shot (T, kept in this browser) and ?autosteer.
+function runPractice(reason:string){if(!RUN||RUN.done||RUN.practice)return;RUN.practice=reason;runSave(true);}
+const tuned=()=>(Object.keys(TUNE_DEFAULTS) as (keyof Tune)[]).some(k=>TUNE[k]!==TUNE_DEFAULTS[k]);
+if(autosteer)runPractice('The trick shot was steered by a test switch.');
+else if(tuned())runPractice('The trick shot is tuned (T, then Reset, puts it back).');
 
 type Phase='walk'|'intro'|'ships'|'shieldDown'|'trick'|'down'|'waste';
 type Kind='update'|'starlink'|'doge'|'sink';
@@ -576,7 +584,7 @@ function toggleTune(){
  panel.style.cssText='position:fixed;right:12px;top:52px;width:300px;max-height:calc(100vh - 70px);overflow:auto;background:rgba(2,8,12,.93);border:1px solid rgba(56,244,255,.5);padding:10px 12px;font:13px DoomSmall,monospace;color:#9fdcea;z-index:20';
  const title=document.createElement('div');title.textContent='TRICK SHOT TUNING · T closes';title.style.cssText='color:#38f4ff;letter-spacing:.1em;margin-bottom:6px';panel.append(title);
  const out=document.createElement('textarea');out.readOnly=true;out.style.cssText='width:100%;height:70px;margin-top:8px;background:#02060a;color:#d8fdff;border:1px solid #234;font:11px monospace;box-sizing:border-box';
- const save=()=>{try{localStorage.setItem('pdoom.trick.tune',JSON.stringify(TUNE));}catch{}out.value=JSON.stringify(TUNE);};
+ const save=()=>{try{localStorage.setItem('pdoom.trick.tune',JSON.stringify(TUNE));}catch{}out.value=JSON.stringify(TUNE);if(tuned())runPractice('The trick shot is tuned (T, then Reset, puts it back).');};
  for(const [key,label,min,max,step] of TUNE_INFO){
   const row=document.createElement('label'),name=document.createElement('div'),input=document.createElement('input');row.style.cssText='display:block;margin:5px 0';
   Object.assign(input,{type:'range',min:String(min),max:String(max),step:String(step),value:String(TUNE[key])});input.style.width='100%';
@@ -586,6 +594,39 @@ function toggleTune(){
  reset.textContent='Reset';reset.onclick=()=>{Object.assign(TUNE,TUNE_DEFAULTS);save();toggleTune();toggleTune();};
  copy.textContent='Copy numbers';copy.onclick=()=>{navigator.clipboard?.writeText(JSON.stringify(TUNE));copy.textContent='Copied';};
  buttons.append(reset,copy);panel.append(buttons,out);save();document.body.append(panel);tunePanel=panel;
+}
+// Skipping (2026-11-09). Jonathan: "for people who are replaying, i don't want to force them to listen to the
+// exposition again". SPACE skips his opening (on to the ships) and the end after the MCP falls (straight to black and
+// the way back to the meadow). On the walk in it cuts the line that's playing, so the next beat comes as soon as you
+// reach it; the walk's fights stay. The speedrun's rules don't change: its clock runs through all of it as before.
+let endSkipped=false,skipEl:HTMLElement|null=null;
+function skippable(c:Ctx):'scene'|'line'|null{
+ if(endSkipped||ending==='black')return null;
+ if(ending||phase==='intro')return 'scene';
+ if(phase==='walk'&&(c.voices.talking()||c.t<captionFree||c.t<toastFree||c.t<grokUntil))return 'line';
+ return null;
+}
+function skipLabel(c:Ctx){
+ const what=skippable(c),text=what==='scene'?'SPACE — SKIP':what==='line'?'SPACE — SKIP LINE':'';
+ if(!skipEl){if(!text)return;skipEl=document.createElement('div');skipEl.id='skip';skipEl.setAttribute('aria-hidden','true');
+  skipEl.style.cssText='position:fixed;z-index:31;right:max(18px,env(safe-area-inset-right));bottom:18px;font:13px DoomSmall,monospace;letter-spacing:.08em;color:#c7b78e;text-shadow:2px 2px #000;pointer-events:none';document.body.append(skipEl);}
+ if(skipEl.textContent!==text)skipEl.textContent=text;skipEl.hidden=!text;
+}
+// cut whoever's talking; `drop` also clears the lines waiting their turn, `run` runs what the cut line was to do next
+function cut(c:Ctx,{drop=false,run=true}={}){
+ c.voices.stop();voiceFree=0;captionFree=toastFree=grokUntil=c.t;for(const id of ['caption','toast','grok'])$(id).hidden=true;
+ if(drop)says=[];const then=afters.splice(0);if(run)for(const a of then)a.f();
+}
+function skip(c:Ctx){
+ const what=skippable(c);if(!what)return;
+ if(what==='line'){cut(c);return;}
+ if(phase==='intro'&&!ending){cut(c,{drop:true,run:false});introSaid=true;go(c,'ships');return;}
+ // the end: black, and the way back
+ endSkipped=true;cut(c,{drop:true,run:false});c.hud.dialog(false);$('crt').hidden=true;$('hud').classList.add('cinema');c.hud.hint('');
+ if(document.pointerLockElement)document.exitPointerLock();
+ ending='black';const black=$('black');black.hidden=false;black.classList.add('title');c.sfx.hush(true);
+ if(FINALE){markDone();offerMeadow();}
+ if(END_MUSIC!=='off')void c.sfx.music(`../local/epilogue-${END_MUSIC}-music.ogg`,{vol:.6,fade:3});
 }
 function clearAll(c:Ctx){
  for(const r of c.recs)if(r.alive){r.alive=false;r.derez(c.sparks);}
@@ -739,6 +780,7 @@ async function startWaste(c:Ctx){
 }
 function jump(c:Ctx,to:Phase){
  if(c.mcp.dead)return;// R restarts after the end
+ runPractice('A test key skipped part of the endgame.');
  if(phase==='walk')walkEnd(c,true);
  clearAll(c);c.phase='fight';c.mcp.integrity=to==='trick'?SHIELD_DOWN_TO:1000;c.mcp.awake=true;c.mcp.reveal=1;
  go(c,to,true);
@@ -778,7 +820,7 @@ export const boss:Mode={
   pt+=dt;swingCd=Math.max(0,swingCd-dt);const mcp=c.mcp;
   if(ending===null)runTick(dt);
   if(shield){shield.t+=dt;const k=Math.min(1,shield.t/shield.dur);mcp.shieldY=shield.from+(shield.to-shield.from)*k*k*(3-2*k);if(k>=1){const then=shield.then;shield=null;then?.();}}
-  tickVoices(c);updateArrivals(c,dt);c.sfx.duck(c.voices.talking());c.dc.quiet(phase==='trick');
+  tickVoices(c);updateArrivals(c,dt);skipLabel(c);c.sfx.duck(c.voices.talking());c.dc.quiet(phase==='trick');
   switch(phase){
    case 'walk':walk(c,dt);updateShots(c,dt);break;
    case 'intro':
@@ -841,6 +883,7 @@ export const boss:Mode={
     c.shake(launchT<10?.2:.08);
     break;}
    case 'down':{
+    if(endSkipped)break;
     const root=mcp.root;
     if(pt<melt.rud){
      // the meltdown: the face glitches and un-downloads, cracks run up the column, the shield panels blow off
@@ -879,7 +922,7 @@ export const boss:Mode={
     break;}
    case 'waste':{
     // the wasteland: the line, the stare, black
-    if(!waste)break;waste.update(c.realDt);you?.update(dt,c.stage.camera.position,c.t,new THREE.Vector3());
+    if(!waste||endSkipped)break;waste.update(c.realDt);you?.update(dt,c.stage.camera.position,c.t,new THREE.Vector3());
     const k=clamp(pt/18,0,1),e=k*k*(3-2*k);c.cam!.pos.lerpVectors(CAM_FROM,CAM_TO,e);c.cam!.look.copy(CAM_LOOK);
     // the stare comes once the line is done (the takes are 10-12 s, deadpan), black 2.8 s later, the title 2 s after
     if(pt>2.6&&pt-dt<=2.6)guide(c,'value',7.8,{prio:2,ttl:20,then:()=>{stareAt=pt+.7;}});
@@ -916,7 +959,8 @@ export const boss:Mode={
  key(c,code){
   if(code==='KeyT')toggleTune();
   if(code==='Digit1')jump(c,'ships');if(code==='Digit2')jump(c,'shieldDown');if(code==='Digit3')jump(c,'trick');
-  if(code==='KeyN'&&phase==='walk'){walkEnd(c,true);return;}
+  if(code==='Space'){skip(c);return;}
+  if(code==='KeyN'&&phase==='walk'){runPractice('A test key skipped part of the endgame.');walkEnd(c,true);return;}
   if(code==='KeyN'){const next:Record<Phase,Phase>={walk:'intro',intro:'ships',ships:'shieldDown',shieldDown:'trick',trick:'trick',down:'down',waste:'waste'};if(phase!=='trick'&&phase!=='down')jump(c,next[phase]);}
  },
  highlight:()=>phase==='trick'?windowBearing:null,
@@ -924,7 +968,7 @@ export const boss:Mode={
  hand:(c)=>phase==='trick'&&!trick&&c.held?1:null,
  state:(c)=>{
   const eye=c.player.eyePos(),mine=shots.filter(s=>s.alive&&s.enemy&&s.target.kind==='player').sort((a,b)=>a.pos.distanceTo(eye)-b.pos.distanceTo(eye))[0];
-  return {phase,pt:+pt.toFixed(2),ending,walk:FINALE?{on:WALK.on,beat,door:WALK.door,live:walkRecs.filter(w=>w.rec.alive).length,trucks:trucks.map(t=>t.info()),trucksWrecked,skyGlitch:sky?.played??0,skyOn:!!sky?.on,heard:[...said].filter(k=>k.startsWith('walk-')),near:+c.sfx.nearness.toFixed(2)}:null,fleet,wave,shipsDown,ships:SHIPS,crowdReturns,spots:spots.length,spotsAt:spots.map(s=>s.world().toArray().map(v=>+v.toFixed(2))),shots:shots.length,hot:shots.some(s=>s.hot),
+  return {phase,pt:+pt.toFixed(2),ending,skip:skippable(c),endSkipped,practice:RUN?.practice??null,walk:FINALE?{on:WALK.on,beat,door:WALK.door,live:walkRecs.filter(w=>w.rec.alive).length,trucks:trucks.map(t=>t.info()),trucksWrecked,skyGlitch:sky?.played??0,skyOn:!!sky?.on,heard:[...said].filter(k=>k.startsWith('walk-')),near:+c.sfx.nearness.toFixed(2)}:null,fleet,wave,shipsDown,ships:SHIPS,crowdReturns,spots:spots.length,spotsAt:spots.map(s=>s.world().toArray().map(v=>+v.toFixed(2))),shots:shots.length,hot:shots.some(s=>s.hot),
    incoming:mine&&mine.pos.distanceTo(eye)<8?mine.pos.toArray().map(v=>+v.toFixed(2)):null,
    attacks:attacks.map(a=>a.kind),started:Object.fromEntries(started),warnings,doges:attacks.filter((a):a is Doges=>a instanceof Doges).reduce((n,a)=>n+a.running,0),
    attempts,best,timeScale:+c.timeScale.toFixed(2),launchT:+launchT.toFixed(1),delays,pathKey,solves,

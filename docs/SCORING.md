@@ -26,11 +26,15 @@ time is the only thing to rank.
 - **Restarts cost time:** someone you freed going down restarts the level (levels 1-2, `Checkpoint.zs
   LoseAll`); MEG3N or SMITH catching you does too (levels 3-4); and so does RESTART LEVEL or F5. None of them stop
   or rewind the clock. A Load Game resumes the same run at the same time.
+- **Skipping (2026-11-09):** the films, the prologue, the guide's walks, a freed prisoner's card, the endgame's
+  opening and its end can all be skipped, and the levels no longer end on a text screen. Skipping changes nothing in
+  the rules: the films, cards and menus never counted, and the endgame's clock runs as before.
 - **Any order:** after the first level, the other three can be played in any order. The route is part of the run.
 - **One run per campaign:** New Game, or a level picked from the episode menu, starts a new campaign and a new run.
   An older save, made before this change, has no run. Its time can't be ranked; start a New Game.
 - **Practice:** cheats (god, noclip and the rest), QA shortcuts (`pdoom_agentic_site`, `pdoom_factory_site`,
-  `?puzzle=`), development endings (`?dev=end`) and the SAFE MODE fixture (`?safemode=1`) make the run practice. It
+  `?puzzle=`), development endings (`?dev=end`), the SAFE MODE fixture (`?safemode=1`) and the endgame's test
+  shortcuts (keys 1, 2, 3 and N, `?part=`, `?autosteer`, a tuned trick shot; since 2026-11-09) make the run practice. It
   keeps timing and shows `PRACTICE` but can't be submitted. Each level reports this as `assisted`, separately
   from a SAFE MODE walk-in, which is a normal part of a run.
 

@@ -68,6 +68,19 @@ await run('natural-wrench-camera',{viewport:{width:1280,height:800}},async(p,d)=
  await face(p,Math.atan2(cam.y-aimed.y,cam.x-aimed.x)*180/Math.PI);await press(p,'Control');
  d.hit=await waitWorld(p,w=>w.camera_broken===1&&w.impacts>=1,'Native melee breaks camera',4000);await shot(p,'camera-broken');assert.equal(d.hit.wrench,1);assert.equal(d.hit.flight,0);const reports=d.hit.cameras[0].reports;await p.waitForTimeout(700);assert.equal((await world(p)).cameras[0].reports,reports,'Broken camera stops reporting');assert.equal(d.hit.released,0);
 });
+// 2026-11-09: a freed prisoner's card (story-beats.js) closes on SPACE, ENTER or E instead of holding the game 3.5 s.
+// The card pauses the engine, so the release shows in the world state only once the card is gone: wait on the card.
+await run('discovery-card-skips',{viewport:{width:1280,height:800}},async(p,d)=>{
+ await warp(p,1936,944,d,270);await press(p,'Space');
+ await p.waitForFunction(()=>document.getElementById('discovery-card')?.hidden===false,{},{timeout:5000});
+ const card=await p.locator('#discovery-card').innerText();assert.match(card,/LIRON SHAPIRA/);assert.match(card,/SPACE — SKIP/);
+ assert.equal((await read(p)).uiBlocked,true,'The card holds the game');await shot(p,'discovery-card');
+ const at=Date.now();await p.keyboard.press('Space');
+ await p.waitForFunction(()=>document.getElementById('discovery-card').hidden,{},{timeout:1000});
+ d.resumed=await running(p,'The game runs again at once');d.skippedMs=Date.now()-at;
+ assert.ok(d.skippedMs<2500,`Back in the game ${d.skippedMs} ms after the press, before the card's 3.5 s`);
+ assert.equal((await waitWorld(p,w=>w.released===1,'Inside release')).released,1);
+});
 // 2026-10-10: Liron's padlock is unbreakable (bearings and Space do nothing); the crawlspace's inside release is his only route.
 await run('padlock-unbreakable',{viewport:{width:1280,height:800}},async(p,d)=>{
  await warp(p,1040,848,d,90); // Refuge already known for legacy follow/order checks.
@@ -120,4 +133,4 @@ for(const[name,viewport]of[['touch-portrait',{width:390,height:844}],['touch-lan
  await warp(p,1040,848,d,90);await warp(p,832,1528,d,90);await touch('Space');await waitWorld(p,w=>w.gun===1,'Touch gun pickup');await warp(p,1930,1160,d,270);await touch('ControlLeft');await waitWorld(p,w=>w.ammo===2,'Touch Sling shot');assert.equal((await world(p)).released,0,'Padlock ignores the shot');await warp(p,1936,944,d,270);await touch('Space');await waitWorld(p,w=>w.released===1,'Touch Use inside release');await warp(p,1930,1160,d,270);await waitWorld(p,w=>w.completed===1,'Touch rescue',15000);await lookAtPerson(p);
  assert.equal(await p.locator('[data-code="KeyQ"]').isVisible(),false);assert.equal((await world(p)).hold,0);await touch('KeyT');assert.equal((await world(p)).tool,0);assert.equal(await p.locator('#attack-button').textContent(),'Swing');await touch('KeyT');assert.equal((await world(p)).tool,1);assert.equal(await p.locator('#attack-button').textContent(),'Sling');await shot(p,name+'-tools');
 });
-}finally{report.passed=report.cases.length===(selected?.length??8)&&report.cases.every(c=>c.passed);await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await Promise.race([browser.close().catch(()=>{}),new Promise(resolve=>setTimeout(resolve,5000))]);console.log(JSON.stringify({passed:report.passed,cases:report.cases.map(({name,passed,failure})=>({name,passed,failure}))}));process.exit(report.passed?0:1);}
+}finally{report.passed=report.cases.length===(selected?.length??9)&&report.cases.every(c=>c.passed);await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await Promise.race([browser.close().catch(()=>{}),new Promise(resolve=>setTimeout(resolve,5000))]);console.log(JSON.stringify({passed:report.passed,cases:report.cases.map(({name,passed,failure})=>({name,passed,failure}))}));process.exit(report.passed?0:1);}

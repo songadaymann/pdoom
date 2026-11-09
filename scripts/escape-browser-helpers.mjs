@@ -39,13 +39,10 @@ async function toMeadow(p,d){
  await p.waitForFunction(()=>JSON.parse(window.render_game_to_text()).outside!==null,{},{timeout:25000});d.reveal=await read(p);assert.equal(d.reveal.escape.outside,1);await shot(p,'meadow-reveal');
  // Every living rescued person settles in camp, including a body you escaped in (the hub view is the CEO's).
  await p.waitForFunction(()=>{const s=JSON.parse(window.render_game_to_text());return s.mode==='escaped'&&s.outside.settled===s.world.people.filter(h=>h.alive).length;},{},{timeout:45000});
- // Bliss stays uninterrupted. Scores remain available on explicit request.
- if(await p.locator('#score-dialog').count()){
-  await p.waitForFunction(()=>JSON.parse(window.render_game_to_text()).scoreView?.available,{},{timeout:5000});
-  d.scoreReady=await read(p);assert.equal(d.scoreReady.scoreView.open,false);assert.equal(d.scoreReady.uiBlocked,false);
-  assert.equal(await p.locator('#show-score').isVisible(),true);assert.equal(await p.locator('#show-score').evaluate(b=>b.classList.contains('score-unread')),true);
-  await shot(p,'uninterrupted-bliss');
- }
+ // Bliss stays uninterrupted: since 2026-11-07 a level has no results card (the speedrun's one card comes at the
+ // end of the game).
+ d.scoreReady=await read(p);assert.equal(d.scoreReady.scoreView?.open??false,false);assert.equal(d.scoreReady.uiBlocked,false);
+ await shot(p,'uninterrupted-bliss');
  d.won=await read(p);assert.equal(d.won.escape.saved,d.won.world.alive);await shot(p,'meadow-gathered');
 }
 

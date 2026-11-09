@@ -4,11 +4,12 @@
 //  1. Enter: the front door (exit room), wrench in hand, the factory's own HUD.
 //  2. Locked in (2026-10-30, Jonathan: no retreat): with Zvi and Victoria at the exit and Paul freed
 //     elsewhere the switch shows no prompt and refuses ("2 still inside, 1 not with you"), MEG3N's
-//     "you can't leave" at most once; bring out all five: the exit text types; FREED 15/20.
-//  3. An empty revisit: straight back out, no text.
+//     "you can't leave" at most once; bring out all five: straight into the meadow (no exit text
+//     since 2026-11-09); FREED 15/20.
+//  3. An empty revisit: straight back out.
 //  4. CONTROL.EXE still loads level 1 with its own HUD.
 //  5. A save from before the lock-in (Zvi and Victoria camped, Paul following): Paul waits in the
-//     break room, the switch refuses until the other three are out, then the exit text.
+//     break room, the switch refuses until the other three are out, then out into the meadow.
 // node scripts/factory-hub-smoke.mjs
 import {chromium} from '@playwright/test';
 import {nativeQA} from './native-qa-helpers.mjs';
@@ -61,7 +62,8 @@ async function refused(message,label){
  return s;
 }
 const scriptErrors=logs=>logs.filter(l=>/Script error|VM execution aborted|Execution could not continue|Unknown texture/.test(l));
-const meadow=label=>wait(s=>s.outside?.active&&s.outside.currentLevel==='meg3n-factory'&&s.melt.phase==='idle'&&!s.exitText.visible,label,30000);
+const meadow=label=>wait(s=>s.outside?.active&&s.outside.currentLevel==='meg3n-factory'&&s.melt.phase==='idle'&&!s.outside.paused,label,30000);
+const noText=async()=>assert.equal(await page.evaluate(()=>!!document.getElementById('exit-text')),false,'No exit text screen');
 try{
  await open({});
  await wait(s=>s.outside?.active&&s.outside.saved_visual===10,'SAFE MODE with levels 1-2 cleared',90000);
@@ -86,24 +88,20 @@ try{
  await free(2);await free(4);await free(3);
  s=await leave('SPACE - leave the factory');
  assert.ok(s.events.some(e=>e.type==='factory-exit'&&e.saved===31&&e.hub===1),'All five come out');
- const typing=await wait(s=>s.exitText.phase==='typing'&&s.exitText.visible&&s.melt.phase==='idle','Finishing the factory types the exit text',20000);
- assert.match(typing.exitText.text,/inspiring/,"Sam's line closes it");await shot('2-exit-text');
- await page.keyboard.press('Space',{delay:80});await wait(s=>s.exitText.chars===s.exitText.total,'Space finishes the text',3000);
- await page.keyboard.press('Space',{delay:80});
- s=await meadow('Into the meadow after the text');
+ s=await meadow('Straight into the meadow');await noText();
  s=await wait(s=>s.outside.people.filter(p=>p.id>=10&&p.arrived).length===5,'All five at camp outside MEG3N.AVI',20000);
  assert.equal(s.outside.future.meg3n.strip,'saved,saved,saved,saved,saved');assert.equal(s.outside.future.meg3n.readme,'beaten');
  let saved=await save();assert.equal(saved.saved2,31);assert.equal(saved.following2,0);assert.equal(s.campaign.saved,15);
  h=await hud();assert.ok(h.checkpoint&&!h.factory,'The meadow is back on the campaign HUD');
  assert.equal(await page.evaluate(()=>document.getElementById('held-wrench').hidden),true,'The wrench is put away in the meadow');
- await shot('2-finished');record('With all five at the exit the switch reads leave: exit text, FREED 15/20');
+ await shot('2-finished');record('With all five at the exit the switch reads leave: straight into the meadow, FREED 15/20');
  // 3. Nobody left: straight back out.
  s=await enterFactory('An empty revisit');
  assert.ok(s.world.people.every(p=>p.camped===1),'Everyone is at camp');
  assert.notEqual(s.factory.guardian_mode,5,'MEG3N does not guard an empty factory');
  s=await leave('SPACE - leave the factory');assert.ok(s.events.some(e=>e.type==='factory-exit'&&e.saved===0));
- s=await meadow('Back out again');assert.equal(s.exitText.phase,'idle');assert.equal((await save()).saved2,31);
- record('An empty revisit: the exit switch lets you straight back out, no text, nothing re-locked');
+ s=await meadow('Back out again');await noText();assert.equal((await save()).saved2,31);
+ record('An empty revisit: the exit switch lets you straight back out, nothing re-locked');
  // 4. Level 1 still loads from here, with its own HUD.
  await page.evaluate(()=>window.__DOOM_DEBUG__.outside.debug.setView(17,-3,0,0));
  await wait(s=>s.outside.nearestDoor==='five-prisons','At CONTROL.EXE',5000);
@@ -124,9 +122,9 @@ try{
  await free(2);await free(3);await free(4);
  s=await leave('SPACE - leave the factory');
  assert.ok(s.events.some(e=>e.type==='factory-exit'&&e.saved===28),'Max, Paul and Ajeya come out');
- await wait(s=>s.exitText.phase==='typing'&&s.exitText.visible&&s.melt.phase==='idle','Finishing the factory types the exit text',20000);
+ await meadow('Out into the meadow');await noText();
  saved=await save();assert.equal(saved.saved2,31);assert.equal(saved.following2,0);
- await shot('5-finished');record('An older partial save: Paul waits in the break room, the switch refuses until the other three are out, then the exit text');
+ await shot('5-finished');record('An older partial save: Paul waits in the break room, the switch refuses until the other three are out, then out into the meadow');
  assert.deepEqual(report.errors,[]);
  const logs=await page.evaluate(()=>window.__DOOM_DEBUG__.logs);
  assert.deepEqual(scriptErrors(logs),[]);

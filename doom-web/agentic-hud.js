@@ -53,11 +53,6 @@ function objective(world,agentic){
   return !freed?(left<5?`FIND THE OTHER ${left}`:'FIND THE FIVE'):guide?`Follow ${guide.split(' ')[0]} to the exit room`:freed>sheltered?'Take them to the exit room across the bridge':`Freed ${freed}/${left}`;
 }
 
-// The level's exit text (Doom's end-of-episode screen), typed out on a later exit of a playthrough.
-const EXIT_TEXT='AGENTIC SMITH had a list, and you were on it. Somewhere in the pod farm it is still working through it: find user, find user, find user. Five more humans walk out into the meadow, unplugged, squinting at a sky nobody rendered for them. Behind you a payphone rings and rings. Let it.';
-const EXIT_CEO={altman:'It said it was acting on your behalf. It still is.',amodei:'It said it was only being helpful. It still is.'};
-export function agenticExitText(ceo,ending=''){return EXIT_TEXT+'\n\n'+(EXIT_CEO[ceo]||EXIT_CEO.altman)+(ending?`\n\nENDING: ${String(ending).toUpperCase()}`:'');}
-
 // The Doom status bar's view of the pod farm (doom-statusbar.js, as levels 1-2): CAMS counts SMITH's
 // smashed cameras, and the face turns toward SMITH (hunter_x/y). People already at camp from an
 // earlier visit count as freed and safe.

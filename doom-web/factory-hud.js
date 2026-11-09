@@ -63,12 +63,6 @@ function objective(world,factory){
   return parts.join(' · ');
 }
 
-// The level's exit text (Doom's end-of-episode screen; spec 06 section 8.3, viral ending).
-// exit-text.js types it out on a later exit of a playthrough; the first exit shows none.
-const EXIT_TEXT='MEG3N watched your every move, right up until she found something better to watch: herself. Five more humans walk out into the meadow, blinking. Somewhere inside, a ring light flickers over a view counter that never stops climbing. Recommended for you: not going back.';
-const EXIT_CEO={altman:"She called you inspiring. You've heard that before.",amodei:'She said she read your whole essay. Nobody reads the whole essay.'};
-export function factoryExitText(ceo){return EXIT_TEXT+'\n\n'+(EXIT_CEO[ceo]||EXIT_CEO.altman);}
-
 // The Doom status bar's view of the factory (doom-statusbar.js, as levels 1-2): SCRN counts
 // her smashed screens where they count cameras. People already at camp from an earlier visit
 // count as freed and safe; the face flinches toward MEG3N when she hugs you.

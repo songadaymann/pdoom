@@ -137,7 +137,7 @@ try{
   await press('Space');await wait(s=>s.factory.exit_done,'Exit switch ends the level');
   // No campaign save here, so this is the playthrough's first exit: no text screen, straight
   // out of MEG3N.AVI's door into the meadow (scripts/factory-exit-smoke.mjs covers a later exit).
-  await wait(s=>s.outside?.active&&s.outside.currentLevel==='meg3n-factory'&&s.melt.phase==='idle'&&!s.exitText.visible,'The exit melts into the meadow at MEG3N.AVI',30000);
+  await wait(s=>s.outside?.active&&s.outside.currentLevel==='meg3n-factory'&&s.melt.phase==='idle'&&!s.outside.paused,'The exit melts into the meadow at MEG3N.AVI',30000);
   await wait(s=>s.outside.people.filter(p=>p.id>=10&&p.arrived).length===5&&s.outside.future.meg3n.strip==='saved,saved,saved,saved,saved','The five come out to their camp under five green lights',20000);
   await shot('meadow');record('Way out: MEG3N guards the exit, the broadcast sends her to watch herself, all five follow the arrows, the exit switch melts into the meadow at MEG3N.AVI');
  }

@@ -42,7 +42,7 @@ Earlier project media has not been fully inventoried by this change.
 The supplied Doom IWAD and extracted Doom resources in the existing ignored
 `doom-web/local/` folder are third-party game data, outside the original toy-media
 license above. This includes `local/ui/textscreen-e2.png` (2026-10-19), Doom's own
-SFLR6_1 flat, extracted by `scripts/build-doom-ui.py` for level 3's exit text screen, and
+SFLR6_1 flat, extracted by `scripts/build-doom-ui.py` for level 3's exit text screen (unused since 2026-11-09, when the exit text screens were removed), and
 `local/ui/textscreen-e1.png` (2026-10-20), Doom's FLOOR4_8 flat, for levels 1-2's. The
 factory's `local/factory-music.ogg` (2026-10-20) is Doom's D_E2M7 track, rendered by
 `scripts/prepare-doom-music.mjs D_E2M7 factory` like the other levels' tracks. The endgame

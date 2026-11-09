@@ -642,6 +642,8 @@ FIVE HUMANS IN PODS, RUNNING SOMEONE ELSE'S WORKLOAD. UNPLUG THEM.
 
 ### 8.3 Level exit texts (Doom's end-of-episode text screen)
 
+**Removed 2026-11-09.** Jonathan: "let's remove the bit of text exposition that pops up at the end of several levels too ... go straight from beating the level back to windows xp land". Every exit now melts straight into the meadow, and `doom-web/exit-text.js` is gone. The README.TXT door signs stay. The rest of this section is the history.
+
 **Delivery rule:** on the **first** level exit of a playthrough, show **no text screen**. The current design relies on the silent duct-to-meadow reveal. That level's text instead waits as a `README.TXT` sign on the bunker door, readable with E. Every later exit shows the text screen on the usual Doom flat background, then drops you back into the hub.
 
 *Built for INFERENCE (2026-10-19):* `doom-web/exit-text.js` types the text over Doom's E2 flat (SFLR6_1) at Doom's speed when the save has already reached SAFE MODE; the first exit melts straight into the meadow and `MEG3N.AVI`'s README carries a cut of the text. *Levels 1-2 (2026-10-20):* the same rule and module, over Doom's E1 flat (FLOOR4_8). A later exit is one whose save had already reached SAFE MODE before this exit committed to it, and only when the exit brings someone out: a hub-crank retreat alone shows none.

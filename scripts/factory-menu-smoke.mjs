@@ -90,7 +90,7 @@ try{
   const logs=await t.page.evaluate(()=>window.__DOOM_DEBUG__.logs);
   assert.ok(logs.some(l=>l.includes('PDOOM_CAMPAIGN {"saved2":31,"lost2":0,"following2":0}')),'PDOOM_CAMPAIGN from the factory');
   s=await t.wait(s=>s.outside?.active&&s.outside.currentLevel==='meg3n-factory'&&s.melt.phase==='idle','Out of MEG3N.AVI into the meadow',30000);
-  assert.equal(s.exitText.phase,'idle','The first exit of a playthrough shows no text screen');
+  assert.equal(await t.page.evaluate(()=>!!document.getElementById('exit-text')),false,'No exit text screen');
   assert.ok(Math.hypot(s.outside.x-MEG3N_DOOR.x,s.outside.z-MEG3N_DOOR.z)<4,`At MEG3N.AVI's door (${s.outside.x},${s.outside.z})`);
   const save=await t.saved();
   assert.equal(save.hub,true,'The save reached SAFE MODE');assert.equal(save.saved2,31);assert.equal(save.ceo,'altman');

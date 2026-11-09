@@ -536,7 +536,7 @@ The common beats are 01's reveal cinematic ([01 §5.3](spec/01-five-prisons-poli
 5. `15 PEOPLE STILL OUT THERE.`
 6. About 10 s in, "Safe mode" fades into the four screen corners: the hub's only label.
 
-The level's exit text waits on the door as `README.TXT`, so the reveal stays silent.
+The level's exit text waits on the door as `README.TXT`, so the reveal stays silent. Since 2026-11-09 no exit shows a text screen (Jonathan: "go straight from beating the level back to windows xp land"); the README.TXT signs stay.
 
 | Starting from | What you see | The beat |
 | --- | --- | --- |

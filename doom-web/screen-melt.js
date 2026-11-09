@@ -10,7 +10,7 @@ export function createScreenMelt({stage,source,audio}){
  const ctx=veil.getContext('2d');
  let frame=null,y=null,raf=0,tics=0,startedAt=0,phase='idle',plays=0;
 
- // What to freeze: the Doom view and status bar, or another full-window screen (exit-text.js).
+ // What to freeze: the Doom view and status bar, or another full-window screen.
  function capture(elements=[source,document.querySelector('#hud canvas.statusbar')]){
   cancel();
   const scale=Math.min(window.devicePixelRatio||1,2),w=Math.max(1,Math.round(innerWidth*scale)),h=Math.max(1,Math.round(innerHeight*scale));
