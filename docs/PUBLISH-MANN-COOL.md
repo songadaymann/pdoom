@@ -38,6 +38,18 @@ normal progression and Load Game. The fixture is available only on loopback with
 
 Local verification reports are ignored under `output/playtest/canonical/` and `output/playtest/canonical-shell/`.
 
+## Solana wallet sign-in released 2026-11-09
+
+- Central Worker `mann-cool` version `b40d0de1-bbec-4e65-a49d-7cc0a13e0806` from `redesign/platform-v1` (`f14708c`, the merge of PR #12, whose tree equals `claude/player-solana-signin` `34d4de7`). The rollback point is `83546af7-d2f9-490a-9915-0a84d726b6da`.
+  - Save your scores lists Solana wallets: the Wallet Standard (Phantom, Solflare, Backpack and others), else `window.phantom.solana`, `window.solflare` or `window.solana`. They appear beside the Ethereum ones, labelled by network.
+  - `/api/v1/player/solana/start` writes a Sign In With Solana message; `/api/v1/player/solana/verify` checks the Ed25519 signature with Web Crypto and links `sol:<address>`.
+  - The shell is `?v=20261109-solana-signin1`. No migration and no game deploy were needed: the card already says "email or a wallet".
+- Before deploy (local): mann-cool tests 32/32, `catalog:validate`, a `wrangler deploy --dry-run` bundle (gzip 156 KiB), and browser checks with a test Wallet Standard wallet and a legacy Phantom object (a cancel, then a sign-in that linked).
+- Live checks:
+  - `solana/start` refuses a bad address (400) and another site (403); `solana/verify` refuses a missing signature (400). The old shell URL redirects to the new one.
+  - On the live page a test Solana wallet's button appeared ("Sign in with QA Solana (Solana)"). The live server wrote the message ("mann.cool wants you to sign in with your Solana account"). The test wallet refused to sign, so nothing was linked; one unused challenge row was written.
+  - The canonical host smoke passed. The canonical shell smoke passed on desktop, phone and tablet with its fullscreen step skipped: this machine's Chrome still refused fullscreen on a blank page (`not granted`).
+
 ## Wallet sign-in (Ethereum) released 2026-11-09
 
 - Production D1: migration `0012_player_wallets.sql` (`player_wallets`, `player_wallet_challenges`) applied with `wrangler d1 migrations apply mann-cool-platform --remote`. It was the only pending migration.

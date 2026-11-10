@@ -93,7 +93,7 @@ player once, with their best approved time. The results card sends the browser's
 Jonathan: "if they want to have their run count for the contest, they have to sign in, but if they just want to put
 their run there, they don't have to". The card says whether you're signed in. Its Sign in button opens the shell's
 email panel, and the card comes back once you're in. A signed-in player's row has a ✓, and signing in later counts the
-runs that browser already posted. Since 2026-11-09 a crypto wallet works too: the shell's panel lists the browser's wallets,
+runs that browser already posted. Since 2026-11-09 a crypto wallet works too, Solana or Ethereum: the shell's panel lists the browser's wallets,
 and signing a one-time Sign-In with Ethereum message (free, no transaction) links the address like an email. The top-ten hold counts players, not runs. The moderation list shows each run's
 player, the email hint and how many other players posted from the same IP.
 
